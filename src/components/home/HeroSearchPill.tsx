@@ -12,6 +12,7 @@
  * publicadas y destacadas en Home); sin resultado, el selector muestra su
  * estado vacío honesto. Nunca un fixture en ejecución pública.
  */
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, MapPin, Compass, ChevronDown } from "lucide-react";
@@ -20,11 +21,13 @@ import { usePublishedDestinations } from "@/lib/destinations/destination-labels"
 import { useHomeFeaturedCategories } from "@/lib/cms/home-featured-categories-query";
 import { cn } from "@/lib/utils";
 
-interface Option {
+export interface HeroSearchOption {
   slug: string;
   name: string;
   hint?: string;
 }
+
+type Option = HeroSearchOption;
 
 export interface HeroSearchPillProps {
   destinoLabel?: string;
@@ -34,6 +37,19 @@ export interface HeroSearchPillProps {
   submitLabel?: string;
   align?: "left" | "center" | "right";
   maxWidth?: "sm" | "md" | "lg" | "xl" | "full";
+  /**
+   * Opciones explícitas de la superficie consumidora. Sin override, el
+   * buscador sigue leyendo destinos y categorías publicados en el CMS.
+   */
+  destinoOptionsOverride?: readonly Option[];
+  categoriaOptionsOverride?: readonly Option[];
+  /** Notifica la selección para superficies que filtran en la misma página. */
+  onDestinoChange?: (option: Option | null) => void;
+  onCategoriaChange?: (option: Option | null) => void;
+  /** Segmentos adicionales dentro de la misma píldora (ej. fecha, viajeros). */
+  extraSegments?: ReactNode;
+  /** Sustituye la navegación canónica cuando la búsqueda ocurre en la página. */
+  onSubmitSearch?: (selection: { destino: Option | null; categoria: Option | null }) => void;
 }
 
 export function HeroSearchPill({
@@ -44,22 +60,32 @@ export function HeroSearchPill({
   submitLabel = "Buscar",
   align = "left",
   maxWidth = "xl",
+  destinoOptionsOverride,
+  categoriaOptionsOverride,
+  onDestinoChange,
+  onCategoriaChange,
+  extraSegments,
+  onSubmitSearch,
 }: HeroSearchPillProps) {
   const navigate = useNavigate();
   // Lote 3B — Los destinos del buscador provienen del CMS publicado.
   const { data: publishedDestinations } = usePublishedDestinations();
-  const destinoOptions: Option[] = (publishedDestinations ?? []).map((d) => ({
-    slug: d.slug,
-    name: d.name,
-    ...(d.tagline ? { hint: d.tagline } : {}),
-  }));
+  const destinoOptions: Option[] =
+    destinoOptionsOverride?.slice() ??
+    (publishedDestinations ?? []).map((d) => ({
+      slug: d.slug,
+      name: d.name,
+      ...(d.tagline ? { hint: d.tagline } : {}),
+    }));
   // Lote 3E — Las categorías del buscador provienen del CMS publicado.
   const { data: publishedCategories } = useHomeFeaturedCategories();
-  const categoriaOptions: Option[] = (publishedCategories ?? []).map((c) => ({
-    slug: c.slug,
-    name: c.name,
-    ...(c.description ? { hint: c.description } : {}),
-  }));
+  const categoriaOptions: Option[] =
+    categoriaOptionsOverride?.slice() ??
+    (publishedCategories ?? []).map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      ...(c.description ? { hint: c.description } : {}),
+    }));
   const [destino, setDestino] = useState<Option | null>(null);
   const [categoria, setCategoria] = useState<Option | null>(null);
   const [openDestino, setOpenDestino] = useState(false);
@@ -80,6 +106,12 @@ export function HeroSearchPill({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    /* Superficies que filtran en la misma página resuelven su propia
+       búsqueda; el resto conserva la navegación canónica del Blueprint. */
+    if (onSubmitSearch) {
+      onSubmitSearch({ destino, categoria });
+      return;
+    }
     if (destino && categoria) {
       navigate({
         to: "/oriente-maya/$destino/$categoria",
@@ -98,6 +130,8 @@ export function HeroSearchPill({
     navigate({ to: "/oriente-maya" });
   };
 
+  const hasExtras = Boolean(extraSegments);
+
   return (
     <form
       role="search"
@@ -107,7 +141,12 @@ export function HeroSearchPill({
     >
       <div
         className={cn(
-          "grid w-full min-w-0 grid-cols-[minmax(0,1fr)_2.75rem_2.75rem] items-center gap-1 rounded-full bg-white p-1 shadow-[0_8px_28px_-10px_rgba(0,0,0,0.32)] ring-1 ring-black/5 backdrop-blur-sm sm:flex sm:flex-row sm:gap-0",
+          "w-full min-w-0 items-center gap-1 rounded-3xl bg-white p-1 shadow-[0_8px_28px_-10px_rgba(0,0,0,0.32)] ring-1 ring-black/5 backdrop-blur-sm",
+          hasExtras
+            ? /* Con segmentos adicionales la píldora fluye en varias líneas
+                 y sólo se vuelve una sola fila cuando hay ancho real. */
+              "flex flex-wrap gap-1"
+            : "grid grid-cols-[minmax(0,1fr)_2.75rem_2.75rem] rounded-full sm:flex sm:flex-row sm:gap-0",
           maxWidthClass,
         )}
       >
@@ -119,6 +158,7 @@ export function HeroSearchPill({
               aria-label={`${destinoLabel}: ${destino?.name ?? destinoPlaceholder}`}
               className={cn(
                 "group relative flex min-h-12 min-w-0 items-center gap-2 rounded-full px-3 py-1 text-left transition-colors sm:flex-[1.12] sm:px-3 sm:py-1.5",
+                hasExtras && "!w-[calc(50%-0.5rem)] !flex-none",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openDestino && "bg-muted/70",
               )}
@@ -149,6 +189,7 @@ export function HeroSearchPill({
               selected={destino?.slug}
               onSelect={(opt) => {
                 setDestino(opt);
+                onDestinoChange?.(opt);
                 setOpenDestino(false);
                 if (!categoria) setTimeout(() => setOpenCategoria(true), 80);
               }}
@@ -168,12 +209,19 @@ export function HeroSearchPill({
               aria-label={`${categoriaLabel}: ${categoria?.name ?? categoriaPlaceholder}`}
               className={cn(
                 "group relative flex size-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-border/70 p-0 text-left transition-colors sm:flex sm:min-h-12 sm:min-w-0 sm:flex-1 sm:justify-start sm:gap-2 sm:border-0 sm:px-3 sm:py-1.5",
+                hasExtras &&
+                  "!size-auto min-h-12 !w-[calc(50%-0.5rem)] !flex-none min-w-0 justify-start gap-2 border-0 px-3 py-1.5",
                 "hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 openCategoria && "bg-muted/70",
               )}
             >
               <Compass className="size-4 shrink-0 text-primary" aria-hidden />
-              <span className="hidden min-w-0 flex-col leading-tight sm:flex">
+              <span
+                className={cn(
+                  "hidden min-w-0 flex-col leading-tight sm:flex",
+                  hasExtras && "flex",
+                )}
+              >
                 <span className="text-[9px] font-semibold uppercase tracking-[0.13em] text-muted-foreground sm:text-[10px] sm:tracking-[0.14em]">
                   {categoriaLabel}
                 </span>
@@ -198,12 +246,18 @@ export function HeroSearchPill({
               selected={categoria?.slug}
               onSelect={(opt) => {
                 setCategoria(opt);
+                onCategoriaChange?.(opt);
                 setOpenCategoria(false);
               }}
               emptyLabel="Sin categorías disponibles"
             />
           </PopoverContent>
         </Popover>
+
+        {/* Segmentos adicionales de la superficie consumidora (misma píldora) */}
+        {extraSegments}
+
+
 
         {/* Botón lupa */}
         <button
@@ -212,11 +266,19 @@ export function HeroSearchPill({
           className={cn(
             "inline-flex size-11 min-h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-primary p-0 text-primary-foreground shadow-md",
             "sm:ml-1 sm:w-auto sm:px-3 sm:py-0",
+            hasExtras && "size-auto min-h-11 w-full basis-full px-4 py-2 sm:ml-0 sm:w-full",
             "transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
           )}
         >
           <Search className="size-4" aria-hidden />
-          <span className="sr-only text-sm font-semibold sm:not-sr-only">{submitLabel}</span>
+          <span
+            className={cn(
+              "sr-only text-sm font-semibold sm:not-sr-only",
+              hasExtras && "not-sr-only",
+            )}
+          >
+            {submitLabel}
+          </span>
         </button>
       </div>
     </form>

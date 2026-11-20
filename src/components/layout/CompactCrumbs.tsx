@@ -64,13 +64,22 @@ export function CompactCrumbs({
   const anchor = resolveCompactAnchorIndex(crumbs, anchorIndex);
   const current = crumbs[lastIndex];
   const anchorCrumb = anchor < lastIndex ? crumbs[anchor] : undefined;
+  // En fichas territoriales profundas mantenemos visible también el nivel
+  // inmediatamente posterior al destino (normalmente la categoría). Así la
+  // cadena móvil conserva Destino → Categoría → Ficha sin expandir el menú.
+  // En cadenas largas la categoría se pliega dentro del menú "…" para que el
+  // nombre de la ficha actual se lea completo en móvil.
+  const contextIndex = anchor + 1 < lastIndex && crumbs.length <= 4 ? anchor + 1 : -1;
+  const contextCrumb = contextIndex >= 0 ? crumbs[contextIndex] : undefined;
   // La casita ya cubre Home: no se repite dentro del menú.
-  const hidden = crumbs.filter((c, i) => i !== lastIndex && i !== anchor && c.to !== "/");
+  const hidden = crumbs.filter(
+    (c, i) => i !== lastIndex && i !== anchor && i !== contextIndex && c.to !== "/",
+  );
 
   if (!current) return null;
 
   return (
-    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-1.5 text-[13px] text-muted-foreground sm:hidden">
+    <ol className="flex h-11 min-w-0 flex-nowrap items-center gap-1 overflow-hidden text-xs font-medium text-muted-foreground sm:hidden">
       <li className="flex shrink-0 items-center">
         <Link
           to="/"
@@ -82,8 +91,8 @@ export function CompactCrumbs({
       </li>
 
       {hidden.length > 0 ? (
-        <li className="flex shrink-0 items-center gap-1.5">
-          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+        <li className="flex shrink-0 items-center gap-0.5">
+          <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
           <Popover>
             <PopoverTrigger
               aria-label="Mostrar niveles intermedios de la ruta"
@@ -117,30 +126,49 @@ export function CompactCrumbs({
       ) : null}
 
       {anchorCrumb ? (
-        <li className="flex shrink-0 items-center gap-1.5">
-          <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+        <li className="flex shrink-0 items-center gap-0.5">
+          <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
           {anchorCrumb.to ? (
             <Link
               to={anchorCrumb.to}
               params={anchorCrumb.params as never}
-              className="inline-flex min-h-11 max-w-[28vw] items-center truncate rounded-md px-1 hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex min-h-11 max-w-[24vw] items-center truncate rounded-md px-0.5 hover:bg-accent hover:text-accent-foreground"
             >
               {anchorCrumb.label}
             </Link>
           ) : (
-            <span className="inline-flex min-h-11 max-w-[28vw] items-center truncate px-1">
+            <span className="inline-flex min-h-11 max-w-[24vw] items-center truncate px-0.5">
               {anchorCrumb.label}
             </span>
           )}
         </li>
       ) : null}
 
-      <li className="flex min-w-0 items-center gap-1.5">
-        <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+      {contextCrumb ? (
+        <li className="flex shrink-0 items-center gap-0.5">
+          <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
+          {contextCrumb.to ? (
+            <Link
+              to={contextCrumb.to}
+              params={contextCrumb.params as never}
+              className="inline-flex min-h-11 max-w-[24vw] items-center truncate rounded-md px-0.5 hover:bg-accent hover:text-accent-foreground"
+            >
+              {contextCrumb.label}
+            </Link>
+          ) : (
+            <span className="inline-flex min-h-11 max-w-[24vw] items-center truncate px-0.5">
+              {contextCrumb.label}
+            </span>
+          )}
+        </li>
+      ) : null}
+
+      <li className="flex min-w-0 flex-1 items-center gap-0.5">
+        <ChevronRight className="size-3 shrink-0 opacity-50" aria-hidden />
         <span
           aria-current="page"
           title={current.label}
-          className="block max-w-[42vw] truncate font-medium text-foreground"
+          className="block min-w-0 flex-1 truncate font-semibold text-foreground"
         >
           {current.label}
         </span>

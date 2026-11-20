@@ -7,13 +7,22 @@
  */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Share2 } from "lucide-react";
 
 import {
   PremiumAluxBar,
-  PremiumEditorialHero,
   PremiumSectionHead,
 } from "@/components/home-premium/shared/PremiumShowcase";
-import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
+import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
+import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
+import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+
+import { Button } from "@/components/ui/button";
+import { ShareSheet } from "@/components/share/ShareSheet";
+
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
@@ -25,6 +34,7 @@ import {
   type EditorialRouteDetailDTO,
   type EditorialRouteStopDTO,
 } from "@/lib/routes-editorial/route-public-contract";
+import { RouteMapSection, routeMapStops } from "./RouteMapSection";
 
 const STOP_KIND_LABELS: Record<string, string> = {
   place: "Lugar",
@@ -49,6 +59,7 @@ function groupByDay(stops: readonly EditorialRouteStopDTO[]) {
 
 export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO }) {
   const [party, setParty] = useState<PartyComposition | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const chips = [
     routeDurationLabel(route),
     routePaceLabel(route.pace),
@@ -73,33 +84,54 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
     });
 
   const days = groupByDay(route.stops);
+  const mapStops = routeMapStops(route.stops);
+  const mapOrder = new Map(mapStops.map((stop, index) => [stop.id, index + 1]));
+
+  // Navegación interna: sólo se declaran las secciones realmente presentes.
+  const subnavAnchors = [
+    ...(mapStops.length ? [{ id: "ruta-mapa", label: "Mapa", iconKey: "map-pin" }] : []),
+    ...(route.stops.length ? [{ id: "ruta-itinerario", label: "Itinerario", iconKey: "info" }] : []),
+    ...(route.gallery.length ? [{ id: "ruta-galeria", label: "Galería", iconKey: "camera" }] : []),
+  ];
 
   return (
     <div className="space-y-8">
-      <PremiumEditorialHero
-        eyebrow="Ruta sugerida"
-        title={route.name}
-        subtitle={route.summary || "Itinerario editorial del Oriente Maya."}
-        media={route.coverUrl ? { url: route.coverUrl, alt: route.coverAlt ?? route.name } : null}
-        caption={
-          route.originDestinationLabel ? `Salida desde ${route.originDestinationLabel}` : undefined
-        }
+      <PremiumHero
+        layout="entity"
+        vm={{
+          presentation: DEFAULT_PREMIUM_PRESENTATION,
+          eyebrow: "Ruta sugerida",
+          title: route.name,
+          description: route.summary || "Itinerario editorial del Oriente Maya.",
+          media: route.coverUrl
+            ? { url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset }
+            : null,
+          badges: [
+            ...(route.originDestinationLabel
+              ? [{ label: `Salida desde ${route.originDestinationLabel}` }]
+              : []),
+            ...chips.map((chip) => ({ label: chip })),
+          ],
+        }}
       />
-
-      {chips.length ? (
-        <div className="flex flex-wrap gap-2">
-          {chips.map((chip) => (
-            <span
-              key={chip}
-              className="rounded-pill border border-border bg-card px-3 py-1 text-xs text-muted-foreground"
-            >
-              {chip}
-            </span>
-          ))}
-        </div>
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+        <FavoriteButton
+          entityKind="route"
+          entityId={route.id}
+          entityTitle={route.name}
+          entitySlug={route.slug}
+          {...(route.coverUrl ? { entityImageUrl: route.coverUrl } : {})}
+          className="min-h-11 w-full justify-center rounded-pill px-4 text-sm sm:w-auto"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShareOpen(true)}
+          className="min-h-11 w-full rounded-pill sm:w-auto"
+        >
+          <Share2 className="size-4" aria-hidden />
+          Compartir
+        </Button>
         <AddToTravelPlanButton
           kind="route"
           targetId={route.id}
@@ -108,11 +140,67 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
           subtitle={route.originDestinationLabel}
           imageUrl={route.coverUrl}
           variant="full"
+          className="col-span-2 min-h-11 w-full justify-center rounded-pill sm:w-auto"
         />
-        <span className="text-xs text-muted-foreground">
-          Guardamos una referencia privada a esta ruta; el itinerario editorial no se modifica.
-        </span>
       </div>
+
+
+      <ShareSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        title={route.name}
+        url={typeof window !== "undefined" ? window.location.href : `/rutas/${route.slug}`}
+        {...(route.summary ? { text: route.summary } : {})}
+        heading="Compartir esta ruta"
+      />
+
+      <PremiumAluxBar
+        question={`¿Quieres adaptar "${route.name}" a tus fechas?`}
+        selectedParty={party}
+        onSelectParty={(value) => {
+          setParty(value);
+          askAlux();
+        }}
+        onContinue={() => askAlux()}
+      />
+
+      {subnavAnchors.length > 1 ? (
+        <ExperienceSubnav
+          dto={{
+            variant: "pill",
+            sticky: true,
+            scrollOffset: 88,
+            ariaLabel: "Secciones de la ruta",
+            anchors: subnavAnchors,
+            capabilities: { scrollSpy: true, collapseOnMobile: true, showIcons: true },
+          }}
+        />
+      ) : null}
+
+      {route.body ? (
+        <ExperienceSection
+          dto={{
+            variant: "editorial",
+            eyebrow: null,
+            title: `Sobre ${route.name}`,
+            lead: null,
+            body: route.body,
+            media: null,
+            attribution: null,
+            ctas: [],
+            align: "left",
+            tone: "default",
+            ariaLabel: `Sobre ${route.name}`,
+            capabilities: { anchor: true, seoHeading: true, richText: false },
+          }}
+        />
+      ) : null}
+
+      <RouteMapSection
+        stops={mapStops}
+        durationDays={route.durationDays}
+        roadRoute={route.roadRoute}
+      />
 
       <section aria-labelledby="ruta-itinerario">
         <PremiumSectionHead
@@ -136,9 +224,20 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
                       key={stop.id}
                       className="rounded-2xl border border-border bg-card p-4 shadow-soft"
                     >
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-                        {STOP_KIND_LABELS[stop.entityKind] ?? "Parada"}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {mapOrder.get(stop.id) ? (
+                          <a
+                            href="#ruta-mapa"
+                            aria-label={`Ver ${stop.title} en el mapa`}
+                            className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
+                          >
+                            {mapOrder.get(stop.id)}
+                          </a>
+                        ) : null}
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+                          {STOP_KIND_LABELS[stop.entityKind] ?? "Parada"}
+                        </p>
+                      </div>
                       <div className="mt-1 flex flex-wrap items-baseline justify-between gap-2">
                         {stop.href ? (
                           <Link
@@ -173,32 +272,73 @@ export function RoutePremiumSurface({ route }: { route: EditorialRouteDetailDTO 
       {route.gallery.length ? (
         <section aria-labelledby="ruta-galeria">
           <PremiumSectionHead id="ruta-galeria" kicker="Galería" title="Así se ve la ruta" />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {route.gallery.map((media) => (
-              <figure
-                key={media.url}
-                className="relative h-48 overflow-hidden rounded-2xl border border-border"
-              >
-                <EditorialMediaFrame
-                  media={{ url: media.url, alt: media.alt ?? route.name }}
-                  label={route.name}
-                  className="absolute inset-0 size-full object-cover"
-                />
-              </figure>
-            ))}
-          </div>
+          {/* Mosaico oficial de la Biblioteca (mismo bloque que hoteles y
+              restaurantes). Sólo fotografías publicadas en el CMS. */}
+          <ExperienceGallery
+            dto={{
+              variant: route.gallery.length >= 3 ? "mosaic" : "grid",
+              items: route.gallery.map((media) => ({
+                kind: "image" as const,
+                url: media.url,
+                asset: media.asset,
+                alt: media.alt ?? route.name,
+              })),
+              maxVisible: 8,
+              aspect: "landscape",
+              heading: null,
+              subheading: null,
+              ariaLabel: `Galería de ${route.name}`,
+              capabilities: {
+                lightbox: true,
+                captions: true,
+                video: false,
+                panorama360: false,
+                model3d: false,
+                ar: false,
+                ugc: false,
+              },
+            }}
+          />
         </section>
       ) : null}
 
-      <PremiumAluxBar
-        question={`¿Quieres adaptar "${route.name}" a tus fechas?`}
-        selectedParty={party}
-        onSelectParty={(value) => {
-          setParty(value);
-          askAlux();
-        }}
-        onContinue={() => askAlux()}
-      />
+      <div className="grid gap-4 rounded-3xl border border-border bg-card p-5 shadow-soft sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="min-w-0">
+          <p className="font-display text-lg">¿Te llevas esta ruta?</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Súmala a Mi Viaje y tu concierge la adapta a tus fechas.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+          <FavoriteButton
+            entityKind="route"
+            entityId={route.id}
+            entityTitle={route.name}
+            entitySlug={route.slug}
+            {...(route.coverUrl ? { entityImageUrl: route.coverUrl } : {})}
+            className="min-h-11 w-full justify-center rounded-pill px-4 text-sm sm:w-auto"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShareOpen(true)}
+            className="min-h-11 w-full rounded-pill sm:w-auto"
+          >
+            <Share2 className="size-4" aria-hidden />
+            Compartir
+          </Button>
+          <AddToTravelPlanButton
+            kind="route"
+            targetId={route.id}
+            title={route.name}
+            slug={route.slug}
+            subtitle={route.originDestinationLabel}
+            imageUrl={route.coverUrl}
+            variant="full"
+            className="col-span-2 min-h-11 w-full justify-center rounded-pill sm:w-auto"
+          />
+        </div>
+      </div>
     </div>
   );
 }

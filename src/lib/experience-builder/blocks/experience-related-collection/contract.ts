@@ -31,6 +31,7 @@
  *    grupos dinámicos) sin consumir Alux/Context Engine todavía.
  */
 import { z } from "zod";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
 
 export const EXPERIENCE_RELATED_COLLECTION_CONTRACT_VERSION = "1.1.0";
 
@@ -126,6 +127,7 @@ export const experienceRelatedActionSchema = z.object({
 export type ExperienceRelatedAction = z.infer<typeof experienceRelatedActionSchema>;
 
 export const experienceRelatedItemSchema = z.object({
+  imageAsset: z.custom<MediaAssetInput>().optional(),
   id: z.string().min(1),
   kind: experienceRelatedEntityKindSchema,
   title: z.string().min(1),

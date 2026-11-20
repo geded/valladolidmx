@@ -7,6 +7,7 @@
  * dato real se omite.
  */
 import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.functions";
+import type { ProductReviewItem, ProductReviewStats } from "@/lib/catalog/marketplace-reads.functions";
 import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import {
   resolveExperienceCommerce,
@@ -20,6 +21,7 @@ import {
 import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 
 export interface ExperienceMediaVM {
+  readonly asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   readonly url: string;
   readonly alt: string;
 }
@@ -57,8 +59,13 @@ export interface ExperiencePremiumVM {
   readonly eyebrow: string;
   readonly tagline: string | null;
   readonly description: string;
+  /** Identificador de la empresa operadora (medición de visibilidad). */
+  readonly operatorId: string | null;
   readonly operatorName: string;
   readonly operatorHref: string | null;
+  /** Logotipo firmado de la empresa operadora; `null` si no está cargado. */
+  readonly operatorLogoUrl: string | null;
+  readonly operatorLogoAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   readonly destinationSlug: string | null;
   readonly destinationLabel: string | null;
   readonly cover: ExperienceMediaVM | null;
@@ -79,6 +86,8 @@ export interface ExperiencePremiumVM {
   readonly location: ExperienceLocationVM | null;
   /** Valoración sólo cuando existen reseñas reales publicadas. */
   readonly rating: { readonly value: number; readonly count: number } | null;
+  readonly reviews: readonly ProductReviewItem[];
+  readonly reviewStats: ProductReviewStats;
   readonly related: readonly ExperienceRelatedVM[];
   readonly commerce: ExperienceCommerceDecision;
   /** Aviso visible sólo en superficies de revisión interna. */
@@ -94,12 +103,12 @@ export function buildExperienceVMFromProduct(
   curatedRelated?: ProductRelatedDTO | null,
 ): ExperiencePremiumVM {
   const cover = product.cover_url
-    ? { url: product.cover_url, alt: `${product.name} — ${product.business.display_name}` }
+    ? { url: product.cover_url, alt: `${product.name} — ${product.business.display_name}`, asset: product.cover_asset }
     : null;
   const gallery = product.media
     .filter((item) => Boolean(item.url))
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map((item) => ({ url: item.url as string, alt: item.alt ?? product.name }));
+    .map((item) => ({ url: item.url as string, alt: item.alt ?? product.name, asset: item.asset }));
 
   const destinationSlug = product.business.destination_slug || null;
   const categorySlug = product.business.category_slug || null;
@@ -194,7 +203,7 @@ export function buildExperienceVMFromProduct(
     hasProvider: Boolean(product.business.id),
   });
 
-  const loc = product.business.primary_location;
+  const loc = product.effective_location ?? product.business.primary_location;
   const location: ExperienceLocationVM | null =
     loc && (loc.label || loc.address_line1)
       ? {
@@ -238,8 +247,11 @@ export function buildExperienceVMFromProduct(
     eyebrow: typeLabel,
     tagline: product.tagline || null,
     description: product.description || "",
+    operatorId: product.business.id ?? null,
     operatorName: product.business.display_name,
     operatorHref,
+    operatorLogoUrl: product.business.logo_url ?? null,
+    operatorLogoAsset: product.business.logo_asset,
     destinationSlug,
     destinationLabel: destinationSlug ? humanize(destinationSlug) : null,
     cover,
@@ -260,6 +272,8 @@ export function buildExperienceVMFromProduct(
       product.review_stats.count > 0
         ? { value: product.review_stats.average, count: product.review_stats.count }
         : null,
+    reviews: product.reviews,
+    reviewStats: product.review_stats,
     related,
     commerce,
     demoNotice: null,

@@ -6,8 +6,8 @@
  *  - Jamás registra en dev, iframe, preview Lovable, o cuando `?sw=off`.
  *  - Desregistra SWs huérfanos en esos contextos (kill-switch).
  *  - Sólo registra `/sw.js` en producción real (build + dominio público).
- *  - `autoUpdate` + actualización segura: prompt no requerido — la nueva
- *    versión se activa con `skipWaiting:false` controlado por workbox.
+ *  - Actualización segura y automática: la nueva versión toma control y
+ *    recarga una sola vez para no mezclar HTML con assets de otro build.
  *  - Emite eventos de observabilidad (install, activate, update, error).
  *
  * Principios de gobernanza 15.10.6:
@@ -114,6 +114,16 @@ function setWaiting(worker: ServiceWorker | null): void {
   if (worker) emit("update-available", { state: worker.state });
 }
 
+function activateWorker(worker: ServiceWorker): void {
+  updateApplying = true;
+  try {
+    worker.postMessage({ type: "SKIP_WAITING" });
+  } catch (err) {
+    updateApplying = false;
+    emit("error", { phase: "apply-update", message: (err as Error)?.message });
+  }
+}
+
 export function registerServiceWorker(): Promise<void> {
   if (registrationPromise) return registrationPromise;
   registrationPromise = (async () => {
@@ -129,7 +139,10 @@ export function registerServiceWorker(): Promise<void> {
       emit("registered", { scope: reg.scope });
 
       if (reg.installing) trackInstalling(reg.installing);
-      if (reg.waiting && navigator.serviceWorker.controller) setWaiting(reg.waiting);
+      if (reg.waiting && navigator.serviceWorker.controller) {
+        setWaiting(reg.waiting);
+        activateWorker(reg.waiting);
+      }
       reg.addEventListener("updatefound", () => {
         if (reg.installing) trackInstalling(reg.installing);
       });
@@ -156,6 +169,7 @@ function trackInstalling(worker: ServiceWorker): void {
       if (navigator.serviceWorker.controller) {
         emit("updated");
         setWaiting(worker);
+        activateWorker(worker);
       } else {
         emit("installed");
       }
@@ -185,14 +199,8 @@ export async function applyPendingUpdate(): Promise<boolean> {
   const target = waitingWorker ?? reg?.waiting ?? null;
   if (!target) return false;
   updateApplying = true;
-  try {
-    target.postMessage({ type: "SKIP_WAITING" });
-    return true;
-  } catch (err) {
-    updateApplying = false;
-    emit("error", { phase: "apply-update", message: (err as Error)?.message });
-    return false;
-  }
+  activateWorker(target);
+  return updateApplying;
 }
 
 /**

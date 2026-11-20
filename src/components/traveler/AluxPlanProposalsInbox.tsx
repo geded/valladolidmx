@@ -15,6 +15,7 @@ import {
   listMyAluxPlanProposals,
   type AluxPlanProposal,
 } from "@/lib/alux/plan-proposals.functions";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 const ENTITY_ICON = {
   business: Building2,
@@ -31,6 +32,7 @@ const ENTITY_LABEL = {
 } as const;
 
 export function AluxPlanProposalsInbox({ onChanged }: { onChanged?: () => void }) {
+  const alux = useAluxBrand();
   const qc = useQueryClient();
   const listFn = useServerFn(listMyAluxPlanProposals);
   const acceptFn = useServerFn(acceptAluxPlanProposal);
@@ -73,7 +75,7 @@ export function AluxPlanProposalsInbox({ onChanged }: { onChanged?: () => void }
     <section className="rounded-2xl border border-border bg-gradient-to-br from-primary/5 to-transparent p-4 md:p-5">
       <header className="mb-4 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-primary" aria-hidden />
-        <h2 className="text-base font-semibold">Alux sugiere para tu viaje</h2>
+        <h2 className="text-base font-semibold">{alux.copy("proposalsTitle")}</h2>
         <span className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
           {items.length} pendiente{items.length === 1 ? "" : "s"}
         </span>
@@ -86,11 +88,13 @@ export function AluxPlanProposalsInbox({ onChanged }: { onChanged?: () => void }
             busy={accept.isPending || dismiss.isPending}
             onAccept={() => accept.mutate(p.id)}
             onDismiss={() => dismiss.mutate(p.id)}
+            whyLabel={alux.copy("proposalsWhy")}
+            hideWhyLabel={alux.copy("proposalsHideWhy")}
           />
         ))}
       </ul>
       <p className="mt-3 text-[11px] text-muted-foreground">
-        Alux propone; tú decides. Nada se añade a tu plan sin tu confirmación.
+        {alux.copy("proposalsDisclaimer")}
       </p>
     </section>
   );
@@ -101,11 +105,15 @@ function ProposalRow({
   busy,
   onAccept,
   onDismiss,
+  whyLabel,
+  hideWhyLabel,
 }: {
   proposal: AluxPlanProposal;
   busy: boolean;
   onAccept: () => void;
   onDismiss: () => void;
+  whyLabel: string;
+  hideWhyLabel: string;
 }) {
   const Icon = ENTITY_ICON[proposal.entity_type] ?? MapPin;
   const label = ENTITY_LABEL[proposal.entity_type] ?? "Sugerencia";
@@ -139,7 +147,7 @@ function ProposalRow({
                 onClick={() => setExpanded((v) => !v)}
                 className="mt-1 text-[11px] font-medium text-primary hover:underline"
               >
-                {expanded ? "Ocultar por qué" : "Por qué Alux lo sugiere"}
+                {expanded ? hideWhyLabel : whyLabel}
               </button>
               {expanded && (
                 <p className="mt-1 rounded-md bg-muted/50 p-2 text-xs text-foreground/80">

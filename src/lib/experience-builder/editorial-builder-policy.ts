@@ -279,6 +279,69 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           source_id: "routing.canonical",
           writable_by: AUTHORING_ROLES,
         },
+        // Campos acreditados de la portada turística ya presentes en plantillas
+        // Premium aprobadas (p. ej. landings de negocio). Se declaran para que el
+        // constructor pueda guardar sin alterar el contenido publicado.
+        {
+          field: "promise",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "typeLine",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaFocal",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaMobileUrl",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaMobileAlt",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "mediaMobileFocal",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ogImageUrl",
+          class: "media",
+          type: "media",
+          source_id: "media.registry",
+          writable_by: AUTHORING_ROLES,
+        },
+        {
+          field: "ogImageAlt",
+          class: "editorial",
+          type: "text",
+          max_length: 240,
+          translatable: true,
+          writable_by: AUTHORING_ROLES,
+        },
       ],
     },
     {
@@ -291,6 +354,9 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       authoring_roles: AUTHORING_ROLES,
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
+        // Orden editorial del cuerpo de la plantilla aprobada (reordenamiento
+        // en el constructor). No altera la maqueta, sólo la secuencia.
+        { field: "order", class: "editorial", type: "number", writable_by: AUTHORING_ROLES },
         {
           field: "eyebrow",
           class: "editorial",
@@ -424,6 +490,12 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
         {
+          field: "order",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
           field: "items",
           class: "governed",
           type: "reference",
@@ -466,7 +538,7 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       family: "trust",
       variants: ["filled", "soft", "outline", "icon-only"],
       allowed_sources: ["trust.badges"],
-      surfaces: ["destination", "business", "product"],
+      surfaces: ["landing", "destination", "business", "product"],
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
         { field: "source", class: "system", type: "select", writable_by: [] },
@@ -1217,6 +1289,15 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           type: "boolean",
           writable_by: ["founder_admin", "territorial_editor"],
         },
+        {
+          // Orden editable de secciones de la plantilla aprobada
+          // (`COMPOSITE_SECTION_REGISTRY["vmx.home.premium-g4"].orderKey`).
+          // Sin esta política el reordenamiento nunca podía guardarse.
+          field: "home_section_order",
+          class: "editorial",
+          type: "reference",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
       ],
     },
     {
@@ -1605,6 +1686,12 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       authoring_roles: ["founder_admin", "territorial_editor"],
       fields: [
         {
+          field: "order",
+          class: "editorial",
+          type: "number",
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
           field: "variant",
           class: "editorial",
           type: "select",
@@ -1665,6 +1752,172 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
       ],
     },
     {
+      // Ficha premium de Empresa (hotel, restaurante, casa de vacaciones)
+      // — textos de sección editables. La autoridad visual sigue siendo
+      // `BusinessSurface`.
+      type: "vmx.business.premium",
+      mode: "authorable",
+      family: "destination",
+      variants: ["empresa-premium-approved"],
+      allowed_sources: ["routing.canonical", "media.registry"],
+      surfaces: ["landing"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "copy_alux_title",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_alux_description",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_gallery_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_promotions_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_reviews_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_reviews_empty",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_contact_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_related_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_related_subheading",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_cta_title",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_cta_subtitle",
+          class: "editorial",
+          type: "text",
+          max_length: 220,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
+    {
+      // Ficha premium de Evento — textos de sección editables.
+      type: "vmx.event.premium",
+      mode: "authorable",
+      family: "destination",
+      variants: ["evento-premium-approved"],
+      allowed_sources: ["routing.canonical", "media.registry"],
+      surfaces: ["landing"],
+      authoring_roles: ["founder_admin", "territorial_editor"],
+      fields: [
+        {
+          field: "copy_alux_title",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_alux_description",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_info_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_description_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_description_title",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_related_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_related_subheading",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_cta_title",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          field: "copy_cta_subtitle",
+          class: "editorial",
+          type: "text",
+          max_length: 200,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+      ],
+    },
+    {
       // G8-Q2D-A · Ficha premium reusable de Lugar y Atractivo.
       type: "vmx.place.premium-q2d",
       mode: "authorable",
@@ -1718,6 +1971,134 @@ export const EDITORIAL_BUILDER_POLICY: EditorialBuilderPolicy = {
           class: "media",
           type: "text",
           max_length: 300,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_gallery_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_services_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_services_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_experiences_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_experiences_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_events_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_events_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_businesses_heading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_businesses_subheading",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_comer",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_dormir",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_hacer",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_comprar",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_group_otros",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_places_kicker",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
+          writable_by: ["founder_admin", "territorial_editor"],
+        },
+        {
+          // G8-Q2D-C · encabezado de sección editable (token `{lugar}`).
+          field: "copy_nearby_places_title",
+          class: "editorial",
+          type: "text",
+          max_length: 160,
           writable_by: ["founder_admin", "territorial_editor"],
         },
       ],

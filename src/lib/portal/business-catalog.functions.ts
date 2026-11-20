@@ -406,6 +406,22 @@ export const withdrawPromotionReview = createServerFn({ method: "POST" })
 
 // ---------- Direct sale (Ventas en línea · CV4.1) ----------
 
+// C0 · Contención: la activación/desactivación de venta en línea y la comisión
+// sólo pueden cambiarlas admin/super_admin. La empresa prepara precio, términos
+// y políticas; Administración autoriza la venta y fija la comisión.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertDirectSaleAdmin(context: any) {
+  const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "admin",
+  });
+  const { data: isSuper } = await context.supabase.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "super_admin",
+  });
+  if (!isAdmin && !isSuper) throw new Error("forbidden_direct_sale_authorization_required");
+}
+
 export const updateProductDirectSaleSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
@@ -436,6 +452,27 @@ export const updateProductDirectSaleSettings = createServerFn({ method: "POST" }
     },
   )
   .handler(async ({ data, context }) => {
+    // C0 · Contención: comparar contra el estado actual. Si la empresa intenta
+    // cambiar enabled o commissionBps, exigir admin/super_admin.
+    const { data: current } = await context.supabase
+      .from("products")
+      .select("direct_sale_enabled, direct_sale_commission_bps")
+      .eq("id", data.productId)
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    if (current) {
+      if (data.enabled !== current.direct_sale_enabled) {
+        await assertDirectSaleAdmin(context as never);
+      }
+      if (
+        data.commissionBps != null &&
+        data.commissionBps !== current.direct_sale_commission_bps
+      ) {
+        await assertDirectSaleAdmin(context as never);
+      }
+    }
+
     const { error } = await (context.supabase.rpc as any)("update_product_direct_sale_settings", {
       _product_id: data.productId,
       _enabled: data.enabled,

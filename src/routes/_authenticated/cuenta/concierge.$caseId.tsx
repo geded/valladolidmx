@@ -7,6 +7,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
+import { CaseMessages } from "@/components/concierge/CaseMessages";
 
 export const Route = createFileRoute("/_authenticated/cuenta/concierge/$caseId")({
   component: TravelerCasePage,
@@ -34,7 +35,10 @@ function TravelerCasePage() {
   const isClosed = ["closed_won", "closed_lost", "archived"].includes(status);
   return (
     <section>
-      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <Link to="/cuenta/concierge" className="text-xs font-medium text-primary hover:underline">
+        ← Mis expedientes
+      </Link>
+      <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         Mi expediente Concierge
       </p>
       <div className="mt-1 mb-6 flex items-center justify-between gap-4">
@@ -48,6 +52,9 @@ function TravelerCasePage() {
             Evaluar este caso
           </Link>
         ) : null}
+      </div>
+      <div className="mb-6">
+        <CaseMessages caseId={caseId} />
       </div>
       <CaseFileView data={q.data} hideInternal />
     </section>

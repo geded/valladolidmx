@@ -10,6 +10,7 @@
  * creará `experience.hero-pro` ni `experience.hero-v2`.
  */
 import { z } from "zod";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
 
 export const EXPERIENCE_HERO_CONTRACT_VERSION = "1.1.0";
 
@@ -71,6 +72,7 @@ export type ExperienceHeroCta = z.infer<typeof experienceHeroCtaSchema>;
  * `crossfade`; la Presentación respeta `prefers-reduced-motion`.
  */
 export const experienceHeroSlideSchema = z.object({
+  asset: z.custom<MediaAssetInput>().optional(),
   url: z.string().min(1),
   alt: z.string().default(""),
   focalPoint: z.string().optional(),
@@ -168,6 +170,7 @@ export const experienceHeroDtoSchema = z.object({
   description: z.string().nullable(),
   media: z
     .object({
+      asset: z.custom<MediaAssetInput>().optional(),
       url: z.string(),
       alt: z.string(),
       overlay: z.number().min(0).max(1),

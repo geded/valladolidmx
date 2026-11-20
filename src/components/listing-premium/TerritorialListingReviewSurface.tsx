@@ -13,10 +13,29 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import {
+  TourismCard,
+  type TourismCardVM,
+} from "@/components/experience-builder/tourism-card/TourismCard";
 import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { cn } from "@/lib/utils";
+import { resolveMediaSource, type MediaAssetInput } from "@/lib/media/resolve-source";
+import { openAluxFloating } from "@/lib/alux/floating-bus";
+import {
+  askAluxWithPreferenceMemory,
+  normalizeTravelPreference,
+} from "@/lib/alux/travel-preferences";
+import { useTravelPreferences } from "@/lib/alux/use-travel-preferences";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
+import type { FavoriteEntityKind } from "@/lib/traveler/traveler-favorites.functions";
+import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 
 const MEDIA = "/api/public/studio-media/governed/v1p1c";
 
@@ -27,12 +46,16 @@ const InteractiveMap = lazy(() =>
 type TerritorialListingFamily =
   | "hoteles"
   | "restaurantes"
+  | "experiencias"
   | "casas-de-vacaciones"
   | "eventos"
   | "lugares"
-  | "que-hacer";
+  | "que-hacer"
+  /** Familia genérica de empresas por categoría del CMS (cenotes, artesanías…). */
+  | "empresas";
 
 interface ListingItem {
+  imageAsset?: MediaAssetInput;
   name: string;
   zone: string;
   copy: string;
@@ -276,6 +299,28 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     items: RESTAURANT_ITEMS,
     nearby: RESTAURANT_NEARBY,
   },
+  experiencias: {
+    family: "experiencias",
+    breadcrumb: "Experiencias",
+    eyebrow: "Vive el Oriente Maya",
+    title: "Experiencias en Valladolid",
+    description:
+      "Vivencias auténticas con comunidades, cocineros y guías locales del Oriente Maya.",
+    resultsTitle: "Experiencias en Valladolid",
+    itemLabel: "experiencia",
+    searchLabel: "Buscar experiencia",
+    searchPlaceholder: "Buscar experiencia, tipo o zona",
+    aluxQuestion: "¿Qué experiencia buscas?",
+    aluxOptions: ["Naturaleza", "Cultura maya", "Con guía local", "En familia", "Aventura"],
+    filters: ["Zona", "Tipo de experiencia", "Ideal para"],
+    nearbyTitle: "Experiencias cerca de Valladolid",
+    mapTitle: "Experiencias en Valladolid",
+    aluxMapTitle: "Cada experiencia abre una nueva ruta.",
+    aluxMapDescription:
+      "Guarda tus favoritas y Alux las combinará con traslados, tiempos y otros descubrimientos cercanos.",
+    items: [],
+    nearby: [],
+  },
   "casas-de-vacaciones": {
     family: "casas-de-vacaciones",
     breadcrumb: "Casas de vacaciones",
@@ -348,7 +393,7 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     family: "que-hacer",
     breadcrumb: "Qué hacer",
     eyebrow: "Inspírate en el territorio",
-    title: "¿Qué hacer en el Oriente Maya?",
+    title: "¿Qué hacer en el Oriente Maya de Yucatán?",
     description:
       "Cultura, naturaleza, aventura, gastronomía y eventos reunidos con la misma mirada editorial de Valladolid.mx.",
     resultsTitle: "Ideas para descubrir el Oriente Maya",
@@ -366,7 +411,64 @@ const PROFILES: Record<TerritorialListingFamily, ListingProfile> = {
     items: [],
     nearby: [],
   },
+  /* Perfil genérico de empresas por categoría del CMS. Usa exactamente la
+     misma plantilla Premium aprobada; la ruta ajusta el copy con el nombre
+     real de la categoría activa. No existe render alternativo. */
+  empresas: {
+    family: "empresas",
+    breadcrumb: "Empresas",
+    eyebrow: "Descubre el territorio",
+    title: "Empresas en Valladolid",
+    description:
+      "Selección editorial de empresas verificadas del Oriente Maya de Yucatán, con ubicación, contacto y contexto territorial.",
+    resultsTitle: "Empresas en Valladolid",
+    itemLabel: "empresa",
+    searchLabel: "Buscar",
+    searchPlaceholder: "Buscar por nombre, zona o servicio",
+    aluxQuestion: "¿Qué necesitas para tu viaje?",
+    aluxOptions: ["Cerca del centro", "En familia", "En pareja", "Medio día", "Con guía"],
+    filters: ["Zona", "Tipo", "Etiquetas"],
+    nearbyTitle: "Más opciones del territorio",
+    mapTitle: "Empresas en Valladolid",
+    aluxMapTitle: "Guarda tus favoritos y arma tu viaje.",
+    aluxMapDescription:
+      "Alux combina lo que guardas con distancias, horarios y tiempo disponible del destino.",
+    items: [],
+    nearby: [],
+  },
 };
+
+/**
+ * Resuelve el alcance territorial del copy aprobado. El copy base está
+ * redactado con Valladolid como marcador territorial; aquí se sustituye
+ * por el destino activo o por la región completa en entradas globales.
+ */
+function territorialize(text: string, destinationLabel: string | null): string {
+  if (destinationLabel) return text.replace(/Valladolid/g, destinationLabel);
+  return text
+    .replace(/cerca de Valladolid/g, "cerca del Oriente Maya")
+    .replace(/en Valladolid/g, "del Oriente Maya de Yucatán")
+    .replace(/de Valladolid/g, "del Oriente Maya de Yucatán")
+    .replace(/Valladolid/g, "el Oriente Maya");
+}
+
+/**
+ * Ajuste de copy para la familia genérica de empresas: permite usar el
+ * nombre real de la categoría del CMS sin crear otra plantilla.
+ */
+export type TerritorialListingProfileOverride = Partial<
+  Pick<
+    ListingProfile,
+    | "breadcrumb"
+    | "eyebrow"
+    | "resultsTitle"
+    | "itemLabel"
+    | "searchPlaceholder"
+    | "nearbyTitle"
+    | "mapTitle"
+    | "filters"
+  >
+>;
 
 export function TerritorialListingReviewSurface({
   family = "hoteles",
@@ -376,6 +478,7 @@ export function TerritorialListingReviewSurface({
   facets = [],
   nearbyItems,
   lockedDestinationLabel,
+  profileOverride,
 }: {
   family?: TerritorialListingFamily;
   dto?: PublicListingDTO;
@@ -386,15 +489,24 @@ export function TerritorialListingReviewSurface({
   nearbyItems?: readonly TourismCardVM[];
   /** Contexto territorial bloqueado (listado dentro de un destino). */
   lockedDestinationLabel?: string | null;
+  profileOverride?: TerritorialListingProfileOverride;
 }) {
   const baseProfile = PROFILES[family];
+  // Alcance territorial real: destino activo cuando la entrada lo declara,
+  // región completa cuando la entrada es global. Nunca un destino por defecto.
+  const scopeLabel = lockedDestinationLabel ?? dto?.destinationLabel ?? null;
+  const overrideKey = JSON.stringify(profileOverride ?? null);
   const profile = useMemo(
     () => ({
       ...baseProfile,
-      title: titleOverride?.trim() || baseProfile.title,
+      title: titleOverride?.trim() || territorialize(baseProfile.title, scopeLabel),
       description: subtitleOverride?.trim() || baseProfile.description,
+      resultsTitle: territorialize(baseProfile.resultsTitle, scopeLabel),
+      nearbyTitle: territorialize(baseProfile.nearbyTitle, scopeLabel),
+      mapTitle: territorialize(baseProfile.mapTitle, scopeLabel),
+      ...(JSON.parse(overrideKey) as Partial<ListingProfile> | null),
     }),
-    [baseProfile, subtitleOverride, titleOverride],
+    [baseProfile, overrideKey, scopeLabel, subtitleOverride, titleOverride],
   );
   const [query, setQuery] = useState("");
   const [zone, setZone] = useState("");
@@ -411,6 +523,15 @@ export function TerritorialListingReviewSurface({
         items={items}
         dto={dto}
         nearbyItems={nearbyItems}
+        lockedDestinationLabel={lockedDestinationLabel ?? dto?.destinationLabel ?? null}
+      />
+    );
+  }
+  if (family === "que-hacer") {
+    return (
+      <QueHacerDiscoveryBody
+        profile={profile}
+        dto={dto}
         lockedDestinationLabel={lockedDestinationLabel ?? dto?.destinationLabel ?? null}
       />
     );
@@ -444,6 +565,206 @@ export function TerritorialListingReviewSurface({
   );
 }
 
+function tourismItemZone(item: TourismCardVM): string | null {
+  const structured = attributeValues(item.filterAttributes?.zone)[0];
+  return structured ? humanizeAttributeValue(structured) : null;
+}
+
+function QueHacerDiscoveryBody({
+  profile,
+  dto,
+  lockedDestinationLabel,
+}: {
+  profile: ListingProfile;
+  dto?: PublicListingDTO;
+  lockedDestinationLabel: string | null;
+}) {
+  const [territory, setTerritory] = useState("");
+  const [showMapMobile, setShowMapMobile] = useState(false);
+  const rails = dto?.discoveryRails ?? [];
+  const isDestinationScope = Boolean(lockedDestinationLabel || dto?.destinationSlug);
+  const allItems = useMemo(() => rails.flatMap((rail) => [...rail.items]), [rails]);
+  const territories = useMemo(
+    () =>
+      unique(
+        allItems.flatMap((item) => {
+          if (isDestinationScope) {
+            const itemTerritory = tourismItemZone(item);
+            return itemTerritory ? [itemTerritory] : [];
+          }
+          const itemTerritory =
+            item.entityKind === "destination" ? item.name : (item.location?.label ?? null);
+          return itemTerritory ? [itemTerritory] : [];
+        }),
+      ),
+    [allItems, isDestinationScope],
+  );
+  const filteredRails = useMemo(
+    () =>
+      rails.map((rail) => ({
+        ...rail,
+        items: territory
+          ? rail.items.filter((item) =>
+              isDestinationScope
+                ? tourismItemZone(item) === territory
+                : item.entityKind === "destination"
+                  ? item.name === territory
+                  : item.location?.label === territory,
+            )
+          : rail.items,
+      })),
+    [isDestinationScope, rails, territory],
+  );
+  const visibleItems = filteredRails.flatMap((rail) => [...rail.items]);
+  const mappedItems = visibleItems.filter(
+    (item) => item.coordinates?.lat != null && item.coordinates?.lng != null,
+  );
+
+  return (
+    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
+      {/* Studio Standard v1.0 · E5 · Listados: marcadores de región para el
+          constructor. Sólo atributos de datos; la maqueta aprobada no cambia. */}
+      <div data-eb-section="hero">
+        <ListingIntro profile={profile} compact />
+      </div>
+      <AluxBar profile={profile} />
+
+      {territories.length ? (
+        <section
+          data-eb-section="territorio"
+          className="mt-5 border-y border-[var(--border)] py-4"
+          aria-label="Filtro territorial"
+        >
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
+                Explora el territorio
+              </p>
+              <h2 className="mt-1 font-display text-xl sm:text-2xl">
+                {isDestinationScope ? "Zonas de este destino" : "Filtrar por destino"}
+              </h2>
+            </div>
+            {territory ? (
+              <button
+                type="button"
+                onClick={() => setTerritory("")}
+                className="shrink-0 text-sm font-semibold text-[var(--selva)] hover:underline"
+              >
+                Ver todo
+              </button>
+            ) : null}
+          </div>
+          <div className="mt-3 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {territories.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setTerritory((current) => (current === option ? "" : option))}
+                aria-pressed={territory === option}
+                className={cn(
+                  "min-h-10 shrink-0 snap-start rounded-full border px-4 text-sm font-semibold transition",
+                  territory === option
+                    ? "border-[var(--selva)] bg-[var(--selva)] text-[var(--selva-foreground)]"
+                    : "border-[var(--border)] bg-card text-foreground hover:border-[var(--selva)]/50",
+                )}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <div data-eb-section="carriles" className="mt-7 space-y-10">
+        {filteredRails.map((rail) => {
+          if (!rail.items.length) return null;
+          return (
+            <section key={rail.id} aria-labelledby={`que-hacer-${rail.id}`}>
+              <header className="mb-3 flex items-end justify-between gap-4">
+                <div className="min-w-0">
+                  <h2 id={`que-hacer-${rail.id}`} className="font-display text-2xl sm:text-3xl">
+                    {rail.title}
+                  </h2>
+                  <p className="mt-1 text-sm text-[var(--muted-foreground)]">{rail.subtitle}</p>
+                </div>
+                <a
+                  href={rail.seeAllHref}
+                  className="hidden shrink-0 text-sm font-semibold text-[var(--selva)] hover:underline sm:block"
+                >
+                  Ver todos
+                </a>
+              </header>
+              <ul className="flex snap-x snap-mandatory scroll-px-1 gap-4 overflow-x-auto pb-3 pr-4 [scrollbar-width:thin]">
+                {rail.items.map((item) => (
+                  <li
+                    key={`${rail.id}-${item.id}`}
+                    className="w-[76%] max-w-[17rem] shrink-0 snap-start sm:w-[15rem]"
+                  >
+                    <QueHacerDiscoveryCard
+                      item={listingItemFromDTO(item, profile)}
+                      trackingSurface="que-hacer"
+                      trackingRail={rail.id}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
+
+      {!visibleItems.length ? (
+        <div className="mt-7 rounded-2xl border border-dashed border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
+          No encontramos opciones publicadas con ese filtro. Prueba otro destino o zona.
+        </div>
+      ) : null}
+
+      {mappedItems.length ? (
+        <div className="mt-10">
+          <button
+            type="button"
+            onClick={() => setShowMapMobile((current) => !current)}
+            className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--border)] bg-card px-4 text-sm font-semibold lg:hidden"
+          >
+            <Map className="size-4" aria-hidden />
+            {showMapMobile ? "Ocultar mapa" : "Ver mapa de los resultados"}
+          </button>
+          <div
+            className={cn(
+              "overflow-hidden rounded-2xl border border-[var(--border)]",
+              showMapMobile ? "block" : "hidden lg:block",
+            )}
+          >
+            <Suspense
+              fallback={<div className="h-72 animate-pulse bg-[var(--brand-surface-soft)]" />}
+            >
+              <InteractiveMap
+                lat={mappedItems[0].coordinates?.lat ?? 20.69}
+                lng={mappedItems[0].coordinates?.lng ?? -88.2}
+                zoom={isDestinationScope ? 12 : 9}
+                markerTitle={mappedItems[0].name}
+                markers={mappedItems.flatMap((item) =>
+                  item.coordinates
+                    ? [
+                        {
+                          lat: item.coordinates.lat,
+                          lng: item.coordinates.lng,
+                          title: item.name,
+                          href: item.href,
+                        },
+                      ]
+                    : [],
+                )}
+                className="h-72 sm:h-96"
+              />
+            </Suspense>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function TerritorialListingBody({
   profile,
   items,
@@ -471,6 +792,7 @@ function TerritorialListingBody({
   setSecondary: (v: string) => void;
   facets: FacetDef[];
 }) {
+  const compactDiscovery = profile.family === "que-hacer";
   const [showMapMobile, setShowMapMobile] = useState(false);
   const [activeFacets, setActiveFacets] = useState<Record<string, string>>({});
   const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
@@ -504,36 +826,45 @@ function TerritorialListingBody({
   return (
     <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
       <div className="w-full">
-        <ListingIntro profile={profile} />
+        {/* Studio Standard v1.0 · E5 · Listados: regiones marcadas para el
+            constructor. Sólo atributos de datos, sin cambio visual. */}
+        <div data-eb-section="hero">
+          <ListingIntro profile={profile} compact={compactDiscovery} />
+        </div>
         <AluxBar profile={profile} />
-        <Filters
-          profile={profile}
-          query={query}
-          setQuery={setQuery}
-          zone={zone}
-          setZone={setZone}
-          zones={zones}
-          primary={primary}
-          setPrimary={setPrimary}
-          primaryValues={primaryValues}
-          secondary={secondary}
-          setSecondary={setSecondary}
-          secondaryValues={secondaryValues}
-          facets={facets}
-          activeFacets={activeFacets}
-          setActiveFacets={setActiveFacets}
-          hasMap={mappedItems.length > 0}
-          onShowMap={() => setShowMapMobile(true)}
-        />
+        <div data-eb-section="territorio">
+          <Filters
+            profile={profile}
+            query={query}
+            setQuery={setQuery}
+            zone={zone}
+            setZone={setZone}
+            zones={zones}
+            primary={primary}
+            setPrimary={setPrimary}
+            primaryValues={primaryValues}
+            secondary={secondary}
+            setSecondary={setSecondary}
+            secondaryValues={secondaryValues}
+            facets={facets}
+            activeFacets={activeFacets}
+            setActiveFacets={setActiveFacets}
+            hasMap={mappedItems.length > 0}
+            onShowMap={() => setShowMapMobile(true)}
+            compact={compactDiscovery}
+          />
+        </div>
 
         <div
-          className={`mt-5 grid items-start gap-6 ${
+          className={`${compactDiscovery ? "mt-4" : "mt-5"} grid items-start gap-6 ${
             mappedItems.length
-              ? "lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]"
+              ? compactDiscovery
+                ? "lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,.65fr)] xl:grid-cols-[minmax(0,1.45fr)_minmax(22rem,.55fr)]"
+                : "lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,.76fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(25rem,.72fr)]"
               : "grid-cols-1"
           }`}
         >
-          <div id="resultados" className="min-w-0">
+          <div id="resultados" data-eb-section="resultados" className="min-w-0">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
@@ -546,10 +877,19 @@ function TerritorialListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
-              {filteredItems.map((item, index) => (
-                <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
-              ))}
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {filteredItems.map((item, index) =>
+                compactDiscovery ? (
+                  <QueHacerDiscoveryCard key={item.source?.id ?? item.name} item={item} />
+                ) : (
+                  <ListingCard
+                    key={item.name}
+                    item={item}
+                    featured={index === 0}
+                    profile={profile}
+                  />
+                ),
+              )}
               {!filteredItems.length ? (
                 <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center text-sm text-[var(--muted-foreground)]">
                   No encontramos opciones con esos filtros. Prueba quitando una selección.
@@ -566,6 +906,7 @@ function TerritorialListingBody({
               items={mappedItems}
               showMobile={showMapMobile}
               onClose={() => setShowMapMobile(false)}
+              compact={compactDiscovery}
             />
           ) : null}
         </div>
@@ -637,6 +978,7 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
     // Sin medio CMS acreditado, la variante editorial elimina el marco de
     // imagen. Nunca usa fotografías de otra entidad o familia como relleno.
     image: item.mediaUrl ?? "",
+    imageAsset: item.mediaAsset,
     tags: unique([
       ...structuredTags,
       ...item.highlights,
@@ -658,7 +1000,13 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
  * tokens del sistema). Esta superficie ya no renderiza uno paralelo.
  */
 
-function ListingIntro({ profile }: { profile: ListingProfile }) {
+function ListingIntro({
+  profile,
+  compact = false,
+}: {
+  profile: ListingProfile;
+  compact?: boolean;
+}) {
   const Icon =
     profile.family === "eventos"
       ? CalendarDays
@@ -670,13 +1018,21 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
             ? Home
             : BedDouble;
   return (
-    <header className="grid gap-5 border-y border-[var(--border)] py-6 sm:grid-cols-[1fr_auto] sm:items-end sm:py-8">
+    <header
+      className={`grid border-y border-[var(--border)] sm:grid-cols-[1fr_auto] sm:items-end ${
+        compact ? "gap-3 py-4 sm:py-5" : "gap-5 py-6 sm:py-8"
+      }`}
+    >
       <div className="max-w-3xl">
         <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.2em] text-[var(--brand-primary-strong)]">
           <Icon className="size-4" aria-hidden /> {profile.eyebrow}
         </p>
-        <h1 className="mt-3 font-display text-display-hero">{profile.title}</h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--muted-foreground)] sm:text-lg">
+        <h1 className={`${compact ? "mt-2" : "mt-3"} font-display text-display-hero`}>
+          {profile.title}
+        </h1>
+        <p
+          className={`${compact ? "mt-2" : "mt-3"} max-w-2xl text-base leading-6 text-[var(--muted-foreground)] sm:text-lg sm:leading-7`}
+        >
           {profile.description}
         </p>
       </div>
@@ -688,6 +1044,12 @@ function ListingIntro({ profile }: { profile: ListingProfile }) {
 }
 
 function AluxBar({ profile }: { profile: ListingProfile }) {
+  /* Alux ya recuerda la intención del viajero: la opción vigente se marca. */
+  const remembered = useTravelPreferences();
+  const isRemembered = (option: string) => {
+    const canonical = normalizeTravelPreference(option);
+    return Boolean(canonical && remembered.some((p) => p.slug === canonical.slug));
+  };
   return (
     <section
       className="mt-5 overflow-hidden rounded-2xl border border-[var(--selva)]/20 bg-[var(--selva)]/[.06] text-[var(--brand-territory-deep)]"
@@ -711,14 +1073,37 @@ function AluxBar({ profile }: { profile: ListingProfile }) {
             {profile.aluxOptions.map((option) => (
               <button
                 key={option}
-                className="relative h-8 shrink-0 rounded-full border border-[var(--selva)]/25 bg-card/70 px-3 text-xs font-medium text-[var(--brand-territory-deep)] transition hover:border-[var(--selva)]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']"
+                type="button"
+                onClick={() =>
+                  askAluxWithPreferenceMemory({
+                    surface: "territorial-listing",
+                    prompt: option,
+                    hint: `Ayúdame con ${profile.itemLabel}. Mi preferencia es: ${option}. Usa Mi Viaje y explica cada recomendación.`,
+                  })
+                }
+                aria-pressed={isRemembered(option)}
+                className={cn(
+                  "relative h-8 shrink-0 rounded-full border px-3 text-xs font-medium text-[var(--brand-territory-deep)] transition hover:border-[var(--selva)]/50 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 before:content-['']",
+                  isRemembered(option)
+                    ? "border-[var(--selva)] bg-[var(--selva)]/15 font-semibold"
+                    : "border-[var(--selva)]/25 bg-card/70",
+                )}
               >
                 {option}
               </button>
             ))}
           </div>
         </div>
-        <button className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] transition hover:bg-[var(--selva)]/10 lg:inline-flex">
+        <button
+          type="button"
+          onClick={() =>
+            askAluxWithPreferenceMemory({
+              surface: "territorial-listing",
+              hint: `Ayúdame a elegir entre estas opciones (${profile.itemLabel}) usando el contexto real de Mi Viaje.`,
+            })
+          }
+          className="hidden min-h-11 shrink-0 items-center gap-2 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] transition hover:bg-[var(--selva)]/10 lg:inline-flex"
+        >
           Recomiéndame <Sparkles className="size-4" aria-hidden />
         </button>
       </div>
@@ -744,6 +1129,7 @@ function Filters({
   setActiveFacets,
   hasMap,
   onShowMap,
+  compact = false,
 }: {
   profile: ListingProfile;
   query: string;
@@ -762,6 +1148,7 @@ function Filters({
   setActiveFacets: (value: Record<string, string>) => void;
   hasMap: boolean;
   onShowMap: () => void;
+  compact?: boolean;
 }) {
   const selects = [
     { label: profile.filters[0], value: zone, setValue: setZone, options: zones },
@@ -774,8 +1161,10 @@ function Filters({
     },
   ];
   return (
-    <section className="mt-4 rounded-2xl border border-[var(--border)] bg-card p-3 shadow-sm sm:p-4">
-      <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto]">
+    <section
+      className={`${compact ? "mt-3 p-2.5 sm:p-3" : "mt-4 p-3 sm:p-4"} rounded-2xl border border-[var(--border)] bg-card shadow-sm`}
+    >
+      <div className="flex snap-x gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto] lg:pb-0">
         <label className="relative min-w-[12.5rem] lg:min-w-0">
           <Search
             className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--muted-foreground)]"
@@ -793,7 +1182,7 @@ function Filters({
           <button
             type="button"
             onClick={onShowMap}
-            className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[var(--selva)] px-4 text-sm font-semibold text-white sm:hidden"
+            className={`inline-flex min-h-11 min-w-max snap-start items-center justify-center gap-2 rounded-xl bg-[var(--selva)] px-4 text-sm font-semibold text-white ${compact ? "lg:hidden" : "sm:hidden"}`}
           >
             <Map className="size-4" aria-hidden /> Ver mapa
           </button>
@@ -861,84 +1250,222 @@ function Filters({
   );
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Traduce la entidad de la tarjeta a los kinds ya soportados. */
+function savableKinds(source?: TourismCardVM): {
+  favorite: FavoriteEntityKind | null;
+  travel: TravelItemKind | null;
+} {
+  if (!source || !UUID_RE.test(source.id)) return { favorite: null, travel: null };
+  switch (source.entityKind) {
+    case "business":
+    case "hotel":
+    case "restaurant":
+      return { favorite: "business", travel: "business" };
+    case "product":
+    case "experience":
+      return { favorite: "product", travel: "product" };
+    case "promotion":
+      return { favorite: "promotion", travel: null };
+    case "event":
+      return { favorite: null, travel: "event" };
+    case "place":
+      return { favorite: null, travel: "place" };
+    case "destination":
+      return { favorite: null, travel: "destination" };
+    default:
+      return { favorite: null, travel: null };
+  }
+}
+
+/**
+ * Autoridad visual compartida de las tarjetas de listado territorial.
+ * Con portada acreditada: imagen protagonista arriba (4:3), favorito sobre
+ * la imagen y ficha compacta debajo. Sin portada: marcador editorial
+ * aprobado con altura controlada (nunca un hueco vacío ni fotografía ajena).
+ * Las acciones sólo se muestran cuando la entidad las soporta: ningún
+ * botón visible queda sin efecto.
+ */
 function ListingCard({
   item,
   featured,
   profile,
+  compactFallback = false,
 }: {
   item: ListingItem;
   featured: boolean;
   profile: ListingProfile;
+  compactFallback?: boolean;
 }) {
+  const tags = item.tags.slice(0, 3);
+  const kinds = savableKinds(item.source);
   return (
-    <article
-      className={`group grid min-w-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm ${
-        item.image
-          ? "grid-cols-[7.25rem_minmax(0,1fr)] sm:grid-cols-[13rem_minmax(0,1fr)]"
-          : "grid-cols-1"
-      }`}
-    >
-      {item.image ? (
-        <div className="relative min-h-[10rem] overflow-hidden bg-[var(--border)] sm:min-h-[13rem]">
+    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm transition hover:shadow-md">
+      <div
+        className={`relative w-full overflow-hidden bg-[var(--brand-surface-soft)] ${
+          !item.image && compactFallback ? "h-36 sm:h-40" : "aspect-[4/3]"
+        }`}
+      >
+        {item.image ? (
+          <picture className="contents">
+          {resolveMediaSource(item.imageAsset, { fallbackUrl: item.image, context: "card", sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}
           <img
-            src={item.image}
+            src={resolveMediaSource(item.imageAsset, { fallbackUrl: item.image, context: "card" }).src}
             alt={item.name}
-            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.025]"
+            loading="lazy"
+            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
           />
-          {featured ? (
-            <span className="absolute left-2 top-2 rounded-full bg-[var(--primary)] px-2 py-1 text-[10px] font-bold text-[var(--brand-territory-deep)]">
-              Recomendado
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-      <div className="flex min-w-0 flex-col p-3 sm:p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand-primary-strong)]">
-              {item.type}
+          </picture>
+        ) : (
+          <div className="absolute inset-0 flex items-end p-4">
+            <p className="line-clamp-3 font-display text-lg leading-snug text-[var(--muted-foreground)]">
+              {item.name}
             </p>
-            <h3 className="mt-1 font-display text-xl leading-tight sm:text-2xl">{item.name}</h3>
           </div>
-          <button
-            aria-label={`Guardar ${item.name}`}
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-[var(--border)]"
-          >
-            <Heart className="size-4" aria-hidden />
-          </button>
-        </div>
+        )}
+        {featured ? (
+          <span className="absolute left-2 top-2 rounded-full bg-[var(--primary)] px-2 py-1 text-[10px] font-bold text-[var(--brand-territory-deep)]">
+            Recomendado
+          </span>
+        ) : null}
+        {kinds.favorite && item.source ? (
+          <FavoriteButton
+            entityKind={kinds.favorite}
+            entityId={item.source.id}
+            entityTitle={item.name}
+            {...(item.image ? { entityImageUrl: item.image } : {})}
+            className="absolute right-2 top-2 z-10"
+          />
+        ) : null}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand-primary-strong)]">
+          {item.type}
+        </p>
+        <h3 className="mt-1 line-clamp-2 font-display text-lg leading-tight sm:text-xl">
+          {item.name}
+        </h3>
         <p className="mt-1 flex items-center gap-1 text-xs text-[var(--muted-foreground)]">
-          <MapPin className="size-3" aria-hidden /> {item.zone}
+          <MapPin className="size-3 shrink-0" aria-hidden />
+          <span className="truncate">{item.zone}</span>
         </p>
-        <p className="mt-3 hidden text-sm leading-6 text-[var(--muted-foreground)] sm:block">
-          {item.copy}
-        </p>
-        <div className="mt-3 hidden flex-wrap gap-2 md:flex">
-          {item.tags.map((tag) => (
-            <span key={tag} className="rounded-full bg-[var(--background)] px-2.5 py-1 text-[11px]">
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className="mt-auto flex items-center gap-2 pt-3">
+        {tags.length ? (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full bg-[var(--background)] px-2 py-0.5 text-[11px] text-[var(--muted-foreground)]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
           {item.href ? (
             <a
               href={item.href}
-              className="inline-flex min-h-10 items-center rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm"
+              className="inline-flex min-h-10 items-center rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-[var(--selva-foreground)]"
             >
               Ver {profile.itemLabel}
             </a>
-          ) : (
-            <button className="min-h-10 rounded-full bg-[var(--selva)] px-4 text-xs font-bold text-white sm:min-h-11 sm:text-sm">
-              Ver {profile.itemLabel}
-            </button>
-          )}
-          <button className="hidden min-h-11 rounded-full border border-[var(--selva)] px-4 text-sm font-semibold text-[var(--selva)] sm:inline-flex sm:items-center">
-            Agregar a mi viaje
-          </button>
+          ) : null}
+          {kinds.travel && item.source ? (
+            <AddToTravelPlanButton
+              kind={kinds.travel}
+              targetId={item.source.id}
+              title={item.name}
+              eligibilityMode="legacy"
+              {...(item.source.href ? { slug: item.source.href } : {})}
+              {...(item.image ? { imageUrl: item.image } : {})}
+              {...(item.zone ? { subtitle: item.zone } : {})}
+            />
+          ) : null}
         </div>
       </div>
     </article>
+  );
+}
+
+/**
+ * Variante compacta de descubrimiento para `/que-hacer` sobre la familia
+ * oficial TourismCard. La tarjeta sólo invita a abrir la ficha; reservar y
+ * agregar a Mi Viaje permanecen dentro de la experiencia completa.
+ */
+function QueHacerDiscoveryCard({
+  item,
+  trackingSurface,
+  trackingRail,
+}: {
+  item: ListingItem;
+  trackingSurface?: string;
+  trackingRail?: string;
+}) {
+  const vm = item.source;
+  if (!vm) return null;
+  const favoriteKind: FavoriteEntityKind | null =
+    vm.entityKind === "event" ? "event" : vm.entityKind === "place" ? "place" : null;
+  const commercialBadge = vm.badges.find((badge) =>
+    /destacad|premium|élite|elite|spotlight/i.test(badge.label),
+  );
+  const displayVm = commercialBadge
+    ? { ...vm, badges: vm.badges.filter((badge) => badge !== commercialBadge) }
+    : vm;
+  const card = (
+    <div>
+      <TourismCard
+        vm={displayVm}
+        contractVariant="compact"
+        capabilities={{
+          compact: true,
+          showBusiness: false,
+          showRating: false,
+          showHighlights: false,
+          showBadges: false,
+          showInstitutionalBadges: false,
+          showAvailability: false,
+          showPrice: false,
+          showPrimaryAction: false,
+          showSecondaryAction: false,
+          showFavorite: false,
+        }}
+        renderMediaActions={
+          favoriteKind
+            ? () => (
+                <FavoriteButton
+                  entityKind={favoriteKind}
+                  entityId={vm.id}
+                  entityTitle={vm.name}
+                  entitySlug={vm.href ?? undefined}
+                  entityImageUrl={vm.mediaUrl ?? undefined}
+                  variant="media-overlay"
+                />
+              )
+            : undefined
+        }
+      />
+      {commercialBadge ? (
+        <p className="mt-1 text-xs font-medium text-[var(--muted-foreground)]">Recomendado</p>
+      ) : null}
+    </div>
+  );
+  if (!vm.operatorId || !trackingSurface) return card;
+  const trackingProps = {
+    businessId: vm.operatorId,
+    surface: trackingSurface,
+    rail: trackingRail ?? null,
+    placement: commercialBadge ? ("contratado" as const) : ("organico" as const),
+    entityKind: vm.entityKind,
+    entityId: vm.id,
+  };
+  return (
+    <>
+      <BusinessImpressionTracker {...trackingProps} />
+      <TrackClick {...trackingProps} eventType="click_card">
+        {card}
+      </TrackClick>
+    </>
   );
 }
 
@@ -991,11 +1518,13 @@ function MapPanel({
   items,
   showMobile,
   onClose,
+  compact = false,
 }: {
   profile: ListingProfile;
   items: ListingItem[];
   showMobile: boolean;
   onClose: () => void;
+  compact?: boolean;
 }) {
   const points = items.flatMap((item) => {
     const coordinates = item.source?.coordinates;
@@ -1007,7 +1536,9 @@ function MapPanel({
   if (!first) return null;
   return (
     <aside
-      className={`${showMobile ? "block" : "hidden"} order-first sm:block lg:order-none lg:sticky lg:top-24`}
+      className={`${showMobile ? "block" : "hidden"} order-first ${
+        compact ? "lg:order-none lg:block" : "sm:block lg:order-none"
+      } lg:sticky lg:top-24`}
     >
       <section className="overflow-hidden rounded-2xl border border-[var(--border)] bg-card shadow-sm">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
@@ -1028,7 +1559,9 @@ function MapPanel({
         </div>
         <Suspense
           fallback={
-            <div className="h-64 animate-pulse bg-[var(--brand-surface-soft)] sm:h-80 lg:h-[31rem]" />
+            <div
+              className={`h-64 animate-pulse bg-[var(--brand-surface-soft)] sm:h-80 ${compact ? "lg:h-[26rem]" : "lg:h-[31rem]"}`}
+            />
           }
         >
           <InteractiveMap
@@ -1042,7 +1575,7 @@ function MapPanel({
               title: item.name,
               href: item.href,
             }))}
-            className="h-64 sm:h-80 lg:h-[31rem]"
+            className={`h-64 sm:h-80 ${compact ? "lg:h-[26rem]" : "lg:h-[31rem]"}`}
           />
         </Suspense>
         <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] p-4 text-sm">
@@ -1209,7 +1742,7 @@ function EventListingBody({
             lockedDestinationLabel
               ? { ...profile, title: `Eventos en ${lockedDestinationLabel}` }
               : dto
-                ? { ...profile, title: "Eventos del Oriente Maya" }
+                ? { ...profile, title: "Eventos del Oriente Maya de Yucatán" }
                 : profile
           }
         />
@@ -1336,7 +1869,7 @@ function EventListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -1360,7 +1893,7 @@ function EventListingBody({
                 <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                   Se muestran aparte y no cuentan dentro de la agenda local.
                 </p>
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {nearbyItems.slice(0, 6).map((card) => (
                     <ListingCard
                       key={card.id}
@@ -1749,7 +2282,7 @@ function PlaceListingBody({
             lockedDestinationLabel
               ? { ...profile, title: `Lugares y sitios de interés en ${lockedDestinationLabel}` }
               : dto
-                ? { ...profile, title: "Lugares y sitios de interés del Oriente Maya" }
+                ? { ...profile, title: "Lugares y sitios de interés del Oriente Maya de Yucatán" }
                 : profile
           }
         />
@@ -1903,7 +2436,7 @@ function PlaceListingBody({
               </p>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {filteredItems.map((item, index) => (
                 <ListingCard key={item.name} item={item} featured={index === 0} profile={profile} />
               ))}
@@ -1928,7 +2461,7 @@ function PlaceListingBody({
                   Pertenecen a otros destinos por proximidad territorial: no son una subzona de{" "}
                   {lockedDestinationLabel} y no cuentan en los resultados locales.
                 </p>
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {nearbyItems.slice(0, 6).map((card) => (
                     <ListingCard
                       key={card.id}

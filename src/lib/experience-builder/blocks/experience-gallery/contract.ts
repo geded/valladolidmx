@@ -12,6 +12,7 @@
  *   - lightbox / zoom / captions → `capabilities.*` sin romper contrato
  */
 import { z } from "zod";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
 
 export const EXPERIENCE_GALLERY_CONTRACT_VERSION = "1.0.0";
 
@@ -43,6 +44,8 @@ export const experienceGalleryItemSchema = z.object({
   nature: z.enum(["documentary", "conceptual"]).optional(),
   width: z.number().optional(),
   height: z.number().optional(),
+  /** H3·A4 (aditivo, opcional): asset + variantes para `resolveMediaSource()`. */
+  asset: z.custom<MediaAssetInput>().optional(),
 });
 export type ExperienceGalleryItem = z.infer<typeof experienceGalleryItemSchema>;
 

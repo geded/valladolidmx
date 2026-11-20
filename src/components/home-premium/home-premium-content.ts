@@ -1,3 +1,4 @@
+import type { EventRecurrencePayload } from "@/lib/events/recurrence";
 /**
  * G8-D · Home Premium G4 — contenido canónico compartido.
  *
@@ -12,8 +13,17 @@
  */
 
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
 
-export type HomePremiumMedia = { url: string; alt: string };
+/**
+ * `asset` es aditivo (H3·A4): cuando el pipeline tiene versiones ligeras
+ * `ready`, el componente oficial puede servirlas; si falta, se usa `url`.
+ */
+export type HomePremiumMedia = {
+  url: string;
+  alt: string;
+  asset?: MediaAssetInput | null;
+};
 
 /**
  * Medios conceptuales aprobados para visualizar la Home completa antes de
@@ -48,14 +58,19 @@ export const HOME_PREMIUM_MEDIA = {
 } as const satisfies Record<string, HomePremiumMedia>;
 
 export type HomePremiumSectionKey =
+  | "hero"
+  | "alux"
   | "destinos"
+  | "experienciasAcceso"
+  | "categorias"
   | "pueblosMagicos"
   | "rutas"
   | "experiencias"
   | "servicios"
   | "eventos"
   | "queHacer"
-  | "mapa";
+  | "mapa"
+  | "travelPlan";
 
 export type HomePremiumRoute = {
   id: string;
@@ -65,6 +80,16 @@ export type HomePremiumRoute = {
   vibe: string;
   description: string;
   sequence: string[];
+  /** Paradas reales publicadas de la ruta (con coordenadas), en orden. */
+  stopPoints?: Array<{
+    id: string;
+    kind: "business" | "destination";
+    lat: number;
+    lng: number;
+    title: string;
+    subtitle: string | null;
+    href: string | null;
+  }>;
   media: HomePremiumMedia;
   /** URL canónica de la ruta editorial publicada. */
   href: string | null;
@@ -80,6 +105,8 @@ export type HomePremiumDestination = {
 };
 
 export type HomePremiumExperience = {
+  /** Empresa operadora acreditada (medición de visibilidad). */
+  businessId?: string | null;
   title: string;
   category: string;
   summary: string;
@@ -88,6 +115,8 @@ export type HomePremiumExperience = {
 };
 
 export type HomePremiumService = {
+  /** Empresa operadora acreditada (medición de visibilidad). */
+  businessId?: string | null;
   title: string;
   destination: string;
   category: string;
@@ -102,6 +131,11 @@ export type HomePremiumEvent = {
   type: string;
   detail: string;
   href: string | null;
+  /** Fecha acreditada del evento (ISO). Null cuando el CMS no la declara. */
+  startsAt?: string | null;
+  recurrence?: EventRecurrencePayload | null;
+  /** Portada del evento en miniatura. Null cuando el CMS no publica medio. */
+  media?: { url: string; alt: string } | null;
 };
 
 export type HomePremiumEditorial = {
@@ -205,7 +239,11 @@ export type HomePremiumContent = {
 };
 
 export const HOME_PREMIUM_SECTION_LABELS: Record<HomePremiumSectionKey, string> = {
+  hero: "Portada",
+  alux: "Alux",
   destinos: "Destinos del Oriente Maya de Yucatán",
+  experienciasAcceso: "Acceso a Experiencias",
+  categorias: "Explora por categoría",
   pueblosMagicos: "Pueblos Mágicos",
   rutas: "Rutas recomendadas por Alux",
   experiencias: "Experiencias",
@@ -213,17 +251,23 @@ export const HOME_PREMIUM_SECTION_LABELS: Record<HomePremiumSectionKey, string> 
   eventos: "Eventos",
   queHacer: "Qué hacer",
   mapa: "Mapa",
+  travelPlan: "Mi Viaje",
 };
 
 export const HOME_PREMIUM_DEFAULT_ORDER: HomePremiumSectionKey[] = [
+  "hero",
+  "alux",
   "destinos",
-  "rutas",
-  "pueblosMagicos",
-  "experiencias",
-  "servicios",
+  "experienciasAcceso",
+  "categorias",
   "eventos",
-  "queHacer",
+  "experiencias",
+  "rutas",
   "mapa",
+  "travelPlan",
+  "pueblosMagicos",
+  "servicios",
+  "queHacer",
 ];
 
 /**
@@ -354,8 +398,8 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
   },
   eventos: {
     kicker: "Agenda editorial",
-    title: "El territorio también ocurre hoy",
-    description: "Eventos publicados con fecha acreditada en el CMS.",
+    title: "¿Qué hacer hoy?",
+    description: "Eventos que están ocurriendo en todo el territorio…",
     media: HOME_PREMIUM_MEDIA.plaza,
     items: [],
   },
@@ -370,9 +414,8 @@ export const HOME_PREMIUM_G4_CONTENT: HomePremiumContent = {
   },
   mapa: {
     kicker: "Del relato al territorio",
-    title: "Mira el territorio y sus paradas",
-    description:
-      "El mapa oficial reúne los puntos reales publicados. En móvil, el orden sigue siendo mapa → paradas.",
+    title: "Mira en el mapa la ruta seleccionada",
+    description: "Visualiza en el territorio tu próximo recorrido por el Oriente Maya de Yucatán.",
     dto: MAP_DTO,
   },
   travelPlan: {

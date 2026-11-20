@@ -2,8 +2,12 @@
  * DestinationMediaPanels — Panel de imagen destacada (hero) y galería
  * múltiple para un destino. Usa signed upload URLs devueltas por
  * `signDestinationImageUpload` y sube directo al bucket con el token.
+ *
+ * Alux IA (sólo editores/admins): al elegir una foto pequeña para la
+ * imagen destacada, ofrece ampliarla. En galería, casilla para ampliar
+ * fotos pequeñas automáticamente en lote.
  */
-import { useRef, useState } from "react";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
@@ -13,11 +17,16 @@ import {
   registerDestinationMedia,
   removeDestinationMedia,
   reorderDestinationGallery,
+  setDestinationMediaFocal,
   signDestinationImageUpload,
 } from "@/lib/cms/destinations-media.functions";
-import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
-
-type MediaRow = Awaited<ReturnType<typeof listDestinationMedia>>[number];
+import { prepareImageForRole, readImageDimensions, withRetry } from "@/lib/cms/image-upload";
+import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
+import { SinglePanel, GalleryPanel } from "@/components/cms/MediaUploadPanels";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FocalPointPicker, type FocalPoint } from "@/components/cms/FocalPointPicker";
 
 interface Props {
   destinationId: string;
@@ -37,6 +46,7 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
     queryFn: () => listFn({ data: { destinationId } }),
   });
 
+
   const invalidate = () => {
     void qc.invalidateQueries({
       queryKey: ["cms", "destination_media", destinationId],
@@ -44,8 +54,10 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
     onChanged?.();
   };
 
-  const uploadOne = async (file: File, role: "hero" | "gallery") => {
+  const uploadOne = async (file: File, role: "hero" | "gallery", rights?: MediaRightsInput) => {
+    if (!rights) throw new Error("Confirma la autoría y el permiso de uso antes de subir.");
     const prepared = await prepareImageForRole(file, role);
+    const dimensions = await readImageDimensions(prepared);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
@@ -61,7 +73,7 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
           upsert: false,
         });
       if (upErr) throw upErr;
-      await registerFn({
+      const registered = await registerFn({
         data: {
           destinationId,
           storagePath: signed.path,
@@ -69,13 +81,16 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
           alt: file.name,
           mime: prepared.type,
           sizeBytes: prepared.size,
+          ...dimensions,
+          rights,
         },
       });
+      deriveVariantsInBackground(prepared, registered);
     });
   };
 
   const heroUpload = useMutation({
-    mutationFn: async (file: File) => uploadOne(file, "hero"),
+    mutationFn: async ({ file, rights }: { file: File; rights?: MediaRightsInput }) => uploadOne(file, "hero", rights),
     onSuccess: () => {
       invalidate();
       toast.success("Imagen destacada actualizada.");
@@ -83,12 +98,12 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo subir."),
   });
   const galleryUpload = useMutation({
-    mutationFn: async (files: File[]) => {
+    mutationFn: async ({ files, rights }: { files: File[]; rights?: MediaRightsInput }) => {
       let ok = 0;
       const errors: string[] = [];
       for (const f of files) {
         try {
-          await uploadOne(f, "gallery");
+          await uploadOne(f, "gallery", rights ? { ...rights, alt: files.length > 1 ? f.name.replace(/\.[^.]+$/, "") : rights.alt } : undefined);
           ok += 1;
         } catch (err) {
           errors.push(`${f.name}: ${err instanceof Error ? err.message : "error"}`);
@@ -125,16 +140,24 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
 
   return (
     <div className="space-y-6">
-      <HeroPanel
-        hero={hero}
-        onUpload={(f) => heroUpload.mutate(f)}
+      <SinglePanel
+        title="Imagen destacada"
+        subtitle="Se usa como portada del destino en la home y en su ficha."
+        role="hero"
+        aspect="h-52 w-full object-cover"
+        emptyLabel="Sin imagen destacada"
+        media={hero}
+        requireRights
+        onUpload={(file, rights) => heroUpload.mutate({ file, rights })}
         onRemove={(id) => removeMut.mutate(id)}
         uploading={heroUpload.isPending}
         error={heroUpload.error}
       />
       <GalleryPanel
+        subtitle="Imágenes adicionales del destino. Arrastra o selecciona varias."
         items={gallery}
-        onUpload={(files) => galleryUpload.mutate(files)}
+        requireRights
+        onUpload={(files, rights) => galleryUpload.mutate({ files, rights })}
         onRemove={(id) => removeMut.mutate(id)}
         onMove={(id, dir) => {
           const idx = gallery.findIndex((g) => g.id === id);
@@ -149,191 +172,76 @@ export function DestinationMediaPanels({ destinationId, onChanged }: Props) {
         uploading={galleryUpload.isPending}
         error={galleryUpload.error}
       />
+      <FocalAdjustPanel
+        items={rows.filter((r) => Boolean(r.previewUrl))}
+        onSaved={invalidate}
+      />
     </div>
   );
 }
 
-/* ────────────────────  HERO panel  ─────────────────────── */
-
-function HeroPanel(props: {
-  hero: MediaRow | null;
-  onUpload: (file: File) => void;
-  onRemove: (id: string) => void;
-  uploading: boolean;
-  error: unknown;
+/** Reacomodar fotos ya subidas: sólo cambia qué parte se ve, nunca el archivo. */
+function FocalAdjustPanel({
+  items,
+  onSaved,
+}: {
+  items: { id: string; previewUrl: string | null; alt: string | null; focal: FocalPoint | null }[];
+  onSaved: () => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const focalFn = useServerFn(setDestinationMediaFocal);
+  const [editing, setEditing] = useState<(typeof items)[number] | null>(null);
+  const [point, setPoint] = useState<FocalPoint>({ x: 0.5, y: 0.5 });
+  const save = useMutation({
+    mutationFn: () => focalFn({ data: { destinationMediaId: editing!.id, ...point } }),
+    onSuccess: () => {
+      toast.success("Foto acomodada.");
+      setEditing(null);
+      onSaved();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo guardar."),
+  });
+  if (items.length === 0) return null;
   return (
-    <section className="rounded-xl border border-border bg-card p-5">
-      <header className="mb-3 flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-semibold tracking-tight">Imagen destacada</h2>
-          <p className="text-xs text-muted-foreground">
-            Se usa como portada del destino en la home y en su ficha.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={props.uploading}
-          className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
-        >
-          {props.uploading ? "Subiendo…" : props.hero ? "Reemplazar" : "Subir"}
-        </button>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) props.onUpload(f);
-            e.target.value = "";
-          }}
-        />
-      </header>
-      {props.hero?.previewUrl ? (
-        <div className="relative overflow-hidden rounded-lg border border-border">
-          <img
-            src={props.hero.previewUrl}
-            alt={props.hero.alt ?? "hero"}
-            className="h-52 w-full object-cover"
-          />
-          <button
-            type="button"
-            onClick={() => props.hero && props.onRemove(props.hero.id)}
-            className="absolute right-2 top-2 rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white hover:bg-black/80"
-          >
-            Quitar
-          </button>
-        </div>
-      ) : (
-        <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border bg-background text-xs text-muted-foreground">
-          Sin imagen destacada
-        </div>
-      )}
-      {props.error instanceof Error && (
-        <p className="mt-2 text-xs text-destructive">{props.error.message}</p>
-      )}
-    </section>
-  );
-}
-
-/* ────────────────────  GALLERY panel  ─────────────────────── */
-
-function GalleryPanel(props: {
-  items: MediaRow[];
-  onUpload: (files: File[]) => void;
-  onRemove: (id: string) => void;
-  onMove: (id: string, direction: -1 | 1) => void;
-  uploading: boolean;
-  error: unknown;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
-  return (
-    <section className="rounded-xl border border-border bg-card p-5">
-      <header className="mb-3 flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-semibold tracking-tight">Galería</h2>
-          <p className="text-xs text-muted-foreground">
-            Imágenes adicionales del destino. Arrastra o selecciona varias.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={props.uploading}
-          className="h-9 rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground disabled:opacity-60"
-        >
-          {props.uploading ? "Subiendo…" : "Añadir imágenes"}
-        </button>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            const files = Array.from(e.target.files ?? []);
-            if (files.length) props.onUpload(files);
-            e.target.value = "";
-          }}
-        />
-      </header>
-
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          const files = Array.from(e.dataTransfer.files ?? []).filter((f) =>
-            f.type.startsWith("image/"),
-          );
-          if (files.length) props.onUpload(files);
-        }}
-        className={`rounded-lg border border-dashed p-3 ${
-          dragOver ? "border-primary bg-primary/5" : "border-border bg-background"
-        }`}
-      >
-        {props.items.length === 0 ? (
-          <p className="py-6 text-center text-xs text-muted-foreground">
-            Sin imágenes en galería. Arrastra archivos aquí o pulsa "Añadir".
-          </p>
-        ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {props.items.map((m, idx) => (
-              <li
-                key={m.id}
-                className="group relative overflow-hidden rounded-md border border-border bg-card"
-              >
-                {m.previewUrl ? (
-                  <img src={m.previewUrl} alt={m.alt ?? ""} className="h-28 w-full object-cover" />
-                ) : (
-                  <div className="h-28 w-full bg-muted" />
-                )}
-                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/60 px-1.5 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100">
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => props.onMove(m.id, -1)}
-                      disabled={idx === 0}
-                      className="rounded px-1.5 py-0.5 hover:bg-white/20 disabled:opacity-40"
-                      title="Mover a la izquierda"
-                    >
-                      ←
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => props.onMove(m.id, 1)}
-                      disabled={idx === props.items.length - 1}
-                      className="rounded px-1.5 py-0.5 hover:bg-white/20 disabled:opacity-40"
-                      title="Mover a la derecha"
-                    >
-                      →
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => props.onRemove(m.id)}
-                    className="rounded px-1.5 py-0.5 hover:bg-white/20"
-                    title="Eliminar"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      {props.error instanceof Error && (
-        <p className="mt-2 text-xs text-destructive">{props.error.message}</p>
-      )}
+    <section className="rounded-2xl border border-border bg-card p-4">
+      <h3 className="font-medium">Acomodar fotos</h3>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Toca una foto para elegir qué parte debe verse siempre en la portada.
+      </p>
+      <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {items.map((it) => (
+          <li key={it.id}>
+            <button
+              type="button"
+              onClick={() => {
+                setEditing(it);
+                setPoint(it.focal ?? { x: 0.5, y: 0.5 });
+              }}
+              aria-label={`Acomodar ${it.alt ?? "foto"}`}
+              className="block w-full overflow-hidden rounded-lg ring-focus"
+            >
+              <img src={it.previewUrl!} alt="" className="aspect-square w-full object-cover" />
+            </button>
+          </li>
+        ))}
+      </ul>
+      <Dialog open={Boolean(editing)} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Acomodar la foto</DialogTitle>
+          </DialogHeader>
+          {editing?.previewUrl ? (
+            <FocalPointPicker src={editing.previewUrl} value={point} onChange={setPoint} />
+          ) : null}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setEditing(null)}>
+              Cancelar
+            </Button>
+            <Button type="button" onClick={() => save.mutate()} disabled={save.isPending}>
+              Guardar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

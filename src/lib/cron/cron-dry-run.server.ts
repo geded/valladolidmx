@@ -33,6 +33,7 @@ const DRY_RUN_TRUE_VALUES = new Set(["1", "true"]);
  */
 export const CRON_DRY_RUN_READ_RPCS: ReadonlySet<string> = new Set([
   "get_orders_needing_trip_email",
+  "get_proposals_needing_payment_reminder",
   "get_coupons_needing_review_reminder",
   "list_visibility_grants_expiring",
   "list_visibility_grants_recently_expired",

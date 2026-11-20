@@ -13,6 +13,7 @@ import type {
   MarketplacePromotionCard,
 } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
 import type { PublicPlaceCard } from "@/lib/places/place-public-contract";
 import type { Destination } from "@/types/territory";
 import type {
@@ -138,6 +139,7 @@ export function businessToTourismCard(
       : [];
   return {
     id: b.id,
+    operatorId: b.id,
     entityKind: categoryToEntityKind(categorySlug),
     eyebrow: categoryToEyebrowLabel(categorySlug),
     name: b.display_name,
@@ -148,6 +150,7 @@ export function businessToTourismCard(
     // business_media → media_assets. El adaptador no debe descartarla:
     // es la misma autoridad gobernada que consumen ficha, mapa y Mi Viaje.
     mediaUrl: b.cover_url ?? null,
+    mediaAsset: b.cover_asset,
     mediaAlt: b.cover_url ? b.display_name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
@@ -180,6 +183,7 @@ function formatDate(iso: string | null | undefined): string | null {
       day: "2-digit",
       month: "short",
       year: "numeric",
+      timeZone: "America/Merida",
     }).format(new Date(iso));
   } catch {
     return iso;
@@ -188,7 +192,11 @@ function formatDate(iso: string | null | undefined): string | null {
 
 export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
   const destinationLabel = e.destination_name || humanizeSlug(e.destination_slug);
-  const dateLabel = formatDate(e.starts_at) + (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
+  const recurrence = recurrenceLabel(e);
+  const schedule = scheduleLabel(e.schedule_times);
+  const dateLabel = recurrence
+    ? [recurrence, schedule].filter(Boolean).join(" · ")
+    : formatDate(e.starts_at) + (e.ends_at ? ` – ${formatDate(e.ends_at)}` : "");
   return {
     id: e.id,
     entityKind: "event",
@@ -198,6 +206,7 @@ export function eventToTourismCard(e: PublicEventCard): TourismCardVM {
     tagline: e.summary || null,
     businessName: e.venue_name || null,
     mediaUrl: e.cover_url || null,
+    mediaAsset: e.cover_asset,
     mediaAlt: e.title,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
@@ -236,6 +245,7 @@ export function placeToTourismCard(p: PublicPlaceCard): TourismCardVM {
     // Portada gobernada del propio lugar (aprobada, no IA); sin medio
     // acreditado la tarjeta muestra el marcador neutral, nunca otra imagen.
     mediaUrl: p.cover_url || null,
+    mediaAsset: p.cover_asset,
     mediaAlt: p.cover_url ? p.name : null,
     rating: null,
     location: destinationLabel ? { label: destinationLabel, distanceKm: null } : null,
@@ -243,8 +253,7 @@ export function placeToTourismCard(p: PublicPlaceCard): TourismCardVM {
       p.latitude != null && p.longitude != null ? { lat: p.latitude, lng: p.longitude } : null,
     territorialContext: "Oriente Maya",
     highlights: [],
-    badges:
-      p.admission_kind === "gratuito" ? [{ label: "Entrada libre", tone: "success" }] : [],
+    badges: p.admission_kind === "gratuito" ? [{ label: "Entrada libre", tone: "success" }] : [],
     institutionalBadges: institutionalBadgesForDestination(p.destination_slug),
     dateLabel: null,
     availabilityLabel: null,
@@ -359,8 +368,12 @@ export function destinationToTourismCard(d: Destination): TourismCardVM {
     href: `/oriente-maya/${d.slug}`,
     tagline: d.tagline || null,
     businessName: null,
-    mediaUrl: null,
-    mediaAlt: null,
+    // `listPublishedDestinations` sólo expone `image_url` cuando la portada
+    // superó la política pública de acreditación. Conservarla aquí evita que
+    // los listados editoriales pierdan el medio gobernado antes del render.
+    mediaUrl: d.image_url ?? null,
+    mediaAsset: d.image_asset,
+    mediaAlt: d.image_url ? `${d.name} — ${d.tagline}` : null,
     rating: null,
     location: null,
     territorialContext: "Oriente Maya",

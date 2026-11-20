@@ -7,6 +7,10 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import {
+  EDITORIAL_STATUS_ORDER,
+  getEditorialStatusLabel,
+} from "@/lib/cms/editorial-language";
 
 export const Route = createFileRoute("/_authenticated/cms/")({
   head: () => ({
@@ -99,7 +103,7 @@ const ENTITIES: EntityCard[] = [
   {
     key: "decision_queue",
     name: "Cola de decisiones (CV8.9)",
-    description: "Backlog humano, asignación, evidencia e historial append-only.",
+    description: "Pendientes, asignación, evidencia e historial de decisiones.",
     to: "/cms/visitor-intel/decisions",
   },
   {
@@ -187,17 +191,15 @@ function CmsDashboard() {
       </section>
 
       <section className="mt-10 rounded-xl border border-dashed border-border bg-card/40 p-5">
-        <h2 className="text-sm font-semibold">Workflow editorial</h2>
+        <h2 className="text-sm font-semibold">Estado de publicación</h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          Todas las transiciones se ejecutarán mediante{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5">transition_content_status</code> conforme
-          a 13.4. Estados oficiales:
+          El contenido avanza por estas etapas antes de mostrarse a los visitantes:
         </p>
         <ol className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-          {["draft", "in_review", "approved", "published", "archived"].map((s, i, arr) => (
+          {EDITORIAL_STATUS_ORDER.map((s, i, arr) => (
             <li key={s} className="flex items-center gap-2">
               <span className="rounded-full border border-border bg-background px-3 py-1 font-medium">
-                {s}
+                {getEditorialStatusLabel(s)}
               </span>
               {i < arr.length - 1 && (
                 <span aria-hidden className="text-muted-foreground">
@@ -207,6 +209,12 @@ function CmsDashboard() {
             </li>
           ))}
         </ol>
+        <details className="mt-3 text-xs text-muted-foreground">
+          <summary className="cursor-pointer select-none">Detalle técnico</summary>
+          <p className="mt-2 rounded-md bg-muted/50 p-2 font-mono text-[10px]">
+            draft → in_review → approved → published → archived
+          </p>
+        </details>
       </section>
     </div>
   );

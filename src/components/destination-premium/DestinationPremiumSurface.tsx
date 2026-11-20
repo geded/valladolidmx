@@ -17,7 +17,7 @@
  *  - Pueblo Mágico sólo desde el registro y la marca institucional acreditada.
  *  - Este componente NO renderiza chrome global (header/footer/ribbon).
  */
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -27,6 +27,7 @@ import {
   Hotel,
   Images,
   Map as MapIcon,
+  MapPin,
   Search,
   Sparkles,
   Tag,
@@ -34,11 +35,16 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight, Share2 } from "lucide-react";
+import { ShareSheet } from "@/components/share/ShareSheet";
+import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 import { Container } from "@/components/layout/Container";
 import { CategoryNavGrid } from "@/components/omxds/CategoryNavGrid";
 import { ExperienceMapBlock } from "@/components/experience-builder/blocks/experience-map/ExperienceMapBlock";
 import type { ExperienceMapDTO } from "@/lib/experience-builder/blocks/experience-map/types";
 import { cn } from "@/lib/utils";
+import { resolveMediaSource } from "@/lib/media/resolve-source";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { PremiumTerritorialBreadcrumb } from "@/components/premium";
@@ -72,6 +78,11 @@ export interface DestinationPremiumSurfaceProps {
   heroVariant?: DestinationHeroVariant;
   galleryLayout?: DestinationGalleryLayout;
   sections?: Partial<Record<DestinationPremiumSectionKey, boolean>>;
+  /**
+   * Orden editable de secciones (Experience Builder). Ausente ⇒ orden
+   * aprobado `DESTINATION_PREMIUM_SECTION_ORDER`. No cambia el diseño.
+   */
+  order?: readonly DestinationPremiumSectionKey[];
   /** Servicio activo inicial (clave de categoría). */
   initialService?: string;
   className?: string;
@@ -98,6 +109,7 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
   experiencias: Sparkles,
   eventos: CalendarDays,
   promociones: Tag,
+  lugares: MapPin,
 };
 
 export function DestinationPremiumSurface({
@@ -106,6 +118,7 @@ export function DestinationPremiumSurface({
   heroVariant = "editorial",
   galleryLayout = "mosaico",
   sections,
+  order = DESTINATION_PREMIUM_SECTION_ORDER,
   initialService,
   className,
   renderServicePreview,
@@ -162,79 +175,101 @@ export function DestinationPremiumSurface({
         </Container>
       ) : null}
 
-      {DESTINATION_PREMIUM_SECTION_ORDER.map((key) => {
-        if (!visible(key)) return null;
-        switch (key) {
-          case "hero":
-            return (
-              <Container key={key} className="mt-5">
-                {heroVariant === "cinematic" ? (
-                  <HeroCinematografico content={content} heroAction={heroAction} />
-                ) : (
-                  <HeroEditorial content={content} heroAction={heroAction} />
-                )}
-              </Container>
-            );
-          case "services":
-            return (
-              <div key={key}>
-                <Container className="mt-8">
-                  <AluxDestinationGuide content={content} />
+      {order.map((key) => {
+        // Marcador de sección para el Experience Builder. No altera el render
+        // público: sólo permite seleccionar y reordenar la sección aprobada.
+        const node = ((): React.ReactNode => {
+          if (!visible(key)) return null;
+          switch (key) {
+            case "hero":
+              return (
+                <Container key={key} className="mt-5">
+                  {heroVariant === "cinematic" ? (
+                    <HeroCinematografico content={content} heroAction={heroAction} />
+                  ) : (
+                    <HeroEditorial content={content} heroAction={heroAction} />
+                  )}
                 </Container>
-                <Container className="mt-8">
-                  <ServiciosStrip
-                    content={content}
-                    active={activeService}
-                    onSelect={setActiveService}
-                    navigation={serviceNavigation}
-                    hrefByKey={serviceHrefByKey}
-                  />
+              );
+            case "services":
+              return (
+                <div key={key}>
+                  <Container className="mt-8">
+                    <AluxDestinationGuide content={content} />
+                  </Container>
+                  <Container className="mt-8">
+                    <ServiciosStrip
+                      content={content}
+                      active={activeService}
+                      onSelect={setActiveService}
+                      navigation={serviceNavigation}
+                      hrefByKey={serviceHrefByKey}
+                    />
+                  </Container>
+                </div>
+              );
+            case "descubre": {
+              // Sin párrafos propios y sin medios la sección sólo aportaba
+              // espacio en blanco: no se renderiza.
+              const hasDescubreText = content.descubre.paragraphs.some((p) => p.trim().length > 0);
+              const hasDescubreMedia = content.descubre.media.some((m) => Boolean(m.url));
+              if (!hasDescubreText && !hasDescubreMedia) return null;
+              return (
+                <Container key={key} className={heroVariant === "editorial" ? "mt-8" : "mt-14"}>
+                  <DescubreDestino content={content} compactTop={heroVariant === "editorial"} />
                 </Container>
-              </div>
-            );
-          case "descubre":
-            return (
-              <Container key={key} className="mt-14">
-                <DescubreDestino content={content} />
-              </Container>
-            );
-          case "gallery":
-            return (
-              <Container key={key} className="mt-14">
-                <GaleriaEditorial content={content} layout={galleryLayout} />
-              </Container>
-            );
-          case "servicePreview":
-            return service ? (
-              <Container key={key} className="mt-14">
-                {renderServicePreview ? (
-                  renderServicePreview(service)
-                ) : (
-                  <ServicioPreview content={content} service={service} />
-                )}
-              </Container>
-            ) : null;
-          case "routes":
-            return routes.length > 0 ? (
-              <Container key={key} className="mt-14">
-                <DestinationRoutes content={content} routes={routes} />
-              </Container>
-            ) : null;
-          case "map":
-            return (
-              <Container key={key} className="mt-16">
-                <ExperienceMapBlock dto={mapDto} />
-              </Container>
-            );
-          case "nearby":
-            return (
-              <Container key={key} className="mt-16">
-                <CercaDelDestino content={content} />
-              </Container>
-            );
-          default:
-            return null;
-        }
+              );
+            }
+            case "gallery": {
+              // Sin fotografías propias la galería sólo aportaba espacio en blanco.
+              const hasGalleryMedia = content.gallery.items.some((m) => Boolean(m.url));
+              if (!hasGalleryMedia) return null;
+              // Portada editorial tipo Airbnb: todas las fotografías ya viven en
+              // "Ver todas las fotos"; no se repite una segunda galería suelta.
+              if (heroVariant !== "cinematic") return null;
+              return (
+                <Container key={key} className="mt-14">
+                  <GaleriaEditorial content={content} layout={galleryLayout} />
+                </Container>
+              );
+            }
+            case "servicePreview":
+              return service ? (
+                <Container key={key} className="mt-14">
+                  {renderServicePreview ? (
+                    renderServicePreview(service)
+                  ) : (
+                    <ServicioPreview content={content} service={service} />
+                  )}
+                </Container>
+              ) : null;
+            case "routes":
+              return routes.length > 0 ? (
+                <Container key={key} className="mt-14">
+                  <DestinationRoutes content={content} routes={routes} />
+                </Container>
+              ) : null;
+            case "map":
+              return (
+                <Container key={key} className="mt-16">
+                  <ExperienceMapBlock dto={mapDto} />
+                </Container>
+              );
+            case "nearby":
+              return (
+                <Container key={key} className="mt-16">
+                  <CercaDelDestino content={content} />
+                </Container>
+              );
+            default:
+              return null;
+          }
+        })();
+        return node ? (
+          <div key={key} data-eb-section={key}>
+            {node}
+          </div>
+        ) : null;
       })}
     </div>
   );
@@ -262,11 +297,11 @@ function DestinationRoutes({
     items.length > 0 ? (
       <section aria-labelledby={id} className="mt-10 first:mt-0">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">{kicker}</p>
-        <h2 id={id} className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+        <h2 id={id} className="mt-2 font-serif text-xl leading-snug sm:text-2xl">
           {title}
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin] [&>a]:w-60 [&>a]:max-w-[calc(100%-1rem)] [&>a]:shrink-0 [&>a]:snap-start">
           {items.map((route) => (
             <Link
               key={route.id}
@@ -279,20 +314,20 @@ function DestinationRoutes({
                   purpose: "personalization",
                 })
               }
-              className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {route.coverUrl ? (
                 <EditorialMediaFrame
-                  media={{ url: route.coverUrl, alt: route.coverAlt ?? route.name }}
+                  media={{ url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset }}
                   label={route.name}
-                  className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className="aspect-video w-full shrink-0 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
               ) : null}
               <div className="p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                   {route.originDestinationLabel ?? "Oriente Maya de Yucatán"}
                 </p>
-                <h3 className="mt-1 font-serif text-xl">{route.name}</h3>
+                <h3 className="mt-1 font-serif text-base font-semibold leading-snug">{route.name}</h3>
                 {route.summary ? (
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{route.summary}</p>
                 ) : null}
@@ -304,9 +339,6 @@ function DestinationRoutes({
                     .filter(Boolean)
                     .join(" · ")}
                 </p>
-                <span className="mt-3 inline-flex items-center text-xs font-semibold text-foreground">
-                  Ver ruta <ArrowRight className="ml-1 size-3" aria-hidden />
-                </span>
               </div>
             </Link>
           ))}
@@ -366,6 +398,11 @@ function DestinationIdentity({ content }: { content: DestinationPremiumContent }
   ];
   return (
     <InstitutionalBadgesBlock
+      className="w-auto [&>ul]:justify-center"
+      navigationHrefs={{
+        "pueblo-magico": `${resolveCanonicalPath({ kind: "region", slug: "oriente-maya" })}?destination=${encodeURIComponent(content.slug)}#pueblos-magicos`,
+        "oriente-maya": `${resolveCanonicalPath({ kind: "region", slug: "oriente-maya" })}?destination=${encodeURIComponent(content.slug)}`,
+      }}
       config={{
         source: "destination",
         subjectSlug: content.slug,
@@ -383,36 +420,81 @@ function DestinationIdentity({ content }: { content: DestinationPremiumContent }
 function HeroCopy({
   content,
   compact = false,
+  distributed = false,
   heroAction,
 }: {
   content: DestinationPremiumContent;
   compact?: boolean;
+  distributed?: boolean;
   heroAction?: ReactNode;
 }) {
   return (
-    <div className={compact ? "" : "max-w-2xl"}>
+    <div className={cn(compact ? "min-w-0" : "max-w-2xl", !distributed && "text-center")}>
+      <div className="flex min-w-0 flex-wrap items-center justify-center gap-2 max-sm:flex-nowrap max-sm:gap-1 max-sm:[--badge-gap-sm:0.25rem] max-sm:[--badge-px-sm:0.375rem] max-sm:[--badge-text-sm:10px] max-sm:[&_img]:size-5 max-sm:[&_ul]:flex-nowrap">
       <DestinationIdentity content={content} />
-      <h1 className="mt-4 font-serif text-display-hero tracking-tight text-foreground">
+      <Button variant="ghost" size="sm" className="h-8 shrink-0 rounded-pill px-3 text-xs font-medium max-sm:gap-0.5 max-sm:px-1 max-sm:text-[10px] max-sm:[&_svg]:size-3" asChild>
+        <Link to="/arma-tu-viaje" search={{ destination: content.slug, destinationLabel: content.hero.title }}>
+          {content.hero.primaryCta.label}<ArrowRight className="size-3.5 shrink-0" aria-hidden />
+        </Link>
+      </Button>
+      </div>
+      <div className={cn("mt-3", distributed && "grid min-w-0 gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center lg:gap-x-10")}>
+      <div className="min-w-0">
+      <h1 className="text-balance font-serif text-3xl leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
         {content.hero.title}
       </h1>
-      <p className="mt-3 text-lg text-foreground/80 sm:text-xl">{content.hero.subtitle}</p>
-      <p className="mt-4 max-w-xl text-base text-muted-foreground">{content.hero.description}</p>
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Button size="lg" className="rounded-pill px-6" asChild>
-          <a href={content.hero.primaryCta.href}>
-            {content.hero.primaryCta.label}
-            <ArrowRight className="ml-2 size-4" aria-hidden />
-          </a>
-        </Button>
-        <Button size="lg" variant="outline" className="rounded-pill px-6" asChild>
+      <p className="mt-2.5 text-base text-foreground/80 sm:text-lg">{content.hero.subtitle}</p>
+      {content.hero.description ? (
+        <p className={cn("mt-3 line-clamp-3 max-w-xl text-sm leading-6 text-muted-foreground", !distributed && "mx-auto")}>
+          {content.hero.description}
+        </p>
+      ) : null}
+      </div>
+      {/* Acciones compactas y armonizadas con el entorno (paridad con Home). */}
+      <div className={cn("flex min-w-0 flex-wrap items-center gap-1 gap-y-2", distributed ? "justify-start flex-nowrap sm:shrink-0 sm:justify-end max-sm:gap-0.5 max-sm:[&>*]:shrink-0 max-[380px]:gap-0! max-[380px]:[&>a]:px-0.5! max-[380px]:[&>button]:px-1! max-[380px]:[&>a]:text-[11px]! max-[380px]:[&>button]:text-[11px]! max-sm:[&>a]:min-h-11 max-sm:[&>button]:min-h-11 max-sm:[&>a]:px-1 max-sm:[&>button]:px-1 max-sm:[&>a]:text-xs max-sm:[&>button]:text-xs max-sm:[&>a]:gap-1 max-sm:[&>button]:gap-1 max-sm:[&>a_svg]:mr-0 max-sm:[&>button_svg]:mr-0 max-sm:[&>a_svg]:size-3.5 max-sm:[&>button_svg]:size-3.5" : "mt-4 justify-center")}>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm"
+          asChild
+        >
           <a href={content.hero.secondaryCta.href}>
-            <Images className="mr-2 size-4" aria-hidden />
+            <Images className="mr-1.5 size-4" aria-hidden />
             {content.hero.secondaryCta.label}
           </a>
         </Button>
+        <DestinationShareButton title={content.hero.title} />
         {heroAction}
       </div>
+      </div>
     </div>
+  );
+}
+
+/* Compartir destino: mismo patrón oficial (ShareSheet) que lugares y empresas. */
+function DestinationShareButton({ title }: { title: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        type="button"
+        size="sm"
+        variant="ghost"
+        onClick={() => setOpen(true)}
+        className="h-9 rounded-pill px-3 text-[13px] text-foreground/70 hover:text-foreground sm:h-10 sm:text-sm"
+      >
+        <Share2 className="mr-1.5 size-4" aria-hidden />
+        Compartir
+      </Button>
+      <ShareSheet
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
+        text="Descubre este destino del Oriente Maya."
+        heading="Compartir destino"
+      />
+    </>
   );
 }
 
@@ -423,31 +505,281 @@ function HeroEditorial({
   content: DestinationPremiumContent;
   heroAction?: ReactNode;
 }) {
-  const [a, b] = content.hero.supporting;
   const hasCover = Boolean(content.hero.cover.url);
+  const slides = [content.hero.cover, ...content.hero.supporting].filter((m) =>
+    Boolean(m?.url),
+  ) as DestinationPremiumMedia[];
+  const [index, setIndex] = useState(0);
+  const [open, setOpen] = useState(false);
+  const total = slides.length;
+  const mosaic = slides.slice(0, 5);
+  const sliderRef = useRef<HTMLUListElement>(null);
+  const slideTo = (i: number) => {
+    const el = sliderRef.current;
+    if (!el) return;
+    const next = (i + total) % total;
+    el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+  };
+  const openAt = (i: number) => {
+    setIndex(i);
+    setOpen(true);
+  };
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-      <HeroCopy content={content} heroAction={heroAction} />
-      <div
-        data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}
-        className="grid grid-cols-2 gap-3 sm:gap-4"
-      >
-        <EditorialMediaFrame
-          media={content.hero.cover}
-          label={content.hero.title}
-          loading="eager"
-          className="col-span-2 h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72"
-          markerClassName="shadow-soft"
-        />
-        {[a, b].filter(Boolean).map((m, index) => (
+    // Portada tipo Airbnb: la fotografía manda; título y acciones debajo.
+    <section aria-label={`Fotografías y presentación de ${content.hero.title}`}>
+      <div data-destination-media={hasCover ? "g8-m1" : "editorial-neutral"}>
+        {total === 0 ? (
           <EditorialMediaFrame
-            key={(m as DestinationPremiumMedia).url || `neutral-${index}`}
-            media={m as DestinationPremiumMedia}
-            className="h-36 w-full rounded-2xl object-cover shadow-soft sm:h-44"
+            media={null}
+            label={content.hero.title}
+            className="h-60 w-full rounded-3xl sm:h-96"
+            markerClassName="shadow-soft"
           />
-        ))}
+        ) : (
+          <>
+            {/* Móvil: deslizable a todo el ancho con contador. */}
+            <div className="relative -mx-4 sm:hidden">
+              <ul
+                ref={sliderRef}
+                className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                aria-label={`Fotografías de ${content.hero.title}`}
+                onScroll={(e) => {
+                  const el = e.currentTarget;
+                  setIndex(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)));
+                }}
+              >
+                {slides.map((m, i) => (
+                  <li key={(m.url || "s") + i} className="w-full shrink-0 snap-center">
+                    <button
+                      type="button"
+                      className="block w-full"
+                      onClick={() => openAt(i)}
+                      aria-label={`Ampliar fotografía ${i + 1} de ${total}`}
+                    >
+                      <EditorialMediaFrame
+                        media={m}
+                        label={content.hero.title}
+                        loading={i === 0 ? "eager" : "lazy"}
+                        context="hero"
+                        sizes="100vw"
+                        className="aspect-[4/3] w-full object-cover"
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {total > 1 ? (
+                <>
+                  <span className="pointer-events-none absolute right-3 top-3 rounded-lg bg-foreground/70 px-2 py-1 text-xs font-semibold text-background">
+                    {Math.min(index, total - 1) + 1} / {total}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => slideTo(index - 1)}
+                    aria-label="Fotografía anterior"
+                    className="absolute left-3 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-background/90 text-foreground shadow-soft ring-focus"
+                  >
+                    <ChevronLeft className="size-5" aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => slideTo(index + 1)}
+                    aria-label="Fotografía siguiente"
+                    className="absolute right-3 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-background/90 text-foreground shadow-soft ring-focus"
+                  >
+                    <ChevronRight className="size-5" aria-hidden />
+                  </button>
+                  <div className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5" aria-hidden>
+                    {slides.slice(0, Math.min(total, 7)).map((_, d) => {
+                      const active = Math.min(index, total - 1) === d || (d === 6 && index >= 6);
+                      return <span key={d} className={cn("size-1.5 rounded-full bg-background/60 transition-all", active && "w-4 bg-background")} />;
+                    })}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openAt(Math.min(index, total - 1))}
+                    className="absolute bottom-3 right-3 h-8 bg-background px-2.5 text-xs"
+                  >
+                    <Images className="size-3.5" aria-hidden />
+                    Ver todas ({total})
+                  </Button>
+                </>
+              ) : null}
+            </div>
+            {/* Tableta y escritorio: mosaico de hasta 5 fotografías. */}
+            <div
+              className={cn(
+                "relative hidden gap-2 overflow-hidden rounded-3xl sm:grid sm:h-[22rem] lg:h-[28rem]",
+                mosaic.length >= 5
+                  ? "sm:grid-cols-4 sm:grid-rows-2"
+                  : mosaic.length >= 3
+                    ? "sm:grid-cols-3 sm:grid-rows-2"
+                    : mosaic.length === 2
+                      ? "sm:grid-cols-2"
+                      : "sm:grid-cols-1",
+              )}
+            >
+              {mosaic.map((m, i) => (
+                <button
+                  key={(m.url || "m") + i}
+                  type="button"
+                  onClick={() => openAt(i)}
+                  aria-label={`Ampliar fotografía ${i + 1} de ${total}`}
+                  className={cn(
+                    "group relative min-h-0 overflow-hidden ring-focus",
+                    i === 0 && mosaic.length >= 3 && "col-span-2 row-span-2",
+                    i === 0 && mosaic.length === 3 && "col-span-2",
+                  )}
+                >
+                  <EditorialMediaFrame
+                    media={m}
+                    label={content.hero.title}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : undefined}
+                    context="hero"
+                    sizes={i === 0 ? "(min-width: 640px) 50vw, 100vw" : "25vw"}
+                    className="absolute inset-0 size-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                  />
+                </button>
+              ))}
+              {total > 1 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openAt(0)}
+                  className="absolute bottom-4 right-4 bg-background"
+                >
+                  <Images className="size-4" aria-hidden />
+                  Ver todas las fotos ({total})
+                </Button>
+              ) : null}
+            </div>
+          </>
+        )}
       </div>
+      <div className="mt-5 sm:mt-6">
+        <HeroCopy content={content} compact distributed heroAction={heroAction} />
+      </div>
+      <DestinationPhotoLightbox
+        title={content.hero.title}
+        slides={slides}
+        open={open}
+        index={index}
+        onIndex={setIndex}
+        onOpenChange={setOpen}
+      />
     </section>
+  );
+}
+
+function DestinationPhotoLightbox({
+  title,
+  slides,
+  open,
+  index,
+  onIndex,
+  onOpenChange,
+}: {
+  title: string;
+  slides: DestinationPremiumMedia[];
+  open: boolean;
+  index: number;
+  onIndex: (i: number) => void;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const total = slides.length;
+  const i = Math.min(Math.max(0, index), Math.max(0, total - 1));
+  const current = slides[i];
+  const go = (d: number) => onIndex((i + d + total) % total);
+  const [touchX, setTouchX] = useState<number | null>(null);
+  if (!current) return null;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="max-w-5xl gap-3 p-3 sm:p-5"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight") go(1);
+          if (e.key === "ArrowLeft") go(-1);
+        }}
+      >
+        <DialogTitle className="font-serif text-lg">
+          {title} · {i + 1} / {total}
+        </DialogTitle>
+        <div
+          className="relative overflow-hidden rounded-2xl bg-muted"
+          onTouchStart={(e) => setTouchX(e.touches[0]?.clientX ?? null)}
+          onTouchEnd={(e) => {
+            const end = e.changedTouches[0]?.clientX;
+            if (touchX != null && end != null && Math.abs(end - touchX) > 40) go(end < touchX ? 1 : -1);
+            setTouchX(null);
+          }}
+        >
+          <EditorialMediaFrame
+            key={current.url + i}
+            media={current}
+            label={title}
+            loading="eager"
+            context="gallery"
+            sizes="(min-width: 1024px) 64rem, 100vw"
+            className="h-[42dvh] w-full object-contain sm:h-[62dvh]"
+          />
+          {total > 1 ? (
+            <>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                aria-label="Fotografía anterior"
+                onClick={() => go(-1)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/90"
+              >
+                <ChevronLeft className="size-5" aria-hidden />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                aria-label="Fotografía siguiente"
+                onClick={() => go(1)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/90"
+              >
+                <ChevronRight className="size-5" aria-hidden />
+              </Button>
+            </>
+          ) : null}
+        </div>
+        {total > 1 ? (
+          <ul className="flex gap-2 overflow-x-auto pb-1" aria-label="Miniaturas">
+            {slides.map((m, j) => (
+              <li key={(m.url || "t") + j} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onIndex(j)}
+                  aria-label={`Ver fotografía ${j + 1}`}
+                  aria-current={j === i}
+                  className={cn(
+                    "block overflow-hidden rounded-lg ring-focus transition",
+                    j === i ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100",
+                  )}
+                >
+                  <EditorialMediaFrame
+                    media={m}
+                    label={title}
+                    context="gallery"
+                    sizes="5rem"
+                    loading="eager"
+                    className="h-14 w-20 object-cover"
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -461,12 +793,11 @@ function HeroCinematografico({
   if (!content.hero.cover.url) return <HeroEditorial content={content} heroAction={heroAction} />;
   return (
     <section className="relative overflow-hidden rounded-3xl shadow-floating">
-      <img
-        src={content.hero.cover.url}
+      <picture className="contents">{resolveMediaSource(content.hero.cover.asset, { fallbackUrl: content.hero.cover.url, context: "hero", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img src={resolveMediaSource(content.hero.cover.asset, { fallbackUrl: content.hero.cover.url, context: "hero" }).src}
         alt={content.hero.cover.alt}
         loading="eager"
         className="h-[420px] w-full object-cover sm:h-[520px]"
-      />
+      /></picture>
       <div
         className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/5"
         aria-hidden
@@ -511,7 +842,7 @@ function ServiciosStrip({
         onSelect={navigates ? undefined : onSelect}
         showCounts={false}
         variant="standard"
-        desktopColumnsClassName="lg:grid-cols-6"
+        desktopColumnsClassName={services.length > 6 ? "lg:grid-cols-4" : "lg:grid-cols-6"}
       />
       {content.servicesNote ? (
         <p className="mt-2 text-xs text-muted-foreground">{content.servicesNote}</p>
@@ -520,41 +851,46 @@ function ServiciosStrip({
   );
 }
 
-function DescubreDestino({ content }: { content: DestinationPremiumContent }) {
-  const [lead, ...rest] = content.descubre.media.filter((item) => Boolean(item.url));
+function DescubreDestino({ content, compactTop = false }: { content: DestinationPremiumContent; compactTop?: boolean }) {
+  const [lead] = content.descubre.media.filter((item) => Boolean(item.url));
+  const hasMedia = Boolean(lead);
   return (
-    <section aria-labelledby="descubre-destino" className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-          {content.descubre.kicker}
-        </p>
-        <h2 id="descubre-destino" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+    <section
+      aria-labelledby="descubre-destino"
+      className={cn(
+        "border-y border-border",
+        compactTop ? "pb-10 pt-8 sm:pb-14" : "py-10 sm:py-14",
+        hasMedia ? "grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-12" : "grid gap-8",
+      )}
+    >
+      {hasMedia ? (
+        <div className="min-w-0 lg:sticky lg:top-24 lg:col-span-5">
+          <EditorialMediaFrame
+            media={lead}
+            label={content.hero.title}
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-elevated sm:aspect-[16/9] lg:aspect-[4/3]"
+          />
+        </div>
+      ) : null}
+      <div className={hasMedia ? "min-w-0 lg:col-span-7" : "max-w-3xl"}>
+        <div className="flex items-center gap-3">
+          <span className="h-px w-8 shrink-0 bg-primary" aria-hidden />
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            {content.descubre.kicker}
+          </p>
+        </div>
+        <h2
+          id="descubre-destino"
+          className="mt-4 max-w-2xl font-serif text-2xl leading-tight tracking-tight sm:text-3xl"
+        >
           {content.descubre.title}
         </h2>
-        <div className="mt-4 space-y-4 text-base leading-relaxed text-foreground/80">
+        <div className="mt-5 max-w-[68ch] space-y-4 text-base leading-relaxed text-foreground/80">
           {content.descubre.paragraphs.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
         </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        {lead ? (
-          <img
-            src={lead.url}
-            alt={lead.alt}
-            loading="lazy"
-            className="col-span-2 h-48 w-full rounded-2xl object-cover shadow-soft"
-          />
-        ) : null}
-        {rest.slice(0, 2).map((m) => (
-          <img
-            key={m.url}
-            src={m.url}
-            alt={m.alt}
-            loading="lazy"
-            className="h-40 w-full rounded-2xl object-cover shadow-soft"
-          />
-        ))}
       </div>
     </section>
   );
@@ -588,16 +924,15 @@ function GaleriaEditorial({
       {layout === "mosaico" ? (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
+            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
+              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
               alt={m.alt}
               loading="lazy"
               className={cn(
                 "w-full rounded-3xl object-cover shadow-soft",
                 i === 0 ? "col-span-2 row-span-2 h-64 sm:h-[21rem]" : "h-32 sm:h-40",
               )}
-            />
+            /></picture>
           ))}
         </div>
       ) : null}
@@ -610,12 +945,11 @@ function GaleriaEditorial({
         >
           {items.map((m, i) => (
             <li key={m.url + i} className="w-[78%] shrink-0 snap-center sm:w-[42%]">
-              <img
-                src={m.url}
+              <picture className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
                 alt={m.alt}
                 loading="lazy"
                 className="h-60 w-full rounded-3xl object-cover shadow-soft"
-              />
+              /></picture>
             </li>
           ))}
         </ul>
@@ -624,13 +958,12 @@ function GaleriaEditorial({
       {layout === "cuadricula" ? (
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
           {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
+            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
+              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
               alt={m.alt}
               loading="lazy"
               className="h-48 w-full rounded-3xl object-cover shadow-soft"
-            />
+            /></picture>
           ))}
         </div>
       ) : null}
@@ -638,13 +971,12 @@ function GaleriaEditorial({
       {layout === "tira" ? (
         <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
           {items.map((m, i) => (
-            <img
-              key={m.url + i}
-              src={m.url}
+            <picture key={m.url + i} className="contents">{resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery", sizes: "100vw" }).sources.map((source) => <source key={source.type} type={source.type} srcSet={source.srcSet} sizes={source.sizes} />)}<img 
+              src={resolveMediaSource(m.asset, { fallbackUrl: m.url, context: "gallery" }).src}
               alt={m.alt}
               loading="lazy"
               className="h-24 w-full rounded-2xl object-cover shadow-soft sm:h-28"
-            />
+            /></picture>
           ))}
         </div>
       ) : null}
@@ -727,7 +1059,7 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
         {content.nearby.kicker}
       </p>
-      <h2 id="cerca-del-destino" className="mt-2 font-serif text-3xl tracking-tight sm:text-4xl">
+      <h2 id="cerca-del-destino" className={cn("mt-2 font-serif", regionalCatalog ? "text-3xl tracking-tight sm:text-4xl" : "text-xl leading-snug sm:text-2xl")}>
         {content.nearby.title}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{content.nearby.description}</p>
@@ -749,18 +1081,18 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
           />
         </div>
       ) : null}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={regionalCatalog ? "mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "mt-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin] [&>a]:w-60 [&>a]:max-w-[calc(100%-1rem)] [&>a]:shrink-0 [&>a]:snap-start [&>article]:w-60 [&>article]:max-w-[calc(100%-1rem)] [&>article]:shrink-0 [&>article]:snap-start"}>
         {shown.map((d) => {
           const card = (
             <article
               key={d.slug}
-              className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+              className={cn("group min-w-0 overflow-hidden border border-border bg-card shadow-soft", regionalCatalog ? "rounded-3xl" : "h-full rounded-2xl")}
             >
               <div className="relative">
                 <EditorialMediaFrame
                   media={d.media}
                   label={d.name}
-                  className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className={cn("w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]", regionalCatalog ? "h-44" : "aspect-video")}
                 />
                 {isPuebloMagico(d.slug) ? (
                   <span className="absolute left-3 top-3 rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
@@ -769,7 +1101,7 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
                 ) : null}
               </div>
               <div className="p-4">
-                <h3 className="font-serif text-lg">{d.name}</h3>
+                <h3 className={cn("font-serif", regionalCatalog ? "text-lg" : "text-base font-semibold leading-snug")}>{d.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{d.tagline}</p>
                 {d.distance ? (
                   <p className="mt-3 inline-flex items-center gap-1.5 text-xs text-foreground/70">
@@ -784,7 +1116,7 @@ function CercaDelDestino({ content }: { content: DestinationPremiumContent }) {
             <Link
               key={d.slug}
               to={d.href}
-              className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className={cn("block min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", regionalCatalog ? "rounded-3xl" : "rounded-2xl")}
             >
               {card}
             </Link>

@@ -7,6 +7,7 @@
  *   2) supabase.storage.uploadToSignedUrl(path, token, file) directo a Storage.
  *   3) registerBusinessMedia → media_assets + business_media + auditoría.
  */
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ import {
 } from "@/lib/portal/business-media.functions";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { prepareImageForRole } from "@/lib/cms/image-upload";
 import { toPlanLimitMessage } from "@/lib/visibility/plan-limit-errors";
 import { toast } from "@/lib/toast";
 
@@ -152,10 +154,13 @@ function MediaSection({
       queryKey: ["portal", "media", businessId],
     });
 
-  const handleUpload = async (file: File) => {
+  const handleUpload = async (original: File) => {
     setBusy(true);
     setStatus(null);
     try {
+      setStatus("Optimizando imagen para web…");
+      const file = await prepareImageForRole(original, role);
+
       const ticket = await ticketFn({
         data: {
           businessId,
@@ -176,7 +181,7 @@ function MediaSection({
 
       const dims = await readImageDimensions(file);
 
-      await registerFn({
+      const registered = await registerFn({
         data: {
           businessId,
           role,
@@ -191,6 +196,7 @@ function MediaSection({
           sortOrder: items.length,
         },
       });
+      deriveVariantsInBackground(file, registered);
       setStatus("Archivo cargado.");
       await refresh();
     } catch (err) {

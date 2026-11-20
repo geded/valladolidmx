@@ -27,8 +27,27 @@ import { PILOT_NON_DEMO_FILTER } from "@/lib/omxds/pilot-allowlist";
 import { PUBLIC_APPROVED_REVIEW_STATE } from "@/lib/omxds/public-eligibility";
 import { buildCanonicalEntityUrl } from "./canonical-entity-binding";
 import { isAccreditedDestinationMedia } from "@/lib/destinations/public-media-policy";
-import { toStablePublicMediaUrl } from "@/lib/media/stable-public-url";
+import {
+  STABLE_PUBLIC_MEDIA_BUCKET,
+  STABLE_PUBLIC_MEDIA_PREFIX,
+  toStablePublicMediaUrl,
+} from "@/lib/media/stable-public-url";
+import { toDerivedPublicMediaUrl } from "@/lib/media/derived-public-url";
+import type { MediaAssetInput, MediaVariantInput } from "@/lib/media/resolve-source";
+import { HOME_PREMIUM_MEDIA } from "@/components/home-premium/home-premium-content";
+
+/** URLs estables ya aprobadas del fixture editorial de la portada. */
+const HOME_PREMIUM_STABLE_MEDIA_URLS: string[] = Object.values(HOME_PREMIUM_MEDIA).map(
+  (m) => m.url,
+);
 import { readPublishedRouteCards } from "@/lib/routes-editorial/route-public-reads.server";
+import {
+  nextEventOccurrence,
+  normalizeExceptionDates,
+  normalizeScheduleTimes,
+  toRecurrencePayload,
+} from "@/lib/events/recurrence";
+import type { EventRecurrenceInput, EventRecurrencePayload } from "@/lib/events/recurrence";
 import {
   routeDifficultyLabel,
   routeDurationLabel,
@@ -135,7 +154,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
   },
   products: {
     select:
-      "id, slug, name, tagline, cover_media_id, price_amount, price_currency, metadata, businesses:business_id ( slug, status, deleted_at, source_review_state, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
+      "id, slug, name, tagline, cover_media_id, price_amount, price_currency, metadata, businesses:business_id ( id, slug, status, deleted_at, source_review_state, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ) )",
     filterable: ["status", "deleted_at", "slug", "name"],
     defaultOrder: { column: "name", ascending: true },
     adapt: (row) => {
@@ -155,6 +174,7 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
       const priceRaw = row.price_amount;
       return {
         id: str(row.id),
+        business_id: str(biz.id),
         slug,
         name,
         short_description: str(row.tagline),
@@ -174,23 +194,47 @@ export const SMART_BLOCK_TABLES: Record<string, TableSpec> = {
     },
   },
   events: {
-    select: "id, slug, title, summary, cover_media_id, starts_at, ends_at",
+    select:
+      "id, slug, title, summary, cover_media_id, starts_at, ends_at, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
     filterable: ["status", "deleted_at", "slug", "starts_at", "ends_at"],
     defaultOrder: { column: "starts_at", ascending: true },
     adapt: (row) => {
       const slug = str(row.slug);
       const name = str(row.title);
       if (!slug || !name) return null;
+      const recurrenceInput: EventRecurrenceInput = {
+        starts_at: str(row.starts_at) ?? "",
+        ends_at: str(row.ends_at),
+        recurrence_frequency:
+          row.recurrence_frequency === "daily" ||
+          row.recurrence_frequency === "weekly" ||
+          row.recurrence_frequency === "monthly" ||
+          row.recurrence_frequency === "yearly"
+            ? row.recurrence_frequency
+            : null,
+        recurrence_interval:
+          typeof row.recurrence_interval === "number" ? row.recurrence_interval : 1,
+        recurrence_weekdays: Array.isArray(row.recurrence_weekdays)
+          ? row.recurrence_weekdays.filter((day): day is number => typeof day === "number")
+          : [],
+        recurrence_until: str(row.recurrence_until),
+        schedule_times: normalizeScheduleTimes(row.schedule_times),
+        exception_dates: normalizeExceptionDates(row.exception_dates),
+        event_timezone: str(row.event_timezone) ?? "America/Merida",
+      };
+      const next = nextEventOccurrence(recurrenceInput);
+      if (!next) return null;
       return {
         id: str(row.id),
         slug,
         name,
         short_description: str(row.summary),
         cover_image_url: null,
-        starts_at: str(row.starts_at),
-        ends_at: str(row.ends_at),
+        starts_at: next.startsAt,
+        ends_at: row.recurrence_frequency ? null : str(row.ends_at),
         href: buildCanonicalEntityUrl({ entityType: "event", slug }),
         featured: false,
+        recurrence: { ...toRecurrencePayload(recurrenceInput) },
         _media: str(row.cover_media_id) ?? undefined,
       };
     },
@@ -212,6 +256,128 @@ function getPublicClient() {
   return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+}
+
+/**
+ * H3·A4 · Carga en lote de assets + variantes `ready` para las URLs públicas
+ * estables que ya usa la portada. No cambia ninguna URL canónica: sólo añade
+ * las versiones ligeras que `resolveMediaSource()` podrá ofrecer vía
+ * `<picture>`. Fail-closed: cualquier error devuelve un mapa vacío y la
+ * superficie conserva exactamente el original de hoy.
+ */
+/** Prefijo editorial gobernado que la portada resuelve en cliente. */
+const GOVERNED_MEDIA_PATH_PREFIX = "governed/v1p1c/";
+
+/** Extrae la ruta de almacenamiento de una URL estable o firmada del bucket. */
+function toStableMediaPath(url: string): string | null {
+  if (typeof url !== "string" || url.length === 0) return null;
+  const clean = url.split("?")[0] ?? url;
+  if (clean.startsWith(STABLE_PUBLIC_MEDIA_PREFIX)) {
+    return clean.slice(STABLE_PUBLIC_MEDIA_PREFIX.length) || null;
+  }
+  const marker = `/${STABLE_PUBLIC_MEDIA_BUCKET}/`;
+  const at = clean.indexOf(marker);
+  if (at >= 0) return clean.slice(at + marker.length) || null;
+  return null;
+}
+
+export async function resolveStableMediaAssets(
+  stableUrls: string[],
+): Promise<Record<string, MediaAssetInput>> {
+  const out: Record<string, MediaAssetInput> = {};
+  const { isMediaPipelineEnabled } = await import("@/lib/media/pipeline-flag.server");
+  if (!(await isMediaPipelineEnabled())) return out;
+  /* Una misma ruta puede llegar como URL estable o como URL firmada ya
+     resuelta: conservamos todas las claves para que la superficie encuentre
+     su asset sin cambiar ninguna URL canónica. */
+  const pathToUrls = new Map<string, Set<string>>();
+  for (const url of stableUrls) {
+    const path = toStableMediaPath(url);
+    if (!path) continue;
+    const set = pathToUrls.get(path) ?? new Set<string>();
+    set.add(url);
+    pathToUrls.set(path, set);
+  }
+  const paths = Array.from(pathToUrls.keys());
+  try {
+    const client = getPublicClient();
+    const baseSelect =
+      "id, storage_bucket, storage_path, width, height, mime_type, pipeline_status";
+    const [listed, governed] = await Promise.all([
+      paths.length > 0
+        ? client
+            .from("media_assets")
+            .select(baseSelect)
+            .eq("storage_bucket", STABLE_PUBLIC_MEDIA_BUCKET)
+            .eq("status", "published")
+            .is("deleted_at", null)
+            .in("storage_path", paths)
+        : Promise.resolve({ data: [], error: null }),
+      /* El bloque editorial gobernado compone sus URLs en cliente, así que
+         sus assets se cargan por prefijo y no por lista. */
+      client
+        .from("media_assets")
+        .select(baseSelect)
+        .eq("storage_bucket", STABLE_PUBLIC_MEDIA_BUCKET)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .like("storage_path", `${GOVERNED_MEDIA_PATH_PREFIX}%`),
+    ]);
+    const assets = [...(listed.data ?? []), ...(governed.data ?? [])];
+    if (assets.length === 0) return out;
+
+    const ready = assets.filter((a) => a.pipeline_status === "ready");
+    if (ready.length === 0) return out;
+
+    const { data: variants } = await client
+      .from("media_asset_variants")
+      .select("asset_id, bucket, path, format, width, height, bytes, status, usage_context")
+      .in(
+        "asset_id",
+        ready.map((a) => a.id),
+      )
+      .eq("status", "ready")
+      .eq("is_current", true);
+
+    const byAsset = new Map<string, MediaVariantInput[]>();
+    for (const v of variants ?? []) {
+      const url = toDerivedPublicMediaUrl(v.bucket, v.path);
+      if (!url) continue;
+      const list = byAsset.get(v.asset_id) ?? [];
+      list.push({
+        format: v.format as MediaVariantInput["format"],
+        width: Number(v.width),
+        height: v.height ?? null,
+        url,
+        bytes: v.bytes ?? null,
+        status: "ready",
+        usage_context: (v.usage_context ?? null) as MediaVariantInput["usage_context"],
+      });
+      byAsset.set(v.asset_id, list);
+    }
+
+    for (const asset of ready) {
+      const stableUrl = toStablePublicMediaUrl(asset.storage_bucket, asset.storage_path);
+      const list = byAsset.get(asset.id);
+      if (!stableUrl || !list || list.length === 0) continue;
+      const entry: MediaAssetInput = {
+        id: asset.id,
+        file_url: stableUrl,
+        original_width: asset.width ?? null,
+        original_height: asset.height ?? null,
+        original_mime: asset.mime_type ?? null,
+        pipeline_status: "ready",
+        variants: list,
+      };
+      out[stableUrl] = entry;
+      for (const url of pathToUrls.get(asset.storage_path) ?? []) {
+        out[url] = entry;
+      }
+    }
+  } catch {
+    /* Fail-closed: sin variantes, la portada sirve el original de siempre. */
+  }
+  return out;
 }
 
 /**
@@ -277,7 +443,21 @@ async function resolveStableMedia(ids: string[]): Promise<Map<string, string>> {
       });
       if (!accredited) continue;
       const stableUrl = toStablePublicMediaUrl(bucket, path);
-      if (stableUrl) out.set(id, stableUrl);
+      if (stableUrl) {
+        out.set(id, stableUrl);
+      } else if (bucket === "destinations") {
+        // Portadas de destino subidas desde el CMS viven en el bucket privado
+        // de destinos: se firman igual que en la ficha pública del destino.
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: signed } = await supabaseAdmin.storage
+            .from(bucket)
+            .createSignedUrl(path, 60 * 60 * 6);
+          if (signed?.signedUrl) out.set(id, signed.signedUrl);
+        } catch {
+          /* fail-closed: la tarjeta conserva su contenido sin medio */
+        }
+      }
     }
   } catch {
     /* Fail-closed sobre imagen: la tarjeta conserva su contenido sin medio. */
@@ -341,10 +521,12 @@ export async function resolveSmartBlockQuery(q: SmartBlockQuery): Promise<SmartB
       Array.from(new Set(page.map((i) => i._media).filter((v): v is string => !!v))),
     );
 
+    const mediaAssets = await resolveStableMediaAssets(Array.from(media.values()));
     const items = page.map((i) => {
       const { _media, ...rest } = i;
       const url = _media ? (media.get(_media) ?? null) : null;
       if (url) {
+        if (mediaAssets[url]) rest.media_asset = mediaAssets[url] as unknown as SmartBlockJsonValue;
         if ("hero_image_url" in rest) rest.hero_image_url = url;
         if ("cover_image_url" in rest) rest.cover_image_url = url;
       }
@@ -455,6 +637,143 @@ export async function resolveTerritoryMapPointsQuery(limit = 60): Promise<Territ
   }
 }
 
+/**
+ * Paradas reales de cada ruta editorial con coordenadas acreditadas.
+ *
+ * El mapa del Home dibujaba sólo los DESTINOS de la ruta, por lo que las
+ * paradas intermedias publicadas (lugares como Cenote Zací o Suytun y
+ * empresas como Yerbabuena del Sisal) no aparecían. Aquí se resuelven las
+ * paradas reales de `editorial_route_stops` en su orden editorial, con la
+ * misma elegibilidad pública fail-closed. Sin coordenadas publicadas, la
+ * parada simplemente no se dibuja: nunca se inventa una ubicación.
+ */
+async function resolveRouteStopPoints(
+  routeIds: string[],
+): Promise<Map<string, TerritoryMapPoint[]>> {
+  const out = new Map<string, TerritoryMapPoint[]>();
+  const ids = Array.from(new Set(routeIds.filter(Boolean)));
+  if (!ids.length) return out;
+  try {
+    const client = getPublicClient();
+    const { data: stops, error } = await client
+      .from("editorial_route_stops")
+      .select("route_id, position, entity_kind, entity_id, title")
+      .in("route_id", ids)
+      .order("position", { ascending: true });
+    if (error) return out;
+    const rows = (stops ?? []) as Row[];
+    const idsOf = (kind: string) =>
+      Array.from(
+        new Set(
+          rows
+            .filter((r) => str(r.entity_kind) === kind && r.entity_id)
+            .map((r) => String(r.entity_id)),
+        ),
+      );
+    const destIds = idsOf("destination");
+    const placeIds = idsOf("place");
+    const bizIds = idsOf("business");
+
+    const [destRes, placeRes, bizRes] = await Promise.all([
+      destIds.length
+        ? client
+            .from("destinations")
+            .select("id, slug, name, latitude, longitude")
+            .in("id", destIds)
+            .eq("status", "published")
+            .is("deleted_at", null)
+        : Promise.resolve({ data: [], error: null }),
+      placeIds.length
+        ? client
+            .from("points_of_interest")
+            .select("id, slug, name, latitude, longitude, destinations:destination_id ( slug )")
+            .in("id", placeIds)
+            .eq("status", "published")
+            .is("deleted_at", null)
+        : Promise.resolve({ data: [], error: null }),
+      bizIds.length
+        ? client
+            .from("businesses")
+            .select(
+              "id, slug, display_name, destinations:destination_id ( slug ), business_categories:primary_category_id ( slug ), business_locations ( latitude, longitude )",
+            )
+            .in("id", bizIds)
+            .eq("status", "published")
+            .is("deleted_at", null)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+    const byId = new Map<string, TerritoryMapPoint>();
+    for (const row of (destRes.data ?? []) as Row[]) {
+      const lat = Number(row.latitude);
+      const lng = Number(row.longitude);
+      const slug = str(row.slug);
+      if (!slug || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      byId.set(String(row.id), {
+        id: String(row.id),
+        kind: "destination",
+        lat,
+        lng,
+        title: str(row.name) ?? slug,
+        subtitle: null,
+        href: `/oriente-maya/${slug}`,
+      });
+    }
+    for (const row of (placeRes.data ?? []) as Row[]) {
+      const lat = Number(row.latitude);
+      const lng = Number(row.longitude);
+      const slug = str(row.slug);
+      const destSlug = str(rel(row, "destinations")?.slug);
+      if (!slug || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      byId.set(String(row.id), {
+        // El contrato del bloque de mapa no declara `place`; el lugar se
+        // representa como punto territorial sin inventar otra familia.
+        id: String(row.id),
+        kind: "destination",
+        lat,
+        lng,
+        title: str(row.name) ?? slug,
+        subtitle: null,
+        href: destSlug ? `/oriente-maya/${destSlug}/lugares/${slug}` : null,
+      });
+    }
+    for (const row of (bizRes.data ?? []) as Row[]) {
+      const loc = rel(row, "business_locations");
+      const lat = Number(loc?.latitude);
+      const lng = Number(loc?.longitude);
+      const slug = str(row.slug);
+      if (!slug || !Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      byId.set(String(row.id), {
+        id: String(row.id),
+        kind: "business",
+        lat,
+        lng,
+        title: str(row.display_name) ?? slug,
+        subtitle: null,
+        href: buildCanonicalEntityUrl({
+          entityType: "business",
+          slug,
+          destinationSlug: str(rel(row, "destinations")?.slug),
+          categorySlug: str(rel(row, "business_categories")?.slug),
+        }),
+      });
+    }
+
+    for (const row of rows) {
+      const routeId = String(row.route_id);
+      const entityId = row.entity_id ? String(row.entity_id) : null;
+      const point = entityId ? byId.get(entityId) : null;
+      if (!point) continue;
+      const list = out.get(routeId) ?? [];
+      if (!list.some((p) => p.id === point.id)) list.push(point);
+      out.set(routeId, list);
+    }
+    return out;
+  } catch {
+    return out;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * G8-R1-F1L-R2 · Corpus real de la Home premium (`vmx.home.premium-g4`)
  *
@@ -467,6 +786,8 @@ export async function resolveTerritoryMapPointsQuery(limit = 60): Promise<Territ
  * ------------------------------------------------------------------ */
 
 export interface HomeRealCard {
+  /** Empresa operadora acreditada, cuando la fuente la declara. */
+  businessId: string | null;
   title: string;
   subtitle: string;
   category: string;
@@ -483,6 +804,8 @@ export interface HomeRealRoute {
   vibe: string;
   description: string;
   sequence: string[];
+  /** Paradas reales publicadas con coordenadas, en orden editorial. */
+  stopPoints: TerritoryMapPoint[];
   href: string;
   mediaUrl: string;
 }
@@ -492,9 +815,20 @@ export interface HomeRealContent {
   experiencias: HomeRealCard[];
   stays: HomeRealCard[];
   food: HomeRealCard[];
-  eventos: Array<HomeRealCard & { day: string }>;
+  eventos: Array<
+    HomeRealCard & {
+      day: string;
+      startsAt: string | null;
+      recurrence: EventRecurrencePayload | null;
+    }
+  >;
   rutas: HomeRealRoute[];
   mapPoints: TerritoryMapPoint[];
+  /**
+   * H3·A4 · Versiones ligeras (AVIF/WebP/JPEG) disponibles por URL pública
+   * estable. Aditivo: si falta una entrada, la superficie sirve el original.
+   */
+  mediaAssets: Record<string, MediaAssetInput>;
 }
 
 /** Pueblos Mágicos del Oriente Maya (registro configurable, G8/H-03). */
@@ -511,11 +845,13 @@ const EMPTY_HOME: HomeRealContent = {
   eventos: [],
   rutas: [],
   mapPoints: [],
+  mediaAssets: {},
 };
 
 function cardsFrom(
   result: SmartBlockResolveResult,
   category: (item: Record<string, SmartBlockJsonValue>) => string,
+  businessIdOf?: (item: Record<string, SmartBlockJsonValue>) => string | null,
 ): HomeRealCard[] {
   const out: HomeRealCard[] = [];
   for (const item of result.items) {
@@ -527,6 +863,7 @@ function cardsFrom(
       (typeof item.cover_image_url === "string" ? item.cover_image_url : null) ??
       "";
     out.push({
+      businessId: businessIdOf?.(item) ?? null,
       title,
       subtitle: typeof item.short_description === "string" ? item.short_description : "",
       category: category(item),
@@ -562,7 +899,7 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       resolveSmartBlockQuery({
         select: ["slug", "name", "short_description", "cover_image_url", "starts_at", "href"],
         table: "events",
-        limit: 6,
+        limit: 30,
       }),
       resolveTerritoryMapPointsQuery(),
       readPublishedRouteCards({ limit: 6 }),
@@ -602,8 +939,10 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       ? [valladolidItem, ...destRes.items.filter((item) => item.slug !== "valladolid")].slice(0, 8)
       : destRes.items;
     const destinos = cardsFrom({ ...destRes, items: destinationItems }, () => "Destino");
-    const businesses = cardsFrom(bizRes, (item) =>
-      typeof item.category_slug === "string" ? item.category_slug : "",
+    const businesses = cardsFrom(
+      bizRes,
+      (item) => (typeof item.category_slug === "string" ? item.category_slug : ""),
+      (item) => (typeof item.id === "string" ? item.id : null),
     );
     const byCategory = (slug: string) => businesses.filter((b) => b.category === slug);
     const stays = byCategory("hoteles")
@@ -613,15 +952,65 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       .slice(0, 4)
       .map((b) => ({ ...b, category: "Gastronomía" }));
     const experiencias = [
-      ...cardsFrom(prodRes, () => "Experiencia"),
+      ...cardsFrom(
+        prodRes,
+        () => "Experiencia",
+        (item) => (typeof item.business_id === "string" ? item.business_id : null),
+      ),
       ...byCategory("experiencias").map((b) => ({ ...b, category: "Experiencias" })),
       ...byCategory("cenotes").map((b) => ({ ...b, category: "Cenotes" })),
     ].slice(0, 6);
 
+    // La fecha acreditada del evento viaja hasta la portada para permitir
+    // búsqueda por fecha. Sin `starts_at` publicado, la tarjeta conserva el
+    // orden editorial y no declara fecha (jamás se inventa una).
+    const eventStartsByHref = new Map<string, string>();
+    const eventRecurrenceByHref = new Map<string, EventRecurrencePayload>();
+    for (const item of eventRes.items) {
+      if (typeof item.href !== "string") continue;
+      if (typeof item.starts_at === "string") eventStartsByHref.set(item.href, item.starts_at);
+      const recurrence = item.recurrence;
+      if (recurrence && typeof recurrence === "object" && !Array.isArray(recurrence)) {
+        eventRecurrenceByHref.set(item.href, recurrence as unknown as EventRecurrencePayload);
+      }
+    }
     const eventos = cardsFrom(eventRes, () => "Evento").map((card, index) => ({
       ...card,
       day: String(index + 1).padStart(2, "0"),
+      startsAt: eventStartsByHref.get(card.href) ?? null,
+      recurrence: eventRecurrenceByHref.get(card.href) ?? null,
     }));
+
+    const stopPointsByRoute = await resolveRouteStopPoints(publishedRoutes.map((r) => r.id));
+    const rutas = publishedRoutes.map((route) => ({
+      id: route.id,
+      title: route.name,
+      duration: routeDurationLabel(route) ?? "",
+      stops: route.stopCount,
+      vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
+      description: route.summary,
+      sequence: [
+        ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
+        ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
+      ],
+      stopPoints: stopPointsByRoute.get(route.id) ?? [],
+      href: routePublicPath(route.slug),
+      mediaUrl: route.coverUrl ?? "",
+    }));
+
+    const mediaAssets = await resolveStableMediaAssets([
+      ...destinos.map((c) => c.mediaUrl),
+      ...experiencias.map((c) => c.mediaUrl),
+      ...stays.map((c) => c.mediaUrl),
+      ...food.map((c) => c.mediaUrl),
+      ...eventos.map((c) => c.mediaUrl),
+      ...rutas.map((r) => r.mediaUrl),
+      ...HOME_PREMIUM_STABLE_MEDIA_URLS,
+    ]);
+
+    for (const route of publishedRoutes) {
+      if (route.coverUrl && route.coverAsset) mediaAssets[route.coverUrl] = route.coverAsset;
+    }
 
     const value: HomeRealContent = {
       destinos,
@@ -629,21 +1018,9 @@ export async function resolveHomePremiumRealContentQuery(): Promise<HomeRealCont
       stays,
       food,
       eventos,
-      rutas: publishedRoutes.map((route) => ({
-        id: route.id,
-        title: route.name,
-        duration: routeDurationLabel(route) ?? "",
-        stops: route.stopCount,
-        vibe: routePaceLabel(route.pace) ?? routeDifficultyLabel(route.difficulty) ?? "",
-        description: route.summary,
-        sequence: [
-          ...(route.originDestinationLabel ? [route.originDestinationLabel] : []),
-          ...route.destinationSlugs.map((slug) => slug.replaceAll("-", " ")),
-        ],
-        href: routePublicPath(route.slug),
-        mediaUrl: route.coverUrl ?? "",
-      })),
+      rutas,
       mapPoints,
+      mediaAssets,
     };
     homeCache = { at: Date.now(), value };
     return value;

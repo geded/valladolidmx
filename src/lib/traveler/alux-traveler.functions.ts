@@ -335,7 +335,11 @@ async function runAluxTraveler(
   const sources = extractSources(context);
 
   // Ola A2 · Inyección de la Base de Conocimiento (M4).
-  const settings = await resolveAluxSettingsServer(supabase).catch(() => null);
+  // La configuración de Alux es interna (prompt/persona/guardrails): se lee
+  // con cliente privilegiado, nunca con el cliente del usuario.
+  const settings = await import("@/integrations/supabase/client.server")
+    .then((m) => resolveAluxSettingsServer(m.supabaseAdmin))
+    .catch(() => null);
   let knowledgeBlock = "";
   let knowledgeCount = 0;
   let knowledgeIds: string[] = [];

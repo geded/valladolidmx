@@ -32,6 +32,9 @@ export interface EditorialRouteStopDTO {
   durationMinutes: number | null;
   /** Enlace canónico resuelto; `null` cuando la entidad no es navegable. */
   href: string | null;
+  /** Coordenadas acreditadas de la entidad; `null` cuando no publicó ubicación. */
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface EditorialRouteCardDTO {
@@ -53,13 +56,21 @@ export interface EditorialRouteCardDTO {
   originDestinationLabel: string | null;
   coverUrl: string | null;
   coverAlt: string | null;
+  coverAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   stopCount: number;
 }
 
 export interface EditorialRouteDetailDTO extends EditorialRouteCardDTO {
   contractVersion: string;
+  /** Texto editorial largo publicado en el CMS (`editorial_routes.body`). */
+  body: string | null;
   stops: EditorialRouteStopDTO[];
-  gallery: Array<{ url: string; alt: string | null }>;
+  roadRoute: {
+    encodedPolyline: string;
+    distanceMeters: number | null;
+    durationSeconds: number | null;
+  } | null;
+  gallery: Array<{ url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>;
 }
 
 export function routePublicPath(slug: string): string {
@@ -120,6 +131,7 @@ export function routeToTourismCard(
     tagline: route.summary || null,
     businessName: null,
     mediaUrl: route.coverUrl,
+    mediaAsset: route.coverAsset,
     mediaAlt: route.coverAlt,
     rating: null,
     location: null,

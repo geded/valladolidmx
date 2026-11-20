@@ -6,7 +6,7 @@
  * tarjetas compactas, distancia opcional) SIN sacar al visitante del
  * micrositio. Respeta el DSL Colonial — sin nuevos tokens.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck, MapPin, X, Navigation, Share2, ExternalLink, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -125,6 +125,16 @@ export function InlineCategoryExplorer({
   const items = data?.items ?? [];
   const totalCount = data?.totalCount ?? 0;
   const hasMore = totalCount > page * pageSize;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const sectionRef = useRef<HTMLElement>(null);
+  const goTo = (next: number) => {
+    setPage(Math.max(1, Math.min(totalPages, next)));
+    sectionRef.current?.querySelector("[data-inline-explorer-list]")?.scrollTo({ left: 0 });
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  useEffect(() => {
+    setPage(1);
+  }, [categorySlug, destinationSlug]);
 
   const sorted = useMemo(() => {
     if (!location) return items;
@@ -165,7 +175,7 @@ export function InlineCategoryExplorer({
   return (
     // G6-S1-A · D-G6-02: todos los controles reales del explorador
     // (botones y enlaces accionables) garantizan 44×44 px y foco visible.
-    <section
+    <section ref={sectionRef}
       aria-label={`Explorando ${label}${destinationName ? ` en ${destinationName}` : ""}`}
       className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5 [&_a[href]]:min-h-[44px] [&_button]:min-h-[44px] [&_button]:min-w-[44px] [&_button]:focus-visible:ring-2 [&_button]:focus-visible:ring-ring"
       data-inline-explorer
@@ -243,7 +253,11 @@ export function InlineCategoryExplorer({
         </p>
       ) : (
         <>
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {/* Móvil: carrusel deslizable (sin lista larga). Tableta/escritorio: rejilla. */}
+          <ul
+            className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 [&>li]:w-[85%] [&>li]:shrink-0 [&>li]:snap-start sm:[&>li]:w-auto"
+            data-inline-explorer-list
+          >
             {sorted.map((it, idx) => (
               <InlineExplorerCard
                 key={it.id}
@@ -259,24 +273,29 @@ export function InlineCategoryExplorer({
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              Página {page} · mostrando {sorted.length} de {totalCount}
+              {(page - 1) * pageSize + 1}–{(page - 1) * pageSize + sorted.length} de {totalCount}
+              {totalPages > 1 ? ` · página ${page} de ${totalPages}` : ""}
             </p>
-            <div className="flex gap-2">
-              {page > 1 ? (
+            {totalPages > 1 ? (
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  onClick={() => goTo(page - 1)}
                 >
                   ← Anterior
                 </Button>
-              ) : null}
-              {hasMore ? (
-                <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)}>
-                  Ver más
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!hasMore}
+                  onClick={() => goTo(page + 1)}
+                >
+                  Siguiente →
                 </Button>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
           </div>
         </>
       )}

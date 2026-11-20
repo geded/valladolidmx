@@ -13,6 +13,7 @@
  */
 import type { HomeRealContent } from "@/lib/experience-builder/smart-blocks.server";
 import { decodeSlotMedia } from "@/lib/media/slot-media";
+import type { MediaAssetInput } from "@/lib/media/resolve-source";
 import {
   HOME_PREMIUM_MEDIA,
   type HomePremiumContent,
@@ -36,6 +37,224 @@ function withValladolidFirst(cards: readonly Card[]): Card[] {
     ...cards.slice(valladolidIndex + 1),
   ];
 }
+
+type RowRec = Record<string, unknown>;
+
+/**
+ * Carriles del Home cuyo corpus publicado admite ajuste editorial explícito
+ * desde el constructor (texto, imagen y enlace), sin crear contenido nuevo
+ * ni sustituir el catálogo del CMS.
+ */
+export type HomeEditableRail =
+  | "destinos"
+  | "rutas"
+  | "experiencias"
+  | "stays"
+  | "food"
+  | "eventos";
+
+export const HOME_RAIL_CONFIG_KEY: Record<HomeEditableRail, string> = {
+  destinos: "destinos_items",
+  rutas: "rutas_items",
+  experiencias: "experiencias_items",
+  stays: "servicios_stays",
+  food: "servicios_food",
+  eventos: "eventos_items",
+};
+
+/** Campos editables por carril. `href_override` cubre el enlace. */
+const RAIL_EDITABLE_KEYS: Record<HomeEditableRail, readonly string[]> = {
+  destinos: ["name", "note", "pueblo_magico", "media_url", "media_alt", "href_override"],
+  rutas: [
+    "title",
+    "duration",
+    "stops",
+    "vibe",
+    "description",
+    "sequence",
+    "media_url",
+    "media_alt",
+    "href_override",
+  ],
+  experiencias: ["title", "category", "summary", "media_url", "media_alt", "href_override"],
+  stays: ["title", "destination", "category", "summary", "media_url", "media_alt", "href_override"],
+  food: ["title", "destination", "category", "summary", "media_url", "media_alt", "href_override"],
+  eventos: ["day", "title", "type", "detail", "media_url", "media_alt", "href_override"],
+};
+
+const savedRowsOf = (configured: unknown): RowRec[] =>
+  Array.isArray(configured)
+    ? configured.filter((row): row is RowRec => Boolean(row) && typeof row === "object")
+    : [];
+
+const normalizeHref = (value: unknown): string =>
+  typeof value === "string" ? value.replace(/\/$/, "") : "";
+
+/** Sólo se acepta un enlace interno canónico como override editorial. */
+const isCanonicalInternalHref = (value: unknown): value is string =>
+  typeof value === "string" && value.startsWith("/") && !value.includes("..");
+
+/** Fila base de cada carril, derivada exclusivamente del corpus publicado. */
+function railBaselineRows(rail: HomeEditableRail, real: HomeRealContent | undefined): RowRec[] {
+  switch (rail) {
+    case "destinos":
+      return withValladolidFirst(real?.destinos ?? []).map((card, index) => {
+        const media = mediaOf(card, "destination", index);
+        return {
+          name: card.title,
+          note: card.subtitle,
+          pueblo_magico: card.puebloMagico,
+          href: card.href,
+          demo: false,
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    case "rutas": {
+      const byTitle = new Map((real?.destinos ?? []).map((card) => [card.title, card]));
+      return (real?.rutas ?? []).map((route, index) => {
+        const cover = route.sequence
+          .map((title) => byTitle.get(title))
+          .find((card): card is Card => Boolean(card?.mediaUrl));
+        const media = route.mediaUrl
+          ? { url: route.mediaUrl, alt: route.title }
+          : cover
+            ? mediaOf(cover)
+            : mediaOf({ title: route.title, mediaUrl: "" }, "route", index);
+        return {
+          id: route.id,
+          title: route.title,
+          duration: route.duration,
+          stops: route.stops,
+          vibe: route.vibe,
+          description: route.description,
+          href: route.href,
+          sequence: route.sequence.map((label) => ({ label })),
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    }
+    case "experiencias":
+      return (real?.experiencias ?? []).map((card, index) => {
+        const media = mediaOf(card, "experience", index);
+        return {
+          title: card.title,
+          category: card.category,
+          summary: card.subtitle,
+          href: card.href,
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    case "stays":
+    case "food":
+      return (real?.[rail] ?? []).map((card, index) => {
+        const media = mediaOf(card, rail === "stays" ? "hotel" : "restaurant", index);
+        return {
+          title: card.title,
+          destination: card.category,
+          category: rail === "stays" ? "Hospedaje" : "Gastronomía",
+          summary: card.subtitle,
+          href: card.href,
+          media_url: media.url,
+          media_alt: media.alt,
+        };
+      });
+    case "eventos":
+      return (real?.eventos ?? []).map((card) => ({
+        day: card.day,
+        title: card.title,
+        type: card.category,
+        detail: card.subtitle,
+        href: card.href,
+        media_url: card.mediaUrl,
+        media_alt: card.mediaUrl.length > 0 ? card.title : "",
+      }));
+  }
+}
+
+/**
+ * Proyección editable de un carril real del Home: el corpus publicado
+ * conserva la autoridad sobre elegibilidad y existencia de cada tarjeta; el
+ * Studio ajusta texto, imagen y enlace sobre esas mismas filas.
+ */
+export function buildHomeRailEditorRows(
+  rail: HomeEditableRail,
+  real: HomeRealContent | undefined,
+  configured: unknown,
+): RowRec[] {
+  const saved = savedRowsOf(configured);
+  return railBaselineRows(rail, real).map((base, index) => {
+    const byHref = saved.find((row) => normalizeHref(row.href) === normalizeHref(base.href));
+    const row = byHref ?? saved[index] ?? {};
+    const out: RowRec = { ...base };
+    for (const key of RAIL_EDITABLE_KEYS[rail]) {
+      const value = row[key];
+      if (value === undefined) continue;
+      if (key === "href_override") {
+        if (isCanonicalInternalHref(value)) out.href = value;
+        continue;
+      }
+      if (typeof value === "string") {
+        if (value.trim()) out[key] = value.trim();
+        continue;
+      }
+      out[key] = value;
+    }
+    return out;
+  });
+}
+
+/** Conserva únicamente los cambios editoriales explícitos sobre el corpus. */
+export function compactHomeRailEditorOverrides(
+  rail: HomeEditableRail,
+  real: HomeRealContent | undefined,
+  next: unknown,
+): RowRec[] {
+  const baseline = railBaselineRows(rail, real);
+  const rows = savedRowsOf(next);
+  const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+
+  return baseline.flatMap((base, index) => {
+    const row = rows.find((c) => normalizeHref(c.href) === normalizeHref(base.href)) ?? rows[index];
+    if (!row) return [];
+    const override: RowRec = { href: base.href };
+    for (const key of RAIL_EDITABLE_KEYS[rail]) {
+      if (key === "href_override") continue;
+      if (row[key] === undefined) continue;
+      if (!same(row[key], base[key])) override[key] = row[key];
+    }
+    // El enlace editado llega en `href`; se guarda como override explícito.
+    if (
+      isCanonicalInternalHref(row.href) &&
+      normalizeHref(row.href) !== normalizeHref(base.href) &&
+      !rows.some((c) => normalizeHref(c.href) === normalizeHref(base.href))
+    ) {
+      override.href_override = row.href;
+    }
+    if (isCanonicalInternalHref(row.href_override)) override.href_override = row.href_override;
+    return Object.keys(override).length > 1 ? [override] : [];
+  });
+}
+
+/** Compatibilidad: puente original de Destinos. */
+export function buildHomeDestinationEditorRows(
+  real: HomeRealContent | undefined,
+  configured: unknown,
+) {
+  return buildHomeRailEditorRows("destinos", real, configured) as Array<
+    RowRec & { href: string; name: string; note: string; media_url: string; media_alt: string }
+  >;
+}
+
+export function compactHomeDestinationEditorOverrides(
+  real: HomeRealContent | undefined,
+  next: unknown,
+) {
+  return compactHomeRailEditorOverrides("destinos", real, next);
+}
+
 
 const GOVERNED_MEDIA_BASE = "/api/public/studio-media/governed/v1p1c";
 
@@ -114,122 +333,278 @@ function isApprovedConfiguredMedia(url: string): boolean {
   );
 }
 
+/**
+ * H3·A4 · Adjunta, sin alterar ninguna URL canónica, el asset con sus
+ * versiones ligeras a cada medio `{ url, alt }` del árbol de la Home. El
+ * render sigue mostrando exactamente la misma imagen; `resolveMediaSource()`
+ * decide después si puede ofrecer AVIF/WebP más livianos.
+ */
+function attachMediaAssets<T>(node: T, assets: Record<string, MediaAssetInput>): T {
+  if (Array.isArray(node)) {
+    return node.map((item) => attachMediaAssets(item, assets)) as unknown as T;
+  }
+  if (!node || typeof node !== "object") return node;
+  const record = node as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(record)) {
+    out[key] = attachMediaAssets(value, assets);
+  }
+  if (typeof record.url === "string" && typeof record.alt === "string" && !("asset" in record)) {
+    const asset = assets[decodeSlotMedia(record.url).src];
+    if (asset) out.asset = asset;
+  }
+  return out as T;
+}
+
+/**
+ * G9 · Máximo declarado por carril en el bloque editorial.
+ *
+ * El contrato ya expone `*_max_items`, pero el corpus real se fusionaba
+ * completo y anulaba esa decisión editorial. Esta lectura permite que el
+ * editor decida cuántas tarjetas se muestran en cada sección.
+ */
+export interface HomeRailLimits {
+  readonly destinos?: number;
+  readonly rutas?: number;
+  readonly experiencias?: number;
+  readonly servicios?: number;
+  readonly eventos?: number;
+  readonly categorias?: number;
+  readonly queHacer?: number;
+}
+
+function positiveLimit(value: unknown): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
+  const rounded = Math.round(value);
+  if (rounded <= 0) return undefined;
+  return Math.min(24, rounded);
+}
+
+export function readHomeRailLimits(config: unknown): HomeRailLimits {
+  if (!config || typeof config !== "object") return {};
+  const record = config as Record<string, unknown>;
+  return {
+    destinos: positiveLimit(record.destinos_max_items),
+    rutas: positiveLimit(record.rutas_max_items),
+    experiencias: positiveLimit(record.experiencias_max_items),
+    servicios: positiveLimit(record.servicios_max_items),
+    eventos: positiveLimit(record.eventos_max_items),
+    categorias: positiveLimit(record.categorias_max_items),
+    queHacer: positiveLimit(record.que_hacer_max_items),
+  };
+}
+
+function limited<T>(items: readonly T[], max: number | undefined): T[] {
+  return typeof max === "number" ? items.slice(0, max) : [...items];
+}
+
+function applyHomeRailLimits(
+  content: HomePremiumContent,
+  limits: HomeRailLimits | undefined,
+): HomePremiumContent {
+  if (!limits) return content;
+  return {
+    ...content,
+    destinos: { ...content.destinos, items: limited(content.destinos.items, limits.destinos) },
+    rutas: { ...content.rutas, items: limited(content.rutas.items, limits.rutas) },
+    experiencias: {
+      ...content.experiencias,
+      items: limited(content.experiencias.items, limits.experiencias),
+    },
+    servicios: {
+      ...content.servicios,
+      stays: limited(content.servicios.stays, limits.servicios),
+      food: limited(content.servicios.food, limits.servicios),
+    },
+    eventos: { ...content.eventos, items: limited(content.eventos.items, limits.eventos) },
+    categorias: { ...content.categorias, items: limited(content.categorias.items, limits.categorias) },
+    queHacer: { ...content.queHacer, items: limited(content.queHacer.items, limits.queHacer) },
+  };
+}
+
+/**
+ * Overrides editoriales por carril. Acepta la configuración completa del
+ * bloque o, por compatibilidad, sólo la colección de destinos.
+ */
+function railOverridesOf(source: unknown, rail: HomeEditableRail): unknown {
+  if (Array.isArray(source)) return rail === "destinos" ? source : undefined;
+  if (!source || typeof source !== "object") return undefined;
+  return (source as RowRec)[HOME_RAIL_CONFIG_KEY[rail]];
+}
+
+const str = (value: unknown, fallback: string): string =>
+  typeof value === "string" && value.trim() ? value : fallback;
+const num = (value: unknown, fallback: number): number =>
+  typeof value === "number" && Number.isFinite(value) ? value : fallback;
+const rowMedia = (row: RowRec | undefined, fallback: { url: string; alt: string }) =>
+  row ? { url: str(row.media_url, fallback.url), alt: str(row.media_alt, fallback.alt) } : fallback;
+
 /** Fusiona el corpus real sobre el contenido editorial resuelto del bloque. */
 export function mergeHomeRealContent(
   content: HomePremiumContent,
   real: HomeRealContent | undefined,
+  editorialOverrides?: unknown,
+  limits?: HomeRailLimits,
 ): HomePremiumContent {
   const safeContent = withoutUnapprovedMedia(content);
-  if (!real) return safeContent;
+  if (!real) return applyHomeRailLimits(safeContent, limits);
+  const mediaAssets = real.mediaAssets ?? {};
+
+  const rowsFor = (rail: HomeEditableRail) =>
+    buildHomeRailEditorRows(rail, real, railOverridesOf(editorialOverrides, rail));
 
   const destinationsWithMedia = real.destinos.filter((card) => card.mediaUrl.length > 0);
-  const destinationByTitle = new Map(real.destinos.map((card) => [card.title, card]));
   const homeDestinations = withValladolidFirst(real.destinos);
+  const destinationRows = rowsFor("destinos");
+  const routeRows = rowsFor("rutas");
+  const experienceRows = rowsFor("experiencias");
+  const stayRows = rowsFor("stays");
+  const foodRows = rowsFor("food");
+  const eventRows = rowsFor("eventos");
   const firstEventWithMedia = real.eventos.find((card) => card.mediaUrl.length > 0);
   const realHeroSlides = destinationsWithMedia.slice(0, 3).map((card) => ({
     media: mediaOf(card),
     caption: card.title,
   }));
 
-  return {
-    ...safeContent,
-    hero: {
-      ...safeContent.hero,
-      slides: realHeroSlides.length > 0 ? realHeroSlides : safeContent.hero.slides,
-    },
-    destinos: {
-      ...safeContent.destinos,
-      items: homeDestinations.map((card, index) => ({
-        name: card.title,
-        note: card.subtitle,
-        media: mediaOf(card, "destination", index),
-        puebloMagico: card.puebloMagico,
-        href: card.href,
-      })),
-    },
-    rutas: {
-      ...safeContent.rutas,
-      items: real.rutas.map((route) => {
-        const cover = route.sequence
-          .map((title) => destinationByTitle.get(title))
-          .find((card): card is Card => Boolean(card?.mediaUrl));
-        return {
-          ...route,
-          media: route.mediaUrl
-            ? { url: route.mediaUrl, alt: route.title }
-            : cover
-              ? mediaOf(cover)
-              : mediaOf({ title: route.title, mediaUrl: "" }, "route", real.rutas.indexOf(route)),
-        };
-      }),
-    },
-    experiencias: {
-      ...safeContent.experiencias,
-      items: real.experiencias.map((card, index) => ({
-        title: card.title,
-        category: card.category,
-        summary: card.subtitle,
-        media: mediaOf(card, "experience", index),
-        href: card.href,
-      })),
-    },
-    servicios: {
-      ...safeContent.servicios,
-      stays: real.stays.map((card, index) => ({
-        title: card.title,
-        destination: card.category,
-        category: "Hospedaje",
-        summary: card.subtitle,
-        media: mediaOf(card, "hotel", index),
-        href: card.href,
-      })),
-      food: real.food.map((card, index) => ({
-        title: card.title,
-        destination: card.category,
-        category: "Gastronomía",
-        summary: card.subtitle,
-        media: mediaOf(card, "restaurant", index),
-        href: card.href,
-      })),
-    },
-    eventos: {
-      ...safeContent.eventos,
-      // La selección editorial explícita del constructor manda sobre la
-      // portada inferida del primer evento. Sólo usamos el evento como
-      // fallback cuando la composición publicada no configuró un medio.
-      media:
-        safeContent.eventos.media.url.length > 0
-          ? safeContent.eventos.media
-          : firstEventWithMedia
-            ? mediaOf(firstEventWithMedia)
-            : safeContent.eventos.media,
-      items: real.eventos.map((card) => ({
-        day: card.day,
-        title: card.title,
-        type: card.category,
-        detail: card.subtitle,
-        href: card.href,
-      })),
-    },
-    mapa: {
-      ...safeContent.mapa,
-      dto: {
-        ...safeContent.mapa.dto,
-        points: real.mapPoints.map((point) => ({
-          id: point.id,
-          kind: point.kind,
-          lat: point.lat,
-          lng: point.lng,
-          title: point.title,
-          subtitle: point.subtitle,
-          href: point.href,
-          thumbUrl: null,
-          badge: null,
-          priceLabel: null,
-        })),
+  return attachMediaAssets(
+    applyHomeRailLimits({
+      ...safeContent,
+      hero: {
+        ...safeContent.hero,
+        slides: realHeroSlides.length > 0 ? realHeroSlides : safeContent.hero.slides,
       },
-    },
-  };
+      destinos: {
+        ...safeContent.destinos,
+        items: homeDestinations.map((card, index) => {
+          const row = destinationRows[index];
+          const fallback = mediaOf(card, "destination", index);
+          return {
+            name: str(row?.name, card.title),
+            note: str(row?.note, card.subtitle),
+            media: rowMedia(row, fallback),
+            puebloMagico:
+              typeof row?.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
+            href: str(row?.href, card.href),
+          };
+        }),
+      },
+      rutas: {
+        ...safeContent.rutas,
+        items: real.rutas.map((route, index) => {
+          const row = routeRows[index];
+          const sequence = Array.isArray(row?.sequence)
+            ? (row.sequence as unknown[])
+                .map((stop) =>
+                  stop && typeof stop === "object" ? String((stop as RowRec).label ?? "") : "",
+                )
+                .filter((label) => label.length > 0)
+            : route.sequence;
+          return {
+            ...route,
+            title: str(row?.title, route.title),
+            duration: str(row?.duration, route.duration),
+            stops: num(row?.stops, route.stops),
+            vibe: str(row?.vibe, route.vibe),
+            description: str(row?.description, route.description),
+            sequence: sequence.length > 0 ? sequence : route.sequence,
+            href: str(row?.href, route.href),
+            media: rowMedia(row, { url: route.mediaUrl, alt: route.title }),
+          };
+        }),
+      },
+      experiencias: {
+        ...safeContent.experiencias,
+        items: real.experiencias.map((card, index) => {
+          const row = experienceRows[index];
+          return {
+            businessId: card.businessId,
+            title: str(row?.title, card.title),
+            category: str(row?.category, card.category),
+            summary: str(row?.summary, card.subtitle),
+            media: rowMedia(row, mediaOf(card, "experience", index)),
+            href: str(row?.href, card.href),
+          };
+        }),
+      },
+      servicios: {
+        ...safeContent.servicios,
+        stays: real.stays.map((card, index) => {
+          const row = stayRows[index];
+          return {
+            businessId: card.businessId,
+            title: str(row?.title, card.title),
+            destination: str(row?.destination, card.category),
+            category: str(row?.category, "Hospedaje"),
+            summary: str(row?.summary, card.subtitle),
+            media: rowMedia(row, mediaOf(card, "hotel", index)),
+            href: str(row?.href, card.href),
+          };
+        }),
+        food: real.food.map((card, index) => {
+          const row = foodRows[index];
+          return {
+            businessId: card.businessId,
+            title: str(row?.title, card.title),
+            destination: str(row?.destination, card.category),
+            category: str(row?.category, "Gastronomía"),
+            summary: str(row?.summary, card.subtitle),
+            media: rowMedia(row, mediaOf(card, "restaurant", index)),
+            href: str(row?.href, card.href),
+          };
+        }),
+      },
+      eventos: {
+        ...safeContent.eventos,
+        // La selección editorial explícita del constructor manda sobre la
+        // portada inferida del primer evento. Sólo usamos el evento como
+        // fallback cuando la composición publicada no configuró un medio.
+        media:
+          safeContent.eventos.media.url.length > 0
+            ? safeContent.eventos.media
+            : firstEventWithMedia
+              ? mediaOf(firstEventWithMedia)
+              : safeContent.eventos.media,
+        items: real.eventos.map((card, index) => {
+          const row = eventRows[index];
+          const media = rowMedia(row, {
+            url: card.mediaUrl,
+            alt: card.mediaUrl.length > 0 ? card.title : "",
+          });
+          return {
+            day: str(row?.day, card.day),
+            title: str(row?.title, card.title),
+            type: str(row?.type, card.category),
+            detail: str(row?.detail, card.subtitle),
+            href: str(row?.href, card.href),
+            startsAt: card.startsAt,
+            recurrence: card.recurrence,
+            media: media.url.length > 0 ? media : null,
+          };
+        }),
+      },
+
+      mapa: {
+        ...safeContent.mapa,
+        dto: {
+          ...safeContent.mapa.dto,
+          points: real.mapPoints.map((point) => ({
+            id: point.id,
+            kind: point.kind,
+            lat: point.lat,
+            lng: point.lng,
+            title: point.title,
+            subtitle: point.subtitle,
+            href: point.href,
+            thumbUrl: null,
+            badge: null,
+            priceLabel: null,
+          })),
+        },
+      },
+    }, limits),
+    mediaAssets,
+  );
 }
 
 /**
@@ -241,7 +616,12 @@ export function resolveHomeSectionVisibility(
   declared: Partial<Record<HomePremiumSectionKey, boolean>>,
 ): Partial<Record<HomePremiumSectionKey, boolean>> {
   const nonEmpty: Record<HomePremiumSectionKey, boolean> = {
+    hero: true,
+    alux: true,
     destinos: content.destinos.items.length > 0,
+    experienciasAcceso: true,
+    categorias: content.categorias.items.length > 0,
+
     pueblosMagicos: content.destinos.items.some((item) => item.puebloMagico),
     rutas: content.rutas.items.length > 0,
     experiencias: content.experiencias.items.length > 0,
@@ -249,6 +629,7 @@ export function resolveHomeSectionVisibility(
     eventos: content.eventos.items.length > 0,
     queHacer: content.queHacer.items.length > 0,
     mapa: content.mapa.dto.points.length > 0,
+    travelPlan: true,
   };
 
   const out: Partial<Record<HomePremiumSectionKey, boolean>> = {};

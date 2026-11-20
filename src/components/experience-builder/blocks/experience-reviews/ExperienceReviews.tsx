@@ -6,7 +6,7 @@
  * viven aquí — la evolución futura ocurre añadiendo variantes o
  * capabilities, jamás duplicando el bloque.
  */
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import {
   clampRating,
@@ -83,17 +83,17 @@ function Distribution({ aggregate }: { aggregate: ExperienceReviewsAggregate }) 
   const total = Object.values(aggregate.distribution).reduce((a, b) => a + b, 0);
   if (total === 0) return null;
   return (
-    <ul className="mt-3 flex flex-col gap-1" role="list">
+    <ul className="mt-2 flex flex-col gap-1" role="list">
       {[5, 4, 3, 2, 1].map((k) => {
         const n = aggregate.distribution[k as 1 | 2 | 3 | 4 | 5];
         const pct = total > 0 ? Math.round((n / total) * 100) : 0;
         return (
-          <li key={k} className="flex items-center gap-2 text-[11px]">
-            <span className="w-6 text-right text-muted-foreground">{k}★</span>
-            <span className="relative h-1.5 flex-1 overflow-hidden rounded-pill bg-muted">
+          <li key={k} className="flex items-center gap-2 text-[10px] leading-none">
+            <span className="w-4 text-right text-muted-foreground">{k}★</span>
+            <span className="relative h-1 flex-1 overflow-hidden rounded-pill bg-muted">
               <span className="absolute inset-y-0 left-0 bg-primary" style={{ width: `${pct}%` }} />
             </span>
-            <span className="w-8 text-right tabular-nums text-muted-foreground">{n}</span>
+            <span className="w-5 text-right tabular-nums text-muted-foreground">{n}</span>
           </li>
         );
       })}
@@ -113,24 +113,24 @@ function AggregateCard({
   return (
     <aside
       data-eb-slot="reviews-aggregate"
-      className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-5"
+      className="flex self-start flex-col gap-1.5 rounded-2xl border border-border bg-card p-4"
     >
-      <div className="flex items-baseline gap-3">
-        <span className="text-4xl font-semibold tabular-nums">
+      <div className="flex items-center gap-2">
+        <span className="text-2xl font-semibold tabular-nums">
           {aggregate.average != null ? aggregate.average.toFixed(1) : "—"}
         </span>
-        <StarLine rating={aggregate.average ?? 0} size="md" />
+        <div className="flex min-w-0 flex-col">
+          <span className="text-sm font-semibold leading-tight">
+            {ratingLabel(aggregate.average)}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {aggregate.count} reseña{aggregate.count === 1 ? "" : "s"}
+          </span>
+        </div>
       </div>
-      <p className="text-sm text-muted-foreground">
-        <span className="font-medium text-foreground">{ratingLabel(aggregate.average)}</span>
-        <span>
-          {" "}
-          · {aggregate.count} reseña{aggregate.count === 1 ? "" : "s"}
-        </span>
-      </p>
       {showDistribution ? <Distribution aggregate={aggregate} /> : null}
       {showByPlatform && aggregate.byPlatform.length > 0 ? (
-        <div className="mt-3 flex flex-col gap-1 border-t border-border pt-3">
+        <div className="mt-2 flex flex-col gap-1 border-t border-border pt-2">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
             Por fuente
           </p>
@@ -159,49 +159,62 @@ interface ReviewCardProps {
 
 function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCardProps) {
   const date = formatDate(item.publishedAt);
+  const initials = item.author.displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
   return (
     <article
       className={cn(
-        "flex h-full flex-col gap-3 rounded-2xl border border-border bg-card",
-        compact ? "p-4" : "p-5",
+        "flex h-full flex-col gap-2.5 rounded-2xl border border-border bg-card p-4",
+        compact && "gap-2.5",
       )}
       data-eb-featured={item.featured || undefined}
     >
-      <header className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <StarLine rating={item.rating} scale={item.ratingScale} />
-            {capabilities.showPlatformBadge ? <PlatformBadge platform={item.platform} /> : null}
-            {item.featured ? (
-              <span className="rounded-pill bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                Destacada
-              </span>
-            ) : null}
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span
+            aria-hidden="true"
+            className="grid size-9 shrink-0 place-items-center rounded-full bg-muted text-xs font-semibold text-foreground/70"
+          >
+            {initials || "V"}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold leading-tight">
+              {item.author.displayName}
+              {item.author.verified ? (
+                <span
+                  className="ml-1 align-middle text-[10px] font-semibold text-primary"
+                  title="Autor verificado"
+                >
+                  ✓
+                </span>
+              ) : null}
+            </p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              {[item.author.location, date].filter(Boolean).join(" · ")}
+            </p>
           </div>
-          <p className="mt-1 truncate text-sm font-semibold">
-            {item.author.displayName}
-            {item.author.verified ? (
-              <span
-                className="ml-1 align-middle text-[10px] font-semibold text-primary"
-                title="Autor verificado"
-              >
-                ✓
-              </span>
-            ) : null}
-          </p>
-          <p className="text-[11px] text-muted-foreground">
-            {[
-              item.author.location,
-              capabilities.showTravelerType ? item.travelerType : null,
-              capabilities.showLanguage ? (item.language?.toUpperCase() ?? null) : null,
-              date,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
         </div>
+        <StarLine rating={item.rating} scale={item.ratingScale} />
       </header>
-      {item.title ? <p className="text-base font-semibold leading-tight">{item.title}</p> : null}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {capabilities.showPlatformBadge ? <PlatformBadge platform={item.platform} /> : null}
+        {capabilities.showTravelerType && item.travelerType ? (
+          <span className="text-[11px] text-muted-foreground">{item.travelerType}</span>
+        ) : null}
+        {capabilities.showLanguage && item.language ? (
+          <span className="text-[11px] text-muted-foreground">{item.language.toUpperCase()}</span>
+        ) : null}
+        {item.featured ? (
+          <span className="rounded-pill bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+            Destacada
+          </span>
+        ) : null}
+      </div>
+      {item.title ? <p className="text-sm font-semibold leading-tight">{item.title}</p> : null}
       <p
         className={cn(
           "whitespace-pre-line text-sm text-foreground/85",
@@ -223,7 +236,7 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
         </div>
       ) : null}
       {capabilities.showBusinessResponse && item.response ? (
-        <div className="mt-1 rounded-xl border border-dashed border-border bg-muted/40 p-3">
+        <div className="rounded-xl border border-dashed border-border bg-muted/40 p-2.5">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             Respuesta del negocio
           </p>
@@ -238,7 +251,7 @@ function ReviewCard({ item, capabilities, renderItemActions, compact }: ReviewCa
           </p>
         </div>
       ) : null}
-      <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-muted-foreground">
+      <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
         <div className="flex flex-wrap items-center gap-3">
           {capabilities.showHelpful && item.helpfulCount != null ? (
             <span>Útil · {item.helpfulCount}</span>
@@ -307,7 +320,6 @@ function JsonLd({ dto }: { dto: ExperienceReviewsDTO }) {
   return (
     <script
       type="application/ld+json"
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }}
     />
   );
@@ -332,6 +344,8 @@ export function ExperienceReviews({
     capabilities,
   } = dto;
 
+  const [expanded, setExpanded] = useState(false);
+
   const showAggregate = capabilities.showAggregate && aggregate != null && aggregate.count > 0;
 
   const wrap = (children: ReactNode) => (
@@ -343,7 +357,7 @@ export function ExperienceReviews({
     >
       <JsonLd dto={dto} />
       {heading || subheading || renderHeaderActions ? (
-        <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div className="flex flex-col gap-1">
             {heading ? <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2> : null}
             {subheading ? <p className="text-sm text-muted-foreground">{subheading}</p> : null}
@@ -380,7 +394,7 @@ export function ExperienceReviews({
     <ul
       role="list"
       className={cn(
-        "grid gap-4",
+        "grid gap-3",
         columns === 1
           ? "grid-cols-1"
           : columns === 3
@@ -399,7 +413,7 @@ export function ExperienceReviews({
   );
 
   const bodyList = (list: ExperienceReviewItem[]) => (
-    <ul role="list" className="flex flex-col gap-4">
+    <ul role="list" className="flex flex-col gap-3">
       {list.map((it) => (
         <li key={it.id}>
           <ReviewCard item={it} capabilities={capabilities} renderItemActions={renderItemActions} />
@@ -411,7 +425,7 @@ export function ExperienceReviews({
   const bodyCarousel = (list: ExperienceReviewItem[]) => (
     <ul
       role="list"
-      className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]"
+      className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:thin]"
     >
       {list.map((it) => (
         <li key={it.id} className="min-w-[280px] max-w-[340px] shrink-0 snap-start">
@@ -442,7 +456,7 @@ export function ExperienceReviews({
     if (list.length === 0) return null;
     const [primary, ...rest] = list;
     return (
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <ReviewCard
             item={primary}
@@ -467,7 +481,7 @@ export function ExperienceReviews({
   };
 
   const bodyWall = (list: ExperienceReviewItem[]) => (
-    <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 [&>*]:mb-4 [&>*]:break-inside-avoid">
+    <div className="columns-1 gap-3 sm:columns-2 lg:columns-3 [&>*]:mb-3 [&>*]:break-inside-avoid">
       {list.map((it) => (
         <ReviewCard
           key={it.id}
@@ -481,16 +495,36 @@ export function ExperienceReviews({
 
   const renderBody = (list: ExperienceReviewItem[]): ReactNode => {
     if (list.length === 0) return null;
-    if (variant === "grid") return bodyGrid(list);
-    if (variant === "carousel") return bodyCarousel(list);
-    if (variant === "compact") return bodyCompact(list);
-    if (variant === "featured") return bodyFeatured(list);
-    if (variant === "wall") return bodyWall(list);
-    return bodyList(list);
+    const showMore = list.length > 1;
+    // Cuando está colapsado, se muestra una sola tarjeta a ancho completo
+    // (independiente del variant) para evitar huecos en grid/carousel.
+    const body: ReactNode = !expanded
+      ? bodyList([list[0]])
+      : (() => {
+          if (variant === "grid") return bodyGrid(list);
+          if (variant === "carousel") return bodyCarousel(list);
+          if (variant === "compact") return bodyCompact(list);
+          if (variant === "featured") return bodyFeatured(list);
+          if (variant === "wall") return bodyWall(list);
+          return bodyList(list);
+        })();
+    if (!showMore) return body;
+    return (
+      <div className="flex flex-col gap-3">
+        {body}
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="self-start rounded-pill border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-accent"
+        >
+          {expanded ? "Ver menos" : `Ver más reseñas (${list.length})`}
+        </button>
+      </div>
+    );
   };
 
   const listSide = (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-5">
       {groups.map((g) => (
         <div key={g.key}>
           {g.label ? (
@@ -506,9 +540,9 @@ export function ExperienceReviews({
 
   if (showAggregate) {
     return wrap(
-      <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="grid gap-4 md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)]">
         <AggregateCard
-          aggregate={aggregate!}
+          aggregate={aggregate}
           showDistribution={capabilities.showAggregateDistribution}
           showByPlatform={capabilities.showByPlatform}
         />

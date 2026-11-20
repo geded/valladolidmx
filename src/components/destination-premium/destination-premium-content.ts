@@ -16,9 +16,11 @@ import {
 } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 
 export interface DestinationPremiumMedia {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /** Cadena vacía representa marcador Editorial neutral; nunca una imagen sustituta. */
   url: string;
   alt: string;
+  focal?: { x: number; y: number } | null;
 }
 
 export interface DestinationPremiumService {
@@ -108,8 +110,8 @@ export type DestinationPremiumSectionKey =
 
 export const DESTINATION_PREMIUM_SECTION_ORDER: DestinationPremiumSectionKey[] = [
   "hero",
-  "services",
   "descubre",
+  "services",
   "gallery",
   "servicePreview",
   "routes",

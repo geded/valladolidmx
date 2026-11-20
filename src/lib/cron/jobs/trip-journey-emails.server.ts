@@ -12,6 +12,7 @@
  * crea token, ni se registra, ni se encola, ni se marca. Sólo contadores.
  */
 import * as React from "react";
+import { formatInMerida } from "@/lib/time/merida";
 import { render } from "@react-email/render";
 import { TEMPLATES } from "@/lib/email-templates/registry";
 import type { CronJobResult, CronRunContext, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
@@ -21,6 +22,7 @@ import {
   recordDryRunOutcome,
   type DryRunKindStats,
 } from "@/lib/cron/cron-dry-run.server";
+import { sendManagedPayload } from "@/lib/email/managed-send.server";
 
 const SITE_NAME = "valladolidmx";
 const SENDER_DOMAIN = "notify.alux.travel";
@@ -59,11 +61,13 @@ function generateToken(): string {
 function formatStartDate(iso: string | null, locale: string | null): string | undefined {
   if (!iso) return undefined;
   try {
-    return new Date(iso + "T12:00:00").toLocaleDateString(locale || "es-MX", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    return (
+      formatInMerida(
+        iso,
+        { day: "numeric", month: "long", year: "numeric" },
+        locale || "es-MX",
+      ) || undefined
+    );
   } catch {
     return undefined;
   }
@@ -199,14 +203,8 @@ export async function runTripJourneyEmails(
         const messageId = crypto.randomUUID();
         const idempotencyKey = `trip-${step.kind}-${row.order_id}`;
 
-        await supabase.from("email_send_log").insert({
-          message_id: messageId,
-          template_name: step.template,
-          recipient_email: email,
-          status: "pending",
-        });
 
-        const { error: enqueueError } = await supabase.rpc("enqueue_email", {
+        const { error: enqueueError } = await sendManagedPayload(supabase, {
           queue_name: "transactional_emails",
           payload: {
             message_id: messageId,

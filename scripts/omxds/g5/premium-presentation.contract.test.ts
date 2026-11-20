@@ -38,8 +38,9 @@ const previews = [
 // control si acredita un delegado REAL y verificable, y ese delegado se
 // inspecciona con las mismas obligaciones aplicables.
 const PRESENTATION_DELEGATED: Record<string, string> = {
+  // La preview consume la misma autoridad Premium que la ruta pública de destino.
   "g4-destination-microsite-preview.tsx":
-    "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+    "src/components/destination-premium/DestinationPremiumSurface.tsx",
   "g4-experience-premium-preview.tsx":
     "src/components/experience-premium/ExperiencePremiumSurface.tsx",
   "g4-event-premium-preview.tsx": "src/components/surfaces/EventPremiumSurface.tsx",

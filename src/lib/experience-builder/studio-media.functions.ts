@@ -45,6 +45,32 @@ function publicProxyUrl(path: string) {
 }
 
 /**
+ * Vista previa editorial firmada (1 h). El proxy público sólo sirve activos
+ * `published`; los borradores gobernados (G8-M1 nacen `draft`) quedaban sin
+ * miniatura en el CMS. Misma técnica ya aprobada en los paneles de medios
+ * de empresas/destinos/zonas/productos: firma con la sesión del editor, por
+ * lo que respeta RLS y no expone nada públicamente.
+ */
+async function signPreviewUrls(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  paths: string[],
+): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  const unique = [...new Set(paths.filter(Boolean))];
+  if (unique.length === 0) return out;
+  try {
+    const { data } = await supabase.storage.from(BUCKET).createSignedUrls(unique, 3600);
+    for (const row of (data ?? []) as Array<{ path?: string | null; signedUrl?: string | null }>) {
+      if (row?.path && row?.signedUrl) out.set(row.path, row.signedUrl);
+    }
+  } catch {
+    // Silencioso: sin firma, la tarjeta cae al proxy estable.
+  }
+  return out;
+}
+
+/**
  * Resuelve una portada temporal únicamente para una vista autenticada.
  * No escribe `events.cover_media_id`, no cambia el workflow del evento y
  * rechaza cualquier activo que no sea IA/conceptual/temporal/preview_only.
@@ -178,6 +204,7 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
         const nature = (rights.nature as string | undefined) ?? null;
         return {
           id: r.id,
+          storagePath: r.storage_path,
           url: publicProxyUrl(r.storage_path),
           alt: resolveMediaAlt(
             { ...r, translations: r.media_asset_translations ?? [] },
@@ -202,8 +229,16 @@ export const listStudioMediaLibrary = createServerFn({ method: "POST" })
         };
       },
     );
+    const visible = filter === "conceptual" ? mapped.filter((r) => r.conceptual) : mapped;
+    const signedByPath = await signPreviewUrls(
+      context.supabase,
+      visible.map((r) => r.storagePath),
+    );
     return {
-      rows: filter === "conceptual" ? mapped.filter((r) => r.conceptual) : mapped,
+      rows: visible.map((r) => ({
+        ...r,
+        previewUrl: signedByPath.get(r.storagePath) ?? r.url,
+      })),
       total: count ?? 0,
       limit,
       offset,
@@ -578,5 +613,40 @@ export const importUrlToStudioMedia = createServerFn({ method: "POST" })
     return {
       id: asset.id as string,
       url: publicProxyUrl(asset.storage_path as string),
+    };
+  });
+
+/* ──────────────  Resolver un activo por id (previsualización CMS)  ────────── */
+
+/**
+ * Devuelve la URL estable y el ALT de un `media_asset` del bucket
+ * `studio-media`. Sólo lectura y sólo para roles editoriales: permite que
+ * los editores del CMS vean la miniatura de la portada seleccionada sin
+ * copiar identificadores a mano.
+ */
+export const getStudioMediaAssetById = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { mediaId: string }) => {
+    if (!d?.mediaId) throw new Error("invalid_input");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+    const { data: row, error } = await context.supabase
+      .from("media_assets")
+      .select("id, storage_path, storage_bucket, alt_text, title, review_state")
+      .eq("id", data.mediaId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (error) throw error;
+    if (!row || row.storage_bucket !== BUCKET) return null;
+    const stableUrl = publicProxyUrl(row.storage_path as string);
+    const signed = await signPreviewUrls(context.supabase, [row.storage_path as string]);
+    return {
+      id: row.id as string,
+      url: stableUrl,
+      previewUrl: signed.get(row.storage_path as string) ?? stableUrl,
+      alt: (row.alt_text as string | null) ?? (row.title as string | null) ?? null,
+      reviewState: (row.review_state as string | null) ?? "unreviewed",
     };
   });

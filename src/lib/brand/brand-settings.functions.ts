@@ -18,7 +18,16 @@ import {
   normalizeHexColor,
   paletteContrastChecks,
   type BrandPalette,
+  normalizeAluxPalette,
+  aluxPaletteContrastChecks,
 } from "./brand-theme";
+import {
+  ALUX_PALETTE_KEYS,
+  DEFAULT_ALUX_COPY,
+  normalizeAluxCopy,
+  type AluxCopyByLocale,
+  type AluxPalette,
+} from "./alux-brand";
 
 export const BRAND_SETTINGS_KEY = "brand.identity";
 
@@ -31,6 +40,8 @@ export interface BrandSettings {
   conciergeName: string;
   logoSrc: string;
   palette: BrandPalette;
+  aluxPalette: AluxPalette;
+  aluxCopy: AluxCopyByLocale;
 }
 
 /** Predeterminados = identidad activa en código (sin cambio visual). */
@@ -42,6 +53,8 @@ export const BRAND_SETTINGS_DEFAULTS: BrandSettings = {
   conciergeName: ACTIVE_BRAND.conciergeName,
   logoSrc: ACTIVE_BRAND.logo.src,
   palette: ACTIVE_BRAND.palette,
+  aluxPalette: ACTIVE_BRAND.aluxPalette,
+  aluxCopy: DEFAULT_ALUX_COPY,
 };
 
 const str = (value: unknown, fallback: string): string =>
@@ -71,6 +84,8 @@ export function normalizeBrandSettings(value: unknown): BrandSettings {
     // Sólo rutas internas: no se admiten activos externos ni logos nuevos.
     logoSrc: logo.startsWith("/") ? logo : BRAND_SETTINGS_DEFAULTS.logoSrc,
     palette: safePalette,
+    aluxPalette: normalizeAluxPalette(row.aluxPalette, BRAND_SETTINGS_DEFAULTS.aluxPalette),
+    aluxCopy: normalizeAluxCopy(row.aluxCopy),
   };
 }
 
@@ -88,7 +103,22 @@ export function validateBrandSettingsInput(input: Partial<BrandSettings>): Brand
   if (paletteContrastChecks(palette).some((check) => !check.pass)) {
     throw new Error("brand_palette_contrast_failed");
   }
-  return { ...normalizeBrandSettings(input), palette };
+  const rawAluxPalette =
+    row.aluxPalette && typeof row.aluxPalette === "object"
+      ? (row.aluxPalette as Record<string, unknown>)
+      : {};
+  if (
+    !ALUX_PALETTE_KEYS.every(
+      (key) => typeof rawAluxPalette[key] === "string" && /^#[0-9a-f]{6}$/i.test(String(rawAluxPalette[key])),
+    )
+  ) throw new Error("alux_palette_invalid_color");
+  const aluxPalette = Object.fromEntries(
+    ALUX_PALETTE_KEYS.map((key) => [key, String(rawAluxPalette[key]).toLowerCase()]),
+  ) as unknown as AluxPalette;
+  if (aluxPaletteContrastChecks(aluxPalette).some((check) => !check.pass)) {
+    throw new Error("alux_palette_contrast_failed");
+  }
+  return { ...normalizeBrandSettings(input), palette, aluxPalette, aluxCopy: normalizeAluxCopy(row.aluxCopy) };
 }
 
 function publicClient() {
@@ -161,7 +191,7 @@ export const updateBrandSettings = createServerFn({ method: "POST" })
         value:
           data as unknown as Database["public"]["Tables"]["platform_settings"]["Insert"]["value"],
         is_public: true,
-        description: "Identidad editorial y paleta visual de la marca activa.",
+        description: "Identidad editorial, paleta visual y voz multilingüe de la marca activa.",
         updated_by: context.userId,
       },
       { onConflict: "key" },

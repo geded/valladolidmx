@@ -43,6 +43,10 @@ import type { InstitutionalBadgeItem } from "@/lib/experience-builder/blocks/exp
 import { cn } from "@/lib/utils";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 
 /* ------------------------------------------------------------------ *
  * Hero — spec ligera; la superficie construye el DTO oficial.
@@ -52,6 +56,7 @@ export interface TourismListingHeroSpec {
   title: string;
   subtitle?: string | null;
   mediaUrl?: string | null;
+  mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   mediaAlt?: string | null;
   badges?: ExperienceHeroBadge[];
   metaLabel?: string | null;
@@ -96,6 +101,14 @@ export interface TourismListingSurfaceProps {
   capabilities?: Partial<TourismCardCapabilities>;
   /** Slot reservado para V4 · Maps Everywhere. */
   mapSlot?: React.ReactNode;
+  /**
+   * Medición de visibilidad (aditiva, invisible). Cuando se declara la
+   * superficie, cada tarjeta con empresa operadora acreditada registra
+   * su exposición y su clic en `business_view_events`. Sin superficie
+   * declarada no se registra nada (constructor, preview, demos).
+   */
+  trackingSurface?: string | null;
+  trackingRail?: string | null;
   /** Entidad favoritable por card (fallback: se deduce por entityKind). */
   favoriteKindFor?: (vm: TourismCardVM) => "business" | "product" | "promotion" | null;
   /**
@@ -130,6 +143,8 @@ export function TourismListingSurface({
   emptyHint,
   capabilities,
   mapSlot,
+  trackingSurface = null,
+  trackingRail = null,
   favoriteKindFor,
   showAddToTrip = true,
   presentation,
@@ -198,15 +213,15 @@ export function TourismListingSurface({
 
   const heroMedia = useMemo(() => {
     const rows = [
-      ...(hero.mediaUrl ? [{ url: hero.mediaUrl, alt: hero.mediaAlt }] : []),
+      ...(hero.mediaUrl ? [{ url: hero.mediaUrl, alt: hero.mediaAlt, asset: hero.mediaAsset }] : []),
       ...items
         .filter((item) => Boolean(item.mediaUrl))
-        .map((item) => ({ url: item.mediaUrl as string, alt: item.mediaAlt ?? item.name })),
+        .map((item) => ({ url: item.mediaUrl as string, alt: item.mediaAlt ?? item.name, asset: item.mediaAsset })),
     ];
     return rows
       .filter((row, index) => rows.findIndex((candidate) => candidate.url === row.url) === index)
       .slice(0, 3);
-  }, [hero.mediaAlt, hero.mediaUrl, items]);
+  }, [hero.mediaAlt, hero.mediaUrl, hero.mediaAsset, items]);
 
   // Editorial es el fallback universal. Cinematográfica sólo se activa
   // cuando fue seleccionada y existe fotografía gobernada.
@@ -245,22 +260,30 @@ export function TourismListingSurface({
 
   return (
     <div className={cn("space-y-6", className)}>
-      <PremiumHero
-        layout="listing"
-        vm={{
-          presentation: premiumPresentation,
-          eyebrow: hero.eyebrow ?? undefined,
-          title: hero.title,
-          description: hero.subtitle ?? undefined,
-          media: activeHeroMedia
-            ? {
-                url: activeHeroMedia.url,
-                alt: activeHeroMedia.alt ?? `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
-              }
-            : null,
-          badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
-        }}
-      />
+      {/* Studio Standard v1.0 · E5: marcadores de región para el constructor.
+          Son atributos de datos, no cambian la maqueta aprobada ni el estilo. */}
+      <div data-eb-section="hero">
+        <PremiumHero
+          layout="listing"
+          vm={{
+            presentation: premiumPresentation,
+            eyebrow: hero.eyebrow ?? undefined,
+            title: hero.title,
+            description: hero.subtitle ?? undefined,
+            media: activeHeroMedia
+              ? {
+                  url: activeHeroMedia.url,
+                  asset: activeHeroMedia.asset,
+                  alt:
+                    activeHeroMedia.alt ??
+                    `${hero.title} en Valladolid, Oriente Maya de Yucatán`,
+                }
+              : null,
+            badges: hero.badges?.map((badge) => ({ label: badge.label })) ?? [],
+          }}
+        />
+      </div>
+
 
       <section
         className="rounded-2xl border border-border bg-card p-4 shadow-soft"
@@ -284,6 +307,7 @@ export function TourismListingSurface({
                 onClick={() =>
                   openAluxFloating({
                     reason: "manual",
+                    prompt,
                     hint: `Ayúdame a comparar ${familyLabel}. Mi prioridad es: ${prompt}.`,
                   })
                 }
@@ -326,7 +350,10 @@ export function TourismListingSurface({
       ) : null}
 
       {territorialChip || facets.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/60 p-3">
+        <div
+          data-eb-section="territorio"
+          className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/60 p-3"
+        >
           {territorialChip ? (
             <span className="inline-flex items-center gap-1 rounded-pill bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               {territorialChip}
@@ -391,20 +418,32 @@ export function TourismListingSurface({
       ) : null}
 
       {displayItems.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
+        <div
+          data-eb-section="resultados"
+          className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center"
+        >
           <p className="text-sm text-muted-foreground">{emptyMessage}</p>
           {emptyHint ? <div className="mt-3 text-sm">{emptyHint}</div> : null}
         </div>
       ) : (
         <div
+          data-eb-section="resultados"
           className={cn(
             mapSlot && "grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,.75fr)]",
           )}
         >
           <ul role="list" className={cn("grid gap-5", colClass)}>
-            {displayItems.map((vm) => (
-              <li key={vm.id}>
-                {columns === 1 ? (
+            {displayItems.map((vm) => {
+              const operatorId = trackingSurface ? (vm.operatorId ?? null) : null;
+              const trackingProps = {
+                businessId: operatorId,
+                surface: trackingSurface,
+                rail: trackingRail,
+                entityKind: vm.entityKind,
+                entityId: vm.id,
+              };
+              const card =
+                columns === 1 ? (
                   <TourismCardRow
                     vm={vm}
                     capabilities={capabilities}
@@ -416,9 +455,22 @@ export function TourismListingSurface({
                     capabilities={capabilities}
                     renderActions={(v) => renderCardActions(v, favoriteKindFor, showAddToTrip)}
                   />
-                )}
-              </li>
-            ))}
+                );
+              return (
+                <li key={vm.id}>
+                  {operatorId ? (
+                    <>
+                      <BusinessImpressionTracker {...trackingProps} />
+                      <TrackClick {...trackingProps} eventType="click_card">
+                        {card}
+                      </TrackClick>
+                    </>
+                  ) : (
+                    card
+                  )}
+                </li>
+              );
+            })}
           </ul>
           {mapSlot ? (
             <aside

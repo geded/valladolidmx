@@ -17,6 +17,7 @@
  */
 
 export interface PlacePremiumMedia {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /** `null` = placeholder neutral: no existe fotografía acreditada del lugar. */
   url: string | null;
   alt: string;
@@ -52,6 +53,27 @@ export interface PlacePremiumNearby {
   distance: string;
   tagline: string;
   media: PlacePremiumMedia;
+}
+
+/**
+ * "Qué hay cerca" — empresas publicadas cuya ubicación real (latitud y
+ * longitud capturadas en CMS, Geolocation Mandatory Rule) está a pocos
+ * metros del lugar. Nunca se infiere por texto de la descripción.
+ */
+export type PlacePremiumNearbyGroupKey = "comer" | "dormir" | "hacer" | "comprar" | "otros";
+
+export interface PlacePremiumNearbyBusiness {
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string | null;
+  categorySlug: string | null;
+  categoryLabel: string | null;
+  href: string | null;
+  distanceKm: number;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  groupKey: PlacePremiumNearbyGroupKey;
 }
 
 export interface PlacePremiumMapPoint {
@@ -119,6 +141,8 @@ export interface PlacePremiumContent {
   /** Vacío a propósito: demuestra el ocultamiento correcto de módulos. */
   events: PlacePremiumRelated[];
   nearby: PlacePremiumNearby[];
+  /** Empresas publicadas cercanas por coordenadas reales (CMS). */
+  nearbyBusinesses: PlacePremiumNearbyBusiness[];
   trip: {
     title: string;
     description: string;
@@ -329,6 +353,7 @@ export const PLACE_PREMIUM_DEMO_CONTENT: PlacePremiumContent = {
     },
   ],
   events: [],
+  nearbyBusinesses: [],
   nearby: [
     {
       id: "near-1",
@@ -392,4 +417,37 @@ export const PLACE_PREMIUM_SECTION_ORDER: readonly PlacePremiumSectionKey[] = [
   "nearby",
   "trip",
   "alux",
+];
+
+/**
+ * Secciones reales de la ficha de Lugar tal como se publican hoy. El orden
+ * por defecto es el aprobado; el Experience Builder sólo puede reordenarlas.
+ */
+export type PlacePremiumRenderSectionKey =
+  | "hero"
+  | "alux"
+  | "gallery"
+  | "intro"
+  | "essentials"
+  | "map"
+  | "services"
+  | "experiences"
+  | "events"
+  | "nearbyBusinesses"
+  | "nearby"
+  | "trip";
+
+export const PLACE_PREMIUM_RENDER_ORDER: readonly PlacePremiumRenderSectionKey[] = [
+  "hero",
+  "alux",
+  "gallery",
+  "intro",
+  "essentials",
+  "map",
+  "services",
+  "experiences",
+  "events",
+  "nearbyBusinesses",
+  "nearby",
+  "trip",
 ];

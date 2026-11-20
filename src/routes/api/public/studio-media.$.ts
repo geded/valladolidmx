@@ -22,6 +22,22 @@ export const Route = createFileRoute("/api/public/studio-media/$")({
 
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+          // Sólo se sirven públicamente los assets publicados y vigentes del
+          // catálogo. Los borradores o material retirado permanecen privados y
+          // sólo son visibles vía el preview autenticado del CMS.
+          const { data: asset, error: assetError } = await supabaseAdmin
+            .from("media_assets")
+            .select("id")
+            .eq("storage_bucket", "studio-media")
+            .eq("storage_path", splat)
+            .eq("status", "published")
+            .is("deleted_at", null)
+            .maybeSingle();
+          if (assetError || !asset) {
+            return new Response("Not found", { status: 404 });
+          }
+
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const storage = (supabaseAdmin as any).storage;
           const { data, error } = await storage

@@ -24,6 +24,8 @@ import {
   subscribeGoogleMapsAuthFailure,
 } from "@/lib/maps/google-maps-loader";
 import { MapUnavailableFallback } from "./MapUnavailableFallback";
+import { StaticMap } from "./StaticMap";
+
 
 /** Resultado de la capa de ruta, reportado a la superficie consumidora. */
 export interface MapRouteStatus {
@@ -96,7 +98,19 @@ function getBrandMapStyles() {
       elementType: "geometry",
       stylers: [{ color: mixHex(secondary, territory, 0.16) }],
     },
-    { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+    /* Ruido comercial fuera, contexto territorial dentro: se ocultan los
+       rótulos de negocios y se conservan los de sitios de interés, parques y
+       zonas arqueológicas con la tipografía de marca. */
+    { featureType: "poi.business", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.medical", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.school", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.attraction", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "poi.park", elementType: "labels", stylers: [{ visibility: "on" }] },
+    {
+      featureType: "poi.place_of_worship",
+      elementType: "labels",
+      stylers: [{ visibility: "on" }],
+    },
     {
       featureType: "poi.park",
       elementType: "geometry",
@@ -201,8 +215,27 @@ export interface InteractiveMapProps {
   optimizeRoute?: boolean;
   /** Reporta la capacidad real usada y el bloqueo exacto del proveedor. */
   onRouteStatus?: (status: MapRouteStatus) => void;
+  /** Refuerza visualmente el recorrido sin alterar los mapas de otras superficies. */
+  routeEmphasis?: "standard" | "prominent";
+  /** Geometría vial acreditada, calculada en servidor para una ruta CMS publicada. */
+  roadRoute?: {
+    encodedPolyline: string;
+    distanceMeters: number | null;
+    durationSeconds: number | null;
+  } | null;
   /** Selección de un marcador desde el mapa. */
   onMarkerSelect?: (key: string) => void;
+  /** Puntos a los que se ajusta el encuadre; por defecto todos los pines. */
+  fitPoints?: Array<{ lat: number; lng: number }>;
+  /** Margen del encuadre en píxeles. */
+  fitPadding?: number;
+  /** Limita el desplazamiento del mapa a un área geográfica. */
+  restriction?: { north: number; south: number; east: number; west: number };
+  /** Zoom mínimo permitido (evita alejarse fuera del área). */
+  minZoom?: number;
+  /** Muestra el nombre de cada parada junto a su pin. */
+  showMarkerNames?: boolean;
+
 }
 
 function labelForIndex(i: number) {
@@ -217,6 +250,38 @@ function getMarkerColors(): { bg: string; fg: string; stroke: string } {
   };
 }
 
+/** Decodifica la geometría compacta de Routes API sin cargar otra biblioteca. */
+function decodePolyline(encoded: string): Array<{ lat: number; lng: number }> {
+  const path: Array<{ lat: number; lng: number }> = [];
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+  while (index < encoded.length) {
+    let result = 0;
+    let shift = 0;
+    let byte: number;
+    do {
+      byte = encoded.charCodeAt(index) - 63;
+      index += 1;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20 && index < encoded.length);
+    lat += result & 1 ? ~(result >> 1) : result >> 1;
+
+    result = 0;
+    shift = 0;
+    do {
+      byte = encoded.charCodeAt(index) - 63;
+      index += 1;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20 && index < encoded.length);
+    lng += result & 1 ? ~(result >> 1) : result >> 1;
+    path.push({ lat: lat / 1e5, lng: lng / 1e5 });
+  }
+  return path;
+}
+
 function markerIconDataUri(letter: string, selected = false): string {
   const { bg, fg, stroke } = getMarkerColors();
   const body = selected ? stroke : bg;
@@ -227,6 +292,23 @@ function markerIconDataUri(letter: string, selected = false): string {
     <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${selected ? stroke : fg}">${letter}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+/** Etiqueta con el nombre de la parada, anclada bajo el pin. */
+function markerNameIconDataUri(text: string): { url: string; width: number; height: number } {
+  const { bg, fg, stroke } = getMarkerColors();
+  const clean = text.length > 28 ? `${text.slice(0, 27)}…` : text;
+  const safe = clean
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const width = Math.max(56, Math.round(clean.length * 7.2) + 20);
+  const height = 26;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="${(height - 2) / 2}" fill="${bg}" stroke="${stroke}" stroke-width="1.5" opacity=".97"/>
+    <text x="${width / 2}" y="${height / 2 + 4}" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="${fg}">${safe}</text>
+  </svg>`;
+  return { url: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`, width, height };
 }
 
 export function InteractiveMap({
@@ -240,7 +322,15 @@ export function InteractiveMap({
   routeStops,
   optimizeRoute = false,
   onRouteStatus,
+  routeEmphasis = "standard",
+  roadRoute,
   onMarkerSelect,
+  fitPoints,
+  fitPadding = 88,
+  restriction,
+  minZoom,
+  showMarkerNames = false,
+
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [failed, setFailed] = useState(false);
@@ -253,8 +343,18 @@ export function InteractiveMap({
   /* Sólo se descarga el SDK cuando el panel está visible y con tamaño real. */
   const shouldMount = useVisibleWithSize(ref);
 
+  /* Firmas estables: evitan reconstruir el mapa (y repetir Directions)
+     cuando el padre vuelve a crear los mismos arreglos en cada render. */
+  const markersSignature = JSON.stringify(markers ?? null);
+  const routeStopsSignature = JSON.stringify(routeStops ?? null);
+  const fitPointsSignature = JSON.stringify(fitPoints ?? null);
+  const restrictionSignature = JSON.stringify(restriction ?? null);
+  const latestRef = useRef({ markers, routeStops, fitPoints, restriction });
+  latestRef.current = { markers, routeStops, fitPoints, restriction };
+
   /* Fallo de autorización del proveedor: suscripción por instancia. */
   useEffect(() => subscribeGoogleMapsAuthFailure(() => setFailed(true)), []);
+
 
   useEffect(() => {
     if (!shouldMount) return;
@@ -268,6 +368,13 @@ export function InteractiveMap({
     loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
+        const {
+          markers,
+          routeStops,
+          fitPoints,
+          restriction,
+        } = latestRef.current;
+
 
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
@@ -280,10 +387,33 @@ export function InteractiveMap({
           mapTypeControl: false,
           fullscreenControl: true,
           gestureHandling: "cooperative",
+          ...(restriction
+            ? { restriction: { latLngBounds: restriction, strictBounds: false } }
+            : {}),
+          ...(typeof minZoom === "number" ? { minZoom } : {}),
         });
         const list: InteractiveMapMarker[] =
           markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
         const bounds = new google.maps.LatLngBounds();
+        /* Paradas muy cercanas (mismo pueblo) se superponen al encuadrar toda
+           la ruta: conservamos su ubicación real y escalonamos la etiqueta y
+           el orden de dibujo para que ninguna parada quede oculta. */
+        const clusterIndex = new Map<number, number>();
+        {
+          const seen: Array<{ lat: number; lng: number; count: number }> = [];
+          list.forEach((m, i) => {
+            const hit = seen.find(
+              (s) => Math.abs(s.lat - m.lat) < 0.02 && Math.abs(s.lng - m.lng) < 0.02,
+            );
+            if (hit) {
+              clusterIndex.set(i, hit.count);
+              hit.count += 1;
+            } else {
+              clusterIndex.set(i, 0);
+              seen.push({ lat: m.lat, lng: m.lng, count: 1 });
+            }
+          });
+        }
         list.forEach((m, i) => {
           const selected = typeof m.order === "number" && m.order > 0;
           const label = selected ? String(m.order) : labelForIndex(i);
@@ -301,23 +431,87 @@ export function InteractiveMap({
           if (m.key) {
             marker.addListener("click", () => markerSelectRef.current?.(m.key as string));
           }
+          const stopName = m.title ?? markerTitle ?? null;
+          if (showMarkerNames && stopName) {
+            const chip = markerNameIconDataUri(stopName);
+            const nameMarker = new google.maps.Marker({
+              position: { lat: m.lat, lng: m.lng },
+              map,
+              title: stopName,
+              zIndex: (selected ? 20 : 10) + 1,
+              icon: {
+                url: chip.url,
+                scaledSize: new google.maps.Size(chip.width, chip.height),
+                anchor: new google.maps.Point(chip.width / 2, -4),
+              },
+            });
+            if (m.key) {
+              nameMarker.addListener("click", () => markerSelectRef.current?.(m.key as string));
+            }
+          }
           bounds.extend({ lat: m.lat, lng: m.lng });
         });
-        if (list.length > 1) map.fitBounds(bounds, 88);
+        const focus = fitPoints && fitPoints.length > 1 ? fitPoints : null;
+        if (focus) {
+          const fb = new google.maps.LatLngBounds();
+          focus.forEach((p) => fb.extend({ lat: p.lat, lng: p.lng }));
+          map.fitBounds(fb, fitPadding);
+        } else if (list.length > 1) {
+          map.fitBounds(bounds, fitPadding);
+        }
+
 
         /* Capa de ruta: sólo con la capacidad real del proveedor. */
         const stops =
           routeStops ?? (connectByRoad ? list.map((m) => ({ lat: m.lat, lng: m.lng })) : []);
         if (stops.length > 1) {
+          const isProminentRoute = routeEmphasis === "prominent";
+          if (isProminentRoute && roadRoute?.encodedPolyline) {
+            const roadPath = decodePolyline(roadRoute.encodedPolyline);
+            new google.maps.Polyline({
+              map,
+              path: roadPath,
+              strokeColor: themeColor("--selva", "#234933"),
+              strokeOpacity: 0.88,
+              strokeWeight: 10,
+            });
+            new google.maps.Polyline({
+              map,
+              path: roadPath,
+              strokeColor: themeColor("--primary", "#eaa840"),
+              strokeOpacity: 1,
+              strokeWeight: 6,
+            });
+            map.fitBounds(bounds, fitPadding);
+            routeStatusRef.current?.({
+              mode: "directions",
+              distanceMeters: roadRoute.distanceMeters ?? undefined,
+              durationSeconds: roadRoute.durationSeconds ?? undefined,
+            });
+            setReady(true);
+            return;
+          }
           const directions = new google.maps.DirectionsService();
+          const routeUnderlay = isProminentRoute
+            ? new google.maps.DirectionsRenderer({
+                map,
+                suppressMarkers: true,
+                preserveViewport: true,
+                polylineOptions: {
+                  strokeColor: themeColor("--selva", "#234933"),
+                  strokeOpacity: 0.9,
+                  strokeWeight: 10,
+                },
+              })
+            : null;
           const renderer = new google.maps.DirectionsRenderer({
             map,
             suppressMarkers: true,
-            preserveViewport: false,
+            preserveViewport: isProminentRoute,
             polylineOptions: {
               strokeColor: themeColor("--primary", "#eaa840"),
-              strokeOpacity: 0.95,
-              strokeWeight: 5,
+              strokeOpacity: 1,
+              strokeWeight: isProminentRoute ? 6 : 5,
             },
           });
           directions.route(
@@ -334,7 +528,9 @@ export function InteractiveMap({
             (result, status) => {
               if (cancelled) return;
               if (status === google.maps.DirectionsStatus.OK && result) {
+                routeUnderlay?.setDirections(result);
                 renderer.setDirections(result);
+                if (isProminentRoute) map.fitBounds(bounds, fitPadding);
                 const route = (
                   result as {
                     routes?: Array<{
@@ -355,22 +551,28 @@ export function InteractiveMap({
                 });
                 return;
               }
-              /* Sin Directions: línea aproximada derivada de coordenadas CMS. */
-              new google.maps.Polyline({
-                map,
-                path: stops.map((s) => ({ lat: s.lat, lng: s.lng })),
-                strokeColor: themeColor("--primary", "#eaa840"),
-                strokeOpacity: 0,
-                icons: [
-                  {
-                    icon: { path: "M 0,-1 0,1", strokeOpacity: 0.9, scale: 3 },
-                    offset: "0",
-                    repeat: "14px",
-                  },
-                ],
-              });
-              map.fitBounds(bounds, 88);
-              routeStatusRef.current?.({ mode: "approximate", providerStatus: status });
+              if (isProminentRoute) {
+                routeStatusRef.current?.({ mode: "none", providerStatus: status });
+              } else {
+                const approximatePath = stops.map((s) => ({ lat: s.lat, lng: s.lng }));
+                new google.maps.Polyline({
+                  map,
+                  path: approximatePath,
+                  strokeColor: themeColor("--primary", "#eaa840"),
+                  strokeOpacity: 0,
+                  icons: [
+                    {
+                      icon: { path: "M 0,-1 0,1", strokeOpacity: 0.9, scale: 3 },
+                      offset: "0",
+                      repeat: "14px",
+                    },
+                  ],
+                });
+              }
+              map.fitBounds(bounds, isProminentRoute ? fitPadding : 88);
+              if (!isProminentRoute) {
+                routeStatusRef.current?.({ mode: "approximate", providerStatus: status });
+              }
             },
           );
         } else {
@@ -384,14 +586,50 @@ export function InteractiveMap({
     return () => {
       cancelled = true;
     };
-  }, [shouldMount, lat, lng, zoom, markerTitle, markers, connectByRoad, routeStops, optimizeRoute]);
+  }, [
+    shouldMount,
+    lat,
+    lng,
+    zoom,
+    markerTitle,
+    markersSignature,
+    connectByRoad,
+    routeStopsSignature,
+    fitPointsSignature,
+    restrictionSignature,
+    optimizeRoute,
+    routeEmphasis,
+    roadRoute?.encodedPolyline,
+    roadRoute?.distanceMeters,
+    roadRoute?.durationSeconds,
+    fitPadding,
+    minZoom,
+    showMarkerNames,
+  ]);
 
   if (failed) {
     const points = (
       markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }]
     ).map((m) => ({ lat: m.lat, lng: m.lng, title: m.title ?? markerTitle ?? null }));
-    return <MapUnavailableFallback points={points} />;
+    /* Mismo respaldo visual que las fichas de hotel, restaurante y casa:
+       el mapa estático server-rendered, más la lista de ubicaciones. */
+    return (
+      <div className="w-full space-y-3">
+        <StaticMap
+          lat={lat}
+          lng={lng}
+          zoom={zoom}
+          width={640}
+          height={380}
+          alt={markerTitle ? `Mapa de ${markerTitle}` : "Mapa del territorio"}
+          markers={points.map((p) => ({ lat: p.lat, lng: p.lng }))}
+          className={className}
+        />
+        <MapUnavailableFallback points={points} />
+      </div>
+    );
   }
+
 
   return (
     <div

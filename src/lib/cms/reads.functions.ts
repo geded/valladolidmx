@@ -82,10 +82,11 @@ export const listDestinationsCms = createServerFn({ method: "POST" })
 
 export const listZonesCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: (ListInput & { destinationId?: string }) | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
+    const destinationId = (data?.destinationId ?? "").trim();
     let q = context.supabase
       .from("destination_zones")
       .select("id, slug, name, status, destination_id, updated_at", {
@@ -94,6 +95,7 @@ export const listZonesCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
+    if (destinationId) q = q.eq("destination_id", destinationId);
     if (search) q = q.ilike("name", `%${search}%`);
     const { data: rows, count, error } = await q;
     if (error) throw error;
@@ -122,11 +124,67 @@ export const listCategoriesCms = createServerFn({ method: "POST" })
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
   });
 
+/* ───────────────  Opciones territoriales compartidas (CMS)  ───────────── */
+
+/**
+ * listCmsTerritoryOptions — Catálogos de apoyo para los filtros de los
+ * listados administrativos (destinos, zonas, categorías de empresa y
+ * empresas). Lectura únicamente; misma autoridad CMS, sin datos inventados.
+ */
+export const listCmsTerritoryOptions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertEditorial(context);
+    const [destinations, zones, categories, businesses] = await Promise.all([
+      context.supabase
+        .from("destinations")
+        .select("id, name")
+        .is("deleted_at", null)
+        .order("name", { ascending: true })
+        .limit(500),
+      context.supabase
+        .from("destination_zones")
+        .select("id, name, destination_id, status")
+        .is("deleted_at", null)
+        .neq("status", "archived")
+        .order("name", { ascending: true })
+        .limit(1000),
+      context.supabase
+        .from("business_categories")
+        .select("id, name, slug")
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: true })
+        .limit(300),
+      context.supabase
+        .from("businesses")
+        .select("id, display_name, destination_id")
+        .is("deleted_at", null)
+        .order("display_name", { ascending: true })
+        .limit(2000),
+    ]);
+    const err =
+      destinations.error ?? zones.error ?? categories.error ?? businesses.error ?? null;
+    if (err) throw err;
+    return {
+      destinations: destinations.data ?? [],
+      zones: zones.data ?? [],
+      categories: categories.data ?? [],
+      businesses: businesses.data ?? [],
+    };
+  });
+
 /* ────────────────────────────  Empresas  ──────────────────────────────── */
+
+interface ListBusinessesInput extends ListInput {
+  destinationId?: string;
+  categoryId?: string;
+  status?: string;
+  verified?: string;
+}
 
 export const listBusinessesCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListBusinessesInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
@@ -139,6 +197,23 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
       .order("display_name", { ascending: true })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("display_name", `%${search}%`);
+    if (data?.destinationId) q = q.eq("destination_id", data.destinationId);
+    if (data?.status) q = q.eq("status", data.status as never);
+    if (data?.verified === "yes") q = q.eq("verified", true);
+    if (data?.verified === "no") q = q.eq("verified", false);
+    if (data?.categoryId) {
+      // La categoría puede ser la principal o venir de la tabla de enlaces.
+      const { data: links, error: linkError } = await context.supabase
+        .from("business_category_links")
+        .select("business_id")
+        .eq("category_id", data.categoryId)
+        .limit(5000);
+      if (linkError) throw linkError;
+      const ids = (links ?? []).map((l: { business_id: string }) => l.business_id);
+      q = ids.length
+        ? q.or(`primary_category_id.eq.${data.categoryId},id.in.(${ids.join(",")})`)
+        : q.eq("primary_category_id", data.categoryId);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -146,9 +221,16 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
 
 /* ────────────────────────────  Productos  ─────────────────────────────── */
 
+interface ListProductsInput extends ListInput {
+  destinationId?: string;
+  businessId?: string;
+  productType?: string;
+  status?: string;
+}
+
 export const listProductsCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListProductsInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
@@ -159,6 +241,22 @@ export const listProductsCms = createServerFn({ method: "POST" })
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("name", `%${search}%`);
+    if (data?.businessId) q = q.eq("business_id", data.businessId);
+    if (data?.productType) q = q.eq("product_type", data.productType as never);
+    if (data?.status) q = q.eq("status", data.status as never);
+    if (data?.destinationId && !data?.businessId) {
+      // Productos del destino = productos de las empresas de ese destino.
+      const { data: bizRows, error: bizError } = await context.supabase
+        .from("businesses")
+        .select("id")
+        .eq("destination_id", data.destinationId)
+        .is("deleted_at", null)
+        .limit(5000);
+      if (bizError) throw bizError;
+      const ids = (bizRows ?? []).map((b: { id: string }) => b.id);
+      if (ids.length === 0) return { rows: [], total: 0, limit, offset };
+      q = q.in("business_id", ids);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -166,12 +264,76 @@ export const listProductsCms = createServerFn({ method: "POST" })
 
 /* ─────────────────────────────  Media  ────────────────────────────────── */
 
+/**
+ * Biblioteca Media · "Mis imágenes" y filtros por uso.
+ *
+ * Delta aditivo sobre la lectura existente: se conservan columnas, orden y
+ * paginación. Se añaden dos filtros opcionales:
+ *  - `scope: "mine"` limita a las imágenes de las empresas del usuario
+ *    (y a las que él mismo cargó), sin exponer activos de terceros.
+ *  - `usage` agrupa los contextos reales del catálogo en portadas, galerías
+ *    y logos, dejando el resto en "otros".
+ */
+export type MediaUsageFilter = "all" | "cover" | "gallery" | "logo" | "other";
+export type MediaScopeFilter = "all" | "mine";
+export type MediaStateFilter = "all" | "draft" | "in_review" | "published";
+
+const MEDIA_COVER_CONTEXTS = ["cover", "cover_mobile", "hero", "business_cover_preview"];
+const MEDIA_GALLERY_CONTEXTS = ["gallery"];
+const MEDIA_LOGO_CONTEXTS = ["logo", "icon", "avatar"];
+const MEDIA_KNOWN_CONTEXTS = [
+  ...MEDIA_COVER_CONTEXTS,
+  ...MEDIA_GALLERY_CONTEXTS,
+  ...MEDIA_LOGO_CONTEXTS,
+];
+
+interface ListMediaInput extends ListInput {
+  scope?: MediaScopeFilter;
+  usage?: MediaUsageFilter;
+  state?: MediaStateFilter;
+}
+
+
 export const listMediaCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListMediaInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
+    const scope: MediaScopeFilter = data?.scope === "mine" ? "mine" : "all";
+    const usage: MediaUsageFilter = (
+      ["cover", "gallery", "logo", "other"] as const
+    ).includes(data?.usage as never)
+      ? (data!.usage as MediaUsageFilter)
+      : "all";
+    const state: MediaStateFilter = (["draft", "in_review", "published"] as const).includes(
+      data?.state as never,
+    )
+      ? (data!.state as MediaStateFilter)
+      : "all";
+
+
+    let businessIds: string[] = [];
+    let productIds: string[] = [];
+    if (scope === "mine") {
+      const { data: memberships, error: memberError } = await context.supabase
+        .from("business_users")
+        .select("business_id")
+        .eq("user_id", context.userId)
+        .eq("status", "active");
+      if (memberError) throw memberError;
+      businessIds = (memberships ?? []).map((m: { business_id: string }) => m.business_id);
+      if (businessIds.length > 0) {
+        const { data: products, error: productError } = await context.supabase
+          .from("products")
+          .select("id")
+          .in("business_id", businessIds)
+          .is("deleted_at", null);
+        if (productError) throw productError;
+        productIds = (products ?? []).map((p: { id: string }) => p.id);
+      }
+    }
+
     let q = context.supabase
       .from("media_assets")
       .select(
@@ -182,10 +344,94 @@ export const listMediaCms = createServerFn({ method: "POST" })
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("alt_text", `%${search}%`);
+
+    if (scope === "mine") {
+      const ownedIds = [...businessIds, ...productIds];
+      const clauses = [`created_by.eq.${context.userId}`];
+      if (ownedIds.length > 0) clauses.push(`entity_id.in.(${ownedIds.join(",")})`);
+      q = q.or(clauses.join(","));
+    }
+
+    if (usage === "other") {
+      q = q.or(
+        `usage_context.is.null,usage_context.not.in.(${MEDIA_KNOWN_CONTEXTS.join(",")})`,
+      );
+    } else if (usage !== "all") {
+      const list =
+        usage === "cover"
+          ? MEDIA_COVER_CONTEXTS
+          : usage === "gallery"
+            ? MEDIA_GALLERY_CONTEXTS
+            : MEDIA_LOGO_CONTEXTS;
+      q = q.in("usage_context", list);
+    }
+
+    if (state !== "all") q = q.eq("status", state);
+
+
+
     const { data: rows, count, error } = await q;
     if (error) throw error;
-    return { rows: rows ?? [], total: count ?? 0, limit, offset };
+
+    // Miniatura editorial: los buckets son privados y los borradores no pasan
+    // por el proxy público, así que firmamos URLs temporales (1 h) con la
+    // sesión del editor. Sin firma la fila sigue mostrándose, sin miniatura.
+    const list = rows ?? [];
+    const pathOf = (r: unknown) =>
+      r as { storage_bucket: string | null; storage_path: string | null };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const storage = (context.supabase as any).storage;
+    const byBucket = new Map<string, string[]>();
+    for (const row of list) {
+      const r = pathOf(row);
+      if (!r.storage_bucket || !r.storage_path) continue;
+      byBucket.set(r.storage_bucket, [...(byBucket.get(r.storage_bucket) ?? []), r.storage_path]);
+    }
+    const signedByKey = new Map<string, string>();
+    for (const [bucket, paths] of byBucket) {
+      try {
+        const { data: signed } = await storage.from(bucket).createSignedUrls(paths, 3600);
+        for (const row of (signed ?? []) as Array<{
+          path?: string | null;
+          signedUrl?: string | null;
+        }>) {
+          if (row?.path && row?.signedUrl) signedByKey.set(`${bucket}:${row.path}`, row.signedUrl);
+        }
+      } catch {
+        // Sin firma: la biblioteca conserva datos y acciones.
+      }
+    }
+
+    // Uso real: derivado de las referencias del CMS, no de la etiqueta manual.
+    const { resolveMediaUsageReferences } = await import("@/lib/cms/media-usage.functions");
+    const usageRefs = await resolveMediaUsageReferences(
+      context.supabase,
+      list.map((row) => String((row as { id: string }).id)),
+    ).catch(() => []);
+    const usageByMedia = new Map<string, typeof usageRefs>();
+    for (const ref of usageRefs) {
+      usageByMedia.set(ref.mediaId, [...(usageByMedia.get(ref.mediaId) ?? []), ref]);
+    }
+
+    return {
+      rows: list.map((row) => {
+        const r = pathOf(row);
+        const id = String((row as { id: string }).id);
+        return {
+          ...row,
+          previewUrl: signedByKey.get(`${r.storage_bucket}:${r.storage_path}`) ?? null,
+          usageRefs: usageByMedia.get(id) ?? [],
+        };
+      }),
+      total: count ?? 0,
+      limit,
+      offset,
+      scope,
+      usage,
+    };
   });
+
+
 
 /* ─────────────────────────────  Reseñas  ──────────────────────────────── */
 
@@ -212,9 +458,15 @@ export const listReviewsCms = createServerFn({ method: "POST" })
 
 /* ─────────────────────────────  Eventos  ─────────────────────────────── */
 
+interface ListEventsInput extends ListInput {
+  destinationId?: string;
+  status?: string;
+  period?: string;
+}
+
 export const listEventsCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: ListInput | undefined) => d ?? {})
+  .inputValidator((d: ListEventsInput | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     await assertEditorial(context);
     const { limit, offset, search } = normalizeInput(data);
@@ -227,6 +479,10 @@ export const listEventsCms = createServerFn({ method: "POST" })
       .order("starts_at", { ascending: false })
       .range(offset, offset + limit - 1);
     if (search) q = q.ilike("title", `%${search}%`);
+    if (data?.destinationId) q = q.eq("destination_id", data.destinationId);
+    if (data?.status) q = q.eq("status", data.status as never);
+    if (data?.period === "upcoming") q = q.gte("starts_at", new Date().toISOString());
+    if (data?.period === "past") q = q.lt("starts_at", new Date().toISOString());
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };

@@ -63,9 +63,10 @@ import {
 } from "@/lib/traveler/travel-plans.functions";
 import { getAluxConciergeContext } from "@/lib/alux/concierge-context.functions";
 import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
-import { ccListMyCases, ccTimelineAppend } from "@/lib/concierge/cc.functions";
+import { ccListMyCases } from "@/lib/concierge/cc.functions";
 import { getConciergeCaseFile } from "@/lib/concierge/concierge.functions";
 import { CaseFileView } from "@/components/concierge/CaseFileView";
+import { CaseMessages } from "@/components/concierge/CaseMessages";
 import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
@@ -73,10 +74,17 @@ import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
 import { deriveTripPhase, type TripPhase } from "@/lib/traveler/trip-phase";
 import { NowNextLaterSurface } from "@/components/traveler/NowNextLaterSurface";
 import { optimizePlanDay } from "@/lib/traveler/travel-plan-optimize.functions";
+import {
+  restorePlanDaySchedule,
+  suggestPlanDaySchedule,
+  type SuggestDayScheduleResult,
+} from "@/lib/traveler/travel-plan-schedule.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
 import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
+import { TripBriefForm } from "@/components/traveler/TripBriefForm";
+import { formatInMerida, meridaDate, meridaDayMonth, meridaLongDate } from "@/lib/time/merida";
 import { MemoriesSection } from "@/components/traveler/MemoriesSection";
 import { DayWeatherChip } from "@/components/traveler/DayWeatherChip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -85,6 +93,12 @@ import {
   openWorkspaceTour,
 } from "@/components/traveler/WorkspaceOnboardingTour";
 import { HelpCircle } from "lucide-react";
+import { useAluxBrand } from "@/lib/brand/brand-context";
+import {
+  getMyPersonalProfile,
+  saveMyConciergeContact,
+} from "@/lib/traveler/profile-personal.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/cuenta/mi-viaje")({
   validateSearch: (raw: Record<string, unknown>): { vista?: MiViajeVista; focus?: string } => {
@@ -195,7 +209,16 @@ function MiViajePage() {
   });
   // CV5.9 · Propuestas pendientes por confirmar (badge + spotlight).
   const fetchCaseFile = useServerFn(getConciergeCaseFile);
-  const activeCaseId = activeQ.data?.plan.case_id ?? null;
+  // Si el plan activo aún no tiene expediente (el viajero ya inició otro viaje
+  // después de enviarlo), seguimos mostrando su expediente más reciente para
+  // que no pierda de vista la propuesta del Concierge.
+  const latestOpenCaseId = useMemo(() => {
+    const closed = new Set(["closed_lost", "archived"]);
+    const open = (cases ?? []).filter((c) => !closed.has(c.status));
+    const sorted = [...open].sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1));
+    return sorted[0]?.id ?? null;
+  }, [cases]);
+  const activeCaseId = activeQ.data?.plan.case_id ?? latestOpenCaseId;
   const { data: caseFile } = useQuery({
     queryKey: ["concierge", "case-file", "traveler", activeCaseId],
     queryFn: () => fetchCaseFile({ data: { caseId: activeCaseId! } }),
@@ -726,6 +749,7 @@ function MiViajeVistaBody({
               search: { vista: "resumen" },
             }}
           />
+          <ConciergeSection data={plan} cases={cases} onChanged={onChanged} />
         </div>
       );
     }
@@ -855,7 +879,7 @@ function AluxWorkspaceHeader({
   const contextBits: string[] = [];
   if (start)
     contextBits.push(
-      `Llegada ${new Date(start + "T00:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" })}`,
+      `Llegada ${meridaDayMonth(start)}`,
     );
   if (party) contextBits.push(`${party} ${party === 1 ? "viajero" : "viajeros"}`);
   contextBits.push(`${itemCount} ${itemCount === 1 ? "parada" : "paradas"} en el plan`);
@@ -1019,6 +1043,50 @@ function ItinerarioTimeline({
 
   const reorderFn = useServerFn(reorderPlanItems);
   const optimizeFn = useServerFn(optimizePlanDay);
+  const suggestFn = useServerFn(suggestPlanDaySchedule);
+  const restoreFn = useServerFn(restorePlanDaySchedule);
+  const updateItemFn = useServerFn(updatePlanItem);
+
+  const restoreSchedule = useMutation({
+    mutationFn: (previous: SuggestDayScheduleResult["previous"]) =>
+      restoreFn({ data: { previous } }),
+    onSuccess: () => onChanged(),
+  });
+
+  const suggestSchedule = useMutation({
+    mutationFn: (dayIndex: number | null) => suggestFn({ data: { planId: data.plan.id, dayIndex } }),
+    onSuccess: (res) => {
+      onChanged();
+      if (res.updated === 0) {
+        toast(res.rationale);
+        return;
+      }
+      toast.success("Alux propuso horarios para tu día", {
+        description: res.rationale,
+        duration: 9000,
+        action: {
+          label: "Deshacer",
+          onClick: () => restoreSchedule.mutate(res.previous),
+        },
+      });
+    },
+    onError: (e: unknown) =>
+      toast.error("Alux no pudo proponer horarios", {
+        description: e instanceof Error ? e.message : "Inténtalo de nuevo.",
+      }),
+  });
+
+  const setItemTime = useMutation({
+    mutationFn: (v: { itemId: string; startsAtLocal: string | null }) =>
+      updateItemFn({
+        data: { itemId: v.itemId, startsAtLocal: v.startsAtLocal, scheduleSource: "traveler" },
+      }),
+    onSuccess: () => onChanged(),
+    onError: (e: unknown) =>
+      toast.error("No pudimos guardar la hora", {
+        description: e instanceof Error ? e.message : "Inténtalo de nuevo.",
+      }),
+  });
 
   const reorder = useMutation({
     mutationFn: (orderedItemIds: string[]) =>
@@ -1129,6 +1197,18 @@ function ItinerarioTimeline({
               {typeof key === "number" ? (
                 <DayWeatherChip startDate={startDate} totalDays={totalDays} dayIndex={key} />
               ) : null}
+              {items.length >= 1 ? (
+                <button
+                  type="button"
+                  onClick={() => suggestSchedule.mutate(key === "sin" ? null : (key as number))}
+                  disabled={suggestSchedule.isPending}
+                  className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15 disabled:opacity-60"
+                  title="Alux propone una hora para cada actividad usando horarios de apertura y traslados"
+                >
+                  <Clock className="size-3" aria-hidden />
+                  Sugerir horarios
+                </button>
+              ) : null}
               {items.length >= 2 ? (
                 <button
                   type="button"
@@ -1170,6 +1250,13 @@ function ItinerarioTimeline({
                       {it.notes ? (
                         <p className="mt-1 text-xs text-muted-foreground">{it.notes}</p>
                       ) : null}
+                      <ItemScheduleRow
+                        item={it}
+                        saving={setItemTime.isPending}
+                        onChange={(startsAtLocal) =>
+                          setItemTime.mutate({ itemId: it.id, startsAtLocal })
+                        }
+                      />
                     </div>
                     {items.length > 1 ? (
                       <div className="ml-auto flex shrink-0 flex-col gap-0.5">
@@ -1205,6 +1292,86 @@ function ItinerarioTimeline({
     </div>
   );
 }
+
+/**
+ * CV6.7 · Hora de cada actividad. Muestra la hora local del destino y
+ * permite ajustarla. Cuando el horario viene de Alux se marca como
+ * sugerencia; al ajustarlo, queda confirmado por el viajero.
+ */
+function ItemScheduleRow({
+  item,
+  saving,
+  onChange,
+}: {
+  item: TravelPlanItem;
+  saving: boolean;
+  onChange: (startsAtLocal: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const value = item.starts_at_local ?? "";
+  const suggested = item.schedule_source === "alux";
+  const byConcierge = item.schedule_source === "concierge";
+
+  return (
+    <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
+      {value ? (
+        <span className="inline-flex items-center gap-1 rounded-pill bg-muted px-2 py-0.5 font-medium text-foreground">
+          <Clock className="size-3" aria-hidden />
+          {value}
+          {item.duration_minutes ? (
+            <span className="font-normal text-muted-foreground">· {item.duration_minutes} min</span>
+          ) : null}
+        </span>
+      ) : (
+        <span className="text-muted-foreground">Sin hora</span>
+      )}
+      {suggested ? (
+        <span className="rounded-pill border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
+          Sugerido por Alux
+        </span>
+      ) : null}
+      {byConcierge ? (
+        <span className="rounded-pill border border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">
+          Definido por tu concierge
+        </span>
+      ) : null}
+      {open ? (
+        <span className="inline-flex items-center gap-1.5">
+          <input
+            type="time"
+            defaultValue={value}
+            aria-label="Hora de inicio"
+            className="h-8 rounded-md border border-border bg-background px-2 text-xs"
+            onBlur={(e) => {
+              const next = e.currentTarget.value || null;
+              setOpen(false);
+              if ((next ?? "") !== value) onChange(next);
+            }}
+            autoFocus
+          />
+          <button
+            type="button"
+            className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
+            onClick={() => setOpen(false)}
+          >
+            Cancelar
+          </button>
+        </span>
+      ) : (
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => setOpen(true)}
+          className="text-[11px] text-primary underline-offset-2 hover:underline disabled:opacity-60"
+        >
+          {value ? "Ajustar hora" : "Poner hora"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+
 
 function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
   const fetchGeo = useServerFn(getPlanItemsGeo);
@@ -1723,11 +1890,7 @@ function ShareExportSection({
             {plan.shared_at ? (
               <p className="mt-2 text-[11px] text-muted-foreground">
                 Activado el{" "}
-                {new Date(plan.shared_at).toLocaleDateString("es-MX", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
+                {meridaLongDate(plan.shared_at)}
               </p>
             ) : null}
           </div>
@@ -2039,9 +2202,7 @@ interface CaseSummary {
 }
 
 function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string }) {
-  const qc = useQueryClient();
   const fetchFile = useServerFn(getConciergeCaseFile);
-  const appendNote = useServerFn(ccTimelineAppend);
   const q = useQuery({
     queryKey: ["concierge", "case-file", "traveler", caseId],
     queryFn: () => fetchFile({ data: { caseId } }),
@@ -2073,27 +2234,6 @@ function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string })
     }, 80);
     return () => window.clearTimeout(id);
   }, [focus, q.data]);
-  const [note, setNote] = useState("");
-  const send = useMutation({
-    mutationFn: (summary: string) =>
-      appendNote({
-        data: {
-          caseId,
-          eventType: "traveler_note",
-          summary,
-          severity: "info",
-        },
-      }),
-    onSuccess: () => {
-      setNote("");
-      qc.invalidateQueries({ queryKey: ["concierge", "case-file", "traveler", caseId] });
-      toast.success("Nota enviada a tu concierge");
-    },
-    onError: (e) =>
-      toast.error("No se pudo enviar la nota", {
-        description: e instanceof Error ? e.message : undefined,
-      }),
-  });
   return (
     <section className="rounded-2xl border bg-card p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -2114,36 +2254,10 @@ function EmbeddedCaseFile({ caseId, focus }: { caseId: string; focus?: string })
         </Link>
       </div>
 
-      <form
-        className="mb-5 space-y-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const t = note.trim();
-          if (t.length >= 3 && !send.isPending) send.mutate(t);
-        }}
-      >
-        <label className="text-xs font-medium text-foreground/80">
-          Enviar una nota rápida a tu concierge
-        </label>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={2}
-          maxLength={1000}
-          placeholder="Ej. Preferimos comenzar el segundo día un poco más tarde…"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-        />
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{note.length}/1000</span>
-          <button
-            type="submit"
-            disabled={note.trim().length < 3 || send.isPending}
-            className="rounded-pill bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
-          >
-            {send.isPending ? "Enviando…" : "Enviar nota"}
-          </button>
-        </div>
-      </form>
+      {/* Conversación real con el concierge (misma superficie que ve el equipo). */}
+      <div className="mb-5">
+        <CaseMessages caseId={caseId} />
+      </div>
 
       {q.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando expediente…</p>
@@ -2167,113 +2281,15 @@ function ConciergeSection({
   cases: CaseSummary[];
   onChanged: () => void;
 }) {
-  const qc = useQueryClient();
-  const promote = useServerFn(promotePlanToCase);
-  const { plan, items } = data;
-  const [summary, setSummary] = useState("");
-
-  const hasContent = items.length > 0 || Boolean((plan.notes ?? "").trim().length >= 8);
-  const alreadyShared = plan.status === "shared_with_concierge" && Boolean(plan.case_id);
-
-  const send = useMutation({
-    mutationFn: (s: string) => promote({ data: { planId: plan.id, summary: s } }),
-    onSuccess: (res) => {
-      setSummary("");
-      qc.invalidateQueries({ queryKey: ["cc", "my-cases"] });
-      onChanged();
-      toast.success("Expediente enviado al Concierge", {
-        description: "Un concierge humano revisará tu viaje.",
-        action: {
-          label: "Ver caso",
-          onClick: () => {
-            window.location.href = `/cuenta/concierge/${res.caseId}`;
-          },
-        },
-      });
-    },
-    onError: (e) =>
-      toast.error("No se pudo enviar", {
-        description: e instanceof Error ? e.message : undefined,
-      }),
-  });
-
-  const derivedSummary =
-    summary.trim() ||
-    `Viaje "${plan.title}" · ${items.length} elemento${items.length === 1 ? "" : "s"}${
-      plan.party_size ? ` · ${plan.party_size} personas` : ""
-    }${plan.start_date ? ` · desde ${plan.start_date}` : ""}`;
-  const canSend = !alreadyShared && hasContent && derivedSummary.length >= 8 && !send.isPending;
 
   return (
     <section className="rounded-lg border bg-card p-5">
       <h2 className="text-lg font-medium">Enviar al Concierge</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tu expediente completo (destinos, empresas, productos, eventos, notas, fechas y personas)
-        viaja como snapshot al concierge humano.
+        Revisa tu viaje, completa los datos del brief y envía a un concierge humano para cotizar.
       </p>
 
-      {alreadyShared ? (
-        <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
-          <p className="font-medium">Ya enviaste este viaje al Concierge.</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            El caso está en proceso. Puedes seguir agregando elementos y volver a enviar cuando
-            quieras revisar contigo tu concierge.
-          </p>
-          {plan.case_id ? (
-            <Link
-              to="/cuenta/concierge/$caseId"
-              params={{ caseId: plan.case_id }}
-              className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
-            >
-              Ver mi caso →
-            </Link>
-          ) : null}
-        </div>
-      ) : !hasContent ? (
-        <div className="mt-4 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-          Agrega al menos un destino, empresa, producto o evento — o escribe notas generales del
-          viaje — para poder enviarlo.
-        </div>
-      ) : (
-        <form
-          className="mt-4 space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (canSend) send.mutate(derivedSummary);
-          }}
-        >
-          <textarea
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            rows={3}
-            maxLength={500}
-            placeholder="Mensaje opcional para tu concierge (fechas flexibles, presupuesto, restricciones…)"
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          />
-          <p className="text-xs text-muted-foreground">
-            Adjuntaremos automáticamente: {items.length} elemento
-            {items.length === 1 ? "" : "s"}
-            {plan.party_size ? ` · ${plan.party_size} personas` : ""}
-            {plan.start_date ? ` · ${plan.start_date}` : ""}
-            {plan.end_date ? ` → ${plan.end_date}` : ""}.
-          </p>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{summary.length}/500</span>
-            <button
-              type="submit"
-              disabled={!canSend}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
-              {send.isPending ? "Enviando…" : "Enviar al Concierge"}
-            </button>
-          </div>
-          {send.isError ? (
-            <p className="text-xs text-destructive">
-              {send.error instanceof Error ? send.error.message : "Error al enviar"}
-            </p>
-          ) : null}
-        </form>
-      )}
+      <TripBriefForm data={data} onChanged={onChanged} />
 
       <div className="mt-6">
         <div className="flex items-center justify-between">
@@ -2293,7 +2309,7 @@ function ConciergeSection({
                 <div className="min-w-0">
                   <p className="truncate text-sm">{c.summary ?? "(sin resumen)"}</p>
                   <p className="text-xs text-muted-foreground">
-                    {c.status} · {c.priority} · {new Date(c.updated_at).toLocaleDateString()}
+                    {c.status} · {c.priority} · {meridaDate(c.updated_at)}
                   </p>
                 </div>
                 <Link
@@ -2526,11 +2542,12 @@ function TripPhaseCard({
   };
 
   const dateFmt = (iso: string) =>
-    new Date(iso).toLocaleDateString("es-MX", {
+    formatInMerida(iso, {
       day: "numeric",
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
 
   return (

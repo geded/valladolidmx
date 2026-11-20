@@ -54,6 +54,41 @@ const schema: BlockSchema = {
   empty_message: text("Mensaje sin resultados", "empty_message"),
   show_add_to_trip: { type: "boolean", label: "Mostrar “Agregar a mi viaje”", default: false },
   show_favorite: { type: "boolean", label: "Mostrar favoritos", default: false },
+  discovery_rails: {
+    type: "list",
+    label: "Carriles de Qué hacer",
+    default: D.discovery_rails,
+    item: {
+      type: "object",
+      label: "Carril",
+      fields: {
+        id: {
+          type: "select",
+          label: "Contenido",
+          options: [
+            { value: "destinations", label: "Destinos o zonas" },
+            { value: "events", label: "Eventos" },
+            { value: "experiences", label: "Experiencias" },
+            { value: "places", label: "Lugares y sitios de interés" },
+          ],
+        },
+        enabled: { type: "boolean", label: "Mostrar carril", default: true },
+        title: { type: "text", label: "Título", translatable: true },
+        subtitle: { type: "text", label: "Texto breve", translatable: true },
+        max_items: { type: "number", label: "Máximo de tarjetas", default: 12 },
+        sort_by: {
+          type: "select",
+          label: "Orden orgánico",
+          default: "manual",
+          options: [
+            { value: "manual", label: "Editorial" },
+            { value: "recent", label: "Más recientes" },
+            { value: "popular", label: "Más populares" },
+          ],
+        },
+      },
+    },
+  },
   items: {
     type: "list",
     label: "Fichas curadas",

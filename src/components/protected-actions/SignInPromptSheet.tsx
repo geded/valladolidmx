@@ -20,6 +20,7 @@ import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n/context";
 import { BottomSheet } from "@/components/workspace/BottomSheet";
+import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
 
 export function SignInPromptSheet() {
   const [gate, setGate] = useState<ActiveGate | null>(() => SheetController.current());
@@ -146,6 +147,7 @@ function GateBody({
   function onGoFullAuth() {
     // Escape hatch — no cancela la acción pendiente; el ResumeRunner
     // reanudará cuando la sesión aparezca en la misma pestaña.
+    rememberAuthReturnPath(`${window.location.pathname}${window.location.search}`);
     void navigate({ to: "/auth" });
     SheetController.close();
   }

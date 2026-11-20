@@ -6,11 +6,14 @@
  * toda validación y autorización efectiva ocurre en las server functions
  * de `places-cms.functions.ts`.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast";
+import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
+import { QuickCreateZoneDialog } from "@/components/cms/QuickCreateZoneDialog";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import {
   checkPlaceDuplicates,
@@ -37,7 +40,10 @@ import {
 } from "@/lib/places/place-territory";
 import { placeDetailsPatchSchema } from "@/lib/places/places-cms-contracts";
 import type { ContentStatus } from "@/lib/cms/workflow";
+import { getEditorialStatusGuidance } from "@/lib/cms/editorial-language";
 import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
+import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
+import { geocodeAddress } from "@/lib/maps/maps.functions";
 
 import {
   PlaceField,
@@ -98,6 +104,19 @@ const TEXT_FIELDS = [
   "price_currency",
 ] as const;
 
+/** Campos que Alux puede proponer al completar la ficha. */
+const AUTOFILL_FIELDS = [
+  { name: "official_name", label: "Nombre oficial" },
+  { name: "short_description", label: "Descripción corta" },
+  { name: "description", label: "Descripción larga" },
+  { name: "directions", label: "Cómo llegar" },
+  { name: "address_line", label: "Dirección" },
+  { name: "best_time_to_visit", label: "Mejor momento para visitar" },
+  { name: "contact_phone", label: "Teléfono" },
+  { name: "contact_website", label: "Sitio web" },
+  { name: "google_place_id", label: "Google Place ID" },
+];
+
 interface Props {
   placeId?: string;
 }
@@ -156,6 +175,7 @@ export function PlaceEditor({ placeId }: Props) {
     description: "",
   });
 
+  const [zoneDialogOpen, setZoneDialogOpen] = useState(false);
   /** Addendum Q2B: zonas activas del destino elegido en el alta. */
   const newPlaceZones = useMemo(
     () => selectableZonesForDestination(opts.zones ?? [], newPlace.destination_id),
@@ -223,9 +243,64 @@ export function PlaceEditor({ placeId }: Props) {
   const [longitude, setLongitude] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  /* Búsqueda de dirección en Google (gateway) para capturar coordenadas. */
+  const geocodeFn = useServerFn(geocodeAddress);
+  const [placeSearch, setPlaceSearch] = useState("");
+  const [searching, setSearching] = useState(false);
+  const mapLat = Number(latitude);
+  const mapLng = Number(longitude);
+  const searchOnGoogle = async () => {
+    const query = placeSearch.trim();
+    if (query.length < 3) {
+      toast.error("Escribe al menos 3 caracteres para buscar.");
+      return;
+    }
+    setSearching(true);
+    try {
+      const res = await geocodeFn({ data: { address: query } });
+      if (!res.ok || res.lat == null || res.lng == null) {
+        toast.error("No encontramos ese lugar en Google. Ajusta la búsqueda o mueve el pin.");
+        return;
+      }
+      setLatitude(String(res.lat));
+      setLongitude(String(res.lng));
+      if (res.formatted && !values.address_line) set("address_line")(res.formatted);
+      toast.success("Coordenadas capturadas. Ajusta el pin si es necesario y guarda.");
+    } catch {
+      toast.error("No pudimos consultar Google en este momento.");
+    } finally {
+      setSearching(false);
+    }
+  };
+  const useMyLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Tu navegador no soporta geolocalización.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(String(pos.coords.latitude));
+        setLongitude(String(pos.coords.longitude));
+        toast.success("Ubicación capturada. Ajusta el pin si es necesario y guarda.");
+      },
+      (err) => toast.error(err.message || "No pudimos leer tu ubicación."),
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  };
+
+  /** Última versión del lugar ya volcada al formulario. */
+  const hydratedRef = useRef<string | null>(null);
+  const [autofillOpen, setAutofillOpen] = useState(false);
 
   useEffect(() => {
     if (!place) return;
+    /* Sólo se recarga el formulario cuando cambia la versión persistida del
+       lugar. Un refresco en segundo plano (guardar medios, horarios…) ya no
+       descarta los cambios que el editor todavía no ha guardado, como la
+       subzona recién elegida. */
+    const stamp = `${String(place.id ?? "")}:${String(place.updated_at ?? "")}`;
+    if (hydratedRef.current === stamp) return;
+    hydratedRef.current = stamp;
     const next: Values = {};
     for (const key of TEXT_FIELDS) next[key] = (place[key] as string | null) ?? "";
     setValues(next);
@@ -339,14 +414,30 @@ export function PlaceEditor({ placeId }: Props) {
     mutationFn: async () => {
       const parsed = placeDetailsPatchSchema.safeParse(buildPatch());
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos inválidos.");
-      return updateFn({
+      const result = await updateFn({
         data: {
           place_id: placeId!,
           expected_updated_at: String(place?.updated_at ?? ""),
           patch: parsed.data,
         },
       });
+      /* Las coordenadas viven fuera del patch de detalles: si el editor movió
+         el pin, se persisten en la misma acción de "Guardar cambios" para no
+         perder la ubicación marcada en el mapa. */
+      const lat = Number(latitude);
+      const lng = Number(longitude);
+      const changed =
+        latitude !== "" &&
+        longitude !== "" &&
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        (Number(place?.latitude ?? NaN) !== lat || Number(place?.longitude ?? NaN) !== lng);
+      if (changed) {
+        await locationFn({ data: { place_id: placeId!, latitude: lat, longitude: lng } });
+      }
+      return result;
     },
+
     onSuccess: async () => {
       setFieldError(null);
       toast.success("Cambios guardados.");
@@ -499,25 +590,50 @@ export function PlaceEditor({ placeId }: Props) {
             }
           >
             {({ id, describedBy }) => (
-              <select
-                id={id}
-                aria-describedby={describedBy}
-                className={inputClass}
-                value={newPlace.destination_zone_id}
-                disabled={!newPlace.destination_id || newPlaceZones.length === 0}
-                onChange={(e) =>
-                  setNewPlace((p) => ({ ...p, destination_zone_id: e.target.value }))
-                }
-              >
-                <option value="">Sin zona</option>
-                {newPlaceZones.map((z) => (
-                  <option key={z.id} value={z.id}>
-                    {z.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  id={id}
+                  aria-describedby={describedBy}
+                  className={`${inputClass} min-w-0 flex-1`}
+                  value={newPlace.destination_zone_id}
+                  disabled={!newPlace.destination_id || newPlaceZones.length === 0}
+                  onChange={(e) =>
+                    setNewPlace((p) => ({ ...p, destination_zone_id: e.target.value }))
+                  }
+                >
+                  <option value="">Sin zona</option>
+                  {newPlaceZones.map((z) => (
+                    <option key={z.id} value={z.id}>
+                      {z.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={!newPlace.destination_id}
+                  onClick={() => setZoneDialogOpen(true)}
+                  className="shrink-0 rounded-md border border-border px-3 text-xs font-medium hover:bg-muted disabled:opacity-50"
+                >
+                  + Nueva zona
+                </button>
+              </div>
             )}
           </PlaceField>
+          {newPlace.destination_id ? (
+            <QuickCreateZoneDialog
+              open={zoneDialogOpen}
+              onOpenChange={setZoneDialogOpen}
+              destinationId={newPlace.destination_id}
+              destinationName={
+                (opts.destinations ?? []).find((d) => d.id === newPlace.destination_id)?.name ??
+                null
+              }
+              onCreated={async (zone) => {
+                await options.refetch();
+                setNewPlace((p) => ({ ...p, destination_zone_id: zone.id }));
+              }}
+            />
+          ) : null}
           <PlaceField name="new-type" label="Tipo de lugar" required>
             {({ id }) => (
               <select
@@ -595,6 +711,12 @@ export function PlaceEditor({ placeId }: Props) {
   }
 
   const status = (place.status as ContentStatus) ?? "draft";
+  /** Territorio de la ficha: acota la búsqueda que hace Alux. */
+  const destinationName =
+    (opts.destinations ?? []).find(
+      (d: { id: string; name: string }) => d.id === (place.destination_id as string | undefined),
+    )?.name ?? "";
+  const zoneName = editZones.find((z) => z.id === zoneId)?.name ?? "";
   const set = (key: string) => (value: string) => setValues((v) => ({ ...v, [key]: value }));
 
   return (
@@ -611,11 +733,37 @@ export function PlaceEditor({ placeId }: Props) {
             <code>/{String(place.slug)}</code> · nombre, slug y destino son campos protegidos.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => setAutofillOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+            Completar con Alux
+          </button>
           <span>Estado:</span>
           <StatusBadge value={status} />
         </div>
       </header>
+
+      <AluxAutofillDialog
+        open={autofillOpen}
+        onClose={() => setAutofillOpen(false)}
+        entityKind="lugar o sitio de interés"
+        name={String(place.name ?? "")}
+        destination={destinationName}
+        zone={zoneName}
+        fields={AUTOFILL_FIELDS}
+        onApply={(patch, facts) => {
+          setValues((v) => ({ ...v, ...patch }));
+          if (facts?.latitude != null && facts.longitude != null && !latitude && !longitude) {
+            setLatitude(String(facts.latitude));
+            setLongitude(String(facts.longitude));
+          }
+        }}
+      />
+
 
       {fieldError && (
         <div
@@ -757,6 +905,47 @@ export function PlaceEditor({ placeId }: Props) {
           </button>
         }
       >
+        <div className="md:col-span-2 space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              className={inputClass}
+              placeholder="Buscar en Google: nombre del lugar o dirección"
+              value={placeSearch}
+              onChange={(e) => setPlaceSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void searchOnGoogle();
+                }
+              }}
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className={buttonClass}
+                disabled={searching}
+                onClick={() => void searchOnGoogle()}
+              >
+                {searching ? "Buscando…" : "Buscar"}
+              </button>
+              <button type="button" className={buttonClass} onClick={useMyLocation}>
+                Mi ubicación
+              </button>
+            </div>
+          </div>
+          <LocationPickerMap
+            lat={Number.isFinite(mapLat) && latitude !== "" ? mapLat : 20.6896}
+            lng={Number.isFinite(mapLng) && longitude !== "" ? mapLng : -88.2019}
+            onChange={(p) => {
+              setLatitude(String(p.lat));
+              setLongitude(String(p.lng));
+            }}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Busca el lugar, toca el mapa o arrastra el pin. Las coordenadas se llenan solas y se
+            guardan con “Guardar ubicación”.
+          </p>
+        </div>
         <PlaceField name="latitude" label="Latitud" required>
           {({ id }) => (
             <input
@@ -1059,8 +1248,8 @@ export function PlaceEditor({ placeId }: Props) {
 
       <PlaceSection
         id="place-workflow"
-        title="Workflow editorial"
-        description="draft → in_review → approved → published → archived. Publicar exige coordenadas, tipo, descripción corta y medios aprobados."
+        title="Estado de publicación"
+        description={`${getEditorialStatusGuidance(status)} Para publicar, completa la ubicación, el tipo, la descripción corta y agrega medios aprobados.`}
       >
         <div className="md:col-span-2 flex flex-wrap gap-2">
           {NEXT_ACTIONS[status].map((action) => (

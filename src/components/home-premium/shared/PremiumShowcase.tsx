@@ -108,6 +108,9 @@ export function PremiumEditorialHero({
             media={media}
             label={title}
             loading="eager"
+            fetchPriority="high"
+            context="hero"
+            sizes="(min-width: 1024px) 50vw, 100vw"
             className="absolute inset-0 size-full object-cover"
           />
           {caption ? (
@@ -155,7 +158,7 @@ export function PremiumAluxBar({
       <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 gap-y-2 border-l-2 border-selva/70 px-3.5 py-2.5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4 lg:px-4 lg:py-2.5">
         <div className="flex min-w-0 items-center gap-2 lg:pr-3">
           <img
-            src="/brand/alux/master/alux-ia-avatar-master-transparent.png"
+            src="/brand/alux/png/alux-ia-avatar-64.png"
             alt={brand.conciergeName}
             className="size-7 shrink-0 object-contain lg:size-8"
           />

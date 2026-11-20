@@ -30,6 +30,8 @@ export interface ExperienceProductsProps {
    * Mantiene el bloque de presentación 100% puro.
    */
   renderItemActions?: (item: ExperienceProductItem) => ReactNode;
+  /** Slot de acción sobre la fotografía, sin alterar otros consumidores. */
+  renderItemMediaActions?: (item: ExperienceProductItem) => ReactNode;
 }
 
 /* ------------------------------------------------------------------ *
@@ -48,6 +50,7 @@ function productItemToVM(item: ExperienceProductItem): TourismCardVM {
     tagline: item.tagline,
     businessName: item.businessName,
     mediaUrl: item.mediaUrl,
+    mediaAsset: item.mediaAsset,
     mediaAlt: item.mediaAlt,
     rating: item.rating,
     location: item.location,
@@ -102,7 +105,12 @@ function groupItems(
   }));
 }
 
-export function ExperienceProducts({ dto, className, renderItemActions }: ExperienceProductsProps) {
+export function ExperienceProducts({
+  dto,
+  className,
+  renderItemActions,
+  renderItemMediaActions,
+}: ExperienceProductsProps) {
   const {
     variant,
     heading,
@@ -120,6 +128,12 @@ export function ExperienceProducts({ dto, className, renderItemActions }: Experi
     ? (vm: TourismCardVM) => {
         const original = items.find((it) => it.id === vm.id);
         return original ? renderItemActions(original) : null;
+      }
+    : undefined;
+  const wrapMediaRender = renderItemMediaActions
+    ? (vm: TourismCardVM) => {
+        const original = items.find((it) => it.id === vm.id);
+        return original ? renderItemMediaActions(original) : null;
       }
     : undefined;
 
@@ -161,11 +175,15 @@ export function ExperienceProducts({ dto, className, renderItemActions }: Experi
               className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]"
             >
               {g.items.map((it) => (
-                <li key={it.id} className="min-w-[260px] max-w-[300px] shrink-0 snap-start">
+                <li
+                  className="w-[68%] min-w-[190px] max-w-[260px] shrink-0 snap-start sm:w-[38%] lg:w-[24%]"
+                  key={it.id}
+                >
                   <TourismCard
                     vm={productItemToVM(it)}
                     capabilities={vmCaps}
                     renderActions={wrapRender}
+                    renderMediaActions={wrapMediaRender}
                   />
                 </li>
               ))}
@@ -178,6 +196,7 @@ export function ExperienceProducts({ dto, className, renderItemActions }: Experi
                     vm={productItemToVM(it)}
                     capabilities={vmCaps}
                     renderActions={wrapRender}
+                    renderMediaActions={wrapMediaRender}
                   />
                 </li>
               ))}

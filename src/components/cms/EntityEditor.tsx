@@ -6,7 +6,7 @@
  * respetan la máquina oficial: draft → in_review → approved → published →
  * archived.
  */
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -19,6 +19,16 @@ import {
 } from "@/lib/cms/writes.functions";
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/cms/EntityListView";
+import { MediaIdField } from "@/components/cms/MediaIdField";
+import {
+  describeEditorialHistory,
+  getEditorialStatusGuidance,
+} from "@/lib/cms/editorial-language";
+import { meridaDateTime } from "@/lib/time/merida";
+import { Sparkles } from "lucide-react";
+import { AluxWorkspaceChat } from "@/components/workspace/AluxWorkspaceChat";
+import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
+
 
 export type FieldType =
   | "text"
@@ -28,7 +38,8 @@ export type FieldType =
   | "multiselect"
   | "tags"
   | "datetime"
-  | "boolean";
+  | "boolean"
+  | "media";
 
 export interface EditorField {
   name: string;
@@ -49,12 +60,21 @@ interface Props {
   backTo: string;
   listQueryKey: string;
   fields: EditorField[];
+  /** Valores iniciales sólo para altas nuevas (p. ej. el destino de trabajo). */
+  defaults?: Record<string, string>;
+  /** Territorio con el que Alux debe investigar esta ficha. */
+  autofillDestination?: string;
+  autofillZone?: string;
   /** Slot para paneles extra (imágenes, galería...) que reciben el id. */
   renderExtras?: (args: {
     id?: string;
     entity: Record<string, unknown> | undefined;
     refresh: () => void;
   }) => ReactNode;
+  /** Contenido extra justo después de un campo (p. ej. zona tras destino). */
+  renderAfterField?: (fieldName: string, values: Record<string, string>) => ReactNode;
+  /** Se ejecuta tras guardar con éxito (antes de navegar en altas nuevas). */
+  onSaved?: (id: string) => Promise<void> | void;
 }
 
 type ContentStatus = "draft" | "in_review" | "approved" | "published" | "archived";
@@ -72,6 +92,46 @@ const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string }[]
   published: [{ to: "archived", label: "Archivar" }],
   archived: [{ to: "draft", label: "Restaurar a borrador" }],
 };
+
+/**
+ * Respaldo local de lo que el editor está tecleando.
+ *
+ * El sistema operativo puede descartar la pestaña cuando el editor cambia de
+ * aplicación o contesta un mensaje; al volver, el formulario se vuelve a montar
+ * vacío. Guardamos lo escrito en este dispositivo (nunca en el servidor, nunca
+ * como contenido publicado) y lo ofrecemos de vuelta al regresar. Se borra al
+ * guardar la ficha o cuando el editor lo descarta.
+ */
+const LOCAL_DRAFT_PREFIX = "vmx.cms.local-draft.v1";
+const LOCAL_DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+interface LocalDraft {
+  savedAt: number;
+  values: Record<string, string>;
+}
+
+function readLocalDraft(key: string): LocalDraft | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<LocalDraft>;
+    if (!parsed || typeof parsed.savedAt !== "number" || typeof parsed.values !== "object") {
+      return null;
+    }
+    if (Date.now() - parsed.savedAt > LOCAL_DRAFT_MAX_AGE_MS) {
+      window.localStorage.removeItem(key);
+      return null;
+    }
+    const values: Record<string, string> = {};
+    for (const [k, v] of Object.entries(parsed.values ?? {})) {
+      if (typeof v === "string") values[k] = v;
+    }
+    return Object.keys(values).length ? { savedAt: parsed.savedAt, values } : null;
+  } catch {
+    return null;
+  }
+}
 
 export function EntityEditor(props: Props) {
   const { table, id, title, description, backTo, listQueryKey, fields } = props;
@@ -108,31 +168,168 @@ export function EntityEditor(props: Props) {
 
   const [values, setValues] = useState<Record<string, string>>(initialValues);
   const [error, setError] = useState<string | null>(null);
+  const [aluxOpen, setAluxOpen] = useState(false);
+  const [autofillOpen, setAutofillOpen] = useState(false);
+
+  /* ---- Respaldo local de lo tecleado (ver nota arriba) ---- */
+  const draftKey = `${LOCAL_DRAFT_PREFIX}:${table}:${id ?? "nuevo"}`;
+  const [recovered, setRecovered] = useState<number | null>(null);
+  const valuesRef = useRef(values);
+  valuesRef.current = values;
+  /** Mientras haya respaldo recuperado, la ficha guardada no lo pisa. */
+  const recoveredRef = useRef(false);
+  const dirtyRef = useRef(false);
+
+  const clearLocalDraft = useCallback(() => {
+    dirtyRef.current = false;
+    recoveredRef.current = false;
+    setRecovered(null);
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(draftKey);
+      } catch {
+        /* almacenamiento no disponible: el formulario sigue funcionando */
+      }
+    }
+  }, [draftKey]);
+
+  const writeLocalDraft = useCallback(() => {
+    if (!dirtyRef.current || typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        draftKey,
+        JSON.stringify({ savedAt: Date.now(), values: valuesRef.current }),
+      );
+    } catch {
+      /* sin espacio o modo privado: no interrumpimos la edición */
+    }
+  }, [draftKey]);
+
+  /* Al abrir el formulario, recuperamos lo que quedó escrito en este equipo. */
+  useEffect(() => {
+    const draft = readLocalDraft(draftKey);
+    if (!draft) return;
+    recoveredRef.current = true;
+    dirtyRef.current = true;
+    setRecovered(draft.savedAt);
+    setValues((current) => ({ ...current, ...draft.values }));
+  }, [draftKey]);
+
+  /* Guardado continuo mientras se escribe, y en el momento exacto en que la
+     aplicación pasa a segundo plano (que es cuando el sistema la descarta). */
+  useEffect(() => {
+    if (!dirtyRef.current) return;
+    const timer = setTimeout(writeLocalDraft, 500);
+    return () => clearTimeout(timer);
+  }, [values, writeLocalDraft]);
 
   useEffect(() => {
-    if (detail.data) {
-      const next: Record<string, string> = { ...initialValues };
-      for (const f of fields) {
-        const v = (detail.data as Record<string, unknown>)[f.name];
-        if (v === null || v === undefined) {
-          next[f.name] = "";
-        } else if (f.type === "datetime") {
-          // `datetime-local` requiere "YYYY-MM-DDTHH:mm" en hora local.
-          const date = new Date(String(v));
-          next[f.name] = Number.isNaN(date.getTime())
-            ? ""
-            : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-                .toISOString()
-                .slice(0, 16);
-        } else if (Array.isArray(v)) {
-          next[f.name] = v.join("\n");
-        } else {
-          next[f.name] = String(v);
+    if (typeof window === "undefined") return;
+    const flush = () => writeLocalDraft();
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("blur", flush);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("blur", flush);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [writeLocalDraft]);
+
+  const updateValue = useCallback((name: string, value: string) => {
+    dirtyRef.current = true;
+    setValues((s) => ({ ...s, [name]: value }));
+  }, []);
+
+
+  /* Altas nuevas: adoptan el contexto de trabajo (p. ej. el destino elegido)
+     sin pisar lo que el editor ya escribió. */
+  const defaultsKey = JSON.stringify(props.defaults ?? {});
+  useEffect(() => {
+    if (isEdit) return;
+    const defaults = JSON.parse(defaultsKey) as Record<string, string>;
+    const entries = Object.entries(defaults).filter(([, v]) => v);
+    if (entries.length === 0) return;
+    setValues((current) => {
+      const next = { ...current };
+      let changed = false;
+      for (const [key, value] of entries) {
+        if (!next[key]) {
+          next[key] = value;
+          changed = true;
         }
       }
-      setValues(next);
+      return changed ? next : current;
+    });
+  }, [defaultsKey, isEdit]);
+
+
+
+  /* Nombre de la ficha: base de la búsqueda que hace Alux.
+     Cada familia nombra su campo principal distinto (empresas usan
+     `display_name`), por eso se recorren las claves acreditadas y, como
+     último recurso, el primer campo de texto obligatorio del formulario. */
+  const autofillName =
+    values["name"] ||
+    values["title"] ||
+    values["display_name"] ||
+    values["legal_name"] ||
+    values[fields.find((f) => f.type === "text" && f.required)?.name ?? ""] ||
+    "";
+  /** Sólo campos de texto: Alux no elige catálogos ni relaciones. */
+  const autofillFields = useMemo(
+    () =>
+      fields
+        .filter((f) => f.type === "text" || f.type === "textarea")
+        .map((f) => ({
+          name: f.name,
+          label: f.label,
+          ...(f.helpText ? { help: f.helpText } : {}),
+        })),
+    [fields],
+  );
+
+
+  /** Valores tal como están guardados en el CMS (base para descartar el respaldo). */
+  const savedValues = useMemo(() => {
+    if (!detail.data) return null;
+    const next: Record<string, string> = { ...initialValues };
+    for (const f of fields) {
+      const v = (detail.data as Record<string, unknown>)[f.name];
+      if (v === null || v === undefined) {
+        next[f.name] = "";
+      } else if (f.type === "datetime") {
+        // `datetime-local` requiere "YYYY-MM-DDTHH:mm" en hora local.
+        const date = new Date(String(v));
+        next[f.name] = Number.isNaN(date.getTime())
+          ? ""
+          : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16);
+      } else if (Array.isArray(v)) {
+        next[f.name] = v.join("\n");
+      } else {
+        next[f.name] = String(v);
+      }
     }
+    return next;
   }, [detail.data, fields, initialValues]);
+
+  useEffect(() => {
+    // Lo recuperado del propio equipo tiene prioridad: es trabajo del editor
+    // que todavía no llegó al CMS.
+    if (!savedValues || recoveredRef.current) return;
+    setValues(savedValues);
+  }, [savedValues]);
+
+  const discardLocalDraft = useCallback(() => {
+    clearLocalDraft();
+    setValues(savedValues ?? initialValues);
+  }, [clearLocalDraft, savedValues, initialValues]);
+
 
   const status = (detail.data?.status as unknown as ContentStatus | undefined) ?? "draft";
 
@@ -164,6 +361,15 @@ export function EntityEditor(props: Props) {
       return upsert({ data: { table, id: id ?? null, payload } });
     },
     onSuccess: async (res) => {
+      // Ya está en el CMS: el respaldo local deja de ser necesario.
+      clearLocalDraft();
+      if (props.onSaved && res?.id) {
+        try {
+          await props.onSaved(res.id as string);
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "No se pudo completar el guardado.");
+        }
+      }
       await qc.invalidateQueries({ queryKey: ["cms", listQueryKey] });
       if (!isEdit) {
         navigate({ to: `${backTo}/${res.id}/editar` as never });
@@ -199,13 +405,95 @@ export function EntityEditor(props: Props) {
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
           )}
         </div>
-        {isEdit && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Estado actual:</span>
-            <StatusBadge value={status} />
+        <div className="flex items-center gap-3">
+          {isEdit && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Estado actual:</span>
+              <StatusBadge value={status} />
+            </div>
+          )}
+          <div className="flex flex-col items-end gap-1">
+            <button
+              type="button"
+              onClick={() => setAutofillOpen(true)}
+              disabled={autofillName.trim().length < 2}
+              title={
+                autofillName.trim().length < 2
+                  ? "Escribe primero el nombre de la ficha"
+                  : "Alux propone el contenido de esta ficha"
+              }
+              className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+              Completar con Alux
+            </button>
+            {autofillName.trim().length < 2 && (
+              <span className="text-[11px] text-muted-foreground">
+                Escribe primero el nombre para que Alux investigue.
+              </span>
+            )}
           </div>
-        )}
+          <button
+            type="button"
+            onClick={() => setAluxOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:bg-muted"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-alux" aria-hidden />
+            ¿Qué escribo aquí?
+          </button>
+        </div>
       </header>
+
+      <AluxAutofillDialog
+        open={autofillOpen}
+        onClose={() => setAutofillOpen(false)}
+        entityKind={title}
+        name={autofillName}
+        {...(props.autofillDestination ? { destination: props.autofillDestination } : {})}
+        {...(props.autofillZone ? { zone: props.autofillZone } : {})}
+        fields={autofillFields}
+        onApply={(patch) => {
+          dirtyRef.current = true;
+          setValues((v) => ({ ...v, ...patch }));
+        }}
+      />
+
+      <AluxWorkspaceChat
+        open={aluxOpen}
+        onOpenChange={setAluxOpen}
+        subject={{
+          kind: "entity",
+          id: id ?? undefined,
+          label: `${title}${values["name"] || values["title"] ? ` · ${values["name"] || values["title"]}` : ""}`,
+          status: isEdit ? status : "draft",
+          fields: fields.map((f) => `${f.label}${f.required ? " (obligatorio)" : ""}`),
+        }}
+        starters={[
+          "¿Qué escribo en el resumen de esta ficha?",
+          "¿Qué campos me faltan para poder publicarla?",
+          "¿Cómo debe ser la descripción larga?",
+        ]}
+        description="Pregunta qué escribir en cada campo de esta ficha, con qué extensión y qué falta para publicarla."
+      />
+
+
+      {recovered !== null && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm">
+          <span>
+            Recuperamos lo que estabas escribiendo en este equipo
+            {" "}
+            ({meridaDateTime(new Date(recovered).toISOString())}). Guarda la ficha para
+            conservarlo.
+          </span>
+          <button
+            type="button"
+            onClick={discardLocalDraft}
+            className="rounded-pill border border-border bg-surface px-3 py-1 text-xs font-medium hover:bg-muted"
+          >
+            Descartar y volver a lo guardado
+          </button>
+        </div>
+      )}
 
       {error && (
         <div
@@ -225,12 +513,14 @@ export function EntityEditor(props: Props) {
         }}
       >
         {fields.map((f) => (
-          <FieldInput
-            key={f.name}
-            field={f}
-            value={values[f.name] ?? ""}
-            onChange={(v) => setValues((s) => ({ ...s, [f.name]: v }))}
-          />
+          <Fragment key={f.name}>
+            <FieldInput
+              field={f}
+              value={values[f.name] ?? ""}
+              onChange={(v) => updateValue(f.name, v)}
+            />
+            {props.renderAfterField?.(f.name, values)}
+          </Fragment>
         ))}
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -270,10 +560,10 @@ export function EntityEditor(props: Props) {
 
       {isEdit && (
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold tracking-tight">Workflow editorial</h2>
+          <h2 className="text-sm font-semibold tracking-tight">Estado de publicación</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            draft → in_review → approved → published → archived. Cada transición se valida
-            server-side y queda asociada al usuario actual como insumo de auditoría futura.
+            {getEditorialStatusGuidance(status)} Cada cambio de estado queda registrado con la
+            persona responsable.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {NEXT_ACTIONS[status].map((action) => (
@@ -292,7 +582,7 @@ export function EntityEditor(props: Props) {
             ))}
             {NEXT_ACTIONS[status].length === 0 && (
               <span className="text-xs text-muted-foreground">
-                Sin transiciones disponibles desde este estado.
+                No hay acciones disponibles para este estado.
               </span>
             )}
           </div>
@@ -301,15 +591,9 @@ export function EntityEditor(props: Props) {
 
       {isEdit && (
         <section className="mt-6 rounded-xl border border-border bg-card p-5">
-          <header className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold tracking-tight">Historial editorial</h2>
-            <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-              content_audit_log
-            </span>
-          </header>
+          <h2 className="text-sm font-semibold tracking-tight">Historial editorial</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Bitácora append-only de creaciones, ediciones y transiciones de estado. Insumo oficial
-            de auditoría (Serie 13.4).
+            Aquí puedes consultar qué cambió, cuándo ocurrió y quién realizó cada acción.
           </p>
           <div className="mt-4 divide-y divide-border text-xs">
             {history.isLoading && <p className="py-2 text-muted-foreground">Cargando historial…</p>}
@@ -321,23 +605,26 @@ export function EntityEditor(props: Props) {
                 key={h.id}
                 className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider">
-                    {h.action}
-                  </span>
-                  {h.from_status && h.to_status && (
-                    <span className="text-muted-foreground">
-                      {h.from_status} → <strong>{h.to_status}</strong>
-                    </span>
+                <div>
+                  <p className="font-medium">{describeEditorialHistory(h)}</p>
+                  {h.notes && <p className="mt-1 text-muted-foreground">Nota: {h.notes}</p>}
+                  {h.actor_user_id && (
+                    <p className="mt-1 text-muted-foreground">Responsable registrado</p>
                   )}
-                  {!h.from_status && h.to_status && (
-                    <span className="text-muted-foreground">
-                      → <strong>{h.to_status}</strong>
-                    </span>
-                  )}
+                  <details className="mt-1 text-muted-foreground">
+                    <summary className="cursor-pointer select-none">Detalle técnico</summary>
+                    <dl className="mt-1 grid gap-1 rounded-md bg-muted/50 p-2 font-mono text-[10px]">
+                      <div>Registro: content_audit_log</div>
+                      <div>Acción: {h.action}</div>
+                      <div>
+                        Estado: {h.from_status ?? "—"} → {h.to_status ?? "—"}
+                      </div>
+                      {h.actor_user_id && <div>Usuario: {h.actor_user_id}</div>}
+                    </dl>
+                  </details>
                 </div>
                 <time className="text-muted-foreground">
-                  {new Date(h.created_at).toLocaleString()}
+                  {meridaDateTime(h.created_at)} · hora de Mérida
                 </time>
               </div>
             ))}
@@ -350,6 +637,17 @@ export function EntityEditor(props: Props) {
 
 function FieldInput(props: { field: EditorField; value: string; onChange: (v: string) => void }) {
   const { field, value, onChange } = props;
+  if (field.type === "media") {
+    return (
+      <MediaIdField
+        label={field.label}
+        value={value}
+        onChange={onChange}
+        helpText={field.helpText}
+        required={field.required}
+      />
+    );
+  }
   const common =
     "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary";
   return (

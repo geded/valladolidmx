@@ -23,7 +23,6 @@ import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 
-
 const ICONS: Record<string, LucideIcon> = {
   calendar: Calendar,
   heart: Heart,
@@ -104,7 +103,11 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
     >
       {(label || meta) && (
         <div className="min-w-0 flex-1">
-          {label ? <p className="truncate text-sm font-semibold text-foreground">{label}</p> : null}
+          {label ? (
+            <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+              {label}
+            </p>
+          ) : null}
           {meta ? <p className="truncate text-xs text-muted-foreground">{meta}</p> : null}
         </div>
       )}
@@ -151,9 +154,9 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
           const iconOnly = !a.label && Boolean(a.iconKey);
 
           const classes = cn(
-            "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-pill text-sm font-semibold transition",
+            "inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-pill text-[13px] font-semibold transition sm:text-sm",
             "focus-visible:outline-none focus-visible:ring-focus",
-            iconOnly ? "px-3" : "px-4",
+            iconOnly ? "px-3" : "px-3.5 sm:px-4",
             a.emphasis === "primary"
               ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft"
               : a.emphasis === "ghost"
@@ -179,9 +182,11 @@ export function ExperienceCtaBar({ dto, onAction, className }: ExperienceCtaBarP
               </button>
             );
           }
-          const href = a.href ?? "#";
+          // Fail-closed: una acción sin destino no se pinta como enlace
+          // decorativo. Ningún botón visible puede quedar sin efecto.
+          if (!a.href) return null;
           return (
-            <a key={i} className={classes} href={href} aria-label={a.label || a.action}>
+            <a key={i} className={classes} href={a.href} aria-label={a.label || a.action}>
               {inner}
             </a>
           );

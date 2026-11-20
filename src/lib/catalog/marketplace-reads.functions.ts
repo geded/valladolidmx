@@ -40,6 +40,7 @@ export interface MarketplaceBusinessCard {
   verified: boolean;
   /** URL firmada de la portada oficial (business_media role=cover). */
   cover_url?: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /** Coordenadas primarias — para el bloque `vmx.experience.map`. */
   latitude?: number | null;
   longitude?: number | null;
@@ -75,6 +76,7 @@ export interface MarketplaceProductCard {
   visibility_level: string;
   /** URL firmada de la portada oficial (product_media role=cover). */
   cover_url?: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 export interface MarketplacePromotionCard {
@@ -119,6 +121,61 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
    * puede alimentar el binding gobernado `geography.location`.
    */
   provenance?: "published" | "demo";
+  /**
+   * Reputación acreditada de la ficha (`reviews`, subject_kind = business,
+   * status = published). `null` = la empresa aún no tiene reseñas publicadas;
+   * la superficie omite la sección de reputación. Nunca se inventan datos.
+   */
+  reviews?: MarketplaceBusinessReviews | null;
+  /**
+   * Atributos turísticos administrables de la empresa
+   * (`businesses.filter_attributes`) resueltos contra el catálogo activo de
+   * su familia (`tourism_attribute_definitions/_options`). Sólo claves con
+   * valor real y opción activa; nunca se inventan datos ni se muestran
+   * claves crudas.
+   */
+  attributes?: BusinessAttributeItem[];
+  /**
+   * Fotografías administradas en CMS (`business_media` → `media_assets`),
+   * ya firmadas. Sólo medios publicados y no eliminados; nunca placeholders.
+   */
+  media?: MarketplaceBusinessMediaItem[];
+}
+
+/** Medio CMS de una empresa (portada o galería) con URL firmada. */
+export interface MarketplaceBusinessMediaItem {
+  role: string;
+  url: string;
+  alt: string | null;
+  /** H3·A4 (aditivo): identidad del asset. */
+  assetId?: string;
+  /** H3·A4 (aditivo): asset + variantes `ready` para `resolveMediaSource()`. */
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
+}
+
+/** Atributo administrable resuelto (misma forma que el de producto). */
+export type BusinessAttributeItem = ProductAttributeItem;
+
+export interface MarketplaceBusinessReviewItem {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string | null;
+  language: string;
+  author_display_name: string | null;
+  verified_source: string | null;
+  published_at: string | null;
+  helpful_count: number;
+  business_response: string | null;
+  business_response_at: string | null;
+}
+
+export interface MarketplaceBusinessReviews {
+  count: number;
+  average: number;
+  verified_count: number;
+  distribution: Record<"1" | "2" | "3" | "4" | "5", number>;
+  items: MarketplaceBusinessReviewItem[];
 }
 
 export interface MarketplaceSearchHit {
@@ -148,6 +205,7 @@ export interface MarketplaceSearchResult {
  * ------------------------------------------------------------------ */
 
 export interface ProductMediaItem {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   id: string;
   role: "cover" | "gallery" | string;
   url: string | null;
@@ -174,6 +232,12 @@ export interface ProductBusinessContext {
     latitude: number | null;
     longitude: number | null;
   } | null;
+  /**
+   * Logotipo firmado de la empresa operadora (`business_media` role `logo`).
+   * Opcional: `null` cuando la empresa aún no lo tiene cargado en CMS.
+   */
+  logo_url?: string | null;
+  logo_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 export interface ProductFaqItem {
@@ -240,6 +304,7 @@ export interface MarketplaceProductDetail {
     terms: string | null;
   };
   cover_url: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   media: ProductMediaItem[];
   business: ProductBusinessContext;
   related: MarketplaceProductCard[];
@@ -257,6 +322,7 @@ export interface MarketplaceProductDetail {
   attributes: ProductAttributeItem[];
   /** Etiqueta editorial de tipo (`metadata.category_label`) si la empresa la capturó. */
   category_label: string | null;
+  effective_location: ProductBusinessContext["primary_location"];
 }
 
 export interface ProductAttributeItem {
@@ -348,7 +414,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     const { data: prod, error } = await supabase
       .from("products")
       .select(
-        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
+        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, location_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -386,7 +452,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       supabase
         .from("product_media")
         .select(
-          "id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state ) )",
+          "id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text, alt_text_ai, alt_text_source, review_state, title, media_asset_translations ( locale, alt_text, alt_text_ai, source, review_state ) )",
         )
         .eq("product_id", prod.id)
         .order("sort_order", { ascending: true })
@@ -404,8 +470,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         .select("label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at")
         .eq("business_id", businessId)
         .is("deleted_at", null)
-        .order("is_primary", { ascending: false })
-        .limit(1),
+        .order("is_primary", { ascending: false }),
       supabase
         .from("promotions")
         .select(
@@ -499,6 +564,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         title: string | null;
         width: number | null;
         height: number | null;
+        pipeline_status: string | null;
         media_asset_translations?: Array<{
           locale: string;
           alt_text: string | null;
@@ -562,7 +628,62 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       }
     }
 
+    const vb = await import("@/lib/media/variant-bundles.server");
+    if (await vb.shouldServePublicVariants()) {
+      const bases = media.flatMap((item) => {
+        const a = rows.find((row) => row.id === item.id)?.media_assets;
+        return a && item.url ? [{ id: a.id, file_url: item.url, width: a.width, height: a.height, pipeline_status: a.pipeline_status }] : [];
+      });
+      const bundles = await vb.attachReadyVariants(bases);
+      for (const item of media) {
+        const id = rows.find((row) => row.id === item.id)?.media_assets?.id;
+        if (id && bundles[id]) item.asset = bundles[id];
+      }
+    }
     const cover = media.find((m) => m.role === "cover") ?? media[0] ?? null;
+
+    /* Logotipo de la empresa operadora (`business_media` role `logo`).
+       Es opcional: sin logotipo acreditado la ficha conserva su composición
+       actual y jamás se inventa una imagen de marca. */
+    let businessLogoUrl: string | null = null;
+    let businessLogoAsset: import("@/lib/media/resolve-source").MediaAssetInput | undefined;
+    try {
+      const { data: logoRow } = await supabase
+        .from("business_media")
+        .select("media_assets:media_assets ( id, width, height, pipeline_status, storage_bucket, storage_path, status, deleted_at )")
+        .eq("business_id", String(biz.id))
+        .eq("role", "logo")
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      const logoAsset = (
+        logoRow as {
+          media_assets?: {
+            id: string; width: number | null; height: number | null; pipeline_status: string | null;
+            storage_bucket?: string;
+            storage_path?: string;
+            status?: string | null;
+            deleted_at?: string | null;
+          } | null;
+        } | null
+      )?.media_assets;
+      if (logoAsset?.storage_bucket && logoAsset.storage_path && !logoAsset.deleted_at) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: signedLogo } = await supabaseAdmin.storage
+          .from(logoAsset.storage_bucket)
+          .createSignedUrl(logoAsset.storage_path, 3600);
+        businessLogoUrl = signedLogo?.signedUrl ?? null;
+        if (businessLogoUrl) {
+          const vb = await import("@/lib/media/variant-bundles.server");
+          if (await vb.shouldServePublicVariants()) {
+            const bundles = await vb.attachReadyVariants([{ id: logoAsset.id, file_url: businessLogoUrl, width: logoAsset.width, height: logoAsset.height, pipeline_status: logoAsset.pipeline_status }]);
+            businessLogoAsset = bundles[logoAsset.id];
+          }
+        }
+      }
+    } catch {
+      businessLogoUrl = null;
+    }
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
@@ -583,15 +704,20 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         }
       : null;
 
-    const locRow = (
+    const locationRows = (
       (locations ?? []) as Array<{
+        id?: string;
         label: string | null;
         address_line1: string | null;
         address_line2: string | null;
         latitude: number | string | null;
         longitude: number | string | null;
       }>
-    )[0];
+    );
+    const locRow =
+      locationRows.find((row) => row.id === (prod as { location_id?: string | null }).location_id) ??
+      locationRows.find((row) => (row as { is_primary?: boolean }).is_primary) ??
+      locationRows[0];
     const primaryLocation = locRow
       ? {
           label: locRow.label,
@@ -673,6 +799,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         terms: ((prod as Record<string, unknown>).direct_sale_terms as string | null) ?? null,
       },
       cover_url: cover?.url ?? null,
+      cover_asset: cover?.asset,
       media,
       business: {
         id: biz.id,
@@ -685,7 +812,10 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
         plan_tier: planTier,
         primary_contact: primaryContact,
         primary_location: primaryLocation,
+        logo_url: businessLogoUrl,
+        logo_asset: businessLogoAsset,
       },
+      effective_location: primaryLocation,
       related,
       promotions: (promos ?? []).map((p) => ({
         id: p.id as string,
@@ -759,11 +889,21 @@ export interface MarketplaceSearchInput {
  * listMarketplaceBusinesses — Devuelve empresas publicadas para el
  * listado público del Marketplace. Whitelist estricta de columnas.
  */
+/** La zona real (destination_zones) del negocio sustituye la etiqueta de la lista fija. */
+function withRealZone(
+  attrs: TourismFilterAttributes,
+  loc: Record<string, unknown> | null,
+): TourismFilterAttributes {
+  const z = loc?.destination_zones as { name?: unknown; status?: unknown } | null | undefined;
+  if (!z || typeof z.name !== "string" || z.status === "archived") return attrs;
+  return { ...attrs, zone: [z.name] } as TourismFilterAttributes;
+}
+
 export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handler(
   async (): Promise<MarketplaceBusinessCard[]> => {
     const supabase = publicClient();
     const selectWithAttributes =
-      "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
+      "id, slug, display_name, tagline, verified, status, deleted_at, filter_attributes, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at, destination_zones ( name, status ) )";
     const legacySelect =
       "id, slug, display_name, tagline, verified, status, deleted_at, destinations!businesses_destination_id_fkey ( slug ), business_categories!businesses_primary_category_id_fkey ( slug ), business_locations!business_locations_business_id_fkey ( latitude, longitude, address_line1, is_primary, deleted_at )";
     const primaryResult = await supabase
@@ -814,8 +954,9 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         latitude: rawLat == null ? null : Number(rawLat),
         longitude: rawLng == null ? null : Number(rawLng),
         address_line1: typeof rawAddr === "string" ? rawAddr : null,
-        filter_attributes: normalizeFilterAttributes(
-          (row as { filter_attributes?: unknown }).filter_attributes,
+        filter_attributes: withRealZone(
+          normalizeFilterAttributes((row as { filter_attributes?: unknown }).filter_attributes),
+          primary,
         ),
       };
     });
@@ -873,6 +1014,71 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         if (!s) continue;
         row.spotlight_headline = s.headline;
         row.spotlight_boost = s.boost;
+      }
+    }
+
+    /* Portada oficial del CMS (business_media role=cover → media_assets).
+       Misma vía canónica que `getDestinationRelated`: el bucket es privado,
+       por lo que la URL se firma server-side con el cliente administrativo.
+       Best-effort: si no hay portada acreditada, `cover_url` queda en null y
+       la tarjeta usa su fallback editorial aprobado. */
+    if (rows.length > 0) {
+      try {
+        const { data: bmedia } = await supabase
+          .from("business_media")
+          .select(
+            "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text )",
+          )
+          .in(
+            "business_id",
+            rows.map((r) => r.id),
+          )
+          .eq("role", "cover")
+          .order("sort_order", { ascending: true });
+        if (bmedia && bmedia.length > 0) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const seen = new Set<string>();
+          const firstPerBusiness = (bmedia as Array<Record<string, unknown>>).filter((r) => {
+            const bid = String(r.business_id);
+            if (seen.has(bid)) return false;
+            seen.add(bid);
+            return true;
+          });
+          const variantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
+          const assetByBusiness = new Map<string, string>();
+          const signed = await Promise.all(
+            firstPerBusiness.map(async (r) => {
+              const asset = r.media_assets as {
+                id: string;
+                width: number | null;
+                height: number | null;
+                pipeline_status: string | null;
+                storage_bucket?: string;
+                storage_path?: string;
+              } | null;
+              if (!asset?.storage_bucket || !asset?.storage_path)
+                return [String(r.business_id), null] as const;
+              const { data: s } = await supabaseAdmin.storage
+                .from(asset.storage_bucket)
+                .createSignedUrl(asset.storage_path, 3600);
+              if (s?.signedUrl && asset.id) {
+                assetByBusiness.set(String(r.business_id), asset.id);
+                variantBases.push({ id: asset.id, file_url: s.signedUrl, width: asset.width, height: asset.height, pipeline_status: asset.pipeline_status });
+              }
+              return [String(r.business_id), s?.signedUrl ?? null] as const;
+            }),
+          );
+          const byBiz = new Map(signed);
+          const vb = await import("@/lib/media/variant-bundles.server");
+          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(variantBases) : {};
+          for (const row of rows) {
+            row.cover_url = byBiz.get(row.id) ?? null;
+            const id = assetByBusiness.get(row.id);
+            if (id && bundles[id]) row.cover_asset = bundles[id];
+          }
+        }
+      } catch (e) {
+        console.warn("[listMarketplaceBusinesses] cover sign failed", e);
       }
     }
 
@@ -936,40 +1142,114 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     if (error) throw new Error(`marketplace_business_failed: ${error.message}`);
     if (!biz) return null;
 
-    const [{ data: products, error: pErr }, { data: promos, error: prErr }, { data: locations }] =
-      await Promise.all([
-        supabase
-          .from("products")
-          .select(
-            "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
-          )
-          .eq("business_id", String(biz.id))
-          .eq("status", "published")
-          .is("deleted_at", null)
-          .order("name", { ascending: true })
-          .limit(48),
-        supabase
-          .from("promotions")
-          .select(
-            "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
-          )
-          .eq("business_id", String(biz.id))
-          .eq("status", "published")
-          .is("deleted_at", null)
-          .order("ends_at", { ascending: true, nullsFirst: false })
-          .limit(24),
-        supabase
-          .from("business_locations")
-          .select(
-            "label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at",
-          )
-          .eq("business_id", String(biz.id))
-          .is("deleted_at", null)
-          .order("is_primary", { ascending: false })
-          .limit(1),
-      ]);
+    const [
+      { data: products, error: pErr },
+      { data: promos, error: prErr },
+      { data: locations },
+      { data: reviewRows },
+      { data: businessMedia },
+    ] = await Promise.all([
+      supabase
+        .from("products")
+        .select(
+          "id, slug, name, tagline, product_type, price_amount, price_currency, status, deleted_at, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
+        )
+        .eq("business_id", String(biz.id))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("name", { ascending: true })
+        .limit(48),
+      supabase
+        .from("promotions")
+        .select(
+          "id, slug, title, description, discount_percent, starts_at, ends_at, status, deleted_at",
+        )
+        .eq("business_id", String(biz.id))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("ends_at", { ascending: true, nullsFirst: false })
+        .limit(24),
+      supabase
+        .from("business_locations")
+        .select("label, address_line1, address_line2, latitude, longitude, is_primary, deleted_at")
+        .eq("business_id", String(biz.id))
+        .is("deleted_at", null)
+        .order("is_primary", { ascending: false })
+        .limit(1),
+      supabase
+        .from("reviews")
+        .select(
+          "id, rating, title, body, language, author_display_name, verified_source, published_at, helpful_count, business_response, business_response_at",
+        )
+        .eq("subject_kind", "business")
+        .eq("subject_id", String(biz.id))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(24),
+      /* Portada + galería administradas en CMS. La ficha necesita todas las
+         fotografías asociadas para su mosaico; sin filas simplemente no se
+         renderiza galería (nunca se inventan medios). */
+      supabase
+        .from("business_media")
+        .select(
+          "role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text, status, deleted_at, width, height, pipeline_status )",
+        )
+        .eq("business_id", String(biz.id))
+        .order("role", { ascending: true })
+        .order("sort_order", { ascending: true })
+        .limit(12),
+    ]);
     if (pErr) throw new Error(`marketplace_products_failed: ${pErr.message}`);
     if (prErr) throw new Error(`marketplace_promos_failed: ${prErr.message}`);
+
+    /* Reputación acreditada: sólo reseñas publicadas y no eliminadas.
+       Sin filas → `null` (la superficie omite la sección). */
+    const reviewItems: MarketplaceBusinessReviewItem[] = (
+      (reviewRows ?? []) as Array<Record<string, unknown>>
+    ).map((r) => ({
+      id: String(r.id),
+      rating: Number(r.rating ?? 0),
+      title: (r.title as string | null) ?? null,
+      body: (r.body as string | null) ?? null,
+      language: typeof r.language === "string" ? r.language : "es",
+      author_display_name: (r.author_display_name as string | null) ?? null,
+      verified_source: (r.verified_source as string | null) ?? null,
+      published_at: (r.published_at as string | null) ?? null,
+      helpful_count: Number(r.helpful_count ?? 0),
+      business_response: (r.business_response as string | null) ?? null,
+      business_response_at: (r.business_response_at as string | null) ?? null,
+    }));
+    const reviewsSummary: MarketplaceBusinessReviews | null =
+      reviewItems.length > 0
+        ? {
+            count: reviewItems.length,
+            average:
+              Math.round(
+                (reviewItems.reduce((acc, it) => acc + it.rating, 0) / reviewItems.length) * 10,
+              ) / 10,
+            verified_count: reviewItems.filter(
+              (it) => it.verified_source && it.verified_source !== "declared_visitor",
+            ).length,
+            distribution: reviewItems.reduce(
+              (acc, it) => {
+                const key = String(Math.min(5, Math.max(1, Math.round(it.rating)))) as
+                  | "1"
+                  | "2"
+                  | "3"
+                  | "4"
+                  | "5";
+                acc[key] += 1;
+                return acc;
+              },
+              { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } as Record<
+                "1" | "2" | "3" | "4" | "5",
+                number
+              >,
+            ),
+            items: reviewItems,
+          }
+        : null;
 
     const destSlug = (biz.destinations as { slug?: unknown } | null)?.slug;
     const catSlug = (biz.business_categories as { slug?: unknown } | null)?.slug;
@@ -979,6 +1259,26 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     const planTier = resolveBusinessPlanTier(
       (biz as { metadata?: Record<string, unknown> | null }).metadata ?? null,
     );
+
+    /* Atributos administrables resueltos contra el catálogo activo de la
+       familia declarada en CMS. Sin familia o sin catálogo, la ficha
+       simplemente no muestra la sección: nunca claves crudas. */
+    const attributeFamilyKey = typeof catFamily === "string" && catFamily.trim() ? catFamily : null;
+    let businessAttributes: BusinessAttributeItem[] = [];
+    if (attributeFamilyKey) {
+      const { data: attrDefs } = await supabase
+        .from("tourism_attribute_definitions")
+        .select(
+          "attribute_key, label, filter_group, sort_order, tourism_attribute_options(value,label,sort_order,active)",
+        )
+        .eq("family_key", attributeFamilyKey)
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      businessAttributes = resolveProductAttributes(
+        biz.filter_attributes,
+        (attrDefs ?? []) as Array<Record<string, unknown>>,
+      );
+    }
 
     const detailLocationRow = (
       (locations ?? []) as Array<{
@@ -1000,19 +1300,149 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         }
       : null;
 
+    /* La ficha usa la misma portada CMS que los listados. Antes, la lectura
+       de detalle nunca consultaba `business_media`, por lo que una portada
+       correctamente asociada desaparecía al abrir la empresa. */
+    let detailCoverUrl: string | null = null;
+    const detailMedia: MarketplaceBusinessMediaItem[] = [];
+    const detailMediaRows = ((businessMedia ?? []) as Array<{
+      role?: string | null;
+      sort_order?: number | null;
+      media_assets?: {
+        id?: string | null;
+        width?: number | null;
+        height?: number | null;
+        pipeline_status?: string | null;
+        storage_bucket?: string | null;
+        storage_path?: string | null;
+        alt_text?: string | null;
+        status?: string | null;
+        deleted_at?: string | null;
+      } | null;
+    }>).filter((r) => {
+      const a = r.media_assets;
+      return Boolean(
+        a?.storage_bucket && a.storage_path && a.status === "published" && a.deleted_at === null,
+      );
+    });
+    if (detailMediaRows.length > 0) {
+      const variantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        for (const row of detailMediaRows) {
+          const a = row.media_assets;
+          if (!a?.storage_bucket || !a.storage_path) continue;
+          const { data: signed } = await supabaseAdmin.storage
+            .from(a.storage_bucket)
+            .createSignedUrl(a.storage_path, 3600);
+          if (!signed?.signedUrl) continue;
+          detailMedia.push({
+            role: typeof row.role === "string" ? row.role : "gallery",
+            url: signed.signedUrl,
+            alt: typeof a.alt_text === "string" ? a.alt_text : null,
+            ...(a.id ? { assetId: a.id } : {}),
+          });
+          if (a.id) {
+            variantBases.push({
+              id: a.id,
+              file_url: signed.signedUrl,
+              width: a.width ?? null,
+              height: a.height ?? null,
+              pipeline_status: a.pipeline_status ?? null,
+            });
+          }
+        }
+        /* H3·A4 · Versiones ligeras (fail-closed): sólo cuando el pipeline
+           está encendido o la ficha es piloto en preview. */
+        try {
+          const vb = await import("@/lib/media/variant-bundles.server");
+          if (await vb.shouldServeVariantsForBusiness(String(biz.slug ?? ""))) {
+            const bundles = await vb.attachReadyVariants(variantBases);
+            for (const m of detailMedia) {
+              const bundle = m.assetId ? bundles[m.assetId] : undefined;
+              if (bundle) m.asset = bundle;
+            }
+          }
+        } catch {
+          /* Sin variantes la ficha conserva las originales. */
+        }
+      } catch {
+        /* Sin credencial de firma la ficha simplemente no muestra medios. */
+      }
+      detailCoverUrl = detailMedia.find((m) => m.role === "cover")?.url ?? null;
+    }
+
+    /* Portada CMS de cada producto (`product_media` role=cover → media_assets).
+       Sin fila acreditada la tarjeta conserva su fallback editorial: nunca se
+       inventan medios ni se construyen URLs fuera del pipeline. */
+    const productCovers = new Map<string, string>();
+    const productCoverAssets: Record<string, import("@/lib/media/resolve-source").MediaAssetInput> = {};
+    const productAssetIds = new Map<string, string>();
+    const productVariantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
+    const productIds = (products ?? []).map((p) => String(p.id));
+    if (productIds.length > 0) {
+      try {
+        const { data: pmedia } = await supabase
+          .from("product_media")
+          .select(
+            "product_id, role, sort_order, media_assets:media_assets ( id, width, height, pipeline_status, storage_bucket, storage_path, status, deleted_at )",
+          )
+          .in("product_id", productIds)
+          .eq("role", "cover")
+          .order("sort_order", { ascending: true });
+        const validRows = ((pmedia ?? []) as Array<Record<string, unknown>>).filter((r) => {
+          const a = r.media_assets as {
+            storage_bucket?: string | null;
+            storage_path?: string | null;
+            status?: string | null;
+            deleted_at?: string | null;
+          } | null;
+          return Boolean(
+            a?.storage_bucket && a.storage_path && a.status === "published" && a.deleted_at === null,
+          );
+        });
+        if (validRows.length > 0) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          for (const row of validRows) {
+            const pid = String(row.product_id);
+            if (productCovers.has(pid)) continue;
+            const a = row.media_assets as { id: string; width: number | null; height: number | null; pipeline_status: string | null; storage_bucket: string; storage_path: string };
+            const { data: signed } = await supabaseAdmin.storage
+              .from(a.storage_bucket)
+              .createSignedUrl(a.storage_path, 3600);
+            if (signed?.signedUrl) {
+              productCovers.set(pid, signed.signedUrl);
+              productAssetIds.set(pid, a.id);
+              productVariantBases.push({ id: a.id, file_url: signed.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+            }
+          }
+        }
+      } catch {
+        /* Sin credencial de firma las tarjetas usan su fallback aprobado. */
+      }
+    }
+
+
+
+    const vb = await import("@/lib/media/variant-bundles.server");
+    if (await vb.shouldServePublicVariants()) Object.assign(productCoverAssets, await vb.attachReadyVariants(productVariantBases));
     return {
       id: String(biz.id),
+      media: detailMedia,
       slug: String(biz.slug),
       display_name: String(biz.display_name),
       tagline: typeof biz.tagline === "string" ? biz.tagline : "",
       description: typeof biz.description === "string" ? biz.description : "",
       primary_location: detailPrimaryLocation,
       provenance: "published",
+      reviews: reviewsSummary,
       verified: Boolean(biz.verified),
+      cover_url: detailCoverUrl,
       destination_slug: typeof destSlug === "string" ? destSlug : "",
       category_slug: typeof catSlug === "string" ? catSlug : "",
       category_family_key: typeof catFamily === "string" && catFamily.trim() ? catFamily : null,
       filter_attributes: normalizeFilterAttributes(biz.filter_attributes),
+      attributes: businessAttributes,
       plan_tier: planTier,
       products: (products ?? []).map((p) => ({
         id: p.id,
@@ -1034,6 +1464,8 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         accepts_online_payment: Boolean((p as Record<string, unknown>).accepts_online_payment),
         requires_availability: Boolean((p as Record<string, unknown>).requires_availability),
         visibility_level: String((p as Record<string, unknown>).visibility_level ?? "standard"),
+        cover_url: productCovers.get(String(p.id)) ?? null,
+        cover_asset: productCoverAssets[productAssetIds.get(String(p.id)) ?? ""],
       })),
       promotions: (promos ?? []).map((p) => ({
         id: p.id,

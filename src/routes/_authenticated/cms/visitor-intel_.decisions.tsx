@@ -155,7 +155,7 @@ function DecisionWorkspace() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      toast.success("Decisión registrada en la bitácora append-only.");
+      toast.success("Decisión guardada en el historial.");
     },
     onError: (error) => toast.error(operationError(error)),
   });
@@ -1004,7 +1004,7 @@ function DecisionDetail({ decision }: { decision: ProjectedDecision }) {
         ) : null}
       </div>
       <div>
-        <h3 className="font-semibold">Historial append-only</h3>
+        <h3 className="font-semibold">Historial de decisiones</h3>
         <ol className="mt-3 space-y-3 border-l border-border pl-4">
           {decision.history.map((entry, index) => (
             <li

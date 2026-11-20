@@ -43,6 +43,42 @@ const rows = (value: unknown): Cfg[] =>
 const EMPTY_MEDIA: HomePremiumMedia = { url: "", alt: "" };
 
 /**
+ * Orden editable de secciones (clave `home_section_order`). Fail-closed: sólo
+ * se aceptan claves conocidas, sin duplicados; las faltantes se completan con
+ * el orden aprobado del preset.
+ */
+const sectionOrder = (value: unknown): HomePremiumSectionKey[] => {
+  if (!Array.isArray(value)) return HOME_PREMIUM_DEFAULT_ORDER;
+  const known = new Set<string>(HOME_PREMIUM_DEFAULT_ORDER);
+  const picked: HomePremiumSectionKey[] = [];
+  for (const item of value) {
+    if (typeof item !== "string" || !known.has(item)) continue;
+    const key = item as HomePremiumSectionKey;
+    if (!picked.includes(key)) picked.push(key);
+  }
+  if (picked.length === 0) return HOME_PREMIUM_DEFAULT_ORDER;
+  // Una sección aprobada que aún no existe en un orden guardado se reinserta en
+  // su lugar del preset (antes de su vecina siguiente), nunca al final: así
+  // dividir una sección no reacomoda la Home publicada.
+  const result = [...picked];
+  for (let i = HOME_PREMIUM_DEFAULT_ORDER.length - 1; i >= 0; i -= 1) {
+    const key = HOME_PREMIUM_DEFAULT_ORDER[i];
+    if (result.includes(key)) continue;
+    let insertAt = result.length;
+    for (let j = i + 1; j < HOME_PREMIUM_DEFAULT_ORDER.length; j += 1) {
+      const next = result.indexOf(HOME_PREMIUM_DEFAULT_ORDER[j]);
+      if (next >= 0) {
+        insertAt = next;
+        break;
+      }
+    }
+    result.splice(insertAt, 0, key);
+  }
+  return result;
+};
+
+
+/**
  * G8-R1-F1L-R2 · Sólo se acepta una ruta interna canónica ("/..."). Cualquier
  * otro valor —incluido "#"— se resuelve como `null` y la tarjeta se descarta.
  */
@@ -202,6 +238,9 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
             vibe: str(row.vibe, item?.vibe ?? ""),
             description: str(row.description, item?.description ?? ""),
             sequence: resolved,
+            // Las paradas georreferenciadas provienen del corpus publicado,
+            // no del CMS editorial: se preservan al fusionar la configuración.
+            stopPoints: item?.stopPoints ?? [],
             media: media(row, item?.media),
             href: hrefN(row.href, item?.href ?? null),
           };
@@ -290,6 +329,15 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
             type: str(row.type, item?.type ?? ""),
             detail: str(row.detail, item?.detail ?? ""),
             href: hrefN(row.href, item?.href ?? null),
+            startsAt:
+              typeof row.starts_at === "string" && row.starts_at.trim().length > 0
+                ? row.starts_at.trim()
+                : (item?.startsAt ?? null),
+            recurrence: item?.recurrence ?? null,
+            media:
+              typeof row.media_url === "string" && row.media_url.trim().length > 0
+                ? { url: row.media_url.trim(), alt: str(row.media_alt, item?.title ?? "") }
+                : (item?.media ?? null),
           }),
         ),
       ),
@@ -347,7 +395,7 @@ export function resolveHomePremiumG4(config: Cfg = {}): HomePremiumG4Resolved {
       queHacer: bool(config.show_que_hacer, true),
       mapa: bool(config.show_mapa, true),
     },
-    order: HOME_PREMIUM_DEFAULT_ORDER,
+    order: sectionOrder(config.home_section_order),
   };
 }
 
@@ -483,6 +531,7 @@ export function homePremiumG4DefaultConfig(): Cfg {
     show_eventos: true,
     show_que_hacer: true,
     show_mapa: true,
+    home_section_order: [...HOME_PREMIUM_DEFAULT_ORDER],
   };
 }
 

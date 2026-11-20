@@ -6,6 +6,7 @@
  * código y el QR sin sacar al usuario del listado.
  */
 import { useEffect, useState } from "react";
+import { meridaLongDate } from "@/lib/time/merida";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
@@ -166,11 +167,7 @@ export function CouponIssueDialog({
             ) : null}
             <p className="text-xs text-muted-foreground">
               Válido hasta{" "}
-              {new Date(coupon.valid_until).toLocaleDateString("es-MX", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+              {meridaLongDate(coupon.valid_until)}
             </p>
             <p className="text-center text-xs text-muted-foreground">
               Presenta este QR o dicta el código en el negocio para aplicar tu descuento.

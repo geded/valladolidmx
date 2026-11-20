@@ -10,6 +10,11 @@ import type {
   MarketplaceProductCard,
 } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
+import {
+  nextEventOccurrence,
+  normalizeExceptionDates,
+  normalizeScheduleTimes,
+} from "@/lib/events/recurrence";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 
@@ -49,7 +54,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     const { data: row, error } = await sb
       .from("destinations")
       .select(
-        "id, slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum )",
+        "id, slug, name, tagline, description, highlights, hero_palette, latitude, longitude, hero_media_id, media_assets:hero_media_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, width, height, original_checksum )",
       )
       .eq("slug", data.slug)
       .maybeSingle();
@@ -75,6 +80,8 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
           deleted_at?: string | null;
           is_demo_seed?: boolean | null;
           pipeline_status?: string | null;
+          width?: number | null;
+          height?: number | null;
           original_checksum?: string | null;
           title?: string | null;
           caption?: string | null;
@@ -99,7 +106,11 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
         const { resolveMediaAlt } = await import("@/lib/media/resolve-alt");
         const meta = (media.metadata ?? {}) as Record<string, unknown>;
         const alt = resolveMediaAlt(media, { fallback: "" });
+        const vb = await import("@/lib/media/variant-bundles.server");
+        const bundles = media.id && await vb.shouldServePublicVariants()
+          ? await vb.attachReadyVariants([{ id: media.id, file_url: hero_url, width: media.width ?? null, height: media.height ?? null, pipeline_status: media.pipeline_status ?? null }]) : {};
         hero_media = {
+          asset: media.id ? bundles[media.id] : undefined,
           mediaAssetId: media.id ?? null,
           url: hero_url,
           role: "cover",
@@ -111,6 +122,7 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
           conceptual: meta.conceptual === true,
           documentary: meta.documentary === true,
           temporary: meta.temporary === true,
+          focal: readFocal(meta.focal),
         };
       }
     }
@@ -244,7 +256,7 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
       rows.map(async (r) => {
         const m = (
           r as unknown as {
-            media_assets?: { storage_bucket: string; storage_path: string } | null;
+            media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
           }
         ).media_assets;
         if (!m?.storage_bucket || !m?.storage_path) return null;
@@ -283,13 +295,14 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
     const { data: rows, error } = await sb
       .from("destination_media")
       .select(
-         "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, original_checksum ), destinations!inner(slug)",
+         "role, sort_order, media_asset_id, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, width, height, original_checksum ), destinations!inner(slug)",
       )
       .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
       .limit(12);
     if (error || !rows) return [];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const bases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
     const resolved = await Promise.all(
       rows.map(async (r) => {
         const row = r as unknown as {
@@ -308,6 +321,8 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
             deleted_at: string | null;
             is_demo_seed: boolean | null;
             pipeline_status: string | null;
+            width: number | null;
+            height: number | null;
             original_checksum: string | null;
             title: string | null;
             caption: string | null;
@@ -325,6 +340,7 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
         if (!s?.signedUrl) return null;
         const meta = (m.metadata ?? {}) as Record<string, unknown>;
         const alt = resolveMediaAlt(m, { fallback: "" });
+        bases.push({ id: m.id, file_url: s.signedUrl, width: m.width ?? null, height: m.height ?? null, pipeline_status: m.pipeline_status });
         const item: PublicMediaAttribution = {
           mediaAssetId: m.id ?? row.media_asset_id ?? null,
           url: s.signedUrl,
@@ -341,7 +357,13 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
         return item;
       }),
     );
-    return resolved.filter((x): x is PublicMediaAttribution => x !== null);
+    const items = resolved.filter((x): x is PublicMediaAttribution => x !== null);
+    const vb = await import("@/lib/media/variant-bundles.server");
+    if (await vb.shouldServePublicVariants()) {
+      const bundles = await vb.attachReadyVariants(bases);
+      for (const item of items) if (item.mediaAssetId && bundles[item.mediaAssetId]) item.asset = bundles[item.mediaAssetId];
+    }
+    return items;
   });
 
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
@@ -384,7 +406,6 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
 
     // H2·P1 — Overrides, businesses y events son independientes entre
     // sí: sólo dependen de `dest.id`. Se lanzan en paralelo.
-    const nowIso = new Date().toISOString();
     const [overridesRes, bizRes, evsRes] = await Promise.all([
       sb
         .from("related_overrides")
@@ -406,14 +427,13 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         .limit(60),
       sb
         .from("events")
-        .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id")
+        .select("id, slug, title, summary, starts_at, ends_at, venue_name, is_free, destination_id, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone")
         .eq("status", "published")
         .is("deleted_at", null)
         .eq("destination_id", dest.id)
 
-        .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })
-        .limit(6),
+        .limit(100),
     ]);
     const overridesRows = overridesRes.data;
     const biz = bizRes.data;
@@ -504,7 +524,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         sb
           .from("business_media")
           .select(
-            "business_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )",
+            "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status )",
           )
           .in("business_id", bizIds)
           .eq("role", "cover")
@@ -538,24 +558,33 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             seen.add(bid);
             return true;
           });
+          const bases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
+          const idByBusiness = new Map<string, string>();
           const signed = await Promise.all(
             first.map(async (r) => {
               const a = (
                 r as unknown as {
-                  media_assets?: { storage_bucket: string; storage_path: string } | null;
+                  media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
                 }
               ).media_assets;
               if (!a) return { id: r.business_id as string, url: null as string | null };
               const { data: s } = await supabaseAdmin.storage
                 .from(a.storage_bucket)
                 .createSignedUrl(a.storage_path, 3600);
+              if (s?.signedUrl) {
+                idByBusiness.set(String(r.business_id), a.id);
+                bases.push({ id: a.id, file_url: s.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+              }
               return { id: r.business_id as string, url: s?.signedUrl ?? null };
             }),
           );
           const byBiz = new Map(signed.map((x) => [x.id, x.url] as const));
+          const vb = await import("@/lib/media/variant-bundles.server");
+          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(bases) : {};
           const patchCover = (c: MarketplaceBusinessCard) => ({
             ...c,
             cover_url: byBiz.get(c.id) ?? null,
+            cover_asset: bundles[idByBusiness.get(c.id) ?? ""],
           });
           grouped.hoteles = grouped.hoteles.map(patchCover);
           grouped.restaurantes = grouped.restaurantes.map(patchCover);
@@ -610,12 +639,14 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           const { data: pmedia } = await sb
             .from("product_media")
             .select(
-              "product_id, role, sort_order, media_assets:media_assets ( storage_bucket, storage_path )",
+              "product_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status )",
             )
             .in("product_id", prodIds)
             .eq("role", "cover")
             .order("sort_order", { ascending: true });
           const byProd = new Map<string, string | null>();
+          const idByProduct = new Map<string, string>();
+          const productBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
           if (pmedia && pmedia.length > 0) {
             try {
               const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -630,13 +661,17 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
                 first.map(async (r) => {
                   const a = (
                     r as unknown as {
-                      media_assets?: { storage_bucket: string; storage_path: string } | null;
+                      media_assets?: { id: string; storage_bucket: string; storage_path: string; width: number | null; height: number | null; pipeline_status: string | null } | null;
                     }
                   ).media_assets;
                   if (!a) return { id: r.product_id as string, url: null as string | null };
                   const { data: s } = await supabaseAdmin.storage
                     .from(a.storage_bucket)
                     .createSignedUrl(a.storage_path, 3600);
+                  if (s?.signedUrl) {
+                    idByProduct.set(String(r.product_id), a.id);
+                    productBases.push({ id: a.id, file_url: s.signedUrl, width: a.width, height: a.height, pipeline_status: a.pipeline_status });
+                  }
                   return { id: r.product_id as string, url: s?.signedUrl ?? null };
                 }),
               );
@@ -645,14 +680,16 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
               console.warn("[getDestinationRelated] product cover sign failed", e);
             }
           }
+          const vb = await import("@/lib/media/variant-bundles.server");
+          const bundles = await vb.shouldServePublicVariants() ? await vb.attachReadyVariants(productBases) : {};
           grouped.productos = grouped.productos.map((p) => {
             const own = byProd.get(p.id) ?? null;
-            if (own) return { ...p, cover_url: own };
+            if (own) return { ...p, cover_url: own, cover_asset: bundles[idByProduct.get(p.id) ?? ""] };
             // Fallback: usar la portada del negocio dueño.
             const parent = grouped.hoteles
               .concat(grouped.restaurantes, grouped.experiencias, grouped.otras)
               .find((b) => b.slug === p.business_slug);
-            return { ...p, cover_url: parent?.cover_url ?? null };
+            return { ...p, cover_url: parent?.cover_url ?? null, cover_asset: parent?.cover_asset };
           });
         }
         if (pinnedIds.product.length > 0) {
@@ -672,13 +709,28 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     if (!eErr && evs) {
       grouped.eventos = evs
         .filter((e) => !hidden.event.has(e.id as string))
-        .map((e) => ({
+        .map<PublicEventCard | null>((e) => {
+          const scheduleTimes = normalizeScheduleTimes(e.schedule_times);
+          const exceptionDates = normalizeExceptionDates(e.exception_dates);
+          const next = nextEventOccurrence({
+            starts_at: e.starts_at as string,
+            ends_at: e.ends_at as string | null,
+            recurrence_frequency: e.recurrence_frequency as "daily" | "weekly" | "monthly" | "yearly" | null,
+            recurrence_interval: e.recurrence_interval as number,
+            recurrence_weekdays: e.recurrence_weekdays as number[],
+            recurrence_until: e.recurrence_until as string | null,
+            schedule_times: scheduleTimes,
+            exception_dates: exceptionDates,
+            event_timezone: e.event_timezone as string,
+          });
+          if (!next) return null;
+          return {
           id: e.id as string,
           slug: e.slug as string,
           title: e.title as string,
           summary: (e.summary as string | null) ?? null,
-          starts_at: e.starts_at as string,
-          ends_at: (e.ends_at as string | null) ?? null,
+          starts_at: next.startsAt,
+          ends_at: e.recurrence_frequency ? null : ((e.ends_at as string | null) ?? null),
           venue_name: (e.venue_name as string | null) ?? null,
           is_free: Boolean(e.is_free),
           destination_slug: dest.slug,
@@ -687,8 +739,18 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           latitude: null,
           longitude: null,
           cover_url: null,
-
-        }));
+          recurrence_frequency: (e.recurrence_frequency as "daily" | "weekly" | "monthly" | "yearly" | null) ?? null,
+          recurrence_interval: Number(e.recurrence_interval ?? 1),
+          recurrence_weekdays: (e.recurrence_weekdays as number[]) ?? [],
+          recurrence_until: (e.recurrence_until as string | null) ?? null,
+          schedule_times: scheduleTimes,
+          exception_dates: exceptionDates,
+          event_timezone: (e.event_timezone as string | null) ?? "America/Merida",
+          } satisfies PublicEventCard;
+        })
+        .filter((event): event is PublicEventCard => event !== null)
+        .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
+        .slice(0, 6);
       if (pinnedIds.event.length > 0) {
         const byId = new Map(grouped.eventos.map((c) => [c.id, c] as const));
         const pinnedCards = pinnedIds.event
@@ -700,3 +762,9 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     }
     return grouped;
   });
+
+function readFocal(v: unknown): { x: number; y: number } | null {
+  if (!v || typeof v !== "object") return null;
+  const { x, y } = v as { x?: unknown; y?: unknown };
+  return typeof x === "number" && typeof y === "number" ? { x, y } : null;
+}

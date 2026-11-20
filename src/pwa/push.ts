@@ -177,7 +177,9 @@ export async function getCurrentPushSubscription(): Promise<PushSubscription | n
  * automáticamente — el consumidor es responsable de enviarla al
  * endpoint autorizado en una sub-adenda posterior.
  */
-export async function subscribePush(): Promise<PushSubscription | null> {
+export async function subscribePush(
+  vapidOverride?: string,
+): Promise<PushSubscription | null> {
   const { forbidden, reason } = isForbiddenContext();
   if (forbidden) {
     emit("skipped", { reason });
@@ -187,7 +189,7 @@ export async function subscribePush(): Promise<PushSubscription | null> {
     emit("skipped", { reason: "no-permission" });
     return null;
   }
-  const vapid = getVapidPublicKey();
+  const vapid = vapidOverride && vapidOverride.length > 0 ? vapidOverride : getVapidPublicKey();
   if (!vapid) {
     emit("error", { phase: "subscribe", message: "missing-vapid-key" });
     return null;

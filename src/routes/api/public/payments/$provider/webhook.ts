@@ -52,11 +52,19 @@ export const Route = createFileRoute("/api/public/payments/$provider/webhook")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+        const { data: conciergeOrder } = normalized.orderId
+          ? await supabaseAdmin
+              .from("concierge_orders")
+              .select("id")
+              .eq("id", normalized.orderId)
+              .maybeSingle()
+          : { data: null };
+
         const { error: insertErr } = await supabaseAdmin.from("payment_events").insert({
           provider: normalized.provider,
           provider_event_id: normalized.providerEventId,
           event_type: normalized.type,
-          order_id: normalized.orderId,
+          order_id: conciergeOrder ? null : normalized.orderId,
           payload: JSON.parse(JSON.stringify(normalized.raw)),
         });
         if (insertErr) {
@@ -68,16 +76,30 @@ export const Route = createFileRoute("/api/public/payments/$provider/webhook")({
         }
 
         if (normalized.type === "payment_succeeded" && normalized.orderId) {
-          const { error } = await supabaseAdmin.rpc("order_mark_paid", {
-            p_order_id: normalized.orderId,
-            p_provider: normalized.provider,
-            p_intent_id: normalized.providerIntentId ?? "",
-            p_event_id: normalized.providerEventId,
-          });
+          const { error } = conciergeOrder
+            ? await supabaseAdmin.rpc("concierge_order_mark_paid_online", {
+                _order_id: normalized.orderId,
+                _provider: normalized.provider,
+                _intent_id: normalized.providerIntentId ?? "",
+                _event_id: normalized.providerEventId,
+              })
+            : await supabaseAdmin.rpc("order_mark_paid", {
+                p_order_id: normalized.orderId,
+                p_provider: normalized.provider,
+                p_intent_id: normalized.providerIntentId ?? "",
+                p_event_id: normalized.providerEventId,
+              });
           if (error) {
             console.error("[payments/webhook] order_mark_paid failed", error);
             return new Response("Processing error", { status: 500 });
           }
+        } else if (normalized.type === "payment_failed" && normalized.orderId && conciergeOrder) {
+          await supabaseAdmin.from("concierge_order_events").insert({
+            order_id: normalized.orderId,
+            event_type: "payment_failed",
+            payload: { provider: normalized.provider, intent_id: normalized.providerIntentId, provider_event_id: normalized.providerEventId, reason: normalized.reason },
+          });
+          await supabaseAdmin.from("concierge_orders").update({ status: "awaiting_payment" }).eq("id", normalized.orderId).eq("status", "awaiting_payment");
         } else if (normalized.type === "payment_failed" && normalized.orderId) {
           const { error } = await supabaseAdmin.rpc("order_mark_payment_failed", {
             p_order_id: normalized.orderId,

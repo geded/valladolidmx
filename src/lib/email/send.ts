@@ -1,8 +1,8 @@
 /**
- * Cliente helper para invocar el endpoint interno de app-emails.
- * Requiere sesión de Supabase (envía el bearer del usuario).
+ * Cliente helper para disparar correos de la app desde pantallas autenticadas.
+ * Delega en la acción de servidor `sendAppEmail` (requiere sesión).
  */
-import { supabase } from "@/integrations/supabase/client";
+import { sendAppEmail } from "@/lib/email/send.functions";
 
 export interface SendTransactionalEmailInput {
   templateName: string;
@@ -12,21 +12,5 @@ export interface SendTransactionalEmailInput {
 }
 
 export async function sendTransactionalEmail(input: SendTransactionalEmailInput) {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session) throw new Error("no_session");
-  const res = await fetch("/lovable/email/transactional/send", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify(input),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`email_send_failed_${res.status}: ${body}`);
-  }
-  return res.json();
+  return sendAppEmail({ data: input });
 }

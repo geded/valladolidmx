@@ -4,6 +4,7 @@
  * @context-engine legacy — herramienta transversal sin territorio
  * (I7 · fila 9). No monta `ContextEngineProvider`.
  */
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
@@ -11,8 +12,33 @@ import { SITE } from "@/config/site";
 import { TripPlannerSurface } from "@/components/surfaces/TripPlannerSurface";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
 import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import { useNavigationSession } from "@/lib/navigation";
+import { readPreviousRoute } from "@/lib/navigation/session-context";
+
+interface TripPlannerSearch {
+  destination?: string;
+  destinationLabel?: string;
+  /** Paso previo del recorrido cuando no es un destino territorial. */
+  from?: "mapa";
+}
 
 export const Route = createFileRoute("/arma-tu-viaje")({
+  validateSearch: (search: Record<string, unknown>): TripPlannerSearch => {
+    const destination =
+      typeof search.destination === "string" && /^[a-z0-9-]+$/.test(search.destination)
+        ? search.destination
+        : undefined;
+    const destinationLabel =
+      typeof search.destinationLabel === "string" && search.destinationLabel.trim()
+        ? search.destinationLabel.trim().slice(0, 80)
+        : undefined;
+    const from = search.from === "mapa" ? ("mapa" as const) : undefined;
+    return {
+      ...(destination ? { destination } : {}),
+      ...(destinationLabel ? { destinationLabel } : {}),
+      ...(from ? { from } : {}),
+    };
+  },
   loader: async () => {
     const composition = await getPublishedCompositionBySlug({
       data: { slug: "arma-tu-viaje" },
@@ -50,19 +76,54 @@ function hasRenderableBlocks(tree: unknown): boolean {
 
 function AYVPage() {
   const { composition } = Route.useLoaderData();
+  const { destination, destinationLabel, from } = Route.useSearch();
+  const session = useNavigationSession();
   const snapshot = composition?.snapshot;
+  const returnDestination = destination
+    ? { slug: destination, label: destinationLabel ?? destination }
+    : null;
+  /**
+   * Continuidad de ruta: si el explorador llegó desde el Mapa territorial,
+   * ese paso permanece visible en la ruta. El `destination` que envía el
+   * Mapa es el origen del cálculo de distancias, no contexto territorial.
+   */
+  const [cameFromMap, setCameFromMap] = useState(false);
+  useEffect(() => {
+    const prev = readPreviousRoute();
+    setCameFromMap(Boolean(prev && prev.startsWith("/mapa")));
+  }, []);
+  const showMapStep = from === "mapa" || cameFromMap;
+  /**
+   * La ruta territorial SIEMPRE parte de la región. Si el explorador
+   * viene de un destino (por search param o por la sesión territorial
+   * vigente), ese destino se conserva como nivel intermedio.
+   */
+  const contextDestination = showMapStep
+    ? null
+    : (returnDestination ??
+      (session?.destination
+        ? { slug: session.destination.slug, label: session.destination.label }
+        : null));
+  const crumbs = [
+    { label: "Oriente Maya", to: "/oriente-maya" },
+    ...(showMapStep ? [{ label: "Mapa", to: "/mapa" as const }] : []),
+    ...(contextDestination
+      ? [
+          {
+            label: contextDestination.label,
+            to: "/oriente-maya/$destino",
+            params: { destino: contextDestination.slug },
+          },
+        ]
+      : []),
+    { label: "Arma tu Viaje" },
+  ];
   return (
-    <PublicShell
-      eyebrow="Plataforma"
-      title="Arma tu Viaje"
-      description="No es un carrito de compras. Es tu expediente personal. Cuando estés listo, lo recibe tu concierge humano."
-      crumbs={[{ label: "Arma tu Viaje" }]}
-      titleAsText
-    >
+    <PublicShell variant="hero" crumbs={crumbs} compactCrumbsOnMobile>
       {composition && snapshot && hasRenderableBlocks(snapshot) ? (
         <CompositionRenderer tree={snapshot} />
       ) : (
-        <TripPlannerSurface />
+        <TripPlannerSurface returnDestination={returnDestination} />
       )}
     </PublicShell>
   );

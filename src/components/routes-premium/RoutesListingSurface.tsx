@@ -24,6 +24,7 @@ import {
   type FilterSelection,
 } from "@/components/experience-premium/ExperienceFiltersBar";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import { buildAluxStageAwareHint } from "@/components/alux/TourismAluxPanel";
 import type { PartyComposition } from "@/lib/traveler/party-composition";
 import {
@@ -46,7 +47,7 @@ function toShowcaseItem(route: EditorialRouteCardDTO): PremiumShowcaseItem {
     key: route.id,
     name: route.name,
     note: route.summary || "Ruta sugerida del Oriente Maya",
-    media: route.coverUrl ? { url: route.coverUrl, alt: route.coverAlt ?? route.name } : null,
+    media: route.coverUrl ? { url: route.coverUrl, alt: route.coverAlt ?? route.name, asset: route.coverAsset } : null,
     to: routePublicPath(route.slug),
     kicker: "Ruta",
     meta: [route.originDestinationLabel, duration].filter(Boolean).join(" · ") || null,
@@ -157,8 +158,9 @@ export function RoutesListingSurface({
   const territory = lockedDestinationLabel ?? destinationLabel ?? null;
 
   const askAlux = (preference?: string) =>
-    openAluxFloating({
-      reason: "manual",
+    askAluxWithPreferenceMemory({
+      surface: "routes-listing",
+      ...(preference ? { prompt: preference } : {}),
       hint: buildAluxStageAwareHint(
         "Ayúdame a elegir una ruta publicada del Oriente Maya.",
         [preference, territory, party ? `Viajo ${party}` : null].filter(Boolean).join(" · ") ||
@@ -170,11 +172,11 @@ export function RoutesListingSurface({
     <div className={cn("space-y-8", className)}>
       <PremiumEditorialHero
         eyebrow="Itinerarios del Oriente Maya"
-        title={territory ? `Rutas desde ${territory}` : "Rutas sugeridas"}
+        title={territory ? `Rutas desde ${territory}` : "Rutas del Oriente Maya de Yucatán"}
         subtitle="Itinerarios editoriales con paradas reales: destinos, lugares, eventos y empresas publicadas."
         media={
           heroRoute?.coverUrl
-            ? { url: heroRoute.coverUrl, alt: heroRoute.coverAlt ?? heroRoute.name }
+            ? { url: heroRoute.coverUrl, alt: heroRoute.coverAlt ?? heroRoute.name, asset: heroRoute.coverAsset }
             : null
         }
         caption={territory ? `Rutas que pasan por ${territory}` : undefined}

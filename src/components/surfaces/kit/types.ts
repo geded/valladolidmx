@@ -22,6 +22,8 @@ export type BadgeVM = {
 export type MediaVM = {
   id?: string;
   url: string;
+  /** H3·A4 (aditivo): asset + variantes para `resolveMediaSource()`. */
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput | null;
   alt?: string;
   /** G8-F1D — Caption acreditado del medio (jamás inventado). */
   caption?: string;

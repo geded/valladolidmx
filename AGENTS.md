@@ -15,6 +15,12 @@ Antes de proponer o modificar una superficie, respetar en este orden:
 
 ## Preservación
 
+- Approved place compositions register their existing block through the shared runtime library and retain normal node traversal and editorial wrappers. Why: a declared renderer cannot display an unregistered saved node; preset replacement would lose editorial state.
+- Place Studio previews hydrate the existing PlacePremiumSurface through the Preview Registry and the public DTO adapter, retaining node copy and order. Why: real entity preview must not replace saved compositions or create another visual authority.
+- Destination identity links reuse the institutional badge renderer through optional internal navigation overrides; planner and region links retain the origin destination through validated search context. Why: preserve one badge authority and existing territorial return navigation without parallel routes.
+- Destination presentation adjustments stay inside DestinationPremiumSurface; narrative media uses EditorialMediaFrame with a fixed aspect ratio independent of description length. Why: keep builder/public authority shared and prevent text growth from distorting photos.
+- Destination route and nearby cards keep their entity-specific links inside the existing surface; compact destination rails do not alter the regional catalog branch. Why: harmonize presentation without changing territorial discovery or introducing another renderer.
+
 - Una plantilla aprobada es una autoridad, no un punto de partida descartable.
 - “Corregir”, “mejorar”, “conectar”, “agregar” o “continuar” no autorizan rediseño.
 - Modificar el componente aprobado; no crear superficies `V2`, `New`, paralelas o fallbacks visuales.
@@ -50,3 +56,8 @@ Airbnb, Tripadvisor y Google Travel son referencias de claridad, confianza, desc
 ## Historia Lovable
 
 No reescribir historial publicado, no hacer force-push y no eliminar la rama de integración. Los commits enviados a la rama conectada deben quedar funcionales y trazables.
+
+- Media variants: every official upload path calls `deriveVariantsInBackground` (`src/lib/media/derive-on-upload-browser.ts`) after registering the original; it writes WebP 400/800/1200 (`browser-canvas` engine) via `derived-variants.functions.ts`, never touches the original and never blocks the upload. Why: sharp cannot run in the Worker; the `scripts/media-pipeline/derive.mjs` batch remains the fallback for missed or failed photos.
+- Public consumers forward optional asset bundles through existing DTOs to `resolveMediaSource`, preserving original URLs, media eligibility, credits and all template geometry. Why: optimization is an additive transport change, not a redesign or editorial replacement.
+- Public variant reads go through `src/lib/media/variant-bundles.server.ts` and are gated by `media_pipeline_enabled` (pilot slugs only outside production). Why: the visitor-facing switch stays a single, reversible flag.
+- Upload-time rights declarations reuse the shared media panels and media-rights validator; destination registration validates editorial identity, destination scope and stored-byte checksum before recording documentary accreditation and its audit event. Why: editors can publish declared real photos without weakening unrelated administrative transitions or public AI protections.

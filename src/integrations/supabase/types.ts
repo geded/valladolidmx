@@ -1390,32 +1390,50 @@ export type Database = {
         Row: {
           business_id: string
           country_code: string | null
+          entity_id: string | null
+          entity_kind: string | null
           event_type: string
+          grant_id: string | null
           id: string
           occurred_at: string
+          placement: string | null
+          rail: string | null
           referer: string | null
           session_hash: string | null
           source: string | null
+          surface: string | null
         }
         Insert: {
           business_id: string
           country_code?: string | null
+          entity_id?: string | null
+          entity_kind?: string | null
           event_type: string
+          grant_id?: string | null
           id?: string
           occurred_at?: string
+          placement?: string | null
+          rail?: string | null
           referer?: string | null
           session_hash?: string | null
           source?: string | null
+          surface?: string | null
         }
         Update: {
           business_id?: string
           country_code?: string | null
+          entity_id?: string | null
+          entity_kind?: string | null
           event_type?: string
+          grant_id?: string | null
           id?: string
           occurred_at?: string
+          placement?: string | null
+          rail?: string | null
           referer?: string | null
           session_hash?: string | null
           source?: string | null
+          surface?: string | null
         }
         Relationships: [
           {
@@ -1430,6 +1448,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_view_events_grant_id_fkey"
+            columns: ["grant_id"]
+            isOneToOne: false
+            referencedRelation: "business_visibility_grants"
             referencedColumns: ["id"]
           },
         ]
@@ -1715,6 +1740,306 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "concierge_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_blackouts: {
+        Row: {
+          business_id: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          product_id: string | null
+          reason: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          product_id?: string | null
+          reason: string
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          product_id?: string | null
+          reason?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_blackouts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "commerce_blackouts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_blackouts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_departures: {
+        Row: {
+          capacity_reservable: number
+          capacity_total: number
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          notes: string | null
+          product_id: string
+          starts_at: string
+          status: string
+          template_id: string | null
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          capacity_reservable: number
+          capacity_total: number
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          notes?: string | null
+          product_id: string
+          starts_at: string
+          status?: string
+          template_id?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          capacity_reservable?: number
+          capacity_total?: number
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          product_id?: string
+          starts_at?: string
+          status?: string
+          template_id?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_departures_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_departures_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_schedule_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_inventory_adjustments: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delta: number
+          departure_id: string
+          id: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delta: number
+          departure_id: string
+          id?: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delta?: number
+          departure_id?: string
+          id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_inventory_adjustments_departure_id_fkey"
+            columns: ["departure_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_departures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_reservation_holds: {
+        Row: {
+          created_at: string
+          departure_id: string
+          expires_at: string
+          id: string
+          idempotency_key: string
+          order_id: string | null
+          product_id: string
+          quantity: number
+          released_reason: string | null
+          status: string
+          traveler_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          departure_id: string
+          expires_at: string
+          id?: string
+          idempotency_key: string
+          order_id?: string | null
+          product_id: string
+          quantity: number
+          released_reason?: string | null
+          status?: string
+          traveler_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          departure_id?: string
+          expires_at?: string
+          id?: string
+          idempotency_key?: string
+          order_id?: string | null
+          product_id?: string
+          quantity?: number
+          released_reason?: string | null
+          status?: string
+          traveler_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_reservation_holds_departure_id_fkey"
+            columns: ["departure_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_departures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_reservation_holds_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_reservation_holds_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_schedule_templates: {
+        Row: {
+          active: boolean
+          capacity_reservable: number | null
+          capacity_total: number
+          created_at: string
+          created_by: string | null
+          cutoff_minutes: number
+          duration_minutes: number
+          id: string
+          label: string | null
+          max_participants: number | null
+          min_lead_hours: number
+          min_participants: number
+          product_id: string
+          sale_horizon_days: number
+          start_times: string[]
+          timezone: string
+          updated_at: string
+          valid_from: string
+          valid_until: string | null
+          weekdays: number[]
+        }
+        Insert: {
+          active?: boolean
+          capacity_reservable?: number | null
+          capacity_total?: number
+          created_at?: string
+          created_by?: string | null
+          cutoff_minutes?: number
+          duration_minutes?: number
+          id?: string
+          label?: string | null
+          max_participants?: number | null
+          min_lead_hours?: number
+          min_participants?: number
+          product_id: string
+          sale_horizon_days?: number
+          start_times: string[]
+          timezone?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          weekdays?: number[]
+        }
+        Update: {
+          active?: boolean
+          capacity_reservable?: number | null
+          capacity_total?: number
+          created_at?: string
+          created_by?: string | null
+          cutoff_minutes?: number
+          duration_minutes?: number
+          id?: string
+          label?: string | null
+          max_participants?: number | null
+          min_lead_hours?: number
+          min_participants?: number
+          product_id?: string
+          sale_horizon_days?: number
+          start_times?: string[]
+          timezone?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          weekdays?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_schedule_templates_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -2234,6 +2559,10 @@ export type Database = {
           discount_amount: number
           editorial_summary: string | null
           editorial_title: string | null
+          email_booking_cancelled_at: string | null
+          email_booking_created_at: string | null
+          email_booking_paid_at: string | null
+          email_booking_refunded_at: string | null
           email_post_sent_at: string | null
           email_t14_sent_at: string | null
           email_t3_sent_at: string | null
@@ -2271,6 +2600,10 @@ export type Database = {
           discount_amount?: number
           editorial_summary?: string | null
           editorial_title?: string | null
+          email_booking_cancelled_at?: string | null
+          email_booking_created_at?: string | null
+          email_booking_paid_at?: string | null
+          email_booking_refunded_at?: string | null
           email_post_sent_at?: string | null
           email_t14_sent_at?: string | null
           email_t3_sent_at?: string | null
@@ -2308,6 +2641,10 @@ export type Database = {
           discount_amount?: number
           editorial_summary?: string | null
           editorial_title?: string | null
+          email_booking_cancelled_at?: string | null
+          email_booking_created_at?: string | null
+          email_booking_paid_at?: string | null
+          email_booking_refunded_at?: string | null
           email_post_sent_at?: string | null
           email_t14_sent_at?: string | null
           email_t3_sent_at?: string | null
@@ -2399,36 +2736,60 @@ export type Database = {
           amount_cents: number
           created_at: string
           currency: string
+          day_index: number | null
+          duration_minutes: number | null
           id: string
+          is_suggestion: boolean
           notes: string | null
           position: number
           proposal_id: string
-          quote_id: string
-          request_id: string
+          quote_id: string | null
+          request_id: string | null
+          source: string
+          starts_at_local: string | null
+          target_id: string | null
+          target_kind: string | null
+          title: string | null
           updated_at: string
         }
         Insert: {
           amount_cents?: number
           created_at?: string
           currency?: string
+          day_index?: number | null
+          duration_minutes?: number | null
           id?: string
+          is_suggestion?: boolean
           notes?: string | null
           position?: number
           proposal_id: string
-          quote_id: string
-          request_id: string
+          quote_id?: string | null
+          request_id?: string | null
+          source?: string
+          starts_at_local?: string | null
+          target_id?: string | null
+          target_kind?: string | null
+          title?: string | null
           updated_at?: string
         }
         Update: {
           amount_cents?: number
           created_at?: string
           currency?: string
+          day_index?: number | null
+          duration_minutes?: number | null
           id?: string
+          is_suggestion?: boolean
           notes?: string | null
           position?: number
           proposal_id?: string
-          quote_id?: string
-          request_id?: string
+          quote_id?: string | null
+          request_id?: string | null
+          source?: string
+          starts_at_local?: string | null
+          target_id?: string | null
+          target_kind?: string | null
+          title?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2455,6 +2816,36 @@ export type Database = {
           },
         ]
       }
+      concierge_proposal_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          items: Json
+          owner_user_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          owner_user_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          owner_user_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       concierge_proposals: {
         Row: {
           case_id: string
@@ -2462,6 +2853,10 @@ export type Database = {
           created_by_user_id: string | null
           currency: string
           id: string
+          pay_reminder_r1_sent_at: string | null
+          pay_reminder_r2_sent_at: string | null
+          pay_reminder_r3_sent_at: string | null
+          pay_reminder_team_sent_at: string | null
           payload: Json
           responded_at: string | null
           sent_at: string | null
@@ -2481,6 +2876,10 @@ export type Database = {
           created_by_user_id?: string | null
           currency?: string
           id?: string
+          pay_reminder_r1_sent_at?: string | null
+          pay_reminder_r2_sent_at?: string | null
+          pay_reminder_r3_sent_at?: string | null
+          pay_reminder_team_sent_at?: string | null
           payload?: Json
           responded_at?: string | null
           sent_at?: string | null
@@ -2500,6 +2899,10 @@ export type Database = {
           created_by_user_id?: string | null
           currency?: string
           id?: string
+          pay_reminder_r1_sent_at?: string | null
+          pay_reminder_r2_sent_at?: string | null
+          pay_reminder_r3_sent_at?: string | null
+          pay_reminder_team_sent_at?: string | null
           payload?: Json
           responded_at?: string | null
           sent_at?: string | null
@@ -3434,13 +3837,22 @@ export type Database = {
           demo_source_url: string | null
           destination_id: string | null
           ends_at: string | null
+          event_timezone: string
+          exception_dates: Json
           external_url: string | null
           filter_attributes: Json
           id: string
           is_demo_seed: boolean
           is_free: boolean
+          latitude: number | null
           locale: Database["public"]["Enums"]["locale_code"]
+          longitude: number | null
           published_at: string | null
+          recurrence_frequency: string | null
+          recurrence_interval: number
+          recurrence_until: string | null
+          recurrence_weekdays: number[]
+          schedule_times: Json
           slug: string
           starts_at: string
           status: Database["public"]["Enums"]["content_status"]
@@ -3462,13 +3874,22 @@ export type Database = {
           demo_source_url?: string | null
           destination_id?: string | null
           ends_at?: string | null
+          event_timezone?: string
+          exception_dates?: Json
           external_url?: string | null
           filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
+          latitude?: number | null
           locale?: Database["public"]["Enums"]["locale_code"]
+          longitude?: number | null
           published_at?: string | null
+          recurrence_frequency?: string | null
+          recurrence_interval?: number
+          recurrence_until?: string | null
+          recurrence_weekdays?: number[]
+          schedule_times?: Json
           slug: string
           starts_at: string
           status?: Database["public"]["Enums"]["content_status"]
@@ -3490,13 +3911,22 @@ export type Database = {
           demo_source_url?: string | null
           destination_id?: string | null
           ends_at?: string | null
+          event_timezone?: string
+          exception_dates?: Json
           external_url?: string | null
           filter_attributes?: Json
           id?: string
           is_demo_seed?: boolean
           is_free?: boolean
+          latitude?: number | null
           locale?: Database["public"]["Enums"]["locale_code"]
+          longitude?: number | null
           published_at?: string | null
+          recurrence_frequency?: string | null
+          recurrence_interval?: number
+          recurrence_until?: string | null
+          recurrence_weekdays?: number[]
+          schedule_times?: Json
           slug?: string
           starts_at?: string
           status?: Database["public"]["Enums"]["content_status"]
@@ -5692,6 +6122,82 @@ export type Database = {
           },
         ]
       }
+      product_direct_sale_requests: {
+        Row: {
+          business_id: string
+          commission_bps: number | null
+          created_at: string
+          currency: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          product_id: string
+          proposed_price_amount: number | null
+          request_note: string | null
+          requested_at: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          commission_bps?: number | null
+          created_at?: string
+          currency?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          product_id: string
+          proposed_price_amount?: number | null
+          request_note?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          commission_bps?: number | null
+          created_at?: string
+          currency?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          product_id?: string
+          proposed_price_amount?: number | null
+          request_note?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_direct_sale_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "product_direct_sale_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_direct_sale_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_media: {
         Row: {
           created_at: string
@@ -5762,6 +6268,7 @@ export type Database = {
           generates_commission: boolean
           id: string
           is_demo_seed: boolean
+          location_id: string | null
           metadata: Json
           name: string
           price_amount: number | null
@@ -5806,6 +6313,7 @@ export type Database = {
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
+          location_id?: string | null
           metadata?: Json
           name: string
           price_amount?: number | null
@@ -5850,6 +6358,7 @@ export type Database = {
           generates_commission?: boolean
           id?: string
           is_demo_seed?: boolean
+          location_id?: string | null
           metadata?: Json
           name?: string
           price_amount?: number | null
@@ -5887,6 +6396,13 @@ export type Database = {
             columns: ["cover_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "business_locations"
             referencedColumns: ["id"]
           },
         ]
@@ -6750,36 +7266,45 @@ export type Database = {
         Row: {
           created_at: string
           day_index: number | null
+          duration_minutes: number | null
           id: string
           item_kind: Database["public"]["Enums"]["travel_item_kind"]
           notes: string | null
           plan_id: string
           position: number
+          schedule_source: string | null
           snapshot: Json
+          starts_at_local: string | null
           target_id: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           day_index?: number | null
+          duration_minutes?: number | null
           id?: string
           item_kind: Database["public"]["Enums"]["travel_item_kind"]
           notes?: string | null
           plan_id: string
           position?: number
+          schedule_source?: string | null
           snapshot?: Json
+          starts_at_local?: string | null
           target_id?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           day_index?: number | null
+          duration_minutes?: number | null
           id?: string
           item_kind?: Database["public"]["Enums"]["travel_item_kind"]
           notes?: string | null
           plan_id?: string
           position?: number
+          schedule_source?: string | null
           snapshot?: Json
+          starts_at_local?: string | null
           target_id?: string | null
           updated_at?: string
         }
@@ -7022,6 +7547,8 @@ export type Database = {
           trip_context: Json
           updated_at: string
           user_id: string
+          whatsapp_contact_consent: boolean
+          whatsapp_contact_consented_at: string | null
         }
         Insert: {
           accessibility?: string[]
@@ -7051,6 +7578,8 @@ export type Database = {
           trip_context?: Json
           updated_at?: string
           user_id: string
+          whatsapp_contact_consent?: boolean
+          whatsapp_contact_consented_at?: string | null
         }
         Update: {
           accessibility?: string[]
@@ -7080,6 +7609,8 @@ export type Database = {
           trip_context?: Json
           updated_at?: string
           user_id?: string
+          whatsapp_contact_consent?: boolean
+          whatsapp_contact_consented_at?: string | null
         }
         Relationships: []
       }
@@ -7321,6 +7852,14 @@ export type Database = {
       }
     }
     Functions: {
+      _commerce_notify_booking: {
+        Args: {
+          _category: Database["public"]["Enums"]["notification_category"]
+          _event: string
+          _order: Database["public"]["Tables"]["concierge_orders"]["Row"]
+        }
+        Returns: undefined
+      }
       _concierge_first_response_at: {
         Args: { _case_id: string }
         Returns: string
@@ -7564,6 +8103,24 @@ export type Database = {
         Args: { _patch: Json; _place_id: string }
         Returns: undefined
       }
+      admin_visibility_performance: {
+        Args: { _window_days?: number }
+        Returns: {
+          business_id: string
+          business_name: string
+          business_slug: string
+          clicks: number
+          expires_at: string
+          grant_id: string
+          impressions: number
+          last_seen: string
+          plan_name: string
+          plan_slug: string
+          starts_at: string
+          status: string
+          surfaces: Json
+        }[]
+      }
       alux_get_concierge_context_for_user: {
         Args: { _user_id: string }
         Returns: Json
@@ -7611,6 +8168,24 @@ export type Database = {
       business_public_source_summary: {
         Args: { _business_id: string }
         Returns: Json
+      }
+      business_review_state: {
+        Args: { _business_ids?: string[] }
+        Returns: {
+          business_id: string
+          has_verification_document: boolean
+          review_notes: string
+          submitted_for_review_at: string
+        }[]
+      }
+      business_visibility_performance: {
+        Args: { _business_id: string; _window_days?: number }
+        Returns: {
+          clicks: number
+          impressions: number
+          placement: string
+          surface: string
+        }[]
       }
       cancel_business_ownership_transfer: {
         Args: { _transfer_id: string }
@@ -7705,6 +8280,193 @@ export type Database = {
       claim_business: {
         Args: { _business_id: string; _notes?: string }
         Returns: string
+      }
+      cms_media_transition: {
+        Args: {
+          _media_id: string
+          _notes?: string
+          _to: Database["public"]["Enums"]["content_status"]
+        }
+        Returns: {
+          alt_text: string | null
+          alt_text_ai: string | null
+          alt_text_locale: string
+          alt_text_source: Database["public"]["Enums"]["media_text_source"]
+          caption: string | null
+          created_at: string
+          created_by: string | null
+          credit: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          demo_seed_batch: string | null
+          demo_source_url: string | null
+          description: string | null
+          duration_seconds: number | null
+          entity_id: string | null
+          entity_kind: string | null
+          height: number | null
+          id: string
+          intelligence: Json
+          is_demo_seed: boolean
+          kind: Database["public"]["Enums"]["media_kind"]
+          metadata: Json
+          mime_type: string | null
+          original_bucket: string | null
+          original_bytes: number | null
+          original_checksum: string | null
+          original_height: number | null
+          original_immutable: boolean
+          original_mime: string | null
+          original_path: string | null
+          original_width: number | null
+          pipeline_engine: string | null
+          pipeline_last_error: string | null
+          pipeline_processed_at: string | null
+          pipeline_status: string
+          review_state: Database["public"]["Enums"]["media_review_state"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number | null
+          status: Database["public"]["Enums"]["content_status"]
+          storage_bucket: string
+          storage_path: string
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+          usage_context: string | null
+          width: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "media_assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      commerce_booking_start: {
+        Args: {
+          _departure_id: string
+          _idempotency_key: string
+          _product_id: string
+          _quantity: number
+        }
+        Returns: Json
+      }
+      commerce_can_manage_order_holds: {
+        Args: { _order_id: string }
+        Returns: boolean
+      }
+      commerce_can_view_product_inventory: {
+        Args: { _product_id: string; _user_id: string }
+        Returns: boolean
+      }
+      commerce_departure_adjust: {
+        Args: { _delta: number; _departure_id: string; _reason: string }
+        Returns: string
+      }
+      commerce_departure_availability: {
+        Args: { _departure_id: string }
+        Returns: number
+      }
+      commerce_departure_set_status: {
+        Args: { _departure_id: string; _reason?: string; _status: string }
+        Returns: undefined
+      }
+      commerce_generate_departures: {
+        Args: { _template_id: string; _until?: string }
+        Returns: number
+      }
+      commerce_hold_confirm: {
+        Args: { _hold_id: string; _order_id?: string }
+        Returns: undefined
+      }
+      commerce_hold_create: {
+        Args: {
+          _departure_id: string
+          _idempotency_key: string
+          _quantity: number
+          _traveler_user_id?: string
+          _ttl_minutes?: number
+        }
+        Returns: {
+          created_at: string
+          departure_id: string
+          expires_at: string
+          id: string
+          idempotency_key: string
+          order_id: string | null
+          product_id: string
+          quantity: number
+          released_reason: string | null
+          status: string
+          traveler_user_id: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "commerce_reservation_holds"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      commerce_hold_release: {
+        Args: { _hold_id: string; _reason?: string }
+        Returns: undefined
+      }
+      commerce_holds_expire: { Args: never; Returns: number }
+      commerce_list_departures: {
+        Args: { _from?: string; _product_id: string; _to?: string }
+        Returns: {
+          adjustments: number
+          available: number
+          blacked_out: boolean
+          capacity_reservable: number
+          capacity_total: number
+          confirmed: number
+          ends_at: string
+          held: number
+          id: string
+          notes: string
+          starts_at: string
+          status: string
+          timezone: string
+        }[]
+      }
+      commerce_order_booking: {
+        Args: { _order_id: string }
+        Returns: {
+          departure_id: string
+          ends_at: string
+          expires_at: string
+          hold_id: string
+          product_name: string
+          quantity: number
+          starts_at: string
+          status: string
+          timezone: string
+        }[]
+      }
+      commerce_order_holds_confirm: {
+        Args: { _order_id: string }
+        Returns: number
+      }
+      commerce_order_holds_release: {
+        Args: { _order_id: string; _reason?: string }
+        Returns: number
+      }
+      commerce_public_departures: {
+        Args: { _from?: string; _product_id: string; _to?: string }
+        Returns: {
+          available: number
+          ends_at: string
+          id: string
+          starts_at: string
+          timezone: string
+        }[]
+      }
+      commerce_setting_int: {
+        Args: { _default: number; _key: string }
+        Returns: number
       }
       concierge_alux_context_for_case: {
         Args: { _case_id: string }
@@ -7837,11 +8599,148 @@ export type Database = {
         Args: { _proposal_id: string }
         Returns: string
       }
+      concierge_directory: {
+        Args: never
+        Returns: {
+          active: boolean
+          display_name: string
+          user_id: string
+        }[]
+      }
       concierge_is_internal: { Args: { _user_id: string }; Returns: boolean }
       concierge_my_workload: { Args: never; Returns: Json }
+      concierge_order_create_adjustment: {
+        Args: { _amount_cents: number; _case_id: string; _title?: string }
+        Returns: string
+      }
+      concierge_order_has_business_member: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
+      concierge_order_mark_paid_cash: {
+        Args: { _note?: string; _order_id: string }
+        Returns: Json
+      }
+      concierge_order_mark_paid_online: {
+        Args: {
+          _event_id: string
+          _intent_id: string
+          _order_id: string
+          _provider: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          commission_amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          destination_name: string | null
+          discount_amount: number
+          editorial_summary: string | null
+          editorial_title: string | null
+          email_booking_cancelled_at: string | null
+          email_booking_created_at: string | null
+          email_booking_paid_at: string | null
+          email_booking_refunded_at: string | null
+          email_post_sent_at: string | null
+          email_t14_sent_at: string | null
+          email_t3_sent_at: string | null
+          email_welcome_sent_at: string | null
+          expires_at: string | null
+          folio: string
+          id: string
+          metadata: Json
+          paid_at: string | null
+          payment_provider: string | null
+          payment_provider_intent_id: string | null
+          source_case_id: string | null
+          source_kind: string
+          source_proposal_id: string | null
+          status: string
+          subtotal_amount: number
+          tax_amount: number
+          total_amount: number
+          travel_plan_id: string | null
+          traveler_email: string | null
+          traveler_locale: string | null
+          traveler_name: string | null
+          traveler_phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "concierge_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      concierge_order_refund: {
+        Args: { _amount?: number; _order_id: string; _reason?: string }
+        Returns: Json
+      }
+      concierge_order_start_online_payment: {
+        Args: { _intent_id: string; _order_id: string; _provider: string }
+        Returns: {
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          commission_amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          destination_name: string | null
+          discount_amount: number
+          editorial_summary: string | null
+          editorial_title: string | null
+          email_booking_cancelled_at: string | null
+          email_booking_created_at: string | null
+          email_booking_paid_at: string | null
+          email_booking_refunded_at: string | null
+          email_post_sent_at: string | null
+          email_t14_sent_at: string | null
+          email_t3_sent_at: string | null
+          email_welcome_sent_at: string | null
+          expires_at: string | null
+          folio: string
+          id: string
+          metadata: Json
+          paid_at: string | null
+          payment_provider: string | null
+          payment_provider_intent_id: string | null
+          source_case_id: string | null
+          source_kind: string
+          source_proposal_id: string | null
+          status: string
+          subtotal_amount: number
+          tax_amount: number
+          total_amount: number
+          travel_plan_id: string | null
+          traveler_email: string | null
+          traveler_locale: string | null
+          traveler_name: string | null
+          traveler_phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "concierge_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      concierge_plan_apply_schedule: {
+        Args: { _case_id: string; _entries: Json }
+        Returns: number
+      }
       concierge_proposal_accept: {
         Args: { _proposal_id: string }
         Returns: Json
+      }
+      concierge_proposal_apply_schedule_to_plan: {
+        Args: { _proposal_id: string }
+        Returns: number
       }
       concierge_proposal_create: {
         Args: {
@@ -7909,6 +8808,10 @@ export type Database = {
       concierge_quotes_list_for_business: {
         Args: { _business_id: string; _limit?: number; _scope?: string }
         Returns: Json[]
+      }
+      concierge_traveler_interests: {
+        Args: { _case_id: string }
+        Returns: Json
       }
       concierge_workload_for_lead: { Args: never; Returns: Json[] }
       create_business_claim_snapshot: {
@@ -7993,10 +8896,6 @@ export type Database = {
       delete_business_product_faq: {
         Args: { _faq_id: string }
         Returns: undefined
-      }
-      delete_email: {
-        Args: { message_id: number; queue_name: string }
-        Returns: boolean
       }
       eb_acquire_edit_lock: {
         Args: { _composition_id: string; _force?: boolean }
@@ -8208,11 +9107,6 @@ export type Database = {
         Args: { _entity_id: string; _entity_type: string; _user_id: string }
         Returns: boolean
       }
-      email_queue_dispatch: { Args: never; Returns: undefined }
-      enqueue_email: {
-        Args: { payload: Json; queue_name: string }
-        Returns: number
-      }
       epm_can_request: {
         Args: { _entity_id: string; _entity_kind: string }
         Returns: boolean
@@ -8237,6 +9131,27 @@ export type Database = {
       get_available_modes: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["profile_mode"][]
+      }
+      get_booking_email_payload: {
+        Args: { _kind: string; _order_id: string }
+        Returns: {
+          cancelled_reason: string
+          currency: string
+          departure_starts_at: string
+          departure_timezone: string
+          destination_name: string
+          folio: string
+          items: Json
+          order_id: string
+          paid_at: string
+          refunded_amount: number
+          seats: number
+          status: string
+          total_amount: number
+          traveler_email: string
+          traveler_locale: string
+          traveler_name: string
+        }[]
       }
       get_business_active_plan: {
         Args: { _business_id: string }
@@ -8314,6 +9229,26 @@ export type Database = {
           traveler_locale: string
           traveler_name: string
           user_id: string
+        }[]
+      }
+      get_proposals_needing_payment_reminder: {
+        Args: { _kind: string }
+        Returns: {
+          accepted_at: string
+          case_id: string
+          case_summary: string
+          currency: string
+          end_date: string
+          party_size: number
+          proposal_id: string
+          start_date: string
+          total_amount_cents: number
+          traveler_email: string
+          traveler_name: string
+          traveler_phone: string
+          traveler_user_id: string
+          valid_until: string
+          whatsapp_consent: boolean
         }[]
       }
       get_public_traveler_profile: { Args: { _handle: string }; Returns: Json }
@@ -8441,6 +9376,7 @@ export type Database = {
         Args: { _error: string; _variant_key: string; _worker_id: string }
         Returns: undefined
       }
+      masu_renew_secret_fingerprint: { Args: never; Returns: string }
       masu_trigger_renewal: { Args: never; Returns: undefined }
       masu_upsert_monotonic: {
         Args: {
@@ -8530,15 +9466,6 @@ export type Database = {
           retry_after_seconds: number
         }[]
       }
-      move_to_dlq: {
-        Args: {
-          dlq_name: string
-          message_id: number
-          payload: Json
-          source_queue: string
-        }
-        Returns: number
-      }
       order_cancel: { Args: { p_order_id: string }; Returns: undefined }
       order_confirm: {
         Args: { p_client_request_id?: string; p_notes?: string }
@@ -8623,6 +9550,27 @@ export type Database = {
         }[]
       }
       preview_business_invitation: { Args: { _token: string }; Returns: Json }
+      product_direct_sale_request_cancel: {
+        Args: { _note?: string; _request_id: string }
+        Returns: undefined
+      }
+      product_direct_sale_request_decide: {
+        Args: {
+          _approve: boolean
+          _commission_bps?: number
+          _note?: string
+          _request_id: string
+        }
+        Returns: undefined
+      }
+      product_direct_sale_request_submit: {
+        Args: { _note?: string; _product_id: string }
+        Returns: string
+      }
+      product_direct_sale_revoke: {
+        Args: { _note?: string; _product_id: string }
+        Returns: undefined
+      }
       publish_business: {
         Args: { _approve: boolean; _business_id: string; _notes?: string }
         Returns: undefined
@@ -8644,22 +9592,20 @@ export type Database = {
         }
         Returns: string
       }
-      read_email_batch: {
-        Args: { batch_size: number; queue_name: string; vt: number }
-        Returns: {
-          message: Json
-          msg_id: number
-          read_ct: number
-        }[]
-      }
       record_business_view_event: {
         Args: {
           _business_id: string
           _country_code?: string
+          _entity_id?: string
+          _entity_kind?: string
           _event_type: string
+          _grant_id?: string
+          _placement?: string
+          _rail?: string
           _referer?: string
           _session_hash?: string
           _source?: string
+          _surface?: string
         }
         Returns: string
       }
@@ -9347,7 +10293,13 @@ export type Database = {
         | "block"
         | "composition"
         | "revision"
-      favorite_entity_kind: "business" | "product" | "promotion"
+      favorite_entity_kind:
+        | "business"
+        | "product"
+        | "promotion"
+        | "place"
+        | "event"
+        | "route"
       hero_palette: "territorio" | "selva" | "cenote" | "atardecer"
       invitation_status: "pending" | "accepted" | "revoked" | "expired"
       locale_code: "es" | "en" | "fr" | "de" | "it" | "pt"
@@ -9640,7 +10592,14 @@ export const Constants = {
         "composition",
         "revision",
       ],
-      favorite_entity_kind: ["business", "product", "promotion"],
+      favorite_entity_kind: [
+        "business",
+        "product",
+        "promotion",
+        "place",
+        "event",
+        "route",
+      ],
       hero_palette: ["territorio", "selva", "cenote", "atardecer"],
       invitation_status: ["pending", "accepted", "revoked", "expired"],
       locale_code: ["es", "en", "fr", "de", "it", "pt"],

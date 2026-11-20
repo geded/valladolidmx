@@ -17,8 +17,8 @@ import {
 } from "../../../src/lib/omxds/category-icon-registry";
 
 // 1 · Cardinalidad e identidad canónica
-assert.equal(CATEGORY_ICON_SLUGS.length, 22, "el registry debe declarar 22 categorías");
-assert.equal(new Set(CATEGORY_ICON_SLUGS).size, 22, "slugs duplicados en el registry");
+assert.equal(CATEGORY_ICON_SLUGS.length, 23, "el registry debe declarar 23 categorías");
+assert.equal(new Set(CATEGORY_ICON_SLUGS).size, 23, "slugs duplicados en el registry");
 
 for (const slug of CATEGORY_ICON_SLUGS) {
   const entry = CATEGORY_ICON_REGISTRY[slug]!;
@@ -66,7 +66,7 @@ const DELEGATED_AUTHORITY: Record<string, string> = {
   // Lote 1 · la preview del micrositio delega en la superficie de revisión
   // compartida, que es donde vive la autoridad real de iconografía.
   "src/routes/lovable/g4-destination-microsite-preview.tsx":
-    "src/components/destination-premium/DestinationMicrositeReviewSurface.tsx",
+    "src/components/destination-premium/DestinationPremiumSurface.tsx",
   "src/routes/lovable/g4-home-premium-preview.tsx":
     "src/components/home-premium/HomePremiumSurface.tsx",
 };

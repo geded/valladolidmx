@@ -1,0 +1,419 @@
+/**
+ * CaseItineraryPanel — Itinerario del viaje y ajuste del itinerario aprobado.
+ *
+ * Delta mínimo sobre el expediente existente: sólo agrega visibilidad del
+ * plan armado y la conciliación entre lo aprobado y lo cobrado. No modifica
+ * CaseFileView ni el Estudio de Propuesta.
+ */
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { meridaDate } from "@/lib/time/merida";
+import {
+  getCaseItinerary,
+  getCaseAdjustmentSummary,
+  createItineraryAdjustmentCharge,
+  registerItineraryCreditNote,
+  applyProposalScheduleToPlan,
+  aluxScheduleCaseItinerary,
+  listCaseSuggestions,
+  type CaseSuggestion,
+} from "@/lib/concierge/proposal-studio.functions";
+
+
+const money = (cents: number, currency = "MXN") =>
+  new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(cents / 100);
+
+const KIND_LABEL: Record<string, string> = {
+  destination: "Destino",
+  business: "Empresa",
+  product: "Experiencia",
+  event: "Evento",
+  route: "Ruta",
+  place: "Lugar",
+  note: "Nota",
+};
+
+export function CaseItineraryPanel({ caseId }: { caseId: string }) {
+  const queryClient = useQueryClient();
+  const itineraryFn = useServerFn(getCaseItinerary);
+  const summaryFn = useServerFn(getCaseAdjustmentSummary);
+  const chargeFn = useServerFn(createItineraryAdjustmentCharge);
+  const creditFn = useServerFn(registerItineraryCreditNote);
+  const applyFn = useServerFn(applyProposalScheduleToPlan);
+  const aluxScheduleFn = useServerFn(aluxScheduleCaseItinerary);
+  const suggestionsFn = useServerFn(listCaseSuggestions);
+  const navigate = useNavigate();
+
+  const itinerary = useQuery({
+    queryKey: ["concierge", "case-itinerary", caseId],
+    queryFn: () => itineraryFn({ data: { caseId } }),
+  });
+  const summary = useQuery({
+    queryKey: ["concierge", "case-adjustment", caseId],
+    queryFn: () => summaryFn({ data: { caseId } }),
+  });
+  const suggestions = useQuery({
+    queryKey: ["concierge", "case-suggestions", caseId],
+    queryFn: () => suggestionsFn({ data: { caseId } }),
+  });
+
+  const [picked, setPicked] = useState<string[]>([]);
+  const [amount, setAmount] = useState("");
+
+  const sendToStudio = () => {
+    const all = (suggestions.data?.suggestions ?? []) as CaseSuggestion[];
+    const chosen = all.filter((s) => picked.includes(s.label));
+    if (!chosen.length) return;
+    try {
+      window.sessionStorage.setItem(
+        `vll:proposal-suggestions:${caseId}`,
+        JSON.stringify(
+          chosen.map((s) => ({
+            title: s.label,
+            notes: s.reason,
+            targetKind: s.kind,
+            targetId: s.entity_id,
+          })),
+        ),
+      );
+    } catch {
+      /* el prellenado es opcional */
+    }
+    void navigate({
+      to: "/concierge/expedientes/$caseId/propuesta",
+      params: { caseId },
+    });
+  };
+
+
+  const charge = useMutation({
+    mutationFn: (cents: number) =>
+      chargeFn({ data: { caseId, amountCents: cents, title: "Ajuste de itinerario" } }),
+    onSuccess: () => {
+      toast.success("Cobro complementario creado. Ya aparece en Reservaciones.");
+      setAmount("");
+      void queryClient.invalidateQueries({ queryKey: ["concierge"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const credit = useMutation({
+    mutationFn: (cents: number) => creditFn({ data: { caseId, amountCents: cents } }),
+    onSuccess: () => {
+      toast.success("Saldo a favor registrado en el historial del expediente.");
+      setAmount("");
+      void queryClient.invalidateQueries({ queryKey: ["concierge"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const plan = itinerary.data;
+  type Stop = NonNullable<typeof plan>["stops"][number];
+  /** -1 agrupa las paradas que todavía no tienen día asignado. */
+  const days = new Map<number, Stop[]>();
+  for (const stop of plan?.stops ?? []) {
+    const day = stop.day_index ?? -1;
+    const list = days.get(day) ?? [];
+    list.push(stop);
+    days.set(day, list);
+  }
+  const applySchedule = useMutation({
+    mutationFn: (proposalId: string) => applyFn({ data: { proposalId } }),
+    onSuccess: (r) => {
+      toast.success(`Horarios aplicados al viaje (${r.applied} paradas).`);
+      void queryClient.invalidateQueries({ queryKey: ["concierge"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
+  const aluxSchedule = useMutation({
+    mutationFn: () => aluxScheduleFn({ data: { caseId } }),
+    onSuccess: (r) => {
+      if (r.applied > 0) {
+        toast.success(
+          `Alux armó la agenda: ${r.applied} paradas con día y hora. El viajero ya la ve en Mi Viaje.`,
+        );
+      } else {
+        toast.info("No había paradas por agendar en este viaje.");
+      }
+      void queryClient.invalidateQueries({ queryKey: ["concierge"] });
+    },
+    onError: (e: Error) =>
+      toast.error(
+        e.message === "alux_unavailable"
+          ? "Alux no pudo armar la agenda en este momento. Intenta de nuevo."
+          : e.message,
+      ),
+  });
+
+  const diff = summary.data?.difference_cents ?? 0;
+  const currency = summary.data?.currency ?? "MXN";
+  const parsedAmount = Math.round(Number(amount.replace(/[^\d.]/g, "")) * 100);
+
+  return (
+    <div className="mb-6 space-y-4">
+      <section className="rounded-lg border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          Itinerario del viaje
+        </h2>
+        {itinerary.isLoading ? (
+          <p className="mt-3 text-sm text-muted-foreground">Cargando itinerario…</p>
+        ) : plan ? (
+          <>
+            <p className="mt-1 font-serif text-xl">{plan.title ?? "Viaje sin nombre"}</p>
+            <p className="text-sm text-muted-foreground">
+              {plan.start_date ? meridaDate(plan.start_date) : "Sin fecha de inicio"}
+              {plan.end_date ? ` — ${meridaDate(plan.end_date)}` : ""}
+              {plan.party_size ? ` · ${plan.party_size} personas` : ""}
+            </p>
+            {plan.stops.length ? (
+              <div
+                className={
+                  plan.scheduled_count === 0
+                    ? "mt-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-sm"
+                    : "mt-3 rounded-md border border-border bg-muted/30 p-3 text-sm"
+                }
+              >
+                {plan.scheduled_count === 0 ? (
+                  <>
+                    <p className="font-medium">
+                      Este viaje todavía no tiene día ni hora asignados.
+                    </p>
+                    <p className="mt-1 text-muted-foreground">
+                      Por eso se ve igual que la propuesta: son las mismas paradas, pero sin agenda.
+                      Alux puede armarla con criterio del destino y el viajero la verá al instante
+                      en Mi Viaje.
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Alux puede completar los días y horas que falten, respetando lo que ya está
+                    capturado.
+                  </p>
+                )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    disabled={aluxSchedule.isPending}
+                    onClick={() => aluxSchedule.mutate()}
+                  >
+                    {aluxSchedule.isPending
+                      ? "Alux está armando la agenda…"
+                      : "Armar agenda con Alux"}
+                  </Button>
+                  {plan.latest_proposal_id && plan.proposal_scheduled_count > 0 ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={applySchedule.isPending}
+                      onClick={() => applySchedule.mutate(plan.latest_proposal_id as string)}
+                    >
+                      Aplicar horarios de la propuesta al viaje
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+            {days.size ? (
+              <div className="mt-4 space-y-4">
+                {[...days.entries()]
+                  .sort((a, b) => a[0] - b[0])
+                  .map(([day, stops]) => (
+                    <div key={day}>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                        {day < 0 ? "Sin día asignado" : `Día ${day + 1}`}
+                      </p>
+
+                      <ul className="mt-2 space-y-2">
+                        {stops.map((stop) => (
+                          <li
+                            key={stop.id}
+                            className="rounded-md border border-border/60 bg-background p-3"
+                          >
+                            <div className="flex flex-wrap items-baseline justify-between gap-2">
+                              <p className="text-sm font-medium">
+                                {stop.title ?? KIND_LABEL[stop.item_kind] ?? "Parada"}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {stop.starts_at_local
+                                  ? stop.starts_at_local.slice(0, 5)
+                                  : "Sin hora"}
+                                {stop.duration_minutes ? ` · ${stop.duration_minutes} min` : ""}
+                              </p>
+                            </div>
+                            {stop.notes ? (
+                              <p className="mt-1 text-xs text-muted-foreground">{stop.notes}</p>
+                            ) : null}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">
+                El viaje todavía no tiene paradas cargadas.
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">
+            Este expediente todavía no tiene un viaje con itinerario.
+          </p>
+        )}
+      </section>
+
+      {suggestions.data &&
+      (suggestions.data.suggestions.length ||
+        suggestions.data.interests.length ||
+        suggestions.data.free_days.length) ? (
+        <section className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Sugerencias de Alux para este viaje
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Lo que el viajero vio y guardó y todavía no está en su viaje. Sin precio: tú eliges qué
+            proponerle y lo cotizas en el Estudio de Propuesta.
+          </p>
+
+          {suggestions.data.free_days.length && suggestions.data.total_days ? (
+            <p className="mt-3 rounded-md bg-muted/50 p-2 text-xs">
+              Días del viaje todavía sin nada agendado:{" "}
+              <span className="font-medium">
+                {suggestions.data.free_days.map((d) => `Día ${d + 1}`).join(", ")}
+              </span>
+            </p>
+          ) : null}
+
+          {suggestions.data.suggestions.length ? (
+            <>
+              <ul className="mt-3 space-y-2">
+                {suggestions.data.suggestions.map((s) => {
+                  const checked = picked.includes(s.label);
+                  return (
+                    <li
+                      key={`${s.kind}-${s.entity_id ?? s.label}`}
+                      className="flex items-start gap-3 rounded-md border border-border/60 bg-background p-3"
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-primary"
+                        checked={checked}
+                        aria-label={`Proponer ${s.label}`}
+                        onChange={() =>
+                          setPicked((prev) =>
+                            checked ? prev.filter((l) => l !== s.label) : [...prev, s.label],
+                          )
+                        }
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{s.label}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {KIND_LABEL[s.kind] ?? s.kind} · {s.reason}
+                        </p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-3">
+                <Button size="sm" disabled={!picked.length} onClick={sendToStudio}>
+                  Agregar a la propuesta ({picked.length})
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Todo lo que el viajero guardó ya está en su viaje.
+            </p>
+          )}
+
+          {suggestions.data.interests.length || suggestions.data.territories.length ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Le interesan: {suggestions.data.interests.join(", ") || "sin datos"}.
+              {suggestions.data.territories.length
+                ? ` Destinos que estuvo viendo: ${suggestions.data.territories.join(", ")}.`
+                : ""}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+
+
+      <section className="rounded-lg border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          Ajustar el itinerario aprobado
+        </h2>
+        {summary.isLoading ? (
+          <p className="mt-3 text-sm text-muted-foreground">Calculando…</p>
+        ) : summary.data ? (
+          <>
+            <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+              <div>
+                <dt className="text-xs text-muted-foreground">Aprobado al viajero</dt>
+                <dd className="font-serif text-lg">
+                  {money(summary.data.approved_cents, currency)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Ya cobrado</dt>
+                <dd className="font-serif text-lg">{money(summary.data.paid_cents, currency)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Por cobrar abierto</dt>
+                <dd className="font-serif text-lg">
+                  {money(summary.data.pending_cents, currency)}
+                </dd>
+              </div>
+            </dl>
+            <p className="mt-3 text-sm">
+              {diff > 0
+                ? `Falta cobrar ${money(diff, currency)} para cubrir lo aprobado.`
+                : diff < 0
+                  ? `Hay ${money(-diff, currency)} cobrados de más: registra el saldo a favor.`
+                  : "Lo aprobado y lo cobrado coinciden."}
+            </p>
+            <div className="mt-4 flex flex-wrap items-end gap-3">
+              <label className="text-sm">
+                <span className="block text-xs text-muted-foreground">
+                  Importe del ajuste (pesos)
+                </span>
+                <Input
+                  inputMode="decimal"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="mt-1 w-40"
+                />
+              </label>
+              <Button
+                disabled={!Number.isFinite(parsedAmount) || parsedAmount <= 0 || charge.isPending}
+                onClick={() => charge.mutate(parsedAmount)}
+              >
+                Crear cobro complementario
+              </Button>
+              <Button
+                variant="outline"
+                disabled={!Number.isFinite(parsedAmount) || parsedAmount <= 0 || credit.isPending}
+                onClick={() => credit.mutate(parsedAmount)}
+              >
+                Registrar saldo a favor
+              </Button>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              El cobro complementario nace con su propio folio del día y no toca el pago original.
+              El saldo a favor queda anotado en el historial; no se devuelve dinero automáticamente.
+            </p>
+          </>
+        ) : null}
+      </section>
+    </div>
+  );
+}

@@ -1,22 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { listMediaCms } from "@/lib/cms/reads.functions";
-import { suggestMediaAlt, suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
-import { MediaTranslationsSheet } from "@/components/cms/media/MediaTranslationsSheet";
+
+import { suggestMediaAltBatch } from "@/lib/cms/media-intelligence.functions";
+import { MediaDetailsSheet } from "@/components/cms/media/MediaDetailsSheet";
+
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/lib/toast";
 import { uploadStudioMediaViaServer } from "@/lib/experience-builder/studio-media.functions";
 import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
-import { Loader2, Upload } from "lucide-react";
+import { Edit3, Loader2, Upload } from "lucide-react";
 
 type Row = {
   id: string;
   kind: string | null;
   storage_bucket: string | null;
   storage_path: string | null;
+  previewUrl?: string | null;
   alt_text: string | null;
   alt_text_ai: string | null;
   alt_text_source: "none" | "ai_pending" | "ai" | "human" | null;
@@ -25,56 +36,28 @@ type Row = {
   width: number | null;
   height: number | null;
   status: string | null;
+  usage_context: string | null;
+  entity_kind: string | null;
+  entity_id: string | null;
   updated_at: string;
+  usageRefs?: Array<{
+    role: string;
+    family: string;
+    entityLabel: string;
+    href: string | null;
+  }>;
 };
 
+
 export const Route = createFileRoute("/_authenticated/cms/media")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    estado: search["estado"] === "in_review" ? ("in_review" as const) : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Media · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: MediaPage,
 });
-
-function SuggestAltButton({ mediaId, disabled }: { mediaId: string; disabled?: boolean }) {
-  const fn = useServerFn(suggestMediaAlt);
-  const [loading, setLoading] = useState(false);
-  return (
-    <Button
-      size="sm"
-      variant="outline"
-      disabled={disabled || loading}
-      onClick={async () => {
-        try {
-          setLoading(true);
-          const res = await fn({ data: { mediaId, locale: "es" } });
-          if ("skipped" in res && res.skipped) {
-            toast.info("ALT humano preservado. La IA no lo sobrescribe.");
-          } else {
-            toast.success("Propuesta IA guardada. Revisa y aprueba en el editor.");
-          }
-        } catch (err) {
-          toast.error(err instanceof Error ? err.message : "Error al sugerir ALT");
-        } finally {
-          setLoading(false);
-        }
-      }}
-    >
-      {loading ? "Analizando…" : "Sugerir ALT"}
-    </Button>
-  );
-}
-
-function TranslateButton({ mediaId }: { mediaId: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button size="sm" variant="ghost" onClick={() => setOpen(true)}>
-        Traducir
-      </Button>
-      {open && <MediaTranslationsSheet mediaId={mediaId} onClose={() => setOpen(false)} />}
-    </>
-  );
-}
 
 function BatchToolbar() {
   const batch = useServerFn(suggestMediaAltBatch);
@@ -178,7 +161,7 @@ function AiConceptBatchUpload() {
           focalX: 0.5,
           focalY: 0.5,
         };
-        await upload({
+        const saved = await upload({
           data: {
             filename: file.name,
             mime: file.type,
@@ -187,6 +170,7 @@ function AiConceptBatchUpload() {
             rights,
           },
         });
+        deriveVariantsInBackground(file, saved);
         uploaded += 1;
         setProgress({ done: uploaded, total: files.length });
       }
@@ -233,51 +217,207 @@ function AiConceptBatchUpload() {
   );
 }
 
-function MediaHeaderActions() {
+const SCOPE_OPTIONS = [
+  { value: "all", label: "Todas las imágenes" },
+  { value: "mine", label: "Mis imágenes" },
+] as const;
+
+const STATE_OPTIONS = [
+  { value: "all", label: "Todos los estados" },
+  { value: "draft", label: "Borradores" },
+  { value: "in_review", label: "Pendientes de aprobación" },
+  { value: "published", label: "Publicadas" },
+] as const;
+
+const USAGE_OPTIONS = [
+  { value: "all", label: "Todos los usos" },
+  { value: "cover", label: "Portadas" },
+  { value: "gallery", label: "Galerías" },
+  { value: "logo", label: "Logos" },
+  { value: "other", label: "Otros" },
+] as const;
+
+type ScopeValue = (typeof SCOPE_OPTIONS)[number]["value"];
+type StateValue = (typeof STATE_OPTIONS)[number]["value"];
+type UsageValue = (typeof USAGE_OPTIONS)[number]["value"];
+
+
+const USAGE_LABELS: Record<string, string> = {
+  cover: "Portada",
+  cover_mobile: "Portada móvil",
+  hero: "Portada",
+  business_cover_preview: "Portada",
+  gallery: "Galería",
+  logo: "Logo",
+  icon: "Logo",
+  avatar: "Logo",
+  social: "Redes",
+  offer: "Oferta",
+  territory: "Territorio",
+};
+
+function CompactFilterSelect<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
+  className = "",
+}: {
+  options: readonly { value: T; label: string }[];
+  value: T;
+  onChange: (next: T) => void;
+  label: string;
+  className?: string;
+}) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <AiConceptBatchUpload />
-      <BatchToolbar />
+    <div className={`min-w-0 space-y-1 ${className}`}>
+      <p className="px-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        {label}
+      </p>
+      <Select value={value} onValueChange={(next) => onChange(next as T)}>
+        <SelectTrigger className="h-10 min-w-0 rounded-lg bg-background px-3 text-xs font-medium shadow-none" aria-label={label}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value} className="text-xs">
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
 
 function MediaPage() {
+  const { estado } = Route.useSearch();
+  const [scope, setScope] = useState<ScopeValue>("all");
+  const [usage, setUsage] = useState<UsageValue>("all");
+  const [state, setState] = useState<StateValue>(estado === "in_review" ? "in_review" : "all");
+  const [detailId, setDetailId] = useState<string | null>(null);
+
   return (
+    <>
     <CmsEntityPage<Row>
       queryKey="media"
       fn={listMediaCms}
       title="Biblioteca multimedia"
-      description="Media Intelligence Pipeline · IA propone, el editor decide."
+      description="Filtra por quién subió la imagen, su estado de aprobación y para qué se usa."
       rowKey={(r) => r.id}
-      emptyMessage="Sin activos multimedia todavía."
-      headerActions={<MediaHeaderActions />}
+      emptyMessage="Sin imágenes con estos filtros."
+      extraParams={{ scope, usage, state }}
+      toolbarVariant="compact"
+      headerActions={
+        <div className="grid min-w-0 gap-2 rounded-lg border border-border bg-card p-2.5 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-3">
+          <div className="grid min-w-0 grid-cols-1 gap-2 min-[520px]:grid-cols-3">
+            <CompactFilterSelect
+              label="Biblioteca"
+              options={SCOPE_OPTIONS}
+              value={scope}
+              onChange={setScope}
+            />
+            <CompactFilterSelect
+              label="Estado"
+              options={STATE_OPTIONS}
+              value={state}
+              onChange={setState}
+            />
+            <CompactFilterSelect
+              label="Uso"
+              options={USAGE_OPTIONS}
+              value={usage}
+              onChange={setUsage}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-1.5 border-t border-border/70 pt-2 sm:flex sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0 [&_button]:h-10 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:text-xs">
+            <AiConceptBatchUpload />
+            <BatchToolbar />
+          </div>
+        </div>
+      }
       columns={[
+        {
+          key: "thumb",
+          header: "Imagen",
+          render: (r) => (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setDetailId(r.id)}
+              className="h-14 w-20 p-0"
+              aria-label="Ver ficha de la imagen"
+              title="Ver y editar la imagen"
+            >
+              {r.previewUrl ? (
+                <img
+                  src={r.previewUrl}
+                  alt={r.alt_text ?? ""}
+                  loading="lazy"
+                  className="h-14 w-20 rounded-md border border-border object-cover"
+                />
+              ) : (
+                <div className="flex h-14 w-20 items-center justify-center rounded-md border border-border bg-muted text-[10px] text-muted-foreground">
+                  Sin vista previa
+                </div>
+              )}
+            </Button>
+          ),
+        },
         {
           key: "alt",
           header: "ALT",
           render: (r) => (
-            <div className="max-w-[320px] space-y-1">
-              <div className="font-medium leading-tight">
+            <div className="w-40 space-y-1 sm:w-48">
+              <div className="line-clamp-2 text-xs font-medium leading-snug" title={r.alt_text ?? "Sin ALT"}>
                 {r.alt_text ?? <span className="text-muted-foreground italic">(sin ALT)</span>}
               </div>
               {r.alt_text_ai && r.alt_text_source !== "human" && (
-                <div className="text-xs text-muted-foreground line-clamp-2">🤖 {r.alt_text_ai}</div>
+                <div className="line-clamp-1 text-[10px] text-muted-foreground">IA: {r.alt_text_ai}</div>
               )}
-              <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                origen: {r.alt_text_source ?? "none"} · revisión: {r.review_state ?? "unreviewed"}
-              </div>
             </div>
           ),
         },
         {
+          key: "usage",
+          header: "Uso",
+          render: (r) => {
+            const refs = r.usageRefs ?? [];
+            if (refs.length === 0) {
+              return (
+                <span className="text-xs text-muted-foreground">
+                  {r.usage_context
+                    ? (USAGE_LABELS[r.usage_context] ?? r.usage_context)
+                    : "Sin usar todavía"}
+                </span>
+              );
+            }
+            return (
+              <ul className="w-36 space-y-0.5 text-[11px] sm:w-44">
+                {refs.slice(0, 1).map((ref, i) => (
+                  <li key={`${ref.role}-${ref.entityLabel}-${i}`}>
+                    <span className="text-muted-foreground">{ref.role} · {ref.family}</span>
+                    <span className="block truncate font-medium" title={ref.entityLabel}>{ref.entityLabel}</span>
+                  </li>
+                ))}
+                {refs.length > 1 ? (
+                  <li className="text-muted-foreground">+{refs.length - 1} uso{refs.length === 2 ? "" : "s"}</li>
+                ) : null}
+              </ul>
+            );
+          },
+        },
+
+        {
           key: "kind",
           header: "Tipo",
+          className: "hidden lg:table-cell",
           render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span>,
         },
         {
           key: "bucket",
           header: "Bucket",
+          className: "hidden xl:table-cell",
           render: (r) => (
             <code className="text-xs text-muted-foreground">{r.storage_bucket ?? "—"}</code>
           ),
@@ -285,6 +425,7 @@ function MediaPage() {
         {
           key: "dim",
           header: "Dim.",
+          className: "hidden xl:table-cell",
           render: (r) => (
             <span className="text-xs text-muted-foreground">
               {r.width && r.height ? `${r.width}×${r.height}` : "—"}
@@ -294,15 +435,18 @@ function MediaPage() {
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },
         {
           key: "actions",
-          header: "IA",
+          header: "Acción",
           render: (r) => (
-            <div className="flex gap-1">
-              <SuggestAltButton mediaId={r.id} />
-              <TranslateButton mediaId={r.id} />
-            </div>
+            <Button size="sm" variant="outline" onClick={() => setDetailId(r.id)}>
+              <Edit3 className="size-3.5" aria-hidden />
+              Editar
+            </Button>
           ),
         },
       ]}
     />
+    <MediaDetailsSheet mediaId={detailId} onOpenChange={(open) => !open && setDetailId(null)} />
+    </>
   );
 }
+

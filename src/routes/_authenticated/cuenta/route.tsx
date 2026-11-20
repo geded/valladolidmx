@@ -18,6 +18,7 @@ import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions"
 import { getProfileModeState } from "@/lib/profile-mode/mode.functions";
 import { WelcomeOnboardingModal } from "@/components/traveler/WelcomeOnboardingModal";
 import { PendingReviewsBanner } from "@/components/traveler/PendingReviewsBanner";
+import { JourneyBackLink } from "@/components/navigation/JourneyBackLink";
 
 export const Route = createFileRoute("/_authenticated/cuenta")({
   component: CuentaWorkspaceRoute,
@@ -32,6 +33,7 @@ function CuentaWorkspaceRoute() {
         className="[&_a]:min-h-6 [&_a]:min-w-6 [&_button]:min-h-6 [&_button]:min-w-6"
       >
         <TravelerOnboardingMount />
+        <JourneyBackLink className="mb-3" />
         <PendingReviewsBanner />
         <Outlet />
       </WorkspaceShell>

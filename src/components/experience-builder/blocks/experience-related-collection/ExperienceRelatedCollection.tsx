@@ -64,6 +64,7 @@ function relatedItemToVM(item: ExperienceRelatedItem, showKindBadge: boolean): T
     tagline,
     businessName: item.businessName,
     mediaUrl: item.imageUrl,
+    mediaAsset: item.imageAsset,
     mediaAlt: item.imageAlt,
     rating: item.rating,
     location: item.location,
@@ -240,7 +241,7 @@ function ItemsLayout({
     return (
       <ul
         role="list"
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]"
+        className="flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:thin]"
       >
         {items.map((it) => (
           <li
@@ -248,7 +249,7 @@ function ItemsLayout({
             className={cn(
               "shrink-0 snap-start",
               tourismCaps.compact
-                ? "min-w-[210px] max-w-[240px] sm:min-w-[230px]"
+                ? "min-w-[190px] max-w-[240px] sm:min-w-[230px]"
                 : "min-w-[260px] max-w-[300px]",
             )}
           >

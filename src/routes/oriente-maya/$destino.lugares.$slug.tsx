@@ -16,6 +16,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PlacePremiumSurface } from "@/components/place-premium/PlacePremiumSurface";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { PublicShell } from "@/components/discovery";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
@@ -23,6 +24,11 @@ import {
   type PublicPlaceDTO,
 } from "@/lib/places/place-public-contract";
 import { getPublicPlace, getPlacePreview } from "@/lib/places/place-public-reads.functions";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import {
+  PLACE_PREMIUM_BLOCK_TYPE,
+  resolvePlacePremiumCopyFromTree,
+} from "@/lib/places/place-copy-resolution";
 import { useAuth } from "@/hooks/useAuth";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { bindPlaceRoute } from "@/lib/experience-builder/canonical-entity-binding";
@@ -35,13 +41,26 @@ const SITE = "https://quehacerenvalladolid.com";
 
 export const Route = createFileRoute("/oriente-maya/$destino/lugares/$slug")({
   loader: async ({ params }) => {
-    const [place, evaluationLot] = await Promise.all([
+    const [place, evaluationLot, specific, template] = await Promise.all([
       getPublicPlace({ data: { destinationSlug: params.destino, placeSlug: params.slug } }),
       // G8-R1-F1G/F1H · Lote interno de evaluación → noindex mientras dure.
       getEvaluationLotSlugs().catch(() => null),
+      /* G8-Q2D-C · Composition-first para TEXTOS (misma arquitectura que la
+         ficha de empresa): primero la composición específica del lugar y, en
+         su ausencia, la plantilla oficial de la familia. Nunca sustituye la
+         autoridad visual aprobada: sólo aporta encabezados editables. */
+      getPublishedCompositionBySlug({
+        data: { slug: `place-${params.slug}`, variant_key: params.slug },
+      }).catch(() => null),
+      getPublishedCompositionBySlug({ data: { slug: "__tpl_place__" } }).catch(() => null),
     ]);
+    const copy = resolvePlacePremiumCopyFromTree(
+      (specific ?? template)?.snapshot ?? null,
+      PLACE_PREMIUM_BLOCK_TYPE,
+    );
     return {
       place: place ?? null,
+      copy,
       inEvaluationLot: isInEvaluationLot(evaluationLot, "place", params.slug),
     };
   },
@@ -81,7 +100,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/lugares/$slug")({
 
 function PlaceRoute() {
   const { destino, slug } = Route.useParams();
-  const { place } = Route.useLoaderData();
+  const { place, copy } = Route.useLoaderData();
   const { user } = useAuth();
   const previewFn = useServerFn(getPlacePreview);
 
@@ -162,8 +181,12 @@ function PlaceRoute() {
             presentation={projection.presentation}
             variant={binding?.variant ?? projection.variant ?? undefined}
             builderNotice={projection.resolution.builderNotice}
+            copy={copy}
             draftNotice={isDraft ? "Borrador · no publicado" : null}
             showBreadcrumbs={false}
+            saveSlot={
+              <FavoriteButton entityKind="place" entityId={dto.id} entityTitle={dto.name} entitySlug={slug} />
+            }
             tripSlot={
               <AddToTravelPlanButton
                 kind="place"

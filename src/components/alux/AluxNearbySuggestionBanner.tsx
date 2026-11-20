@@ -15,6 +15,7 @@ import { Sparkles, MapPin } from "lucide-react";
 import { useVisitorGeolocation } from "@/components/maps/useVisitorGeolocation";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import { logAluxPublicSignal } from "@/lib/alux/public-signals";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 export interface NearbyPoint {
   id: string;
@@ -46,6 +47,7 @@ export function AluxNearbySuggestionBanner({
   radiusKm = 5,
 }: AluxNearbySuggestionBannerProps) {
   const { location, status } = useVisitorGeolocation();
+  const alux = useAluxBrand();
 
   const nearby = useMemo(() => {
     if (!location) return [];
@@ -65,20 +67,19 @@ export function AluxNearbySuggestionBanner({
   return (
     <div
       role="note"
-      aria-label="Sugerencia proactiva de Alux"
-      className="mt-6 flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+      aria-label={`Sugerencia proactiva de ${alux.name}`}
+      className="mt-6 flex flex-col gap-3 rounded-2xl border border-alux/20 bg-alux-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="flex items-start gap-3">
-        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-alux/15 text-alux">
           <Sparkles className="size-4" aria-hidden />
         </span>
         <div className="text-sm">
           <p className="font-semibold text-foreground">
-            Alux te sugiere {count} lugares a menos de {distanceLabel} de ti
+            {alux.copy("nearbyTitle", { count, distance: distanceLabel })}
           </p>
           <p className="text-xs text-muted-foreground">
-            Ordenados por cercanía real en {destinationLabel}. Puedo priorizar por tus intereses o
-            filtrar por lo que está abierto ahora.
+            {alux.copy("nearbyBody", { destination: destinationLabel })}
           </p>
         </div>
       </div>
@@ -91,10 +92,10 @@ export function AluxNearbySuggestionBanner({
           });
           openAluxFloating({ reason: "nearby-suggestion", hint: destinationLabel });
         }}
-        className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-[1.02]"
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-alux px-4 py-2 text-xs font-semibold text-alux-foreground shadow-soft transition-transform hover:scale-[1.02]"
       >
         <MapPin className="size-3.5" aria-hidden />
-        Ver con Alux
+        {alux.copy("nearbyCta")}
       </button>
     </div>
   );

@@ -323,7 +323,8 @@ function countryFlag(iso: string | null): string {
 
 function csvSafe(v: string): string {
   if (v == null) return "";
-  const s = String(v);
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  let s = String(v);
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  if (/[",\n']/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }

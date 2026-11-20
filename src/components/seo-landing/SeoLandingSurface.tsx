@@ -14,6 +14,10 @@
  * degradados gigantes sustituyendo fotografía ausente.
  */
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { BusinessLogo } from "@/components/common/BusinessLogo";
+import { getPublicBusinessLogo } from "@/lib/catalog/business-logo.functions";
 import {
   Accessibility,
   ArrowRight,
@@ -207,6 +211,24 @@ function AluxPanel({
   );
 }
 
+/**
+ * Logotipo acreditado de la empresa de origen (`entityRef = business:<id>`).
+ * Fail-closed: sin entidad empresa o sin logo aprobado no renderiza nada y
+ * el hero conserva exactamente su composición aprobada.
+ */
+function LandingBrandLogo({ entityRef }: { entityRef: string | null }) {
+  const businessId = entityRef?.startsWith("business:") ? entityRef.slice("business:".length) : null;
+  const logoFn = useServerFn(getPublicBusinessLogo);
+  const q = useQuery({
+    queryKey: ["public", "business-logo", businessId],
+    queryFn: () => logoFn({ data: { businessId: businessId as string } }),
+    enabled: Boolean(businessId),
+    staleTime: 5 * 60_000,
+  });
+  if (!q.data?.url) return null;
+  return <BusinessLogo url={q.data.url} businessName={q.data.name ?? ""} size="md" />;
+}
+
 export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   const { hero, trust, intro, features, offers, info, territory, gallery, alux, sections } = vm;
   const featured = offers?.items[0] ?? null;
@@ -218,7 +240,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
   return (
     <div className="pb-8">
       {/* ── 1 · Hero dividido premium (42 / 58) ───────────────────── */}
-      <section className={cn(SHELL, "pt-3 sm:pt-4")} aria-label="Portada">
+      <section className={cn(SHELL, "pt-3 sm:pt-4")} aria-label="Portada" data-eb-section="hero">
         <div
           className={cn(
             "grid overflow-hidden rounded-3xl border border-border bg-card shadow-elevated",
@@ -251,6 +273,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
           ) : null}
 
           <div className="order-2 flex min-w-0 flex-col justify-center gap-2.5 p-5 sm:p-7 lg:order-1 lg:p-9">
+            <LandingBrandLogo entityRef={vm.entityRef} />
             {hero.eyebrow ? (
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
                 {hero.eyebrow}
@@ -304,7 +327,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
       {/* ── 2 · Franja horizontal de confianza ────────────────────── */}
       {trust.length > 0 ? (
-        <section className={cn(SHELL, "mt-3")} aria-label="Señales de confianza">
+        <section className={cn(SHELL, "mt-3")} aria-label="Señales de confianza" data-eb-section="badges">
           <ul
             className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:gap-0 sm:divide-x sm:divide-border sm:overflow-visible sm:rounded-2xl sm:border sm:border-border sm:bg-surface sm:pb-0 lg:grid-cols-4"
             tabIndex={0}
@@ -352,6 +375,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {intro || features.length > 0 ? (
               <section
                 aria-labelledby="landing-intro"
+                data-eb-section="intro"
                 style={{ order: sections.indexOf("intro") }}
                 className="min-w-0 sm:px-5 sm:first:pl-0"
               >
@@ -399,6 +423,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {offers ? (
               <section
                 aria-labelledby="landing-offers"
+                data-eb-section="offers"
                 style={{ order: sections.indexOf("offers") }}
                 className="min-w-0 sm:px-5"
               >
@@ -438,6 +463,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {info ? (
               <section
                 aria-labelledby="landing-info"
+                data-eb-section="infoGrid"
                 style={{ order: sections.indexOf("info") }}
                 className="min-w-0 sm:px-5"
               >
@@ -466,6 +492,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
             {territory ? (
               <section
                 aria-labelledby="landing-territory"
+                data-eb-section="map"
                 style={{ order: sections.indexOf("territory") }}
                 className="min-w-0 sm:px-5 sm:last:pr-0"
               >
@@ -536,7 +563,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
       {/* ── 4 · Banda Alux (sólo si no hay cuerpo editorial que la absorba) ── */}
       {alux && !aluxColumn ? (
-        <div className={cn(SHELL, "mt-6 sm:mt-8")}>
+        <div className={cn(SHELL, "mt-6 sm:mt-8")} data-eb-section="aluxPlanner">
           <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 sm:flex-row sm:items-center sm:gap-5 sm:px-6">
             <AluxMark
               family="avatar"
@@ -566,7 +593,7 @@ export function SeoLandingSurface({ vm }: { vm: SeoLandingSurfaceVM }) {
 
       {/* Galería complementaria (sólo si el CMS la pobló). */}
       {gallery.length > 0 ? (
-        <div className={cn(SHELL, "mt-6")}>
+        <div className={cn(SHELL, "mt-6")} data-eb-section="gallery">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {gallery.slice(0, 4).map((img) => (
               <figure

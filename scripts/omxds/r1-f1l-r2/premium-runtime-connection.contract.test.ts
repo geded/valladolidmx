@@ -441,9 +441,9 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const breadcrumb = read("src/components/layout/BreadcrumbTerritorial.tsx");
 
     expect(breadcrumb).toContain("flex-col items-stretch");
-    expect(breadcrumb).toContain("lg:flex-row");
+    expect(breadcrumb).toContain("sm:flex-row");
     expect(breadcrumb).toContain("w-full min-w-0");
-    expect(breadcrumb).toContain("lg:w-auto");
+    expect(breadcrumb).toContain("sm:w-auto");
   });
 
   test("todas las familias aprobadas conservan breadcrumb, Alux y conexión productiva", () => {
@@ -579,10 +579,12 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(wrapper).toContain("titleOverride={titleOverride}");
     expect(wrapper).toContain("subtitleOverride={subtitleOverride}");
     expect(wrapper).toContain("facets={facets}");
-    expect(territorial).toContain("titleOverride?.trim() || baseProfile.title");
+    // El título territorializa el perfil base cuando no hay override editorial.
+    expect(territorial).toContain("titleOverride?.trim() || territorialize(baseProfile.title");
     expect(territorial).toContain("subtitleOverride?.trim() || baseProfile.description");
     expect(territorial).toContain("facet.extract(item.source) !== selected");
-    expect(route).toContain("facets={tipoFacet ? [tipoFacet] : []}");
+    expect(route).toContain("<ListingPremiumSurfaceFromDTO");
+    expect(territorial).toContain("QueHacerDiscoveryBody");
   });
 
   test("la Home expone enlaces en el constructor y convierte las acciones visibles en navegación", () => {
@@ -656,7 +658,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     const cmsPreview = read("src/routes/_authenticated/cms/eventos.$eventId.portada-preview.tsx");
     const lovablePreview = read("src/routes/lovable/g4-event-premium-preview.tsx");
 
-    expect(publicRoute).toContain("<EventPremiumSurface event={event} />");
+    expect(publicRoute).toContain("<EventPremiumSurface event={event}");
     expect(publicRoute).not.toContain("EventSurfaceContractBoundary");
     expect(publicRoute).not.toContain("getOmxdsSurfaceContractsFlag");
     expect(cmsPreview).toContain("<EventPremiumSurface");
@@ -685,7 +687,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(studio).toContain('previewMode && pageType === "home"');
     expect(studio).toContain("pageType={pageType}");
     expect(studio).toContain("tree={renderedTree}");
-    expect(publicRoute).toContain("pickFirstMediaUrl(authorityTree)");
+    expect(publicRoute).toContain("pickFirstMediaUrl(stableAuthorityTree)");
     expect(publicRoute).not.toContain("pickFirstMediaUrl(published.snapshot)");
     expect(authority).toContain("root: { children: [premiumNode] }");
     expect(authority).toContain("chrome: snapshot.chrome");
@@ -723,8 +725,8 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(root).toContain('import("@/pwa/sync-runner")');
     expect(root).not.toContain('from "@/pwa/register-sw"');
     expect(root).not.toContain('from "@/pwa/sync-runner"');
-    expect(vite).toContain('outDir: ".output/public"');
-    expect(vite).toContain('additionalManifestEntries: [{ url: "/offline"');
+    expect(vite).toContain('outDir: "dist/client"');
+    expect(vite).toContain('{ url: "/offline.html"');
     expect(vite).toContain('"assets/{index,client,styles,PublicShell,HomePremiumSurface}-*.*"');
     expect(vite).not.toContain('globPatterns: ["**/*.{js,css');
     expect(vite).not.toContain('cacheName: "static-assets"');
@@ -732,20 +734,26 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
 
   test("Home conserva la jerarquía de Marca e Inspiración alrededor de las rutas", () => {
     const surface = read("src/components/home-premium/HomePremiumSurface.tsx");
-    const territory = surface.indexOf('data-home-journey="territory"');
-    const categories = surface.indexOf('data-home-journey="categories"');
-    const routes = surface.indexOf('data-home-journey="routes"');
-    const alux = surface.indexOf('data-home-journey="alux"');
-    const travelPlan = surface.indexOf('data-home-journey="travel-plan"');
-    const remaining = surface.indexOf("remainingDiscoveryOrder.map");
+    const content = read("src/components/home-premium/home-premium-content.ts");
+    const orderStart = content.indexOf("export const HOME_PREMIUM_DEFAULT_ORDER");
+    const defaultOrder = content.slice(orderStart, content.indexOf("];", orderStart));
+    const territory = defaultOrder.indexOf('"destinos"');
+    const categories = defaultOrder.indexOf('"categorias"');
+    const routes = defaultOrder.indexOf('"rutas"');
+    const alux = defaultOrder.indexOf('"alux"');
+    const travelPlan = defaultOrder.indexOf('"travelPlan"');
 
+    // Alux abre el recorrido; después Territorio → Categorías → Rutas →
+    // Mi Viaje y al final el resto del descubrimiento.
     expect(territory).toBeGreaterThan(-1);
+    expect(alux).toBeGreaterThan(-1);
+    expect(alux).toBeLessThan(territory);
     expect(territory).toBeLessThan(categories);
     expect(categories).toBeLessThan(routes);
-    expect(routes).toBeLessThan(alux);
-    expect(alux).toBeLessThan(travelPlan);
-    expect(travelPlan).toBeLessThan(remaining);
-    expect(surface).toContain('key !== "destinos" && key !== "rutas"');
+    expect(routes).toBeLessThan(travelPlan);
+    expect(surface).toContain("presentationOrder.map");
+    expect(surface).toContain('data-eb-section="alux"');
+    expect(surface).toContain('data-eb-section="travelPlan"');
     expect(surface).toContain('heroVariant === "editorial"');
     expect(surface).toContain("useHeroAutoplay(content.hero.slides.length, setIndex)");
   });
@@ -774,7 +782,7 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     );
     const card = read("src/components/experience-builder/tourism-card/TourismCard.tsx");
 
-    expect(business).toContain("`Explora cerca de ${b.display_name}`");
+    expect(business).toContain("fillBusinessCopy(copy.relatedHeading, b.display_name)");
     expect(business).toContain('id: "cerca-del-perfil"');
     expect(business).toContain("maxItems: 4");
     expect(business).toContain('density: usesApprovedFamilyTemplate ? "compact" : "comfortable"');
@@ -783,13 +791,17 @@ describe("G8-R1-F1L-R2 · conexiones premium runtime", () => {
     expect(business).toContain("sourceBusiness.category_family_key");
     expect(business).toContain("sourceBusiness.category_slug");
     expect(business).toContain("activeContract?.family");
-    expect(business).toContain("const usesApprovedFamilyTemplate = approvedFamily !== null");
+    // Toda ficha usa ya la plantilla Premium aprobada de su familia.
+    expect(business).toContain("const usesApprovedFamilyTemplate = true");
     expect(business).toContain('hoteles: "hotel"');
     expect(business).toContain('restaurantes: "restaurant"');
     expect(business).toContain('"casas-de-vacaciones": "vacation_rental"');
-    expect(business).toContain("{usesApprovedFamilyTemplate ? (");
-    expect(collection).toContain('"min-w-[210px] max-w-[240px] sm:min-w-[230px]"');
-    expect(card).toContain('caps.compact ? "aspect-[16/9] max-h-36"');
+    expect(business).toContain(
+      'presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}',
+    );
+    expect(collection).toContain('"min-w-[190px] max-w-[240px] sm:min-w-[230px]"');
+    expect(card).toContain("caps.compact");
+    expect(card).toContain('"aspect-[16/9] max-h-36"');
   });
 
   test("el CMS administra identidad y paleta global con contraste y vista previa", () => {
