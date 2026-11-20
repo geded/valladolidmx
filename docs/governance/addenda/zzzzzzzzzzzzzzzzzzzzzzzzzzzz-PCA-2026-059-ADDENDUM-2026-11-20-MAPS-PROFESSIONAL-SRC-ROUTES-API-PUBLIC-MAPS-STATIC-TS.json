@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-MAPS-PROFESSIONAL-SRC-ROUTES-API-PUBLIC-MAPS-STATIC-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Revisa, vamos a dejar los mapas presentables y profesionales, pues es algo que los viajeros se fijan mucho») para armonizar la presentación de los mapas: imagen fija con la paleta de marca y sin rótulos comerciales de Google, campo abierto en crema claro, pines más pequeños en listados con muchos lugares y acercamiento de contexto en la ubicación de fichas, sin cambiar estructura, orden, contenido CMS, rutas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/api/public/maps/static.ts",
+    "previous_sha256": "e07df6f7ecd5ccaea3aff704c3d7c1190174878c1ec10a07b7cc78d6b9f37321",
+    "current_sha256": "907e808e514168baf8f6ccb68a710323ee484e7844bb5e8aa053fde168a3e25f",
+    "semantic_change": "Delta de presentación de mapas: la imagen fija usa la cartografía de marca y pines oro/selva, el campo abierto del mapa interactivo es crema claro, los listados con más de 12 lugares usan pines más pequeños y la ubicación de fichas abre con acercamiento 14 para dar contexto. Sin cambios de estructura, orden, datos CMS, proveedor ni otras secciones.",
+    "authority": "Founder · mapas presentables y profesionales · 2026-11-20"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Los mapas conservan proveedor, controles, rutas, enlaces «Cómo llegar» y datos; sólo cambia la presentación cartográfica, tamaño de pin y acercamiento inicial.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

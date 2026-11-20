@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-094",
+  "title": "Mapas · presentación profesional en toda la plataforma",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Revisa, vamos a dejar los mapas presentables y profesionales, pues es algo que los viajeros se fijan mucho») para armonizar la presentación de los mapas: imagen fija con la paleta de marca y sin rótulos comerciales de Google, campo abierto en crema claro, pines más pequeños en listados con muchos lugares y acercamiento de contexto en la ubicación de fichas, sin cambiar estructura, orden, contenido CMS, rutas, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/maps/BusinessLocationBlock.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/api/public/maps/static.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/maps/BusinessLocationBlock.tsx",
+      "sha256": "75dfc6f7ec696f93e554ab2fb0fd91afee4ecc0561287b6cf566fc21004ef89e",
+      "authority": "Founder · mapas presentables y profesionales · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/api/public/maps/static.ts",
+      "sha256": "907e808e514168baf8f6ccb68a710323ee484e7844bb5e8aa053fde168a3e25f",
+      "authority": "Founder · mapas presentables y profesionales · 2026-11-20"
+    }
+  ],
+  "public_routes": ["/", "/oriente-maya", "/oriente-maya/valladolid", "/hoteles", "/restaurantes"],
+  "required_feature_flags": [],
+  "required_tests": ["bun test ./scripts/maps/map-fallback.contract.test.tsx"]
+}

@@ -107,7 +107,7 @@
     },
     {
       "path": "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
-      "sha256": "e122f78cf473ee65718a85a868eb6947e23b375063e4df6dcd875ae87ef4bd3a"
+      "sha256": "618d8a6f2c3d5d0a8b31ec05044789371fcd9dd7bdbd7d91eb2f6abf3f8b0ad0"
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
@@ -123,7 +123,7 @@
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "63e29ee6f27fb36633b92836fe2bcc6d6470f9590440ee88a21209230f566ae4"
+      "sha256": "490d9caf6f3effc2b453200daa2054db51fbcc768a85bc981c1150e5061e7369"
     }
   ]
 }

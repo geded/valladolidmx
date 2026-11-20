@@ -85,7 +85,8 @@ function getBrandMapStyles() {
     {
       featureType: "landscape.natural",
       elementType: "geometry",
-      stylers: [{ color: mixHex(secondary, territory, 0.12) }],
+      /* Campo abierto en crema claro: el monte deja de verse gris oliva. */
+      stylers: [{ color: mixHex(secondary, territory, 0.04) }],
     },
     {
       featureType: "landscape.man_made",
@@ -95,7 +96,7 @@ function getBrandMapStyles() {
     {
       featureType: "poi",
       elementType: "geometry",
-      stylers: [{ color: mixHex(secondary, territory, 0.16) }],
+      stylers: [{ color: mixHex(secondary, territory, 0.1) }],
     },
     /* Ruido comercial fuera, contexto territorial dentro: se ocultan los
        rótulos de negocios y se conservan los de sitios de interés, parques y
@@ -411,6 +412,11 @@ export function InteractiveMap({
             }
           });
         }
+        /* Listados con muchos lugares (p. ej. 30 hoteles en el centro): pines
+           más pequeños para que no se amontonen; mismo diseño y letra. */
+        const dense = list.length > 12;
+        const pinW = dense ? 22 : MARKER_W;
+        const pinH = dense ? 28 : MARKER_H;
         list.forEach((m, i) => {
           const selected = typeof m.order === "number" && m.order > 0;
           const label = selected ? String(m.order) : labelForIndex(i);
@@ -421,8 +427,8 @@ export function InteractiveMap({
             zIndex: selected ? 20 : 10,
             icon: {
               url: markerIconDataUri(label, selected),
-              scaledSize: new google.maps.Size(MARKER_W, MARKER_H),
-              anchor: new google.maps.Point(MARKER_W / 2, MARKER_H - 2),
+              scaledSize: new google.maps.Size(pinW, pinH),
+              anchor: new google.maps.Point(pinW / 2, pinH - 2),
             },
           });
           if (m.key) {

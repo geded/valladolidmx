@@ -26,13 +26,39 @@ const Query = z.object({
 // Marker adicional: "kind:LABEL:lat,lng" o "kind:lat,lng" (legacy).
 const MARKER_RE =
   /^(poi|business|product|event|destination)(?::([A-Z0-9]))?:(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
+/* Pines con la paleta de marca (oro / selva), igual que el mapa interactivo. */
 const MARKER_COLORS: Record<string, string> = {
-  business: "0x0d5c46",
+  business: "0xeaa840",
   product: "0xd97706",
   event: "0x7c3aed",
-  destination: "0xdc2626",
-  poi: "0x0d5c46",
+  destination: "0x234933",
+  poi: "0xeaa840",
 };
+
+/* Cartografía territorial Valladolid.mx para la imagen fija: misma paleta
+   crema / selva / oro del mapa interactivo y sin rótulos comerciales,
+   médicos ni escolares de Google que compiten con nuestras paradas. */
+const BRAND_STATIC_STYLES = [
+  "element:geometry|color:0xece4d3",
+  "element:labels.text.fill|color:0x234933",
+  "element:labels.text.stroke|color:0xffffff",
+  "feature:administrative|element:geometry.stroke|color:0xb4b9a6",
+  "feature:landscape.natural|element:geometry|color:0xe4dece",
+  "feature:landscape.man_made|element:geometry|color:0xf6f3eb",
+  "feature:poi|element:geometry|color:0xd8d5c3",
+  "feature:poi.business|element:labels|visibility:off",
+  "feature:poi.medical|element:labels|visibility:off",
+  "feature:poi.school|element:labels|visibility:off",
+  "feature:poi.park|element:geometry|color:0xbcbfad",
+  "feature:road|element:geometry|color:0xffffff",
+  "feature:road|element:geometry.stroke|color:0xc4c5b3",
+  "feature:road.highway|element:geometry|color:0xeaa840",
+  "feature:road.highway|element:geometry.stroke|color:0xb8903d",
+  "feature:road.highway|element:labels.text.fill|color:0x234933",
+  "feature:transit|element:labels|visibility:off",
+  "feature:water|element:geometry|color:0x8fc4cf",
+  "feature:water|element:labels.text.fill|color:0x057c94",
+];
 
 export const Route = createFileRoute("/api/public/maps/static")({
   server: {
@@ -59,8 +85,9 @@ export const Route = createFileRoute("/api/public/maps/static")({
         gw.searchParams.set("scale", String(scale));
         gw.searchParams.set("format", format);
         gw.searchParams.set("maptype", "roadmap");
+        for (const style of BRAND_STATIC_STYLES) gw.searchParams.append("style", style);
         if (rawMarkers.length === 0) {
-          gw.searchParams.append("markers", `color:red|size:mid|${lat},${lng}`);
+          gw.searchParams.append("markers", `color:${MARKER_COLORS.poi}|size:mid|${lat},${lng}`);
         } else {
           // Un `markers=` por pin para preservar la etiqueta individual.
           for (const raw of rawMarkers) {

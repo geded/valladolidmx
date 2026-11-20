@@ -76,6 +76,7 @@ export function BusinessLocationBlock({
               lat={lat}
               lng={lng}
               markerTitle={name}
+              zoom={14}
               className={
                 stacked
                   ? "h-[320px] w-full rounded-2xl border border-border sm:h-[420px] lg:h-[480px]"
@@ -87,7 +88,7 @@ export function BusinessLocationBlock({
           <StaticMap
             lat={lat}
             lng={lng}
-            zoom={15}
+            zoom={14}
             width={640}
             height={360}
             alt={`Mapa de ${name}`}
