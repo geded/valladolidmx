@@ -15,6 +15,13 @@
       "when": 1795183947948,
       "tag": "0001_alux_google_place_link_events",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795211248529,
+      "tag": "0002_lock_down_definer_functions",
+      "breakpoints": true
     }
   ]
 }
