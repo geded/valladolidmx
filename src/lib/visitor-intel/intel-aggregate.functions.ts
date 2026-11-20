@@ -13,6 +13,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { VisitorEventSchema, type VisitorEvent } from "./events";
+import { readVisitorIntelEvents } from "./event-reads.server";
 import {
   JOURNEY_TRANSITIONS,
   VISITOR_STAGES,
@@ -65,33 +66,16 @@ export const aggregateJourneyIntel = createServerFn({ method: "POST" })
     if (!isAdmin && !isSuper) throw new Response("Forbidden", { status: 403 });
 
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query: any = (supabaseAdmin as any)
-      .schema("visitor_intel")
-      .from("events")
-      .select("subject_id, payload, is_simulation, simulation_run_id")
-      .gte("occurred_at", since);
-    if (data.mode === "real") {
-      query = query.eq("is_simulation", false);
-    } else if (data.mode === "simulation") {
-      query = query.eq("is_simulation", true);
-      if (data.simulation_run_id) {
-        query = query.eq("simulation_run_id", data.simulation_run_id);
-      }
-    } else if (data.mode === "combined" && data.simulation_run_id) {
-      query = query.or(`is_simulation.eq.false,simulation_run_id.eq.${data.simulation_run_id}`);
-    }
-    const { data: rows, error } = (await query) as {
-      data: Array<{ subject_id: string; payload: unknown }> | null;
-      error: unknown;
-    };
-
-    if (error) {
-      console.error("[visitor_intel.intel-aggregate] read failed", error);
-      throw new Response("Read failed", { status: 500 });
-    }
+    const rows = await readVisitorIntelEvents(
+      {
+        since,
+        mode: data.mode === "real" || data.mode === "simulation" || data.mode === "combined"
+          ? data.mode
+          : "all",
+        ...(data.simulation_run_id ? { simulationRunId: data.simulation_run_id } : {}),
+      },
+      "intel-aggregate",
+    );
 
     const activeSubjects = new Set<string>();
     const progressedSubjects = new Set<string>();

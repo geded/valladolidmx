@@ -207,37 +207,29 @@ export function aggregatePageRows(
 }
 
 async function readEvents(since: string, filters: { route_prefix?: string }): Promise<EventRow[]> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query: any = (supabaseAdmin as any)
-    .schema("visitor_intel")
-    .from("events")
-    .select("subject_id, surface, route, locale, payload")
-    .eq("kind", "intent.signal")
-    .gte("occurred_at", since)
-    .limit(20_000);
-  if (filters.route_prefix) {
-    query = query.like("route", `${filters.route_prefix}%`);
-  }
-  const { data, error } = (await query) as { data: EventRow[] | null; error: unknown };
-  if (error) {
-    console.error("[visitor_intel.page-performance] read failed", error);
-    throw new Response("Read failed", { status: 500 });
-  }
-  return data ?? [];
+  const { readVisitorIntelEvents } = await import("./event-reads.server");
+  const rows = await readVisitorIntelEvents(
+    {
+      since,
+      kind: "intent.signal",
+      ...(filters.route_prefix ? { routePrefix: filters.route_prefix } : {}),
+      maxRows: 20_000,
+    },
+    "page-performance",
+  );
+  return rows.map((row) => ({
+    subject_id: row.subject_id,
+    surface: row.surface,
+    route: row.route,
+    locale: row.locale,
+    payload: row.payload,
+  })) as unknown as EventRow[];
 }
 
 /** A1 · Sesiones anónimas nuevas (transición T1) dentro de la ventana. */
 async function readNewSessions(since: string): Promise<number> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { count } = (await (supabaseAdmin as any)
-    .schema("visitor_intel")
-    .from("events")
-    .select("event_id", { count: "exact", head: true })
-    .eq("kind", "journey.transition")
-    .gte("occurred_at", since)) as { count: number | null };
-  return count ?? 0;
+  const { countVisitorIntelEvents } = await import("./event-reads.server");
+  return countVisitorIntelEvents({ since, kind: "journey.transition" }, "page-performance");
 }
 
 /** A7 · Caché corta de lectura; siempre reemplazable por recálculo. */

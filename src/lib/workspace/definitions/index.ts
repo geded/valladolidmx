@@ -924,6 +924,17 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.visitor-intel",
+      workspaceId: "cms",
+      label: "Inteligencia del visitante",
+      icon: BarChart3,
+      to: "/cms/visitor-intel",
+      group: "operacion",
+      order: 10.9,
+      roles: ["super_admin", "admin"],
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.observabilidad",
       workspaceId: "cms",
       label: "Observabilidad",

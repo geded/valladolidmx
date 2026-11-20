@@ -15,6 +15,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { VisitorEventSchema, type VisitorEvent } from "./events";
+import { readVisitorIntelEvents } from "./event-reads.server";
 import { JOURNEY_TRANSITIONS, type JourneyTransitionId } from "./journey";
 import { KPI_CATALOG } from "./kpis";
 
@@ -145,34 +146,7 @@ export const detectJourneyOpportunities = createServerFn({ method: "POST" })
     const currentSince = new Date(now - windowMs).toISOString();
     const previousSince = new Date(now - 2 * windowMs).toISOString();
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: rows, error } = await (
-      supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            select: (c: string) => {
-              gte: (
-                c: string,
-                v: string,
-              ) => Promise<{
-                data: Array<{ occurred_at: string; payload: unknown }> | null;
-                error: unknown;
-              }>;
-            };
-          };
-        };
-      }
-    )
-      .schema("visitor_intel")
-      .from("events")
-      .select("occurred_at, payload")
-      .gte("occurred_at", previousSince);
-
-    if (error) {
-      console.error("[visitor_intel.opportunities] read failed", error);
-      throw new Response("Read failed", { status: 500 });
-    }
+    const rows = await readVisitorIntelEvents({ since: previousSince }, "opportunities");
 
     const current = emptyAggregate();
     const previous = emptyAggregate();

@@ -15,6 +15,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { VisitorEventSchema, type VisitorEvent } from "./events";
+import { readVisitorIntelEvents } from "./event-reads.server";
 import { projectVisitorState, type ProjectedVisitorState } from "./projection";
 
 const InputSchema = z.object({ subject_id: z.string().min(1) });
@@ -36,36 +37,7 @@ export const projectVisitorStateFromDb = createServerFn({ method: "POST" })
       throw new Response("Forbidden", { status: 403 });
     }
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await (
-      supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            select: (cols: string) => {
-              eq: (
-                col: string,
-                val: string,
-              ) => {
-                order: (
-                  col: string,
-                  opts: { ascending: boolean },
-                ) => Promise<{ data: Array<{ payload: unknown }> | null; error: unknown }>;
-              };
-            };
-          };
-        };
-      }
-    )
-      .schema("visitor_intel")
-      .from("events")
-      .select("payload")
-      .eq("subject_id", data.subject_id)
-      .order("occurred_at", { ascending: true });
-
-    if (error) {
-      console.error("[visitor_intel.projection] read failed", error);
-      throw new Response("Read failed", { status: 500 });
-    }
+    const rows = await readVisitorIntelEvents({ subjectId: data.subject_id }, "projection");
 
     const events: VisitorEvent[] = [];
     for (const r of rows ?? []) {

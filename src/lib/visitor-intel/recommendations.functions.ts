@@ -25,6 +25,7 @@ import {
   type RecommendationLifecycleStatus,
 } from "./events";
 import { loadDecisionProjection } from "./decision-projection.server";
+import { readVisitorIntelEvents } from "./event-reads.server";
 import {
   MIN_FAMILY_SIGNAL,
   projectFamilyLearningSignals,
@@ -120,21 +121,16 @@ export const recordRecommendationLifecycleEvent = createServerFn({ method: "POST
       payload: data.event,
       retention_bucket: "R_24M",
     };
+    // `visitor_intel` no está expuesto en la Data API: misma función interna
+    // idempotente que la ingesta (ON CONFLICT DO NOTHING).
     const { error } = await (
       supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            upsert: (
-              r: Record<string, unknown>,
-              o: { onConflict: string; ignoreDuplicates: boolean },
-            ) => Promise<{ error: { code?: string; message: string } | null }>;
-          };
-        };
+        rpc: (
+          fn: string,
+          args: { p_row: Record<string, unknown> },
+        ) => Promise<{ error: { code?: string; message: string } | null }>;
       }
-    )
-      .schema("visitor_intel")
-      .from("events")
-      .upsert(row, { onConflict: "event_id", ignoreDuplicates: true });
+    ).rpc("visitor_intel_ingest_event", { p_row: row });
     if (error && error.code !== "23505") {
       console.error("[visitor_intel.recommendations] insert failed", error);
       throw new Response("Insert failed", { status: 500 });
@@ -161,40 +157,10 @@ export const aggregateRecommendationValidation = createServerFn({ method: "POST"
     if (!isAdmin && !isSuper) throw new Response("Forbidden", { status: 403 });
 
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: rows, error } = await (
-      supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            select: (c: string) => {
-              eq: (
-                c: string,
-                v: string,
-              ) => {
-                gte: (
-                  c: string,
-                  v: string,
-                ) => Promise<{
-                  data: Array<{ occurred_at: string; payload: unknown }> | null;
-                  error: unknown;
-                }>;
-              };
-            };
-          };
-        };
-      }
-    )
-      .schema("visitor_intel")
-      .from("events")
-      .select("occurred_at, payload")
-      .eq("kind", "recommendation.lifecycle")
-      .gte("occurred_at", since);
-
-    if (error) {
-      console.error("[visitor_intel.recommendations] read failed", error);
-      throw new Response("Read failed", { status: 500 });
-    }
+    const rows = await readVisitorIntelEvents(
+      { since, kind: "recommendation.lifecycle" },
+      "recommendations",
+    );
 
     const records = new Map<string, RecommendationRecord>();
     for (const r of rows ?? []) {

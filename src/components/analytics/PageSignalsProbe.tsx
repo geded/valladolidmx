@@ -5,7 +5,8 @@
  *  · `page_view` al entrar a una página y `page_engaged` al leer más de la mitad;
  *  · inicio de sesión anónima (T1 Extraño → Anónimo), una vez por sesión;
  *  · exploración profunda (varias superficies o permanencia), una vez por sesión;
- *  · primera intención anónima (guardar o agregar a Mi Viaje), una vez por sesión.
+ *  · primera intención anónima (guardar o agregar a Mi Viaje), una vez por sesión;
+ *  · invitación a registrarse mostrada, una vez por motivo y sesión.
  *
  * Respeta la pausa de personalización y jamás envía datos personales.
  */
@@ -16,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { emitPageSignal } from "@/lib/visitor-intel/page-signals";
 import {
   trackFirstIntent,
+  trackRegistrationPrompt,
   trackSessionStart,
   trackSurfaceVisited,
 } from "@/lib/visitor-intel/session-signals";
@@ -86,6 +88,31 @@ export function PageSignalsProbe() {
 
     return () => {
       cancelled = true;
+    };
+  }, [isAuthenticated]);
+
+  // Invitación a registrarse: se escucha el canal existente de acciones
+  // protegidas, sin tocar la ventana de registro ni sus botones.
+  useEffect(() => {
+    if (typeof window === "undefined" || isAuthenticated) return;
+    let unsubscribe: (() => void) | null = null;
+    let cancelled = false;
+    void import("@/lib/protected-actions/observability").then((mod) => {
+      if (cancelled) return;
+      unsubscribe = mod.subscribeProtectedActionEvents((event, meta) => {
+        if (event !== "protected_action.gated") return;
+        void trackRegistrationPrompt({
+          pathname: window.location.pathname,
+          isAuthenticated: false,
+          locale: document.documentElement.lang || undefined,
+          kind: meta.kind,
+          ...(meta.reason ? { reason: meta.reason } : {}),
+        });
+      });
+    });
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
     };
   }, [isAuthenticated]);
 

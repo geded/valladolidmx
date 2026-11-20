@@ -10215,7 +10215,41 @@ export type Database = {
           scope_type: string
         }[]
       }
+      visitor_intel_append_decision_event: {
+        Args: { _event: Json; _expected_from_state: string }
+        Returns: string
+      }
+      visitor_intel_count_events: {
+        Args: { _kind?: string; _since?: string }
+        Returns: number
+      }
       visitor_intel_ingest_event: { Args: { p_row: Json }; Returns: boolean }
+      visitor_intel_read_events: {
+        Args: {
+          _kind?: string
+          _limit?: number
+          _mode?: string
+          _offset?: number
+          _route_prefix?: string
+          _simulation_run_id?: string
+          _since?: string
+          _subject_id?: string
+          _subject_prefix?: string
+        }
+        Returns: {
+          event_id: string
+          ingested_at: string
+          is_simulation: boolean
+          kind: string
+          locale: string
+          occurred_at: string
+          payload: Json
+          route: string
+          simulation_run_id: string
+          subject_id: string
+          surface: string
+        }[]
+      }
       withdraw_business_review: {
         Args: { _business_id: string; _notes?: string }
         Returns: undefined

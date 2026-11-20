@@ -255,6 +255,82 @@ export async function trackFirstIntent(
   return publish(event, input.isAuthenticated);
 }
 
+/**
+ * A4 · Invitación a registrarse mostrada (AC1.4). Un hito por motivo y
+ * sesión; sólo tipo y motivo, nunca datos personales.
+ */
+const PROMPTS_KEY = "vmx.visitor.prompts.v1";
+
+export function registrationPromptTarget(kind: string, reason?: string): string {
+  const clean = (v: string) => v.replace(/[^a-z0-9_.:-]/gi, "").slice(0, 48) || "default";
+  return `${clean(kind)}:${clean(reason ?? "default")}`;
+}
+
+export async function trackRegistrationPrompt(
+  input: EmitBase & { kind: string; reason?: string },
+): Promise<boolean> {
+  if (typeof window === "undefined" || input.isAuthenticated) return false;
+  const target = registrationPromptTarget(input.kind, input.reason);
+  let seen: string[] = [];
+  try {
+    seen = JSON.parse(window.sessionStorage.getItem(PROMPTS_KEY) ?? "[]") as string[];
+    if (!Array.isArray(seen)) seen = [];
+  } catch {
+    seen = [];
+  }
+  if (seen.includes(target)) return false;
+
+  const now = Date.now();
+  const { memory, route, surface, common } = baseEvent(input, now);
+  if (memory.personalization === "paused") return false;
+  try {
+    window.sessionStorage.setItem(PROMPTS_KEY, JSON.stringify([...seen, target].slice(-20)));
+  } catch {
+    /* sin almacenamiento ⇒ puede repetirse en la sesión */
+  }
+
+  const event = {
+    ...common,
+    kind: "intent.signal",
+    context: { surface, route },
+    intent: {
+      action: "registration_prompt_shown",
+      target_type: "registration",
+      target_id: target,
+      strength: 0.6,
+    },
+  } as unknown as VisitorEvent;
+  return publish(event, false);
+}
+
+/**
+ * A5 · Registro: transición T2 Anónimo → Identificado. El llamador la emite
+ * una sola vez, cuando el servidor confirma que la cuenta es nueva. El sujeto
+ * es el mismo id seudónimo del recorrido anónimo, sin datos personales.
+ */
+export async function trackIdentified(
+  input: Omit<EmitBase, "isAuthenticated"> & { hadSavedTrip: boolean },
+): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const now = Date.now();
+  const { memory, route, surface, common } = baseEvent({ ...input, isAuthenticated: true }, now);
+  if (memory.personalization === "paused") return false;
+
+  const event = {
+    ...common,
+    kind: "journey.transition",
+    context: { surface, route },
+    transition: {
+      id: "T2_anonymous_to_identified",
+      from: "anonymous",
+      to: "identified",
+      attributed_action: "visitor.identified",
+      influencing_capabilities: input.hadSavedTrip ? ["ac1_moments"] : [],
+    },
+  } as unknown as VisitorEvent;
+  return publish(event, true);
+}
+
 /** Sólo para pruebas: reinicia el estado de sesión del navegador. */
 export function __resetVisitorSession(): void {
   if (typeof window === "undefined") return;

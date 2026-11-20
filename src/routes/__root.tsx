@@ -66,6 +66,12 @@ const AnonymousDraftImportRunner = React.lazy(() =>
     default: m.AnonymousDraftImportRunner,
   })),
 );
+// Aviso «Nuevo viajero registrado» + paso Anónimo → Identificado del monitor.
+const TravelerSignupNotifier = React.lazy(() =>
+  import("@/components/traveler/TravelerSignupNotifier").then((m) => ({
+    default: m.TravelerSignupNotifier,
+  })),
+);
 // Monitor de usuarios · M1 — sonda de señales de página (no pinta nada).
 const PageSignalsProbe = React.lazy(() =>
   import("@/components/analytics/PageSignalsProbe").then((m) => ({
@@ -496,6 +502,9 @@ function RootComponent() {
             </React.Suspense>
             <React.Suspense fallback={null}>
               <AnonymousDraftImportRunner />
+            </React.Suspense>
+            <React.Suspense fallback={null}>
+              <TravelerSignupNotifier />
             </React.Suspense>
             {/*
           Navigation Blueprint · N3 — Único punto de suscripción global

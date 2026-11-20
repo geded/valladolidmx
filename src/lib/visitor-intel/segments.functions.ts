@@ -21,6 +21,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 import { VisitorEventSchema, type VisitorEvent } from "./events";
+import { readVisitorIntelEvents } from "./event-reads.server";
 import { JOURNEY_TRANSITIONS, type JourneyTransitionId } from "./journey";
 
 export const SEGMENT_SNAPSHOT_CONTRACT_VERSION = "1.0.0" as const;
@@ -128,34 +129,7 @@ export const aggregateJourneySegments = createServerFn({ method: "POST" })
     }
 
     const since = new Date(Date.now() - data.window_days * 86_400_000).toISOString();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: rows, error } = await (
-      supabaseAdmin as unknown as {
-        schema: (s: string) => {
-          from: (t: string) => {
-            select: (c: string) => {
-              gte: (
-                c: string,
-                v: string,
-              ) => Promise<{
-                data: Array<{ subject_id: string; payload: unknown }> | null;
-                error: unknown;
-              }>;
-            };
-          };
-        };
-      }
-    )
-      .schema("visitor_intel")
-      .from("events")
-      .select("subject_id, payload")
-      .gte("occurred_at", since);
-
-    if (error) {
-      console.error("[visitor_intel.segments] read failed", error);
-      throw new Response("Read failed", { status: 500 });
-    }
+    const rows = await readVisitorIntelEvents({ since }, "segments");
 
     // Baseline global + por bucket.
     const globalActive = new Set<string>();

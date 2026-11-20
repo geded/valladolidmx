@@ -102,15 +102,13 @@ type AuthContext = {
 };
 
 type DecisionAdminClient = {
-  schema: (schema: string) => {
-    rpc: (
-      fn: string,
-      args: { _event: unknown; _expected_from_state: string | null },
-    ) => Promise<{
-      data: string | null;
-      error: { code?: string; message: string } | null;
-    }>;
-  };
+  rpc: (
+    fn: string,
+    args: { _event: unknown; _expected_from_state: string | null },
+  ) => Promise<{
+    data: string | null;
+    error: { code?: string; message: string } | null;
+  }>;
 };
 
 export interface DecisionAssignableOwner {
@@ -168,9 +166,11 @@ async function appendDecisionEvent(
   const eventId = crypto.randomUUID();
   const event = buildDecisionLifecycleEvent({ event_id: eventId, payload });
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await (supabaseAdmin as unknown as DecisionAdminClient)
-    .schema("visitor_intel")
-    .rpc("append_decision_event", {
+  // `visitor_intel` no está expuesto en la Data API: envoltura pública
+  // (sólo service_role) de `visitor_intel.append_decision_event`.
+  const { data, error } = await (supabaseAdmin as unknown as DecisionAdminClient).rpc(
+    "visitor_intel_append_decision_event",
+    {
       _event: event,
       _expected_from_state: expectedFromState,
     });
