@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-093",
+  "title": "Mapas · recorrido completo en celular y pines compactos",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («los mapas no se ven bien en celular y no puedo ver más que la parte que se fija al entrar, los indicadores de los destinos se ven también muy grandes, hay que ponerlos más profesionales y elegantes») para que el mapa de la ruta del Home quepa completo en su marco en celular y tableta y los pines compartidos sean más compactos y sobrios, sin cambiar estructura, orden, contenido CMS, rutas, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/maps/InteractiveMap.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx",
+      "sha256": "a25f5d985eefe57c73066148bd7c019cbfd0a749b946535ebc75287a505096d0",
+      "authority": "Founder · mapas legibles en celular y pines compactos · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "b777dcba12555a853f3e9f44dbf2e98f0739ed371ce9045ec6b27b301162f4d4",
+      "authority": "Founder · mapas legibles en celular y pines compactos · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/maps/InteractiveMap.tsx",
+      "sha256": "fdf0393c31c005b48fb95083d8221b31dea69cd514b178e483994d40dd92b396",
+      "authority": "Founder · mapas legibles en celular y pines compactos · 2026-11-20"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": ["bun test ./scripts/maps/map-fallback.contract.test.tsx"]
+}

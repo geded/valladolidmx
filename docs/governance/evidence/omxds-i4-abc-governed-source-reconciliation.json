@@ -43,23 +43,23 @@
   "artifacts": [
     {
       "path": "src/lib/catalog/marketplace-reads.functions.ts",
-      "sha256": "fb4e4e4a836a00a2aef5690f8f932a133d1a08c579de3606ba3d0ba29a518346"
+      "sha256": "ac72d0ea5fd2256bf1ec030080b21d12511f702bb50f9836dc0e19575042b146"
     },
     {
       "path": "src/lib/experience-builder/preview-registry.tsx",
-      "sha256": "1de25f34517b8c7990239711c0d095ce57f5850ef14f94b02d10ac0027e7e0a6"
+      "sha256": "205020a1c42dfb887ddebc46b50321de70bb5b332a7232b96faf60389130a954"
     },
     {
       "path": "src/lib/experience-builder/editorial-builder-policy.ts",
-      "sha256": "b31f96672a241a6df334f47eb4fb9d165717e4bf6122f2d331b4c357c9a64e32"
+      "sha256": "cf84fc7acb6fa26915809c8e04a1bf1b3061326a5d979001ffc4956d35b9be65"
     },
     {
       "path": "src/lib/experience-builder/blocks/experience-info-grid/contract.ts",
-      "sha256": "ac8c465978537ecaa78df6d8a201c72970bc932b8d1b1f3359b949712b3aba46"
+      "sha256": "e2e533e0ef94ee8e7952c4e23903e3f4c0eb46ad05b97656c535563cdee6f03c"
     },
     {
       "path": "src/lib/experience-builder/block-library.ts",
-      "sha256": "3188b9d1c7450398a275d1c6880a7138bcdb9b156fd50334c1f7f52f17f0b49e"
+      "sha256": "91bac6c9b275901a4e5d81e98dcf1b9499a032b2fae52a14415b02522d55849e"
     },
     {
       "path": "src/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGridBlock.tsx",
@@ -67,7 +67,7 @@
     },
     {
       "path": "src/lib/experience-builder/studio.functions.ts",
-      "sha256": "2383b0303cce40a834ce916ef2b37736f878b92391e0e036fdb8bc933f34d8c7"
+      "sha256": "61b84a509892af0a953b1441524eab938ee36ce9e2d516f34b618e205dcf61c0"
     },
     {
       "path": "src/routes/preview/composition.$token.tsx",
@@ -75,11 +75,11 @@
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "e539d1d9b8854c2903e7aa84e08f6f103dca1eebeefc2f1bffe7caaaf7b2a785"
+      "sha256": "2121191e69280374f12cb7b0660a2d9aa7f7a859a2d5d6cb5d9094eac8eb59c7"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-authoring.test.ts",
-      "sha256": "75290dfdd44d9c4db3498c1a1f8de1e333355d68407b6c68424a14b086a68de6"
+      "sha256": "55be28ae341fd03e068128f3dc838319359923d0e9c2b61af08fe176b647e60c"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-reconciliation.test.ts",
@@ -91,7 +91,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "4c6d4966e460c3e76c698caa7447a67461055c81753a0c051c3cdb8f401528df"
+      "sha256": "02679f8d846f29e023c0285a459b4ba1de94c864fe4599af10fe27f2c8fcbae1"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
@@ -107,23 +107,23 @@
     },
     {
       "path": "docs/governance/evidence/omxds-i4-c-preview-concurrency-audit-rollback.json",
-      "sha256": "f0c36a7798b3244e5c4f8c7d7039cff39ef98b2d0b9001e1f046783f18ea9d97"
+      "sha256": "e122f78cf473ee65718a85a868eb6947e23b375063e4df6dcd875ae87ef4bd3a"
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "60ffb246b22e3921ef9b88a16b58ca98f9ad6089ff0d8f01ddf2a7f895a84493"
+      "sha256": "893bee7da618ec7e26760a2973fdefbc7673fda34b29b9fd67f5d9640bdc6bac"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "c99832cab2c34a1c5e82955168a0a2a8d61a2c28673c1b6ccc50b470ed75b531"
+      "sha256": "27490c86ccf0a51e2f25a7e6c9ad67d97e41dd371316ccf7e1229fc46a7907e8"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "8a78b41b5bda5fb44e9ebe0f23aa2e7bf44ae2fd9394638d8efa97e9c0c6bfd7"
+      "sha256": "779055154978aa58de26c347c701075757affb033f7b312293ad62b9664bcbad"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "1164224f943698a02d03adb5aeec55e6618adfb1192ae65a4cfd129d31d79ec7"
+      "sha256": "63e29ee6f27fb36633b92836fe2bcc6d6470f9590440ee88a21209230f566ae4"
     }
   ]
 }

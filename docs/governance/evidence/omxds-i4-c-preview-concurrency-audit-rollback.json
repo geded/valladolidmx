@@ -42,19 +42,19 @@
     },
     {
       "path": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
-      "sha256": "60ffb246b22e3921ef9b88a16b58ca98f9ad6089ff0d8f01ddf2a7f895a84493"
+      "sha256": "893bee7da618ec7e26760a2973fdefbc7673fda34b29b9fd67f5d9640bdc6bac"
     },
     {
       "path": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
-      "sha256": "c99832cab2c34a1c5e82955168a0a2a8d61a2c28673c1b6ccc50b470ed75b531"
+      "sha256": "27490c86ccf0a51e2f25a7e6c9ad67d97e41dd371316ccf7e1229fc46a7907e8"
     },
     {
       "path": "docs/governance/generated/08-KNOWLEDGE-GRAPH.json",
-      "sha256": "8a78b41b5bda5fb44e9ebe0f23aa2e7bf44ae2fd9394638d8efa97e9c0c6bfd7"
+      "sha256": "779055154978aa58de26c347c701075757affb033f7b312293ad62b9664bcbad"
     },
     {
       "path": "docs/governance/generated/GOVERNANCE-ARTIFACT-INVENTORY.json",
-      "sha256": "1164224f943698a02d03adb5aeec55e6618adfb1192ae65a4cfd129d31d79ec7"
+      "sha256": "63e29ee6f27fb36633b92836fe2bcc6d6470f9590440ee88a21209230f566ae4"
     },
     {
       "path": "docs/governance/product-authorizations/PCA-2026-015.json",
@@ -62,7 +62,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "4c6d4966e460c3e76c698caa7447a67461055c81753a0c051c3cdb8f401528df"
+      "sha256": "02679f8d846f29e023c0285a459b4ba1de94c864fe4599af10fe27f2c8fcbae1"
     },
     {
       "path": "scripts/governance/validate-full-suite.mjs",
@@ -70,7 +70,7 @@
     },
     {
       "path": "scripts/omxds/i3/business-premium-surface.evidence.mjs",
-      "sha256": "fe9b34bcaf8a758648b0a37bfa17ebea698b97e670e378f3cbe169c3c890ed42"
+      "sha256": "596d0c1fe2715ce8931362acf1e8b8c570d3c2da12795334e5aa7c34579f2498"
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-preview-concurrency.evidence.mjs",
@@ -78,19 +78,19 @@
     },
     {
       "path": "scripts/omxds/i4/editorial-builder-preview-concurrency.test.ts",
-      "sha256": "170530448e38effed98abbbd091003d13961f16bba3d8fe09c21736ff449c7ed"
+      "sha256": "12a4830bc6fae6867cec3cdb64154e4f87d9bfd47fd2768c8a3dc6576b05ce67"
     },
     {
       "path": "src/components/experience-builder/VisualStudio.tsx",
-      "sha256": "e539d1d9b8854c2903e7aa84e08f6f103dca1eebeefc2f1bffe7caaaf7b2a785"
+      "sha256": "2121191e69280374f12cb7b0660a2d9aa7f7a859a2d5d6cb5d9094eac8eb59c7"
     },
     {
       "path": "src/integrations/supabase/types.ts",
-      "sha256": "afb332ed93e0d23a0ff9cd30eea3024941aead990a345fd2109fa7e165f58335"
+      "sha256": "defd907f8d3b33f5b2cb163e15d0eddcd0a79657a38abb700c6a36fc58cb034d"
     },
     {
       "path": "src/lib/experience-builder/studio.functions.ts",
-      "sha256": "2383b0303cce40a834ce916ef2b37736f878b92391e0e036fdb8bc933f34d8c7"
+      "sha256": "61b84a509892af0a953b1441524eab938ee36ce9e2d516f34b618e205dcf61c0"
     },
     {
       "path": "src/routes/preview/composition.$token.tsx",

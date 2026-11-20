@@ -55,6 +55,8 @@ export interface ExperienceMapBlockProps {
   immersive?: boolean;
   /** Dibuja el recorrido por carretera siguiendo el orden de los puntos. */
   connectByRoad?: boolean;
+  /** Altura del mapa interactivo; por defecto la de la variante elegida. */
+  mapHeightClassName?: string;
 }
 
 export function ExperienceMapBlock({
@@ -63,6 +65,7 @@ export function ExperienceMapBlock({
   interactiveOnly = false,
   immersive = false,
   connectByRoad = false,
+  mapHeightClassName,
 }: ExperienceMapBlockProps) {
   // C2.F1 · Piloto Render-Only. Normalizamos vía defaults render-only
   // (equivalente runtime a `schema.parse` para inputs válidos, ver
@@ -140,6 +143,7 @@ export function ExperienceMapBlock({
                 className={cn(
                   "w-full rounded-2xl border border-border",
                   immersive ? "h-[32rem] shadow-elevated sm:h-[38rem]" : "h-[420px]",
+                  mapHeightClassName,
                 )}
               />
             </Suspense>

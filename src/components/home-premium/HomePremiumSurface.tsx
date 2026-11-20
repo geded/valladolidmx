@@ -1589,6 +1589,9 @@ function MapSection({
           interactiveOnly
           immersive
           connectByRoad={routePoints.length >= 2}
+          /* El mapa cabe completo en su marco (bajo el título): el recorrido y los
+             controles de zoom quedan visibles en celular y tableta. */
+          mapHeightClassName="h-[15rem] sm:h-[22rem] lg:h-[38rem]"
         />
       </div>
     </section>

@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-20-MAPS-COMPACT-PINS-SRC-COMPONENTS-EXPERIENCE-BUILDER-BLOCKS-EXPERIENCE-MAP-EXPERIENCEMAPBLOCK-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («los mapas no se ven bien en celular y no puedo ver más que la parte que se fija al entrar, los indicadores de los destinos se ven también muy grandes, hay que ponerlos más profesionales y elegantes») para que el mapa de la ruta del Home quepa completo en su marco en celular y tableta y los pines compartidos sean más compactos y sobrios, sin cambiar estructura, orden, contenido CMS, rutas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/experience-builder/blocks/experience-map/ExperienceMapBlock.tsx",
+    "previous_sha256": "ceab57407847ada2ccaf1937353860ca8568db3765cdfaff4ad16b5431d56724",
+    "current_sha256": "a25f5d985eefe57c73066148bd7c019cbfd0a749b946535ebc75287a505096d0",
+    "semantic_change": "Delta de presentación: el mapa interactivo del Home toma la altura de su marco en celular y tableta (recorrido y controles visibles), el encuadre usa un margen proporcional en mapas pequeños y los pines/etiquetas compartidos se reducen a una silueta compacta. Sin cambios de estructura, orden, datos CMS ni otras secciones.",
+    "authority": "Founder · mapas legibles en celular y pines compactos · 2026-11-20"
+  },
+  "invariants": [
+    "Home conserva estructura, orden, rutas, Mi Viaje, Alux, header y footer.",
+    "Los mapas conservan proveedor, controles, rutas y datos; sólo cambia tamaño de pin y encuadre.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

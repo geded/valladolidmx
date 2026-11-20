@@ -236,6 +236,10 @@ export interface InteractiveMapProps {
   showMarkerNames?: boolean;
 }
 
+/* Tamaño del pin en pantalla (px CSS). */
+const MARKER_W = 28;
+const MARKER_H = 36;
+
 function labelForIndex(i: number) {
   return String.fromCharCode(65 + (i % 26));
 }
@@ -284,10 +288,12 @@ function markerIconDataUri(letter: string, selected = false): string {
   const { bg, fg, stroke } = getMarkerColors();
   const body = selected ? stroke : bg;
   const ring = selected ? bg : stroke;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="48" viewBox="0 0 40 48">
-    <path d="M20 2C10.6 2 3 9.6 3 19c0 12.4 17 27 17 27s17-14.6 17-27C37 9.6 29.4 2 20 2Z" fill="${body}" stroke="${ring}" stroke-width="2.5"/>
-    <circle cx="20" cy="19" r="10" fill="${ring}" opacity=".92"/>
-    <text x="20" y="23.5" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="${selected ? stroke : fg}">${letter}</text>
+  /* Pin compacto y sobrio: silueta fina, sombra suave y letra discreta. */
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${MARKER_W}" height="${MARKER_H}" viewBox="0 0 28 36">
+    <ellipse cx="14" cy="34.2" rx="4.2" ry="1.3" fill="${stroke}" opacity=".22"/>
+    <path d="M14 1.5C7.4 1.5 2.2 6.6 2.2 13.1c0 8.6 11.8 19.9 11.8 19.9s11.8-11.3 11.8-19.9C25.8 6.6 20.6 1.5 14 1.5Z" fill="${body}" stroke="${ring}" stroke-width="1.4"/>
+    <circle cx="14" cy="13" r="7" fill="${ring}" opacity=".9"/>
+    <text x="14" y="16.4" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="700" letter-spacing=".2" fill="${selected ? stroke : fg}">${letter}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
@@ -297,11 +303,11 @@ function markerNameIconDataUri(text: string): { url: string; width: number; heig
   const { bg, fg, stroke } = getMarkerColors();
   const clean = text.length > 28 ? `${text.slice(0, 27)}…` : text;
   const safe = clean.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const width = Math.max(56, Math.round(clean.length * 7.2) + 20);
-  const height = 26;
+  const width = Math.max(48, Math.round(clean.length * 6.2) + 16);
+  const height = 22;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="${(height - 2) / 2}" fill="${bg}" stroke="${stroke}" stroke-width="1.5" opacity=".97"/>
-    <text x="${width / 2}" y="${height / 2 + 4}" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="${fg}">${safe}</text>
+    <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="${(height - 2) / 2}" fill="${bg}" stroke="${stroke}" stroke-width="1" opacity=".96"/>
+    <text x="${width / 2}" y="${height / 2 + 3.6}" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="${fg}">${safe}</text>
   </svg>`;
   return { url: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`, width, height };
 }
@@ -362,6 +368,10 @@ export function InteractiveMap({
       .then((google) => {
         if (cancelled || !ref.current) return;
         const { markers, routeStops, fitPoints, restriction } = latestRef.current;
+        /* En mapas pequeños (celular) el margen fijo dejaba el recorrido
+           diminuto o fuera de cuadro: se limita a una fracción del lado corto. */
+        const shortSide = Math.min(ref.current.clientWidth, ref.current.clientHeight);
+        const pad = shortSide > 0 ? Math.min(fitPadding, Math.round(shortSide * 0.16)) : fitPadding;
 
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
@@ -411,8 +421,8 @@ export function InteractiveMap({
             zIndex: selected ? 20 : 10,
             icon: {
               url: markerIconDataUri(label, selected),
-              scaledSize: new google.maps.Size(40, 48),
-              anchor: new google.maps.Point(20, 48),
+              scaledSize: new google.maps.Size(MARKER_W, MARKER_H),
+              anchor: new google.maps.Point(MARKER_W / 2, MARKER_H - 2),
             },
           });
           if (m.key) {
@@ -442,9 +452,9 @@ export function InteractiveMap({
         if (focus) {
           const fb = new google.maps.LatLngBounds();
           focus.forEach((p) => fb.extend({ lat: p.lat, lng: p.lng }));
-          map.fitBounds(fb, fitPadding);
+          map.fitBounds(fb, pad);
         } else if (list.length > 1) {
-          map.fitBounds(bounds, fitPadding);
+          map.fitBounds(bounds, pad);
         }
 
         /* Capa de ruta: sólo con la capacidad real del proveedor. */
@@ -468,7 +478,7 @@ export function InteractiveMap({
               strokeOpacity: 1,
               strokeWeight: 6,
             });
-            map.fitBounds(bounds, fitPadding);
+            map.fitBounds(bounds, pad);
             routeStatusRef.current?.({
               mode: "directions",
               distanceMeters: roadRoute.distanceMeters ?? undefined,
@@ -516,7 +526,7 @@ export function InteractiveMap({
               if (status === google.maps.DirectionsStatus.OK && result) {
                 routeUnderlay?.setDirections(result);
                 renderer.setDirections(result);
-                if (isProminentRoute) map.fitBounds(bounds, fitPadding);
+                if (isProminentRoute) map.fitBounds(bounds, pad);
                 const route = (
                   result as {
                     routes?: Array<{
@@ -555,7 +565,7 @@ export function InteractiveMap({
                   ],
                 });
               }
-              map.fitBounds(bounds, isProminentRoute ? fitPadding : 88);
+              map.fitBounds(bounds, isProminentRoute ? pad : Math.min(88, pad));
               if (!isProminentRoute) {
                 routeStatusRef.current?.({ mode: "approximate", providerStatus: status });
               }
