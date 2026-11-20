@@ -482,6 +482,89 @@ export interface AluxConverseCandidate {
   readonly coords: { lat: number; lng: number } | null;
   /** Estado de horario ya calculado en TZ del destino (null si no hay horario). */
   readonly openState: "open" | "closed" | null;
+  /**
+   * Evidencia publicada de que se puede vivir de noche: horario que cierra
+   * tarde o evento que inicia de noche ("yes"), horario que cierra temprano
+   * ("no") o sin dato (null / ausente).
+   */
+  readonly nightFit?: AluxNightFit;
+}
+
+/* ─────────────────────────── Momento del día (noche) ─────────────────────────── */
+export type AluxNightFit = "yes" | "no" | null;
+
+/** Hora a partir de la cual algo cuenta como "de noche" (minutos, hora local). */
+const NIGHT_START_MINUTES = 19 * 60;
+const NIGHT_EVENT_START_HOUR = 18;
+
+/** Señales de noche en el texto publicado (sin acentos). "cenote" no coincide. */
+const NIGHT_TEXT_RE =
+  /\b(noche\w*|nocturn\w*|cena|cenas|cenar|velada\w*|estrellas|anochecer|video ?mapping|mapping|luces)\b/;
+
+function minutesOf(value: string | null | undefined): number | null {
+  if (!value) return null;
+  const m = /^(\d{1,2}):(\d{2})/.exec(value);
+  if (!m) return null;
+  return Number(m[1]) * 60 + Number(m[2]);
+}
+
+/** Evidencia nocturna a partir del horario semanal publicado. */
+export function nightFitFromHours(
+  rows:
+    | readonly { opens_at: string | null; closes_at: string | null; is_closed: boolean | null }[]
+    | undefined,
+): AluxNightFit {
+  if (!rows || rows.length === 0) return null;
+  let known = false;
+  for (const r of rows) {
+    if (r.is_closed) continue;
+    const open = minutesOf(r.opens_at);
+    const close = minutesOf(r.closes_at);
+    if (close === null) continue;
+    known = true;
+    // Cierra después de medianoche o a partir de las 19:00.
+    if ((open !== null && close <= open) || close >= NIGHT_START_MINUTES) return "yes";
+  }
+  return known ? "no" : null;
+}
+
+/** Evidencia nocturna a partir del inicio de un evento (hora local del destino). */
+export function nightFitFromStart(
+  iso: string | null | undefined,
+  timeZone = "America/Merida",
+): AluxNightFit {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", hourCycle: "h23" }).format(d),
+  );
+  if (!Number.isFinite(hour)) return null;
+  return hour >= NIGHT_EVENT_START_HOUR ? "yes" : "no";
+}
+
+/** Familias donde la falta de horario no descarta una opción nocturna. */
+const NIGHT_UNKNOWN_OK: ReadonlySet<AluxConverseFamily> = new Set([
+  "hotel",
+  "casa",
+  "restaurante",
+  "destino",
+]);
+
+/**
+ * ¿La opción respeta el momento del día pedido? Sólo filtra la noche: un lugar
+ * o experiencia sin evidencia publicada de que se viva de noche no se ofrece
+ * cuando el explorador pide "de noche" (ej. un cenote que cierra de día).
+ */
+export function fitsRequestedTimeOfDay(
+  c: Pick<AluxConverseCandidate, "family" | "title" | "summary" | "facts" | "nightFit">,
+  timeOfDay: AluxTravelIntent["timeOfDay"],
+): boolean {
+  if (timeOfDay !== "noche") return true;
+  const text = normalizeText([c.title, c.summary ?? "", ...c.facts.map((f) => f.text)].join(" "));
+  if (NIGHT_TEXT_RE.test(text) || c.nightFit === "yes") return true;
+  if (c.nightFit === "no") return false;
+  return NIGHT_UNKNOWN_OK.has(c.family);
 }
 
 /* ─────────────────────────── Saneamiento anti-inyección ─────────────────────────── */

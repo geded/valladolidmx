@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-089-ADDENDUM-2026-11-20-ALUX-COMFORT-SRC-LIB-ALUX-CONVERSE-FUNCTIONS-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-089",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («haz que sea muy cómodo usar a Alux»): que Alux no ofrezca lugares sin evidencia de visitarse de noche cuando el viajero lo pide (caso «Cenote de noche» → Suytun) y que al responder el hilo se coloque al inicio de la respuesta, sin rediseñar el concierge, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/alux/converse.functions.ts",
+    "previous_sha256": "b7402049bd6dc258ce270eb1b7822ae3e39a52ff79a9214497afe73d1956461f",
+    "current_sha256": "c11e7b0ed92c1af498a39c8fc83c49bd3cf2367e2b4a90bb737fd042674d2fdd",
+    "semantic_change": "Delta localizado en Alux: el hilo se coloca al inicio de cada respuesta y las opciones sin evidencia nocturna se excluyen cuando el viajero pide «de noche». Sin cambios de diseño, contenido CMS ni otras superficies.",
+    "authority": "Founder · Alux cómodo: respuestas al inicio y respeto de «de noche» · 2026-11-20"
+  },
+  "invariants": [
+    "El concierge Alux conserva su diseño, tarjetas, Mi Viaje, resumen de reseñas y navegación.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

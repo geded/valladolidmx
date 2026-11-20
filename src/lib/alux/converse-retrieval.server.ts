@@ -27,6 +27,8 @@ import {
   type AluxCanonicalCandidate,
 } from "./canonical-catalog.server";
 import {
+  nightFitFromHours,
+  nightFitFromStart,
   normalizeText,
   sanitizeCmsText,
   type AluxConverseCandidate,
@@ -373,6 +375,7 @@ async function loadBusinessesFor(
       subtitle: r.categoryName || null,
       coords: coordsBy.get(r.id) ?? null,
       openState: open.state,
+      nightFit: nightFitFromHours(hoursBy.get(r.id)),
     });
   }
   return { candidates, ids, index };
@@ -456,6 +459,7 @@ async function enrichCatalog(
     let family: AluxConverseFamily = "otra";
     let planKind: AluxConverseCandidate["planKind"] = c.planKind;
     let openState: AluxConverseCandidate["openState"] = null;
+    let nightFit: AluxConverseCandidate["nightFit"] = null;
     let subtitle: string | null = c.categoryName;
 
     if (c.entityKind === "place") {
@@ -467,6 +471,7 @@ async function enrichCatalog(
       if (open.label) facts.push(fact(open.label));
       else unavailable.push("horario");
       openState = open.state;
+      nightFit = nightFitFromHours(placeHoursBy.get(c.entityId));
       if (p) {
         const dur = Number(p["visit_duration_minutes"]);
         if (Number.isFinite(dur) && dur > 0) facts.push(fact(`Visita aproximada: ${dur} min`));
@@ -532,7 +537,9 @@ async function enrichCatalog(
       family = "evento";
       planKind = "event";
       const e = eventBy.get(c.entityId);
-      const when = formatWhen(c.startsAt ?? (e ? (e["starts_at"] as string | null) : null));
+      const startsAt = c.startsAt ?? (e ? (e["starts_at"] as string | null) : null);
+      const when = formatWhen(startsAt);
+      nightFit = nightFitFromStart(startsAt, TZ);
       if (when) facts.push(fact(`Fecha: ${when} (hora local)`));
       else unavailable.push("fechas");
       if (e) {
@@ -577,6 +584,7 @@ async function enrichCatalog(
       subtitle,
       coords: c.coords ? { lat: c.coords.lat, lng: c.coords.lng } : null,
       openState,
+      nightFit,
     });
   }
   return out;

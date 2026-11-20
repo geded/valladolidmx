@@ -6,6 +6,8 @@
 - [x] Negocios, lugares, experiencias (reseñas del negocio) y eventos (negocio o sede); en recomendaciones del chat se despliega a petición.
 - [x] Probado: Casa Tía Micha, Zazil Tunich, Cena Romántica (evento y experiencia) y video mapping «Valladolid en la Historia» (Iglesia de San Gervasio).
 - [ ] Landing premium de Zazil Tunich (vista Founder): su panel de Alux aún no está conectado a la ficha; conectarlo cuando la landing sea oficial (espera decisión del Founder).
+- [x] Alux respeta «de noche»: ya no ofrece cenotes o lugares sin evidencia nocturna (caso Suytun).
+- [x] Al responder, Alux se coloca al inicio de la respuesta, no al final de las tarjetas.
 - [ ] Destinos (pueblos) no tienen resumen de reseñas en Google; se queda sin resumen.
 
 ## Revisión automática de gobernanza al día · 2026-11-20

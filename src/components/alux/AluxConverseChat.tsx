@@ -194,10 +194,30 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
     saveThread(messages, understood);
   }, [messages, understood, hydrated]);
 
+  // Desplazamiento cómodo del hilo: mientras Alux piensa se ve la pregunta al
+  // pie; cuando responde, el hilo se coloca al INICIO de la respuesta (con la
+  // pregunta del explorador arriba) para leer de arriba hacia abajo sin tener
+  // que regresar desde el final de las tarjetas.
   useEffect(() => {
     const el = logRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [messages.length, status]);
+    if (!el) return;
+    const last = messages[messages.length - 1];
+    if (status === "thinking" || !last || last.role !== "assistant") {
+      el.scrollTop = el.scrollHeight;
+      return;
+    }
+    const idx = messages.length - 1;
+    const prev = messages[idx - 1];
+    const anchorId = prev && prev.role === "user" ? prev.id : last.id;
+    const anchor = el.querySelector<HTMLElement>(`[data-msg-id="${anchorId}"]`);
+    if (!anchor) return;
+    const top =
+      el.scrollTop + anchor.getBoundingClientRect().top - el.getBoundingClientRect().top - 4;
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
+  }, [messages, status]);
 
   // Mi Viaje (fuente canónica): plan activo autenticado o borrador anónimo.
   const {
@@ -507,7 +527,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       >
         {messages.map((m) =>
           m.role === "user" ? (
-            <div key={m.id} className="flex justify-end">
+            <div key={m.id} data-msg-id={m.id} className="flex justify-end">
               <p
                 className={[
                   "max-w-[88%] rounded-2xl rounded-br-md px-3 py-2 text-[13px] leading-snug",
@@ -520,19 +540,20 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
               </p>
             </div>
           ) : (
-            <AssistantTurn
-              key={m.id}
-              message={m}
-              tripKeys={tripKeys}
-              titleById={titleById}
-              isAuthed={isAuthed}
-              onAsk={(q) => void send(q)}
-              onRemove={(rec) => removeMutation.mutate(rec)}
-              removing={removeMutation.isPending}
-              onApplyOrder={(keys) => reorderMutation.mutate(keys)}
-              applyingOrder={reorderMutation.isPending}
-              coords={props.coords}
-            />
+            <div key={m.id} data-msg-id={m.id}>
+              <AssistantTurn
+                message={m}
+                tripKeys={tripKeys}
+                titleById={titleById}
+                isAuthed={isAuthed}
+                onAsk={(q) => void send(q)}
+                onRemove={(rec) => removeMutation.mutate(rec)}
+                removing={removeMutation.isPending}
+                onApplyOrder={(keys) => reorderMutation.mutate(keys)}
+                applyingOrder={reorderMutation.isPending}
+                coords={props.coords}
+              />
+            </div>
           ),
         )}
 
