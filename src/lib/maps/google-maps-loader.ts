@@ -20,7 +20,10 @@
 type LatLng = { lat: number; lng: number };
 
 export interface GMapInstance {
-  fitBounds: (bounds: unknown, padding?: number) => void;
+  fitBounds: (
+    bounds: unknown,
+    padding?: number | { top: number; right: number; bottom: number; left: number },
+  ) => void;
   setZoom: (zoom: number) => void;
   setCenter: (position: LatLng) => void;
   addListener: (event: string, handler: (e: never) => void) => void;

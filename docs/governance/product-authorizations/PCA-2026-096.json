@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-096",
+  "title": "Mapas · el mapa del inicio vuelve a mostrar la ruta completa",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («No estoy entendiendo qué pasó en la página de inicio con el mapa, así estaba y mostraba la ruta de destinos») para corregir el delta previo del mapa de Paradas del territorio: más alto en celular y tableta y encuadre con márgenes para que todas las paradas queden visibles sin quedar cortadas ni tapadas por los controles, sin cambiar estructura, orden, contenido CMS, rutas, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/maps/google-maps-loader.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/maps/google-maps-loader.ts",
+      "sha256": "3bcc19b3586ffb880ef4214874d1ff9aaf5c6d5d69e250c7493108dfe63a841b",
+      "authority": "Founder · mapa del inicio con la ruta completa · 2026-11-20"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": ["bun test ./scripts/maps/map-fallback.contract.test.tsx"]
+}

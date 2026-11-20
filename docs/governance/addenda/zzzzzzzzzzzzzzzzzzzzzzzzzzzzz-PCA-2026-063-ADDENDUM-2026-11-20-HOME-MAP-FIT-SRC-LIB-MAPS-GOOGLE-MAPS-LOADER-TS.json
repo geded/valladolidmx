@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-2026-11-20-HOME-MAP-FIT-SRC-LIB-MAPS-GOOGLE-MAPS-LOADER-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («No estoy entendiendo qué pasó en la página de inicio con el mapa, así estaba y mostraba la ruta de destinos») para corregir el delta previo del mapa de Paradas del territorio: más alto en celular y tableta y encuadre con márgenes para que todas las paradas queden visibles sin quedar cortadas ni tapadas por los controles, sin cambiar estructura, orden, contenido CMS, rutas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/maps/google-maps-loader.ts",
+    "previous_sha256": "e8df8681fc2c681a3d9c21d440d5716b891cc7ebf4527f87eafca78a9af2517d",
+    "current_sha256": "3bcc19b3586ffb880ef4214874d1ff9aaf5c6d5d69e250c7493108dfe63a841b",
+    "semantic_change": "Sólo tipo: el encuadre del mapa acepta márgenes distintos por lado (arriba, derecha, abajo, izquierda), como ya permite el proveedor. Sin cambios de carga, clave, canal ni comportamiento.",
+    "authority": "Founder · mapa del inicio con la ruta completa · 2026-11-20"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Los mapas conservan proveedor, controles, rutas, pines y datos; sólo cambia la altura del mapa del Home y los márgenes del encuadre.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}
