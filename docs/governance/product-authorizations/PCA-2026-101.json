@@ -1,0 +1,61 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-101",
+  "title": "Espacio uniforme antes del pie de página en todas las páginas públicas",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («estos espacios abajo de la última sección de las plantillas y el footer o pie de página queda muy separado y diferentes en las diferentes páginas, ¿por qué?»; autorización «Sí, aplícalo»: un solo espacio igual antes del pie de página en todas las páginas, unos 100 px en celular y 140 px en computadora): reducir sólo el relleno inferior acumulado del marco público compartido, de la plantilla de destinos y de los listados territoriales; sin cambiar secciones, tarjetas, orden, contenido CMS, pie de página, Alux, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/common/PageShell.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/discovery/PublicShell.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/common/PageShell.tsx",
+      "sha256": "cbfa88882d7b6c7880252bf966cb14c580bc81889e7614c8d1caed146c2c483e",
+      "authority": "Founder · espacio uniforme antes del pie de página · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/destination-premium/DestinationPremiumSurface.tsx",
+      "sha256": "e2e1b48e1f336b9654921b00eb11317dc7da741211224e178197698bc4f6de8f",
+      "authority": "Founder · espacio uniforme antes del pie de página · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/discovery/PublicShell.tsx",
+      "sha256": "0801e21094c6410d44377b471e80f2da70e3090300ac4de895363bcd761460e6",
+      "authority": "Founder · espacio uniforme antes del pie de página · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+      "sha256": "fed02b63234f59d4630694512432ccbf8735d533c872ace737f7850e85dde6fc",
+      "authority": "Founder · espacio uniforme antes del pie de página · 2026-11-20"
+    }
+  ],
+  "public_routes": [
+    "/",
+    "/oriente-maya/valladolid",
+    "/hoteles",
+    "/eventos/noches-de-la-heroica-valladolid"
+  ],
+  "required_feature_flags": [],
+  "required_tests": []
+}

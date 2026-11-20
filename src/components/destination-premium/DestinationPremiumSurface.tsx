@@ -168,7 +168,7 @@ export function DestinationPremiumSurface({
   );
 
   return (
-    <div className={cn("pb-24", className)}>
+    <div className={cn(className)}>
       {showBreadcrumbs ? (
         <Container className="pt-6">
           <PremiumTerritorialBreadcrumb crumbs={content.breadcrumbs} compactOnMobile />

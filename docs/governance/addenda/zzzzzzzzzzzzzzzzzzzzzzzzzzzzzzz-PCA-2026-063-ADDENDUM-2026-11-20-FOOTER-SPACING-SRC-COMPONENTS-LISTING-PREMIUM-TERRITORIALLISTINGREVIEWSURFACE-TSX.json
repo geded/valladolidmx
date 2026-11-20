@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-2026-11-20-FOOTER-SPACING-SRC-COMPONENTS-LISTING-PREMIUM-TERRITORIALLISTINGREVIEWSURFACE-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («estos espacios abajo de la última sección de las plantillas y el footer o pie de página queda muy separado y diferentes en las diferentes páginas, ¿por qué?»; autorización «Sí, aplícalo»: un solo espacio igual antes del pie de página en todas las páginas, unos 100 px en celular y 140 px en computadora): reducir sólo el relleno inferior acumulado del marco público compartido, de la plantilla de destinos y de los listados territoriales; sin cambiar secciones, tarjetas, orden, contenido CMS, pie de página, Alux, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/listing-premium/TerritorialListingReviewSurface.tsx",
+    "previous_sha256": "0b3bd18a3bfef49502ccd897e37667b1f8fe81bb04d2d1651aa4b24df514aef5",
+    "current_sha256": "fed02b63234f59d4630694512432ccbf8735d533c872ace737f7850e85dde6fc",
+    "semantic_change": "Sólo se reduce el relleno inferior acumulado antes del pie de página (PCA-2026-101); estructura, secciones, contenido y comportamiento aprobados se conservan.",
+    "authority": "Founder · espacio uniforme antes del pie de página · 2026-11-20"
+  },
+  "invariants": [
+    "Secciones, tarjetas, orden, contenido CMS, pie de página y Alux sin cambios.",
+    "Sólo cambia el espacio vacío inferior de la página.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

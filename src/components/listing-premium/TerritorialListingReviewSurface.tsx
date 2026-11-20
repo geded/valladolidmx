@@ -621,7 +621,7 @@ function QueHacerDiscoveryBody({
   );
 
   return (
-    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
+    <div className="bg-[var(--background)] pb-4 text-[var(--foreground)] sm:pb-6">
       {/* Studio Standard v1.0 · E5 · Listados: marcadores de región para el
           constructor. Sólo atributos de datos; la maqueta aprobada no cambia. */}
       <div data-eb-section="hero">
@@ -824,7 +824,7 @@ function TerritorialListingBody({
     (item) => item.source?.coordinates?.lat != null && item.source?.coordinates?.lng != null,
   );
   return (
-    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
+    <div className="bg-[var(--background)] pb-4 text-[var(--foreground)] sm:pb-6">
       <div className="w-full">
         {/* Studio Standard v1.0 · E5 · Listados: regiones marcadas para el
             constructor. Sólo atributos de datos, sin cambio visual. */}
@@ -1749,7 +1749,7 @@ function EventListingBody({
       : profile.resultsTitle;
 
   return (
-    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
+    <div className="bg-[var(--background)] pb-4 text-[var(--foreground)] sm:pb-6">
       <div className="w-full">
         <ListingIntro
           profile={
@@ -2289,7 +2289,7 @@ function PlaceListingBody({
       : profile.resultsTitle;
 
   return (
-    <div className="bg-[var(--background)] pb-12 text-[var(--foreground)] sm:pb-16">
+    <div className="bg-[var(--background)] pb-4 text-[var(--foreground)] sm:pb-6">
       <div className="w-full">
         <ListingIntro
           profile={

@@ -111,7 +111,7 @@ function PublicShellBody({
 }: PublicShellBodyProps) {
   if (variant === "minimal") {
     return (
-      <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
+      <main id="main" tabIndex={-1} className={cn("pb-10 lg:pb-12", className)}>
         {children}
       </main>
     );
@@ -120,7 +120,7 @@ function PublicShellBody({
   if (variant === "hero") {
     const hasCrumbs = useContextCrumbs || Boolean(crumbs && crumbs.length > 0);
     return (
-      <main id="main" tabIndex={-1} className={cn("pb-24", className)}>
+      <main id="main" tabIndex={-1} className={cn("pb-10 lg:pb-12", className)}>
         {hasCrumbs ? (
           <Container className="pb-5 pt-2 sm:pb-6 sm:pt-3">
             <BreadcrumbTerritorial
@@ -139,7 +139,7 @@ function PublicShellBody({
   const hasCrumbs = useContextCrumbs || Boolean(crumbs && crumbs.length > 0);
 
   return (
-    <main id="main" tabIndex={-1} className={cn("pb-24 pt-8 md:pt-12", className)}>
+    <main id="main" tabIndex={-1} className={cn("pb-10 pt-8 md:pt-12 lg:pb-12", className)}>
       <Container>
         {hasCrumbs ? (
           <BreadcrumbTerritorial

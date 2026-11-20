@@ -18,7 +18,7 @@ interface Props {
 
 export function PageShell({ title, eyebrow, description, crumbs, children }: Props) {
   return (
-    <main id="main" className="pb-24 pt-8 md:pt-12">
+    <main id="main" className="pb-10 pt-8 md:pt-12 lg:pb-12">
       <Container>
         <BreadcrumbTerritorial crumbs={crumbs} />
         <header className="mt-6 max-w-3xl">
