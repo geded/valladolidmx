@@ -1591,7 +1591,7 @@ function MapSection({
           connectByRoad={routePoints.length >= 2}
           /* El mapa cabe completo en su marco (bajo el título): el recorrido y los
              controles de zoom quedan visibles en celular y tableta. */
-          mapHeightClassName="h-[15rem] sm:h-[22rem] lg:h-[38rem]"
+          mapHeightClassName="h-[20rem] sm:h-[26rem] lg:h-[38rem]"
         />
       </div>
     </section>

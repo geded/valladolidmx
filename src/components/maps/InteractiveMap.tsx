@@ -372,7 +372,16 @@ export function InteractiveMap({
         /* En mapas pequeños (celular) el margen fijo dejaba el recorrido
            diminuto o fuera de cuadro: se limita a una fracción del lado corto. */
         const shortSide = Math.min(ref.current.clientWidth, ref.current.clientHeight);
-        const pad = shortSide > 0 ? Math.min(fitPadding, Math.round(shortSide * 0.16)) : fitPadding;
+        const basePad =
+          shortSide > 0 ? Math.min(fitPadding, Math.round(shortSide * 0.16)) : fitPadding;
+        /* Arriba se suma la altura del pin y a la derecha el ancho de los
+           controles de zoom: ninguna parada queda cortada ni tapada. */
+        const pad = {
+          top: basePad + MARKER_H,
+          right: basePad + 44,
+          bottom: basePad,
+          left: basePad,
+        };
 
         const map = new google.maps.Map(ref.current, {
           center: { lat, lng },
@@ -532,7 +541,9 @@ export function InteractiveMap({
               if (status === google.maps.DirectionsStatus.OK && result) {
                 routeUnderlay?.setDirections(result);
                 renderer.setDirections(result);
-                if (isProminentRoute) map.fitBounds(bounds, pad);
+                /* Mismo encuadre con márgenes para todas las rutas: el ajuste
+                   automático del proveedor dejaba paradas al borde del mapa. */
+                map.fitBounds(bounds, pad);
                 const route = (
                   result as {
                     routes?: Array<{
@@ -571,7 +582,7 @@ export function InteractiveMap({
                   ],
                 });
               }
-              map.fitBounds(bounds, isProminentRoute ? pad : Math.min(88, pad));
+              map.fitBounds(bounds, pad);
               if (!isProminentRoute) {
                 routeStatusRef.current?.({ mode: "approximate", providerStatus: status });
               }

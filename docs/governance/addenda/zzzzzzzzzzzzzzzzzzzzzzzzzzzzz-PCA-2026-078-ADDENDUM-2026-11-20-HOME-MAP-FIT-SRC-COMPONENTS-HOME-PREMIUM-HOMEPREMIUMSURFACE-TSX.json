@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-078-ADDENDUM-2026-11-20-HOME-MAP-FIT-SRC-COMPONENTS-HOME-PREMIUM-HOMEPREMIUMSURFACE-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-078",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («No estoy entendiendo qué pasó en la página de inicio con el mapa, así estaba y mostraba la ruta de destinos») para corregir el delta previo del mapa de Paradas del territorio: más alto en celular y tableta y encuadre con márgenes para que todas las paradas queden visibles sin quedar cortadas ni tapadas por los controles, sin cambiar estructura, orden, contenido CMS, rutas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "b777dcba12555a853f3e9f44dbf2e98f0739ed371ce9045ec6b27b301162f4d4",
+    "current_sha256": "45d51b2c5b90b4bae2905210e07d8ad2d319d15c6667ed9147fa7180e03ebdc8",
+    "semantic_change": "Corrección del encuadre del mapa: el mapa de Paradas del territorio del Home vuelve a ser más alto en celular (20rem) y tableta (26rem), y el encuadre compartido deja margen arriba para el pin y a la derecha para los controles; todas las rutas usan ese encuadre tras dibujarse. Sin cambios de estructura, orden, datos CMS, proveedor ni otras secciones.",
+    "authority": "Founder · mapa del inicio con la ruta completa · 2026-11-20"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Los mapas conservan proveedor, controles, rutas, pines y datos; sólo cambia la altura del mapa del Home y los márgenes del encuadre.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}
