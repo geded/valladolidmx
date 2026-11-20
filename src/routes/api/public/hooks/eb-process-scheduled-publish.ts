@@ -25,8 +25,13 @@ export const Route = createFileRoute("/api/public/hooks/eb-process-scheduled-pub
           request.headers.get("x-cron-secret") ??
           request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
           "";
-        const expected = process.env.EB_CRON_SECRET ?? "";
-        if (!expected || !provided || !safeEqual(provided, expected)) {
+        // Se aceptan el secreto propio histórico y el canónico de los ganchos
+        // cron (`cron_hooks_invoke`), que es el emisor real desde pg_cron.
+        const candidates = [process.env.EB_CRON_SECRET, process.env.CRON_HOOKS_SECRET].filter(
+          (value): value is string => typeof value === "string" && value.length >= 32,
+        );
+        const authorized = provided.length > 0 && candidates.some((exp) => safeEqual(provided, exp));
+        if (!authorized) {
           return new Response("Unauthorized", { status: 401 });
         }
 

@@ -15,6 +15,7 @@ import { useResolvedContext } from "@/lib/context-engine";
 import { cn } from "@/lib/utils";
 import { TerritorialSwitcherMount } from "@/components/navigation/TerritorialSwitcherMount";
 import { CompactCrumbs, shouldCompactCrumbs } from "@/components/layout/CompactCrumbs";
+import { ORIENTE_MAYA } from "@/config/regions";
 
 interface Props {
   /**
@@ -62,8 +63,16 @@ export function BreadcrumbTerritorial({
   className,
 }: Props) {
   const ctx = useResolvedContext();
-  const effectiveCrumbs: readonly BreadcrumbCrumb[] =
+  const sourceCrumbs: readonly BreadcrumbCrumb[] =
     useContextCrumbs && ctx ? crumbsFromContext(ctx) : (crumbs ?? []);
+  /**
+   * La casita ya enlaza a "/". Si la primera miga también es Inicio,
+   * se omite para no duplicar el mismo destino de navegación.
+   */
+  const effectiveCrumbs: readonly BreadcrumbCrumb[] =
+    sourceCrumbs.length > 1 && sourceCrumbs[0]?.to === "/"
+      ? sourceCrumbs.slice(1)
+      : sourceCrumbs;
 
   if (effectiveCrumbs.length === 0) return null;
 
@@ -71,72 +80,101 @@ export function BreadcrumbTerritorial({
   const compact = compactOnMobile && shouldCompactCrumbs(effectiveCrumbs);
 
   return (
-    <nav
-      aria-label="Ruta territorial"
+    <div
       className={cn(
-        "flex flex-col items-stretch gap-3 text-sm lg:flex-row lg:items-start lg:justify-between",
+        "flex flex-col items-stretch gap-2 text-xs sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:text-sm",
         className,
       )}
     >
-      {compact ? <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} /> : null}
-      {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
-      <ol
-        className={cn(
-          "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] sm:flex-wrap sm:whitespace-normal lg:flex-1",
-          compact ? "hidden sm:flex" : null,
-        )}
-      >
-        <li className="flex shrink-0 items-center gap-1.5">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-          >
-            <Home className="size-3.5" aria-hidden />
-            <span className="sr-only">Inicio</span>
-          </Link>
-        </li>
-        {effectiveCrumbs.map((c, i) => {
-          const isLast = i === effectiveCrumbs.length - 1;
-          return (
-            <li key={`${c.label}-${i}`} className="flex min-w-0 shrink-0 items-center gap-1.5">
-              <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
+      {/*
+        El selector de destino vive FUERA del `nav` de migajas: dentro se
+        leía como una migaja más y repetía el destino al final de la ruta.
+      */}
+      <nav aria-label="Ruta territorial" className="min-w-0 lg:flex-1">
+        {compact ? (
+          <CompactCrumbs crumbs={effectiveCrumbs} anchorIndex={mobileAnchorIndex} />
+        ) : null}
+        {/* Móvil: una sola línea desplazable; desde `sm` puede envolver. */}
+        <ol
+          className={cn(
+            "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap text-muted-foreground [scrollbar-width:none] lg:flex-wrap lg:whitespace-normal",
+            compact ? "hidden sm:flex" : null,
+          )}
+        >
+          <li className="flex shrink-0 items-center gap-1.5">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
+            >
+              <Home className="size-3.5" aria-hidden />
+              <span className="sr-only">Inicio</span>
+            </Link>
+          </li>
+          {effectiveCrumbs.map((c, i) => {
+            const isLast = i === effectiveCrumbs.length - 1;
+            /**
+             * La región ya es el contexto implícito de toda la plataforma:
+             * en cadenas profundas se colapsa a "…" conservando el enlace y
+             * la etiqueta completa para lectores de pantalla.
+             */
+            const isRegion = c.to === `/${ORIENTE_MAYA.slug}`;
+            const collapseRegion = isRegion && !isLast && effectiveCrumbs.length > 2;
+            return (
+              <li
+                key={`${c.label}-${i}`}
+                className={cn(
+                  "flex min-w-0 items-center gap-1.5",
+                  isLast ? "shrink" : "shrink-0",
+                )}
+              >
+                <ChevronRight className="size-3.5 shrink-0 opacity-50" aria-hidden />
 
-              {c.to && !isLast ? (
-                <Link
-                  to={c.to}
-                  params={c.params as never}
-                  className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
-                >
-                  {c.label}
-                </Link>
-              ) : (
-                <span
-                  aria-current={isLast ? "page" : undefined}
-                  className={cn(
-                    "block truncate",
-                    // El nombre actual puede truncarse en móvil.
-                    isLast ? "max-w-[46vw] font-medium text-foreground sm:max-w-none" : "",
-                  )}
-                >
-                  {c.label}
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+                {c.to && !isLast ? (
+                  <Link
+                    to={c.to}
+                    params={c.params as never}
+                    title={collapseRegion ? c.label : undefined}
+                    className="rounded-md px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {collapseRegion ? (
+                      <>
+                        <span aria-hidden>…</span>
+                        <span className="sr-only">{c.label}</span>
+                      </>
+                    ) : (
+                      c.label
+                    )}
+                  </Link>
+                ) : (
+                  <span
+                    aria-current={isLast ? "page" : undefined}
+                    className={cn(
+                      "block truncate",
+                      // El nombre actual puede truncarse en móvil.
+                      isLast ? "max-w-[46vw] font-medium text-foreground lg:max-w-none" : "",
+                    )}
+                  >
+                    {c.label}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
       {/*
         N2.5 · Montaje visual único del DestinationSwitcher junto al
         breadcrumb. Se autooculta si no hay contexto territorial o si
         existe un único destino publicado — no genera ruido en Home,
         Blog, Contacto ni superficies sin ancla.
       */}
-      <TerritorialSwitcherMount
-        className={cn(
-          "h-11 w-full min-w-40 shrink-0 text-xs lg:h-8 lg:w-auto lg:max-w-64",
-          compact ? "hidden sm:flex" : null,
-        )}
-      />
-    </nav>
+      <div
+        role="group"
+        aria-label="Cambiar de destino"
+        className="shrink-0"
+      >
+        <TerritorialSwitcherMount className="h-9 w-full min-w-0 text-xs sm:h-8 sm:w-auto sm:max-w-56" />
+      </div>
+    </div>
   );
 }

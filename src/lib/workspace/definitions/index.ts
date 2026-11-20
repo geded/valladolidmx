@@ -26,6 +26,8 @@ import {
   BookOpenText,
   ShoppingCart,
   Activity,
+  FileText,
+  MessageCircle,
 } from "lucide-react";
 import {
   Mail,
@@ -584,6 +586,46 @@ const concierge: WorkspaceDefinition = {
       surfaces: ["sidebar", "bottom", "palette"],
       primary: true,
     },
+    {
+      id: "concierge.reservations",
+      workspaceId: "concierge",
+      label: "Reservaciones",
+      icon: CreditCard,
+      to: "/concierge/reservaciones",
+      group: "trabajo",
+      order: 2,
+      surfaces: ["sidebar", "bottom", "palette"],
+    },
+    {
+      id: "concierge.proposals",
+      workspaceId: "concierge",
+      label: "Propuestas",
+      icon: FileText,
+      to: "/concierge/propuestas",
+      group: "trabajo",
+      order: 3,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
+      id: "concierge.itineraries",
+      workspaceId: "concierge",
+      label: "Itinerarios",
+      icon: MapIcon,
+      to: "/concierge/itinerarios",
+      group: "trabajo",
+      order: 4,
+      surfaces: ["sidebar", "bottom", "palette"],
+    },
+    {
+      id: "concierge.questions",
+      workspaceId: "concierge",
+      label: "Preguntas",
+      icon: MessageCircle,
+      to: "/concierge/preguntas",
+      group: "trabajo",
+      order: 5,
+      surfaces: ["sidebar", "palette"],
+    },
   ],
   alux: {
     headline: "Hay 4 expedientes que requieren atención hoy.",
@@ -609,6 +651,8 @@ const concierge: WorkspaceDefinition = {
   aluxCapabilities: [
     { id: "concierge.cases.read", label: "Leer expedientes asignados" },
     { id: "concierge.workload.read", label: "Leer carga personal" },
+    { id: "concierge.proposals.read", label: "Leer propuestas del expediente" },
+    { id: "concierge.itineraries.read", label: "Leer itinerarios armados" },
   ],
   commands: [
     {
@@ -616,6 +660,30 @@ const concierge: WorkspaceDefinition = {
       label: "Ir a la bandeja",
       icon: Inbox,
       run: (ctx) => ctx.navigate("/concierge"),
+    },
+    {
+      id: "concierge.cmd.reservations",
+      label: "Ver reservaciones",
+      icon: CreditCard,
+      run: (ctx) => ctx.navigate("/concierge/reservaciones"),
+    },
+    {
+      id: "concierge.cmd.proposals",
+      label: "Ver propuestas",
+      icon: FileText,
+      run: (ctx) => ctx.navigate("/concierge/propuestas"),
+    },
+    {
+      id: "concierge.cmd.itineraries",
+      label: "Ver itinerarios",
+      icon: MapIcon,
+      run: (ctx) => ctx.navigate("/concierge/itinerarios"),
+    },
+    {
+      id: "concierge.cmd.questions",
+      label: "Ver preguntas sin responder",
+      icon: MessageCircle,
+      run: (ctx) => ctx.navigate("/concierge/preguntas"),
     },
     {
       id: "concierge.cmd.public-site",
@@ -636,11 +704,16 @@ const concierge: WorkspaceDefinition = {
       { type: "case", label: "Expediente" },
       { type: "traveler", label: "Viajero" },
       { type: "message", label: "Mensaje" },
+      { type: "reservation", label: "Reservación" },
     ],
     selectionModes: ["single", "multi"],
     views: [
       { id: "inbox", label: "Bandeja", kind: "list" },
       { id: "case", label: "Expediente", kind: "detail" },
+      { id: "reservations", label: "Reservaciones", kind: "list" },
+      { id: "proposals", label: "Propuestas", kind: "list" },
+      { id: "itineraries", label: "Itinerarios", kind: "list" },
+      { id: "questions", label: "Preguntas", kind: "list" },
     ],
   },
 };
@@ -811,6 +884,16 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.experiencias",
+      workspaceId: "cms",
+      label: "Experiencias",
+      icon: Sparkles,
+      to: "/cms/experiencias",
+      group: "operacion",
+      order: 10.06,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.visibilidad",
       workspaceId: "cms",
       label: "Paquetes de visibilidad",
@@ -869,6 +952,18 @@ const cms: WorkspaceDefinition = {
       group: "operacion",
       order: 13,
       surfaces: ["sidebar", "palette"],
+    },
+    {
+      id: "cms.configuracion",
+      workspaceId: "cms",
+      label: "Configuración",
+      icon: Settings,
+      to: "/cms/configuracion",
+      group: "operacion",
+      order: 14.5,
+      surfaces: ["sidebar", "palette"],
+      // La autorización efectiva permanece en el servidor (admin/super_admin).
+      roles: ["super_admin", "admin"],
     },
     {
       id: "cms.contenido-evaluacion",

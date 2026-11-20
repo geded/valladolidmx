@@ -17,9 +17,14 @@ export function WorkspaceBottomNav() {
   const [moreOpen, setMoreOpen] = useState(false);
 
   if (!workspace) return null;
-  const all = getNavItemsForWorkspace(workspace.id, "bottom");
-  const primary = all.find((i) => i.primary);
-  const others = all.filter((i) => i !== primary).slice(0, 3);
+  const bottomItems = getNavItemsForWorkspace(workspace.id, "bottom");
+  const sidebarItems = getNavItemsForWorkspace(workspace.id, "sidebar");
+  const primary = bottomItems.find((i) => i.primary);
+  const others = bottomItems.filter((i) => i !== primary).slice(0, 3);
+  // "Más" es la navegación completa en móvil. Algunos destinos operativos
+  // viven sólo en el sidebar de escritorio; se incorporan aquí sin duplicar
+  // los que ya forman parte de la barra inferior.
+  const all = [...bottomItems, ...sidebarItems.filter((item) => !bottomItems.some((bottom) => bottom.id === item.id))];
 
   return (
     <>

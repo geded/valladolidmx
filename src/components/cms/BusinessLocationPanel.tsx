@@ -198,6 +198,7 @@ export function BusinessLocationPanel({ businessId }: Props) {
               {msg}
             </p>
           ) : null}
+
         </div>
       </div>
     </section>

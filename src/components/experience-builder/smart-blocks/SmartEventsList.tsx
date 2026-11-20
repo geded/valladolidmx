@@ -1,5 +1,6 @@
 import { SmartEmpty } from "./SmartCard";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 export interface SmartEventItem {
   id?: string;
@@ -10,6 +11,7 @@ export interface SmartEventItem {
   starts_at?: string | null;
   ends_at?: string | null;
   href?: string | null;
+  media_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   [k: string]: unknown;
 }
 
@@ -20,6 +22,7 @@ function formatDate(iso?: string | null): string {
       day: "2-digit",
       month: "short",
       year: "numeric",
+      timeZone: "America/Merida",
     }).format(new Date(iso));
   } catch {
     return iso;
@@ -52,10 +55,10 @@ export function SmartEventsList({ items, title }: { items: SmartEventItem[]; tit
                 className="flex items-center gap-4 p-4 transition hover:bg-muted/40"
               >
                 {e.cover_image_url ? (
-                  <img
-                    src={e.cover_image_url}
-                    alt={String(e.name ?? "Evento")}
-                    loading="lazy"
+                  <EditorialMediaFrame
+                    media={{ url: e.cover_image_url, alt: String(e.name ?? "Evento"), asset: e.media_asset }}
+                    context="thumbnail"
+                    sizes="64px"
                     className="h-16 w-16 rounded-lg object-cover"
                   />
                 ) : (

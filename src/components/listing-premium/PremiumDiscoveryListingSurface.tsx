@@ -24,12 +24,18 @@ import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
+import { askAluxWithPreferenceMemory } from "@/lib/alux/travel-preferences";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import { useBrand } from "@/lib/brand/brand-context";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 
@@ -268,8 +274,9 @@ function askAlux(profile: FamilyProfile, preference: string) {
       : profile.family === "casas-de-vacaciones"
         ? "elegir una casa de vacaciones"
         : "elegir dónde hospedarme";
-  openAluxFloating({
-    reason: "manual",
+  askAluxWithPreferenceMemory({
+    surface: "premium-discovery-listing",
+    prompt: preference,
     hint: `Ayúdame a ${task}. Preferencia inicial: ${preference}. Primero determina si estoy planeando el viaje o si ya estoy en Valladolid o el Oriente Maya. Si planeo, pregunta fechas, acompañantes y presupuesto; pide ubicación sólo si ya estoy en destino y con permiso. Usa Mi Viaje y explica por qué recomiendas cada opción.`,
   });
 }
@@ -373,16 +380,38 @@ export function PremiumDiscoveryListingSurface({
             </p>
             {filtered.length ? (
               <div className="space-y-3">
-                {filtered.map((item, index) => (
-                  <PremiumListingCard
-                    key={item.id}
-                    item={item}
-                    index={index}
-                    profile={profile}
-                    featured={index === 0}
-                    cinematic={cinematic}
-                  />
-                ))}
+                {filtered.map((item, index) => {
+                  const tracking = {
+                    businessId: item.operatorId ?? null,
+                    surface: dto.family,
+                    rail: "listado",
+                    entityKind: item.entityKind,
+                    entityId: item.id,
+                  };
+                  const card = (
+                    <PremiumListingCard
+                      item={item}
+                      index={index}
+                      profile={profile}
+                      featured={index === 0}
+                      cinematic={cinematic}
+                    />
+                  );
+                  return (
+                    <div key={item.id}>
+                      {tracking.businessId ? (
+                        <>
+                          <BusinessImpressionTracker {...tracking} />
+                          <TrackClick {...tracking} eventType="click_card">
+                            {card}
+                          </TrackClick>
+                        </>
+                      ) : (
+                        card
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="rounded-2xl border border-border bg-card p-8 text-sm text-muted-foreground">
@@ -432,7 +461,14 @@ function PremiumHero({
           cinematic && "absolute inset-0",
         )}
       >
-        <img src={hero.src} alt={hero.alt} className="absolute inset-0 size-full object-cover" />
+        <EditorialMediaFrame
+          media={{ url: hero.src, alt: hero.alt }}
+          context="hero"
+          loading="eager"
+          fetchPriority="high"
+          sizes="100vw"
+          className="absolute inset-0 size-full object-cover"
+        />
         <div
           className={cn(
             "absolute inset-0",
@@ -621,9 +657,10 @@ function PremiumListingCard({
           featured || cinematic ? "min-h-56" : "min-h-36",
         )}
       >
-        <img
-          src={media.src}
-          alt={media.alt}
+        <EditorialMediaFrame
+          media={{ url: media.src, alt: media.alt }}
+          context="card"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
         />
         {featured ? (

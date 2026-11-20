@@ -7,23 +7,25 @@
  */
 import { BookMarked } from "lucide-react";
 import type { AluxTravelerSource } from "@/lib/traveler/alux-traveler.functions";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 export interface AluxSourcesFooterProps {
   sources: AluxTravelerSource[];
 }
 
 export function AluxSourcesFooter({ sources }: AluxSourcesFooterProps) {
+  const alux = useAluxBrand();
   if (!sources || sources.length === 0) {
     return (
       <p className="text-[11px] italic text-muted-foreground">
-        Sin referencias del catálogo utilizadas.
+        {alux.copy("sourcesEmpty")}
       </p>
     );
   }
   return (
     <div>
       <p className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-        <BookMarked className="size-3" aria-hidden /> Fuentes utilizadas
+        <BookMarked className="size-3" aria-hidden /> {alux.copy("sourcesTitle")}
       </p>
       <ul className="flex flex-wrap gap-1.5">
         {sources.map((s, i) => (

@@ -9,7 +9,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { ORIENTE_MAYA } from "@/config/regions";
+import { categoryAncestors } from "@/lib/navigation/category-context";
 import {
   publishedDestinationsQueryOptions,
   useDestinationLabel,
@@ -22,22 +22,7 @@ function buildRutasContext(
   destino: string | undefined,
   destinationLabel: (slug: string) => string,
 ): RouteContextDeclaration {
-  const explicitAncestors = destino
-    ? [
-        {
-          kind: "region" as const,
-          slug: ORIENTE_MAYA.slug,
-          label: ORIENTE_MAYA.name,
-          href: "/oriente-maya",
-        },
-        {
-          kind: "destination" as const,
-          slug: destino,
-          label: destinationLabel(destino),
-          href: `/oriente-maya/${destino}`,
-        },
-      ]
-    : [];
+  const explicitAncestors = categoryAncestors(destino, destinationLabel);
   return defineRouteContext({
     current: { kind: "category", slug: "rutas", label: "Rutas", href: "/rutas" },
     ancestors: explicitAncestors,

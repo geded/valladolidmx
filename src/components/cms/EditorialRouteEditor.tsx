@@ -63,7 +63,14 @@ const BASE_FIELDS: EditorField[] = [
   { name: "interests", label: "Intereses", type: "tags" },
   { name: "audiences", label: "Público", type: "tags" },
   { name: "seasons", label: "Temporadas", type: "tags" },
+  {
+    name: "cover_media_id",
+    label: "Imagen de la ruta",
+    type: "media",
+    helpText: "Selecciona una imagen de la Biblioteca o sube una nueva desde aquí.",
+  },
 ];
+
 
 export function EditorialRouteEditor({ id }: { id?: string }) {
   const destinationsFn = useServerFn(listDestinationsForSelect);
@@ -101,8 +108,15 @@ export function EditorialRouteEditor({ id }: { id?: string }) {
       listQueryKey="editorial-routes"
       fields={fields}
       renderExtras={({ id: entityId }) =>
-        entityId ? <EditorialRouteStopsPanel routeId={entityId} /> : null
+        entityId ? (
+          <EditorialRouteStopsPanel routeId={entityId} />
+        ) : (
+          <p className="rounded-xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+            Guarda la ruta como borrador para agregar sus paradas y verlas en el mapa.
+          </p>
+        )
       }
+
     />
   );
 }

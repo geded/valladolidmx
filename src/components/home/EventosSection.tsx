@@ -12,11 +12,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { Container } from "@/components/layout/Container";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import { listPublishedEvents, type PublicEventCard } from "@/lib/events/public-reads.functions";
+import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
 
 const DATE_FMT = new Intl.DateTimeFormat("es-MX", {
   day: "2-digit",
   month: "short",
   year: "numeric",
+  timeZone: "America/Merida",
 });
 
 function formatDate(iso: string): string {
@@ -25,6 +27,12 @@ function formatDate(iso: string): string {
   } catch {
     return iso;
   }
+}
+
+function eventDateLabel(event: PublicEventCard): string {
+  const recurrence = recurrenceLabel(event);
+  if (!recurrence) return formatDate(event.starts_at);
+  return [recurrence, scheduleLabel(event.schedule_times)].filter(Boolean).join(" · ");
 }
 
 export function EventosSection({ config }: { config?: Record<string, unknown> } = {}) {
@@ -68,7 +76,7 @@ export function EventosSection({ config }: { config?: Record<string, unknown> } 
                 className="group block h-full rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:bg-accent"
               >
                 <p className="text-xs font-medium uppercase tracking-[0.14em] text-primary">
-                  {formatDate(e.starts_at)}
+                  {eventDateLabel(e)}
                   {e.is_free ? " · Gratis" : null}
                 </p>
                 <p className="mt-2 text-lg font-semibold text-foreground group-hover:text-primary">

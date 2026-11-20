@@ -23,6 +23,8 @@ import { ExperienceHero } from "./ExperienceHero";
 import type { ExperienceHeroDTO } from "@/lib/experience-builder/blocks/experience-hero/contract";
 import { EmptyHint } from "@/components/surfaces/kit";
 import { Share2 } from "lucide-react";
+import { useState } from "react";
+import { ShareSheet } from "@/components/share/ShareSheet";
 
 export function ExperienceHeroFromProduct() {
   const p = useProduct();
@@ -33,9 +35,9 @@ export function ExperienceHeroFromProduct() {
   const gallery = (p.media ?? [])
     .filter((m) => Boolean(m.url))
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-    .map((m) => ({ url: m.url as string, alt: m.alt || p.name }));
+    .map((m) => ({ url: m.url as string, alt: m.alt || p.name, asset: m.asset }));
   if (gallery.length === 0 && p.cover_url) {
-    gallery.push({ url: p.cover_url, alt: p.name });
+    gallery.push({ url: p.cover_url, alt: p.name, asset: p.cover_asset });
   }
 
   const badges: ExperienceHeroDTO["badges"] = [];
@@ -66,7 +68,7 @@ export function ExperienceHeroFromProduct() {
     eyebrow: p.product_type || null,
     title: p.name,
     description: p.tagline || null,
-    media: gallery[0] ? { url: gallery[0].url, alt: gallery[0].alt, overlay: 0 } : null,
+    media: gallery[0] ? { url: gallery[0].url, alt: gallery[0].alt, overlay: 0, asset: gallery[0].asset } : null,
     mediaSlides: gallery,
     badges,
     meta,
@@ -105,30 +107,25 @@ export function ExperienceHeroFromProduct() {
 }
 
 function ShareProductButton({ title }: { title: string }) {
-  async function handleShare() {
-    if (typeof navigator === "undefined") return;
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    try {
-      const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
-      if (nav.share) {
-        await nav.share({ title, url });
-        return;
-      }
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-      }
-    } catch {
-      /* usuario canceló */
-    }
-  }
+  const [open, setOpen] = useState(false);
   return (
-    <button
-      type="button"
-      onClick={handleShare}
-      aria-label="Compartir"
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur-sm transition hover:bg-background focus-visible:outline-none focus-visible:ring-focus"
-    >
-      <Share2 className="h-5 w-5" aria-hidden="true" />
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Compartir"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur-sm transition hover:bg-background focus-visible:outline-none focus-visible:ring-focus"
+      >
+        <Share2 className="h-5 w-5" aria-hidden="true" />
+      </button>
+      <ShareSheet
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
+        text="Descúbrelo en el Oriente Maya."
+        heading="Compartir"
+      />
+    </>
   );
 }

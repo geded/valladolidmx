@@ -30,9 +30,11 @@ import {
 import { getOmxdsSurfaceContractsFlag } from "@/lib/omxds/surfaces/surface-contracts-flag.server";
 import { getBusinessPremiumEligibility } from "@/lib/omxds/surfaces/business-premium-eligibility.server";
 import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
-import { CompositionRenderer } from "@/lib/experience-builder/composition-renderer";
+import {
+  BUSINESS_PREMIUM_BLOCK_TYPE,
+  resolveBusinessPremiumCopyFromTree,
+} from "@/lib/businesses/business-copy-resolution";
 import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
-import { ZazilTunichPremiumSurface } from "@/routes/lovable/founder-zazil-premium-preview";
 
 export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
   loader: async ({ params }) => {
@@ -47,12 +49,10 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
     const [business, specific, template, surfaceContractsEnabled, evaluationLot, nonDiscoverable] =
       await Promise.all([
         getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
-        // SEO.A3.M1 · Authority Business Landing — composition-first.
-        // Se resuelve primero una composición específica por slug
-        // (`biz-<slug>`) que permite landings editoriales premium; en su
-        // ausencia la ruta cae a la plantilla oficial de negocio y, en
-        // último término, al render directo de `BusinessSurface`. Misma
-        // arquitectura que Región y Destino — cero excepciones por empresa.
+        // La composición empresarial sólo aporta textos compatibles del
+        // bloque oficial `vmx.business.premium`. La identidad pública siempre
+        // se renderiza con `BusinessSurface`; las landings promocionales viven
+        // exclusivamente en `/l/<slug>` y nunca sustituyen esta ficha.
         getPublishedCompositionBySlug({
           data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
         }).catch(() => null),
@@ -207,14 +207,15 @@ function EmpresaTerritorialPage() {
   // G8-R1-C2 — punto único de decisión: el resolutor canónico.
   const premiumEnabled = canonicalBinding.surface === "premium";
 
-  if (business.slug === "zazil-tunich") {
-    return (
-      <ContextEngineProvider declaration={declaration}>
-        <ZazilTunichPremiumSurface />
-      </ContextEngineProvider>
-    );
-  }
 
+  /* Textos de sección editables desde el constructor. Cuando la
+     composición publicada declara el bloque `vmx.business.premium`, la
+     autoridad visual sigue siendo `BusinessSurface` y sólo se aplican sus
+     encabezados; fail-closed a los textos aprobados. */
+  const businessCopy = resolveBusinessPremiumCopyFromTree(
+    composition?.snapshot ?? null,
+    BUSINESS_PREMIUM_BLOCK_TYPE,
+  );
   return (
     <ContextEngineProvider declaration={declaration}>
       <BusinessSurfaceProvider business={business} related={related}>
@@ -223,9 +224,7 @@ function EmpresaTerritorialPage() {
           business={business}
           related={related}
           premiumEligibility={premiumEnabled ? premiumEligibility : null}
-          legacy={
-            composition ? <CompositionRenderer tree={composition.snapshot} /> : <BusinessSurface />
-          }
+          legacy={<BusinessSurface copy={businessCopy} />}
         />
       </BusinessSurfaceProvider>
     </ContextEngineProvider>

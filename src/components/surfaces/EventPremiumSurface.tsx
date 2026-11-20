@@ -1,22 +1,42 @@
 /**
  * EventPremiumSurface — Ficha Premium de evento.
  *
- * Reutiliza el hero editorial compartido aprobado (texto y datos a la
- * izquierda, galería a la derecha), el shell público, el breadcrumb
- * territorial, Alux contextual y Mi Viaje. No expone selector de
- * presentación ni hero legacy: la autoridad visual es única.
+ * Adaptada al mismo patrón visual de la familia Premium aprobada
+ * (hoteles, restaurantes, casas de vacaciones): PremiumHero → fila de
+ * acciones (compartir, guardar, agregar a Mi Viaje) → Alux → datos
+ * clave → descripción → ubicación → eventos cercanos → CTA final.
  *
- * Todos los datos provienen de la lectura real (`getEventBySlug`).
- * Los atributos no capturados en el CMS simplemente no se muestran.
+ * No crea superficie nueva ni componentes paralelos. Reutiliza
+ * exclusivamente los bloques oficiales del Experience Builder y los
+ * componentes compartidos vigentes. Sin reserva ni cobro en línea.
  */
-import type { ReactNode } from "react";
-import { ArrowRight, CalendarDays, Clock3, MapPin, Ticket } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Share2 } from "lucide-react";
 import { PublicShell } from "@/components/discovery";
-import { Container } from "@/components/layout/Container";
-import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
+import { Button } from "@/components/ui/button";
+import { PremiumHero } from "@/components/premium";
+import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
-import type { PublicEventDetail } from "@/lib/events/public-reads.functions";
+import { FavoriteButton } from "@/components/commerce/FavoriteButton";
+import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
+import { ShareSheet } from "@/components/share/ShareSheet";
+import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
+import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
+import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
+import { TourismCard } from "@/components/experience-builder/tourism-card/TourismCard";
+import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
+import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/experience-section/contract";
+import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
+import type { PublicEventDetail, PublicEventCard } from "@/lib/events/public-reads.functions";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
+import { recurrenceLabel, scheduleLabel } from "@/lib/events/recurrence";
+import {
+  EVENT_PREMIUM_COPY_DEFAULTS,
+  fillEventCopy,
+  type EventPremiumCopy,
+} from "./event-premium-copy";
+
+const EVENT_TIME_ZONE = "America/Merida";
 
 function formatDay(iso?: string | null): string | null {
   if (!iso) return null;
@@ -26,6 +46,7 @@ function formatDay(iso?: string | null): string | null {
     day: "2-digit",
     month: "long",
     year: "numeric",
+    timeZone: EVENT_TIME_ZONE,
   }).format(date);
 }
 
@@ -33,26 +54,58 @@ function formatTime(iso?: string | null): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit" }).format(date);
+  return new Intl.DateTimeFormat("es-MX", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: EVENT_TIME_ZONE,
+  }).format(date);
 }
 
-const TAG_KEYS = [
-  "audience",
-  "time_of_day",
-  "venue_type",
-  "accessibility",
-  "reservation_required",
-] as const;
+function eventCardToVM(card: PublicEventCard): TourismCardVM {
+  const startDay = formatDay(card.starts_at);
+  return {
+    id: card.id,
+    entityKind: "event",
+    name: card.title,
+    href: `/eventos/${card.slug}`,
+    tagline: card.summary,
+    businessName: card.venue_name,
+    mediaUrl: card.cover_url,
+    mediaAsset: card.cover_asset,
+    mediaAlt: card.title,
+    rating: null,
+    location: card.destination_name ? { label: card.destination_name, distanceKm: null } : null,
+    territorialContext: card.destination_name ?? null,
+    highlights: [],
+    badges: [],
+    institutionalBadges: [],
+    dateLabel: startDay,
+    startsAt: card.starts_at,
+    endsAt: card.ends_at,
+    availabilityLabel: null,
+    priceAmount: null,
+    priceCurrency: null,
+    priceHint: card.is_free ? "Entrada libre" : null,
+    primaryAction: { label: "Ver evento", href: `/eventos/${card.slug}` },
+    secondaryAction: null,
+  };
+}
 
 export function EventPremiumSurface({
   event,
+  related = [],
   readOnlyPreview = false,
   previewCover,
+  copy = EVENT_PREMIUM_COPY_DEFAULTS,
 }: {
   event: PublicEventDetail;
+  related?: PublicEventCard[];
   readOnlyPreview?: boolean;
   previewCover?: ReactNode;
+  copy?: EventPremiumCopy;
 }) {
+  const [shareOpen, setShareOpen] = useState(false);
+
   const attrs = event.filter_attributes ?? {};
   const eventType = attributeValues(attrs.event_type)[0];
   const startDay = formatDay(event.starts_at);
@@ -60,37 +113,90 @@ export function EventPremiumSurface({
   const startTime = formatTime(event.starts_at);
   const endTime = formatTime(event.ends_at);
   const admission = attributeValues(attrs.admission_type)[0];
+  const recurrence = recurrenceLabel(event);
+  const scheduledTimes = scheduleLabel(event.schedule_times);
 
-  const facts = [
+  /* ---- InfoGrid: datos clave del evento ---- */
+  const infoItems: ExperienceInfoGridDTO["items"] = [
     startDay
       ? {
-          icon: CalendarDays,
-          label: "Fecha",
+          iconKey: "calendar",
+          label: recurrence ? "Próxima función" : "Fecha",
           value: endDay && endDay !== startDay ? `${startDay} – ${endDay}` : startDay,
+          tone: "default" as const,
         }
       : null,
-    startTime
+    scheduledTimes || startTime
       ? {
-          icon: Clock3,
+          iconKey: "clock",
           label: "Horario",
-          value: endTime ? `${startTime}–${endTime} h` : `${startTime} h`,
+          value: scheduledTimes ?? (endTime ? `${startTime}–${endTime} h` : `${startTime} h`),
+          tone: "default" as const,
         }
       : null,
-    event.venue_name ? { icon: MapPin, label: "Sede", value: event.venue_name } : null,
+    event.venue_name
+      ? { iconKey: "map-pin", label: "Sede", value: event.venue_name, tone: "default" as const }
+      : null,
     {
-      icon: Ticket,
+      iconKey: "ticket",
       label: "Acceso",
       value: admission
         ? humanizeAttributeValue(admission)
         : event.is_free
           ? "Entrada libre"
           : "Entrada de pago",
+      tone: "default" as const,
     },
-  ].filter(Boolean) as { icon: typeof CalendarDays; label: string; value: string }[];
+    recurrence
+      ? {
+          iconKey: "repeat",
+          label: "Recurrencia",
+          value: `${recurrence}${event.recurrence_until ? ` · hasta ${formatDay(`${event.recurrence_until}T12:00:00-06:00`)}` : " · programación permanente"}`,
+          tone: "primary" as const,
+        }
+      : null,
+  ].filter((item): item is NonNullable<typeof item> => item !== null);
 
-  const tags = TAG_KEYS.flatMap((key) =>
-    attributeValues(attrs[key]).map((value) => humanizeAttributeValue(value)),
-  );
+  const infoGridDto: ExperienceInfoGridDTO | null =
+    infoItems.length > 0
+      ? {
+          variant: "cards",
+          heading: copy.infoHeading,
+          columns: 3,
+          items: infoItems,
+          ariaLabel: "Información clave del evento",
+          provenance: "published",
+          capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+        }
+      : null;
+
+  /* ---- Section: descripción editorial ---- */
+  const descriptionSection: ExperienceSectionDTO | null = event.body
+    ? {
+        variant: "editorial",
+        eyebrow: copy.descriptionKicker,
+        title: copy.descriptionTitle,
+        lead: event.summary ?? null,
+        body: event.body
+          .replace(/\\n/g, "\n")
+          .split(/\n\n+/)
+          .map((p) => p.trim())
+          .filter(Boolean)
+          .map((p) => `<p>${p.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">")}</p>`)
+          .join(""),
+        media: null,
+        attribution: null,
+        ctas: event.external_url
+          ? [{ label: "Más información", href: event.external_url, emphasis: "secondary" }]
+          : [],
+        align: "left",
+        tone: "default",
+        ariaLabel: null,
+        capabilities: { anchor: true, seoHeading: true, richText: true },
+      }
+    : null;
+
+  const hasLocation = typeof event.latitude === "number" && typeof event.longitude === "number";
 
   const crumbs = [
     { label: "Oriente Maya", to: "/oriente-maya" as const },
@@ -103,131 +209,185 @@ export function EventPremiumSurface({
 
   return (
     <PublicShell crumbs={crumbs} useContextCrumbs compactCrumbsOnMobile>
-      <div className="bg-[var(--background)] pb-16 text-[var(--foreground)]">
-        <Container className="pt-4 sm:pt-6">
-          <section className="grid gap-7 overflow-hidden rounded-[2rem] border border-[var(--border)] bg-card p-5 shadow-elevated sm:p-7 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:p-9">
-            <div className="order-2 lg:order-1">
-              <div className="flex flex-wrap items-center gap-2">
-                {eventType ? (
-                  <span className="rounded-full border border-[var(--selva)]/25 bg-[var(--selva)]/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[.16em] text-[var(--selva)]">
-                    {humanizeAttributeValue(eventType)}
-                  </span>
-                ) : null}
-                {event.destination_name ? (
-                  <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[11px] uppercase tracking-[.16em] text-[var(--muted-foreground)]">
-                    {event.destination_name} · Oriente Maya de Yucatán
-                  </span>
-                ) : null}
-              </div>
-              <h1 className="mt-4 font-display text-4xl leading-[1.04] tracking-tight sm:text-5xl">
-                {event.title}
-              </h1>
-              {event.summary ? (
-                <p className="mt-3 text-lg leading-7 text-[var(--muted-foreground)]">
-                  {event.summary}
-                </p>
-              ) : null}
-              {facts.length ? (
-                <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-4 text-sm">
-                  {facts.map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="flex min-w-0 items-start gap-2">
-                      <Icon
-                        className="mt-0.5 size-4 shrink-0 text-[var(--brand-primary-strong)]"
-                        aria-hidden
-                      />
-                      <div>
-                        <dt className="text-[10px] uppercase tracking-[.14em] text-[var(--muted-foreground)]">
-                          {label}
-                        </dt>
-                        <dd className="mt-0.5 font-semibold">{value}</dd>
-                      </div>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                {!readOnlyPreview ? (
-                  <AddToTravelPlanButton
-                    kind="event"
-                    targetId={event.id}
-                    title={event.title}
-                    slug={event.slug ?? null}
-                    imageUrl={event.cover_url ?? null}
-                    subtitle={startDay}
-                    variant="full"
-                  />
-                ) : null}
-                {event.external_url ? (
-                  <a
-                    href={event.external_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--selva)] px-7 text-sm font-semibold text-[var(--selva)]"
-                  >
-                    Más información <ArrowRight className="size-4" aria-hidden />
-                  </a>
-                ) : null}
-              </div>
-            </div>
-            <div className="order-1 lg:order-2">
-              {previewCover ??
-                (event.cover_url ? (
-                  <img
-                    src={event.cover_url}
-                    alt={event.title}
-                    className="h-56 w-full rounded-3xl object-cover shadow-elevated sm:h-72 lg:h-[26rem]"
-                    loading="eager"
-                  />
-                ) : (
-                  <div className="h-56 w-full rounded-3xl border border-dashed border-[var(--border)] bg-[var(--brand-surface-soft)] sm:h-72 lg:h-[26rem]" />
-                ))}
-            </div>
-          </section>
-        </Container>
+      {/* ---- Hero Premium (mismo bloque que hoteles/restaurantes/casas) ---- */}
+      <PremiumHero
+        layout="entity"
+        vm={{
+          presentation: DEFAULT_PREMIUM_PRESENTATION,
+          eyebrow: eventType ? humanizeAttributeValue(eventType) : "Evento",
+          title: event.title,
+          description: event.summary ?? undefined,
+          media: event.cover_url ? { url: event.cover_url, alt: event.title, asset: event.cover_asset } : null,
+          badges: event.destination_name
+            ? [
+                {
+                  label: `${event.destination_name} · Oriente Maya de Yucatán`,
+                  tone: "neutral" as const,
+                },
+              ]
+            : [],
+        }}
+      />
 
-        <Container className="mt-6 sm:mt-8">
-          <TourismAluxPanel
-            title="¿Qué fechas estarás en la región?"
-            description="Alux combinará este evento con lugares, mesas y experiencias cercanas sin romper el ritmo de tu viaje."
-            task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya de Yucatán.`}
-            prompts={[
-              "Este fin de semana",
-              "Ya estoy aquí",
-              "En pareja",
-              "En familia",
-              "Con amigos",
-            ]}
-            compact
+      {/* ---- Fila de acciones: compartir, guardar, agregar a Mi Viaje ---- */}
+      <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-4 sm:px-6 lg:px-8">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => setShareOpen(true)}
+          aria-label="Compartir evento"
+          className="rounded-pill border border-border bg-background shadow-soft"
+        >
+          <Share2 className="h-5 w-5" aria-hidden="true" />
+        </Button>
+        <ShareSheet
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          title={event.title}
+          url={typeof window !== "undefined" ? window.location.href : ""}
+          text="Descubre este evento en el Oriente Maya de Yucatán."
+          heading="Compartir evento"
+        />
+        {!readOnlyPreview ? (
+          <FavoriteButton
+            entityKind="event"
+            entityId={event.id}
+            entityTitle={event.title}
+            {...(event.slug ? { entitySlug: event.slug } : {})}
+            {...(event.cover_url ? { entityImageUrl: event.cover_url } : {})}
           />
-        </Container>
-
-        {event.body || tags.length ? (
-          <Container className="mt-10 lg:mt-14">
-            <section className="grid gap-7 lg:grid-cols-[.82fr_1.18fr] lg:items-start">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--brand-primary-strong)]">
-                  La experiencia
-                </p>
-                <h2 className="mt-3 font-display text-4xl leading-tight">Qué vas a vivir</h2>
-                {tags.length ? (
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <span key={tag} className="rounded-full bg-card px-3 py-2 text-xs shadow-sm">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-              {event.body ? (
-                <div className="whitespace-pre-line text-base leading-8 text-[var(--muted-foreground)]">
-                  {event.body}
-                </div>
-              ) : null}
-            </section>
-          </Container>
+        ) : null}
+        {!readOnlyPreview ? (
+          <AddToTravelPlanButton
+            kind="event"
+            targetId={event.id}
+            title={event.title}
+            slug={event.slug ?? null}
+            imageUrl={event.cover_url ?? null}
+            subtitle={startDay}
+            variant="full"
+          />
         ) : null}
       </div>
+
+      {/* ---- Alux contextual ---- */}
+      <TourismAluxPanel
+        className="mx-auto mt-4 w-full max-w-7xl"
+        title={fillEventCopy(copy.aluxTitle, event.title)}
+        description={copy.aluxDescription}
+        task={`Ayúdame a integrar ${event.title} en mi viaje por el Oriente Maya de Yucatán.`}
+        selection={{
+          entityRef: `event:${event.id}`,
+          title: event.title,
+          ...(event.destination_slug ? { destinationSlug: event.destination_slug } : {}),
+          ...(event.destination_slug ? { destinationLabel: event.destination_slug } : {}),
+        }}
+      />
+
+      {/* ---- Datos clave del evento ---- */}
+      {infoGridDto ? (
+        <section data-eb-anchor className="mt-6 scroll-mt-24">
+          <ExperienceInfoGrid dto={infoGridDto} />
+        </section>
+      ) : null}
+
+      {/* ---- Descripción editorial ---- */}
+      {descriptionSection ? (
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
+          <ExperienceSection dto={descriptionSection} />
+        </section>
+      ) : null}
+
+      {/* ---- Ubicación / Cómo llegar ---- */}
+      {hasLocation ? (
+        <section id="ubicacion" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
+          <BusinessLocationBlock
+            lat={event.latitude!}
+            lng={event.longitude!}
+            name={event.venue_name ?? event.title}
+            presentation="premium"
+            layout="stacked"
+          />
+        </section>
+      ) : null}
+
+      {/* ---- Eventos cercanos ---- */}
+      {related.length > 0 ? (
+        <section
+          id="descubre"
+          data-eb-anchor
+          className="mx-auto mt-8 w-full max-w-7xl scroll-mt-24 sm:mt-10"
+        >
+          <h2 className="font-serif text-xl tracking-tight text-foreground sm:text-2xl">
+            {fillEventCopy(copy.relatedHeading, event.title)}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">{copy.relatedSubheading}</p>
+          <div className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-[46%] lg:[&>*]:w-auto">
+            {related.slice(0, 8).map((card) => (
+              <TourismCard
+                key={card.id}
+                vm={eventCardToVM(card)}
+                capabilities={{
+                  showMedia: true,
+                  showEyebrow: false,
+                  showBusiness: true,
+                  showTagline: true,
+                  showRating: false,
+                  showLocation: true,
+                  showDistance: false,
+                  showTerritorialContext: false,
+                  showHighlights: false,
+                  showBadges: false,
+                  showInstitutionalBadges: false,
+                  showDate: true,
+                  showAvailability: false,
+                  showPrice: false,
+                  showPrimaryAction: false,
+                  showSecondaryAction: false,
+                  showFavorite: false,
+                  showRationale: false,
+                  compact: true,
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* ---- CTA final ---- */}
+      <section className="mx-auto mt-8 w-full max-w-7xl px-4 pb-4 sm:mt-10 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-lg font-semibold text-foreground">
+              {fillEventCopy(copy.ctaTitle, event.title)}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{copy.ctaSubtitle}</p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            {!readOnlyPreview ? (
+              <AddToTravelPlanButton
+                kind="event"
+                targetId={event.id}
+                title={event.title}
+                slug={event.slug ?? null}
+                imageUrl={event.cover_url ?? null}
+                subtitle={startDay}
+              />
+            ) : null}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setShareOpen(true)}
+              aria-label="Compartir evento"
+              className="rounded-pill border border-border bg-background shadow-soft"
+            >
+              <Share2 className="h-5 w-5" aria-hidden="true" />
+            </Button>
+          </div>
+        </div>
+      </section>
     </PublicShell>
   );
 }

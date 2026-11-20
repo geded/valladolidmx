@@ -9,6 +9,7 @@ export interface SmartBusinessItem {
   cover_image_url?: string | null;
   logo_url?: string | null;
   href?: string | null;
+  media_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   [k: string]: unknown;
 }
 
@@ -39,6 +40,7 @@ export function SmartBusinessesGrid({
             title={String(b.name ?? "Empresa")}
             description={b.short_description ?? null}
             imageUrl={b.cover_image_url ?? b.logo_url ?? null}
+            imageAsset={b.media_asset}
             href={b.href ?? null}
             actions={
               b.id ? (

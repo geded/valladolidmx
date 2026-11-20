@@ -10,6 +10,7 @@ export interface SmartProductItem {
   price?: number | null;
   currency?: string | null;
   href?: string | null;
+  media_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   [k: string]: unknown;
 }
 
@@ -47,6 +48,7 @@ export function SmartProductsGrid({ items, title }: { items: SmartProductItem[];
             title={String(p.name ?? "Producto")}
             description={p.short_description ?? null}
             imageUrl={p.cover_image_url ?? null}
+            imageAsset={p.media_asset}
             href={p.href ?? null}
             badge={formatPrice(p.price ?? null, p.currency ?? null)}
             actions={

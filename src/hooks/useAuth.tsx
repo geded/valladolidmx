@@ -147,3 +147,13 @@ export function useAuth(): AuthContextValue {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }
+
+/**
+ * Lectura tolerante del contexto de sesión para superficies decorativas
+ * (p. ej. el disparador flotante de Alux) que pueden renderizarse en SSR
+ * dentro de chunks perezosos. Nunca lanza: devuelve `null` si no hay
+ * proveedor disponible en ese árbol.
+ */
+export function useOptionalAuth(): AuthContextValue | null {
+  return useContext(AuthContext) ?? null;
+}

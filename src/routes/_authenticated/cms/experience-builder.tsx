@@ -13,6 +13,7 @@
  *  - CMS First, BEA, Customer Case File, Alux read-only.
  */
 
+import { useLayoutEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,6 +51,7 @@ export const Route = createFileRoute("/_authenticated/cms/experience-builder")({
 type StudioMode = "visual" | "professional";
 
 function ExperienceBuilderShell() {
+  const shellRef = useRef<HTMLDivElement | null>(null);
   const { roles } = useAuth();
   const canAdvanced = roles.includes("admin") || roles.includes("super_admin");
   const search = useSearch({ strict: false }) as {
@@ -77,8 +79,44 @@ function ExperienceBuilderShell() {
       replace: true,
     });
 
+  // El bloqueo de desplazamiento del workspace sólo aplica cuando hay una
+  // página abierta en el lienzo (el lienzo tiene su propio scroller). En el
+  // panel de páginas la lista debe poder desplazarse con normalidad.
+  const canvasOpen = Boolean(page);
+  useLayoutEffect(() => {
+    if (!canvasOpen) return;
+    const workspaceMain = shellRef.current?.closest<HTMLElement>("main#main");
+    if (!workspaceMain) return;
+    const previousScrollTop = workspaceMain.scrollTop;
+    const previousOverflow = workspaceMain.style.overflow;
+    const previousOverscroll = workspaceMain.style.overscrollBehavior;
+    // El listado puede estar desplazado al abrir una plantilla. El editor ocupa
+    // su propio lienzo y debe iniciar bajo las barras del Workspace, no heredar
+    // ese desplazamiento y dejar fuera de pantalla su acción de salida.
+    const keepEditorAtTop = () => {
+      if (workspaceMain.scrollTop !== 0) workspaceMain.scrollTop = 0;
+    };
+    keepEditorAtTop();
+    workspaceMain.addEventListener("scroll", keepEditorAtTop, { passive: true });
+    workspaceMain.style.overflow = "hidden";
+    workspaceMain.style.overscrollBehavior = "none";
+    return () => {
+      workspaceMain.removeEventListener("scroll", keepEditorAtTop);
+      workspaceMain.style.overflow = previousOverflow;
+      workspaceMain.style.overscrollBehavior = previousOverscroll;
+      // La lista vuelve a montarse después del editor; restaurar en el siguiente
+      // cuadro evita que el navegador limite la posición mientras aún no existe.
+      window.requestAnimationFrame(() => {
+        workspaceMain.scrollTop = previousScrollTop;
+      });
+    };
+  }, [canvasOpen]);
+
   return (
-    <div className="flex flex-col">
+    <div
+      ref={shellRef}
+      className={`flex min-h-0 flex-col ${canvasOpen ? "overflow-hidden" : ""}`}
+    >
       <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
         <Link
           to="/cms"

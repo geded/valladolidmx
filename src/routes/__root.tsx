@@ -1,3 +1,4 @@
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, queryOptions } from "@tanstack/react-query";
 import {
   Outlet,
@@ -8,7 +9,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -65,6 +66,12 @@ const AnonymousDraftImportRunner = React.lazy(() =>
     default: m.AnonymousDraftImportRunner,
   })),
 );
+// Monitor de usuarios · M1 — sonda de señales de página (no pinta nada).
+const PageSignalsProbe = React.lazy(() =>
+  import("@/components/analytics/PageSignalsProbe").then((m) => ({
+    default: m.PageSignalsProbe,
+  })),
+);
 const SyncStatusBanner = React.lazy(() =>
   import("@/components/discovery/SyncStatusBanner").then((m) => ({
     default: m.SyncStatusBanner,
@@ -86,7 +93,7 @@ import {
   BRAND_SETTINGS_DEFAULTS,
   normalizeBrandSettings,
 } from "@/lib/brand/brand-settings.functions";
-import { brandPaletteStyle } from "@/lib/brand/brand-theme";
+import { aluxPaletteStyle, brandPaletteStyle } from "@/lib/brand/brand-theme";
 import {
   institutionalAuthorityQueryOptions,
   useInstitutionalAuthority,
@@ -99,6 +106,8 @@ import { GlobalNavigationSessionBridge } from "@/components/navigation/Navigatio
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { getOmxdsVisualFoundationsFlag } from "@/lib/omxds/visual-foundations-flag.server";
+import { SITE_DOMAIN_DEFAULTS, getSiteDomainSettings } from "@/lib/settings/site-domains.functions";
+import { setCanonicalDomain } from "@/config/site";
 
 const OMXDS_THEME_BOOTSTRAP = `(()=>{try{const r=document.documentElement;if(r.dataset.omxdsVisualFoundations!=="enabled")return;const k="valladolidmx:theme";const s=localStorage.getItem(k);const t=s==="sol"||s==="luna"?s:matchMedia("(prefers-color-scheme: dark)").matches?"luna":"sol";r.classList.toggle("dark",t==="luna");r.dataset.theme=t;r.style.colorScheme=t==="luna"?"dark":"light"}catch{}})();`;
 
@@ -128,26 +137,65 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+/**
+ * Adenda 15.10.6 · Offline First — Diagnóstico 2026-09-21.
+ * Sin conexión, cualquier fallo de red terminaba en el mensaje genérico de
+ * error. Aquí se distingue "sin conexión" de "error real": se informa con
+ * lenguaje claro y se reintenta automáticamente al recuperar la red.
+ * No cachea, no persiste y no altera ninguna plantilla pública.
+ */
+function isOfflineLikeError(error: Error): boolean {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) return true;
+  const message = `${error?.name ?? ""} ${error?.message ?? ""}`.toLowerCase();
+  return (
+    message.includes("failed to fetch") ||
+    message.includes("networkerror") ||
+    message.includes("network request failed") ||
+    message.includes("load failed") ||
+    message.includes("err_internet_disconnected")
+  );
+}
+
+function ErrorComponent({ error: rawError, reset }: ErrorComponentProps) {
+  const error = rawError instanceof Error ? rawError : new Error(String(rawError));
   const router = useRouter();
+  const offline = isOfflineLikeError(error);
+  const [retrying, setRetrying] = useState(false);
+
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
+  useEffect(() => {
+    if (!offline || typeof window === "undefined") return;
+    const retry = () => {
+      setRetrying(true);
+      void router.invalidate();
+      reset();
+    };
+    window.addEventListener("online", retry);
+    return () => window.removeEventListener("online", retry);
+  }, [offline, reset, router]);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-2xl">Algo no cargó</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Intenta de nuevo o vuelve al inicio.</p>
+        <h1 className="text-2xl">{offline ? "Sin conexión" : "Algo no cargó"}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {offline
+            ? "No hay conexión a internet. Puedes seguir viendo las páginas que ya visitaste; el resto se cargará solo cuando vuelva la señal."
+            : "Intenta de nuevo o vuelve al inicio."}
+        </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
+              setRetrying(true);
               router.invalidate();
               reset();
             }}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-95"
           >
-            Reintentar
+            {retrying ? "Reintentando…" : "Reintentar"}
           </button>
           <a
             href="/"
@@ -176,22 +224,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Lote 3B · B — La identidad de marca administrable se precarga en SSR
     // para que header, pie y superficies públicas la pinten sin parpadeo.
     // Fail-safe: ante cualquier error se conserva el fallback de código.
-    const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome] = await Promise.all([
-      getOmxdsVisualFoundationsFlag(),
-      context.queryClient
-        .ensureQueryData(brandSettingsQueryOptions)
-        .catch(() => BRAND_SETTINGS_DEFAULTS),
-      // Lote 3B · C — Autoridad institucional vigente (distintivos).
-      context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
-      // El chrome público debe llegar en la primera respuesta para evitar que
-      // header y footer cambien de geometría después de hidratar React.
-      context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
-    ]);
+    const [omxdsVisualFoundationsEnabled, brandSettings, , publishedHome, siteDomains] =
+      await Promise.all([
+        // Offline First: sin red esta bandera fallaba y derribaba toda la
+        // aplicación. Fail-safe al valor de código, como el resto del loader.
+        getOmxdsVisualFoundationsFlag().catch(() => false),
+        context.queryClient
+          .ensureQueryData(brandSettingsQueryOptions)
+          .catch(() => BRAND_SETTINGS_DEFAULTS),
+        // Lote 3B · C — Autoridad institucional vigente (distintivos).
+        context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
+        // El chrome público debe llegar en la primera respuesta para evitar que
+        // header y footer cambien de geometría después de hidratar React.
+        context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
+        // Configuración → Dominios: dominio canónico administrable.
+        getSiteDomainSettings().catch(() => SITE_DOMAIN_DEFAULTS),
+      ]);
+
+    // Aplica el dominio canónico vigente en SSR (antes de generar head/canonical).
+    setCanonicalDomain(siteDomains.primaryDomain);
 
     return {
       omxdsVisualFoundationsEnabled,
       brandSettings: normalizeBrandSettings(brandSettings),
       publishedHome,
+      siteDomains,
     };
   },
 
@@ -224,8 +281,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", href: "/favicon.ico", sizes: "any" },
-      { rel: "apple-touch-icon", href: "/logo.png" },
+      { rel: "icon", type: "image/png", href: "/favicon.png", sizes: "64x64" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       // Tipografía centralizada vía tokens. Cargada por <link> según Tailwind v4.
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -257,13 +314,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  const { omxdsVisualFoundationsEnabled, brandSettings } = Route.useLoaderData();
+  // El shell también se pinta cuando el loader raíz no terminó (errores o
+  // not-found tempranos): conservar los valores de código como fallback.
+  const loaderData = Route.useLoaderData() as
+    | { omxdsVisualFoundationsEnabled: boolean; brandSettings: ReturnType<typeof normalizeBrandSettings>; siteDomains: typeof SITE_DOMAIN_DEFAULTS }
+    | undefined;
+  const omxdsVisualFoundationsEnabled = loaderData?.omxdsVisualFoundationsEnabled ?? false;
+  const brandSettings = loaderData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
+  const siteDomains = loaderData?.siteDomains ?? SITE_DOMAIN_DEFAULTS;
+  // Mantiene el origen canónico sincronizado también tras hidratar.
+  setCanonicalDomain(siteDomains.primaryDomain);
   return (
     <html
       lang="es"
       suppressHydrationWarning
       data-tourism-brand={ACTIVE_BRAND.key}
-      style={{ ...ACTIVE_BRAND_THEME_STYLE, ...brandPaletteStyle(brandSettings.palette) }}
+      style={{
+        ...ACTIVE_BRAND_THEME_STYLE,
+        ...brandPaletteStyle(brandSettings.palette),
+        ...aluxPaletteStyle(brandSettings.aluxPalette),
+      }}
       data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
     >
       <head>
@@ -282,7 +352,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const { omxdsVisualFoundationsEnabled, brandSettings } = Route.useLoaderData();
+  const rootData = Route.useLoaderData() as
+    | { omxdsVisualFoundationsEnabled: boolean; brandSettings: ReturnType<typeof normalizeBrandSettings> }
+    | undefined;
+  const omxdsVisualFoundationsEnabled = rootData?.omxdsVisualFoundationsEnabled ?? false;
+  const brandSettings = rootData?.brandSettings ?? normalizeBrandSettings(BRAND_SETTINGS_DEFAULTS);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const headerVariant = pathname === "/" ? "overlay" : "solid";
   // Rutas con shell propio (CMS Studio, Portal Empresarial, Admin, Cuenta).
@@ -408,6 +482,11 @@ function RootComponent() {
           sessionStorage (deep-links, refresh, back/forward).
         */}
             <GlobalNavigationSessionBridge />
+            {!isAppShellRoute ? (
+              <React.Suspense fallback={null}>
+                <PageSignalsProbe />
+              </React.Suspense>
+            ) : null}
           </AuthProvider>
         </BrandProvider>
       </I18nProvider>
@@ -429,7 +508,9 @@ function PublicChrome({
   // menú, botón destacado y columnas del footer una sola vez desde el
   // Experience Builder y verlo aplicado en cualquier ruta.
   void pathname;
-  const { publishedHome } = Route.useLoaderData();
+  const publishedHome = (
+    Route.useLoaderData() as { publishedHome?: Awaited<ReturnType<typeof getPublishedHomeComposition>> | null } | undefined
+  )?.publishedHome;
   const config = publishedHome?.snapshot?.chrome?.[position];
 
   if (position === "header") {

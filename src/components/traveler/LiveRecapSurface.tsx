@@ -10,6 +10,7 @@
  */
 
 import { ArrowRight, CheckCircle2, Circle, Sunrise } from "lucide-react";
+import { meridaClock } from "@/lib/time/merida";
 import type { LiveRecap } from "@/lib/traveler/live-recap";
 
 export interface LiveRecapSurfaceProps {
@@ -22,7 +23,7 @@ function fmtTime(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return meridaClock(d);
 }
 
 export function LiveRecapSurface({ recap, onOpenTomorrow, className }: LiveRecapSurfaceProps) {

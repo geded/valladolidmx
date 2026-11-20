@@ -1,0 +1,106 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-089",
+  "title": "Activación de Alux desde la personalización de rutas del Home",
+  "status": "Approved",
+  "branch": "fix/home-route-alux-action-20260910",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para corregir el botón existente Personalizar con Alux de las rutas del Home y hacer que abra el concierge con el contexto de la ruta seleccionada, sin rediseñar la sección, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/floating-bus.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-retrieval.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-grounding.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/canonical-catalog.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/home-premium/HomePremiumSurface.tsx",
+      "sha256": "aeb3e287c3d1226796e8f6ffb332897a601730bf66b778c6e621c8e925a9b041",
+      "authority": "Founder · activación funcional de Alux desde rutas · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/floating-bus.ts",
+      "sha256": "c1412500c9c3bc73136a6dbb248b53d4559951e618c5709e48c8baeb2e5dc58e",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-contract.ts",
+      "sha256": "d37294fd3f16acea659dd0cb7c635f2f218dcba3ba733b6a13c3e59d8d076f59",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx",
+      "sha256": "929f02b2dc54ba9c8a0410edef86b125d56c37c851238db14cf1cf22c3814720",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts",
+      "sha256": "fbdb77afad2ac6274e60777dbb211930d5640990af01369706119ebf40ea7dfc",
+      "authority": "Founder · contexto completo de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-retrieval.server.ts",
+      "sha256": "b2074f060cce780951084e20436be19a41d64edf79bb8941f77c3955827a3580",
+      "authority": "Founder · recuperación de todos los territorios de la ruta seleccionada · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-grounding.ts",
+      "sha256": "af9ea6fdc7fbaf89e379be4cf4ac8cfc9717a676f78a32fe1ef582a6190f2f5a",
+      "authority": "Founder · grounding completo de paradas de ruta para Alux · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/canonical-catalog.server.ts",
+      "sha256": "78509c1d4c8b5f917db2bf780570d97eed8efaa2a07dfe32c3c3931b8db50237",
+      "authority": "Founder · elegibilidad canónica por ID para paradas de ruta · 2026-09-10"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/lovable/g4-home-premium-preview.tsx",
+      "sha256": "18b118742d401078aae609fcfbabfff379f41415a254a7f7b6114eb63f1b681c",
+      "authority": "Founder · preview compartida con rutas CMS canónicas · 2026-09-10"
+    }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": ["Governance Integrity", "revisión funcional del botón Personalizar con Alux"]
+}

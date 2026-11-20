@@ -11,10 +11,11 @@ export interface DestinationPremiumNearbySource {
   subtitle: string;
   href: string;
   mediaUrl: string;
+  mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
 }
 
 function mediaOf(item: PublicMediaAttribution): DestinationPremiumMedia {
-  return { url: item.url, alt: item.alt ?? "" };
+  return { url: item.url, alt: item.alt ?? "", asset: item.asset, focal: item.focal ?? null };
 }
 
 export function buildDestinationPremiumRuntime(input: {
@@ -40,12 +41,25 @@ export function buildDestinationPremiumRuntime(input: {
           },
         ]
       : [];
-  const allMedia = [
-    ...(cover ? [mediaOf(cover)] : approvedConceptual.slice(0, 1)),
-    ...gallery.map(mediaOf),
-    ...approvedConceptual.slice(1),
-  ];
-  const paragraphs = destination.description?.trim() ? [destination.description.trim()] : [];
+  const heroRole = media.filter((item) => item.role === "hero").map(mediaOf);
+  // Pool editorial: cada sección consume fotografías distintas.
+  // Prioridad: medios con rol "hero", luego galería, y sólo al final la portada.
+  const editorialPool = [...heroRole, ...gallery.map(mediaOf), ...approvedConceptual];
+  const coverMedia = cover ? mediaOf(cover) : (approvedConceptual[0] ?? null);
+  const heroMedia = editorialPool[0] ?? coverMedia ?? { url: "", alt: "" };
+  // Reparto editorial: el hero rota entre sus propias fotografías,
+  // "Descubre" usa otras y la galería se queda con el resto.
+  const poolSize = editorialPool.length;
+  // Portada tipo Airbnb: el hero reúne TODAS las fotografías (mosaico +
+  // "Ver todas las fotos"); "Descubre" toma una sola, distinta del mosaico
+  // cuando existe, y la galería conserva el resto para variantes que la usan.
+  const heroSupporting = editorialPool.slice(1);
+  const afterHero = editorialPool.slice(Math.min(poolSize, 5));
+  const narrativeMedia = (afterHero[0] ?? editorialPool[1]) ? [afterHero[0] ?? editorialPool[1]] : [];
+  const galleryItems = editorialPool.slice(1);
+  const heroDescription = destination.tagline?.trim() ?? "";
+  const descubreText = destination.description?.trim() ?? "";
+  const paragraphs = descubreText ? [descubreText] : [];
   const mapItems = [
     ...(destination.latitude != null && destination.longitude != null
       ? [
@@ -84,14 +98,12 @@ export function buildDestinationPremiumRuntime(input: {
         : null,
       regionBadge: "Oriente Maya de Yucatán",
       title: destination.name,
-      subtitle: destination.tagline ?? "Descubre este destino del Oriente Maya de Yucatán",
-      description:
-        destination.description?.trim() ||
-        `Explora ${destination.name} y prepara tu recorrido por el Oriente Maya de Yucatán.`,
+      subtitle: heroDescription || `Descubre ${destination.name} en el Oriente Maya de Yucatán`,
+      description: "",
       primaryCta: { label: "Arma tu viaje", href: "/arma-tu-viaje" },
       secondaryCta: { label: "Explorar servicios", href: "#servicios-destino" },
-      cover: allMedia[0] ?? { url: "", alt: "" },
-      supporting: allMedia.slice(1, 3),
+      cover: heroMedia,
+      supporting: heroSupporting,
     },
     services: [
       { key: "hoteles", label: "Hoteles", hint: "Dónde dormir", media: { url: "", alt: "" } },
@@ -115,13 +127,19 @@ export function buildDestinationPremiumRuntime(input: {
         media: { url: "", alt: "" },
       },
       { key: "eventos", label: "Eventos", hint: "Agenda del destino", media: { url: "", alt: "" } },
+      {
+        key: "lugares",
+        label: "Lugares y sitios de interés",
+        hint: "Puntos emblemáticos",
+        media: { url: "", alt: "" },
+      },
     ],
     servicesNote: "Selecciona una categoría para descubrir opciones publicadas en este destino.",
     descubre: {
       kicker: "El destino",
       title: `Descubre ${destination.name}`,
       paragraphs,
-      media: allMedia.slice(1, 4),
+      media: narrativeMedia,
     },
     gallery: {
       kicker: "Galería",
@@ -129,7 +147,7 @@ export function buildDestinationPremiumRuntime(input: {
       note: cover
         ? "Fotografías acreditadas para uso público."
         : "Visuales conceptuales temporales, reemplazables desde Medios.",
-      items: allMedia,
+      items: galleryItems,
     },
     servicePreview: {
       actionLabel: "Ver todo",
@@ -157,7 +175,7 @@ export function buildDestinationPremiumRuntime(input: {
           name: item.title,
           distance: "",
           tagline: item.subtitle,
-          media: { url: item.mediaUrl, alt: item.title },
+          media: { url: item.mediaUrl, alt: item.title, asset: item.mediaAsset },
           href: item.href,
         })),
     },

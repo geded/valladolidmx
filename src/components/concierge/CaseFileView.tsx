@@ -4,9 +4,16 @@
  */
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { meridaDate, meridaDateTime, meridaLongDate } from "@/lib/time/merida";
 import { useServerFn } from "@tanstack/react-start";
-import { useRouter, useNavigate } from "@tanstack/react-router";
+import { useRouter, useNavigate, Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Check, Circle, Headset, Sparkles, Mail, Phone, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAluxBrand } from "@/lib/brand/brand-context";
+import { briefToDetailRows, type TripBrief } from "@/lib/traveler/trip-brief";
 import { toast } from "@/lib/toast";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   acceptConciergeProposal,
   rejectConciergeProposal,
@@ -14,12 +21,17 @@ import {
   viewConciergeProposal,
   withdrawConciergeProposal,
   createConciergeProposal,
-  assignConciergeCase,
+  assignSelfConciergeCase,
   releaseConciergeCase,
   setConciergeCasePriority,
   getConciergeCaseHandoffContext,
+  requestConciergeQuote,
 } from "@/lib/concierge/concierge.functions";
-import { createOrderFromProposal } from "@/lib/concierge/orders.functions";
+import {
+  createOrderFromProposal,
+  markConciergeOrderPaidCash,
+} from "@/lib/concierge/orders.functions";
+import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
 import {
   generateAluxSummary,
   generateAluxProducts,
@@ -47,8 +59,39 @@ type CaseFile = {
     priority_reason?: string | null;
   };
   viewer: { user_id: string; is_internal: boolean };
-  traveler: { user_id: string; display_name?: string | null; preferred_language?: string | null };
-  travel_plan: { id: string } | null;
+  traveler: {
+    user_id: string;
+    display_name?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    preferred_language?: string | null;
+    whatsapp_contact_consent?: boolean;
+    whatsapp_contact_consented_at?: string | null;
+  };
+  travel_plan: {
+    id: string;
+    title?: string | null;
+    status?: string | null;
+    party_size?: number | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    notes?: string | null;
+    source?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+    items?: Array<{
+      id: string;
+      item_kind: string;
+      day_index?: number | null;
+      position?: number | null;
+      notes?: string | null;
+      title?: string | null;
+      subtitle?: string | null;
+      slug?: string | null;
+    }>;
+  } | null;
   requests: Array<{
     id: string;
     title: string;
@@ -56,6 +99,7 @@ type CaseFile = {
     status: string;
     source_type: string;
     notes: string | null;
+    business_id?: string | null;
   }>;
   links: Array<{ link_type: string; target_id: string }>;
   businesses: Array<{ id: string; display_name: string; slug: string | null }>;
@@ -108,6 +152,12 @@ type CaseFile = {
       business_id: string;
       business_name: string | null;
       request_title: string;
+      day_index?: number | null;
+      /** Hora local del destino (America/Merida). */
+      starts_at_local?: string | null;
+      duration_minutes?: number | null;
+      is_suggestion?: boolean | null;
+      source?: string | null;
     }>;
   }>;
   assignment?: {
@@ -135,6 +185,191 @@ type CaseFile = {
   } | null;
 };
 
+const CASE_STATUS_LABELS: Record<string, string> = {
+  new: "Nuevo",
+  triaged: "En revisión",
+  in_progress: "En atención",
+  waiting_customer: "Esperando respuesta del viajero",
+  waiting_business: "Esperando respuesta de una empresa",
+  on_hold: "En pausa",
+  resolved: "Resuelto",
+  closed_won: "Cerrado con viaje confirmado",
+  closed_lost: "Cerrado sin confirmación",
+  closed: "Cerrado",
+  archived: "Archivado",
+  cancelled: "Cancelado",
+  lost: "Cerrado sin confirmación",
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  low: "Baja",
+  normal: "Normal",
+  high: "Alta",
+  urgent: "Urgente",
+};
+
+const PRIORITY_SOURCE_LABELS: Record<string, string> = {
+  manual: "Definida por el concierge",
+  sla: "Calculada por tiempo de respuesta",
+  trip_date: "Calculada por cercanía del viaje",
+  payment: "Relacionada con una confirmación",
+  system: "Asignada automáticamente",
+  alux: "Sugerida por Alux",
+  other: "Otro criterio",
+};
+
+const SLA_STATUS_LABELS: Record<string, string> = {
+  on_time: "A tiempo",
+  due_soon: "Por vencer",
+  overdue: "Vencido",
+};
+
+const REQUEST_STATUS_LABELS: Record<string, string> = {
+  open: "Pendiente de revisión",
+  quoting: "Solicitando cotización",
+  quoted: "Cotización recibida",
+  accepted: "Aceptada",
+  rejected: "Rechazada",
+  cancelled: "Cancelada",
+};
+
+const QUOTE_STATUS_LABELS: Record<string, string> = {
+  requested: "Solicitada",
+  draft: "En preparación",
+  submitted: "Recibida",
+  withdrawn: "Retirada",
+  expired: "Vencida",
+  accepted: "Aceptada",
+  rejected: "Rechazada",
+};
+
+const PROPOSAL_STATUS_LABELS: Record<string, string> = {
+  draft: "En preparación",
+  sent: "Enviada al viajero",
+  viewed: "Vista por el viajero",
+  accepted: "Aceptada",
+  rejected: "Rechazada",
+  withdrawn: "Retirada",
+  expired: "Vencida",
+};
+
+const SOURCE_LABELS: Record<string, string> = {
+  travel_plan: "Mi Viaje",
+  travel_plan_item: "Experiencia guardada en Mi Viaje",
+  marketplace_product: "Ficha de una experiencia",
+  manual: "Solicitud registrada por el Concierge",
+};
+
+const REQUEST_KIND_LABELS: Record<string, string> = {
+  reservable: "Requiere cotización o disponibilidad",
+  non_reservable: "Interés o actividad por considerar",
+};
+
+const ITEM_KIND_LABELS: Record<string, string> = {
+  business: "Empresa",
+  hotel: "Hotel",
+  restaurant: "Restaurante",
+  vacation_rental: "Casa de vacaciones",
+  experience: "Experiencia",
+  product: "Experiencia",
+  event: "Evento",
+  place: "Lugar",
+  destination: "Destino",
+  route: "Ruta",
+};
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  "Concierge.Handoff.Context": "Información del viaje compartida con el Concierge",
+  concierge_handoff_context: "Información del viaje compartida con el Concierge",
+  "Concierge.Case.Created": "Expediente creado",
+  "Concierge.Case.Assigned": "Expediente asignado",
+  "Concierge.Case.Reassigned": "Expediente reasignado",
+  "Concierge.Case.Released": "Expediente liberado",
+  "Concierge.Case.StatusChanged": "Estado del expediente actualizado",
+  "Concierge.Case.PriorityChanged": "Prioridad actualizada",
+  "Concierge.Case.TargetResponseSet": "Fecha objetivo de respuesta actualizada",
+  "Concierge.Request.Created": "Solicitud agregada al expediente",
+  "Concierge.Quote.Requested": "Cotización solicitada",
+  "Concierge.Quote.Submitted": "Cotización recibida",
+  "Concierge.Proposal.Created": "Propuesta preparada",
+  "Concierge.Proposal.Sent": "Propuesta enviada al viajero",
+  "Concierge.Proposal.Viewed": "Propuesta vista por el viajero",
+  "Concierge.Proposal.Accepted": "Propuesta aceptada",
+  "Concierge.Itinerary.Scheduled": "Itinerario armado con los horarios de la propuesta",
+  "Concierge.Message.Received": "Mensaje nuevo en la conversación",
+};
+
+const FIELD_LABELS: Record<string, string> = {
+  destination: "Destino",
+  destination_id: "Destino",
+  destination_name: "Destino",
+  destinations: "Destinos",
+  last_destination: "Último destino consultado",
+  recent_destinations: "Destinos consultados recientemente",
+  interests: "Intereses",
+  categories: "Intereses",
+  visited_places: "Lugares visitados",
+  saved_places: "Lugares guardados",
+  routes: "Rutas de interés",
+  notes: "Notas",
+  count: "Registros",
+  updated_at: "Última actualización",
+  created_at: "Fecha de registro",
+};
+
+const VALUE_LABELS: Record<string, string> = {
+  es: "Español",
+  en: "Inglés",
+  fr: "Francés",
+  de: "Alemán",
+  it: "Italiano",
+  pt: "Portugués",
+  low: "Bajo",
+  medium: "Medio",
+  high: "Alto",
+  budget: "Económico",
+  comfort: "Confort",
+  premium: "Premium",
+};
+
+function labelFor(value: string | null | undefined, labels: Record<string, string>): string {
+  if (!value) return "Sin datos";
+  return labels[value] ?? humanizeKey(value);
+}
+
+function humanizeKey(value: string): string {
+  const spaced = value
+    .replaceAll("_", " ")
+    .replaceAll(".", " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .trim();
+  return spaced ? spaced.charAt(0).toUpperCase() + spaced.slice(1) : "Sin datos";
+}
+
+function readableValue(value: unknown): string {
+  if (value == null || value === "") return "Sin información";
+  if (typeof value === "boolean") return value ? "Sí" : "No";
+  if (typeof value === "number") return value.toLocaleString("es-MX");
+  if (typeof value === "string") {
+    const mapped = VALUE_LABELS[value.toLowerCase()];
+    if (mapped) return mapped;
+    const maybeDate = /^\d{4}-\d{2}-\d{2}T/.test(value) ? new Date(value) : null;
+    return maybeDate && !Number.isNaN(maybeDate.getTime())
+      ? meridaDateTime(maybeDate)
+      : humanizeKey(value);
+  }
+  if (Array.isArray(value)) return value.map(readableValue).join(", ");
+  return Object.values(value as Record<string, unknown>)
+    .map(readableValue)
+    .join(" · ");
+}
+
+function readableEntries(value: Record<string, unknown>): Array<[string, string]> {
+  return Object.entries(value)
+    .filter(([, entry]) => entry !== undefined && entry !== null && entry !== "")
+    .map(([key, entry]) => [FIELD_LABELS[key] ?? humanizeKey(key), readableValue(entry)]);
+}
+
 export function CaseFileView({
   data,
   hideInternal = false,
@@ -148,28 +383,21 @@ export function CaseFileView({
 
   return (
     <div className="grid gap-6">
-      <Header f={f} />
+      <Header f={f} internal={internal} />
+      {!internal && <TravelerConciergeProgress f={f} />}
+      {!internal && <ProposalsSection f={f} internal={false} />}
       {internal && <SlaAssignmentPanel f={f} />}
+      {internal && <TravelerContactSection traveler={f.traveler} />}
+      <TravelPlanSection plan={f.travel_plan} />
       {internal && <HandoffContextCard caseId={f.case.id} />}
       {internal && <AluxAssistantPanel caseId={f.case.id} />}
-      <Section title="Solicitudes">
+      <Section title="Qué solicita el viajero">
         {f.requests.length === 0 ? (
           <Empty>Sin solicitudes registradas.</Empty>
         ) : (
           <ul className="grid gap-2">
-            {f.requests.map((r) => (
-              <li key={r.id} className="rounded-md border border-border bg-card p-3 text-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium">{r.title}</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {r.status}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Tipo: {r.kind} · Origen: {r.source_type}
-                </p>
-                {r.notes ? <p className="mt-1 text-xs text-foreground/80">{r.notes}</p> : null}
-              </li>
+            {f.requests.map((request) => (
+              <RequestCard key={request.id} request={request} f={f} internal={internal} />
             ))}
           </ul>
         )}
@@ -178,7 +406,9 @@ export function CaseFileView({
       {f.businesses.length > 0 && (
         <Section title="Empresas participantes">
           <ul className="flex flex-wrap gap-2 text-xs">
-            {f.businesses.map((b) => (
+            {Array.from(
+              new Map(f.businesses.map((business) => [business.id, business])).values(),
+            ).map((b) => (
               <li key={b.id} className="rounded-full border border-border bg-card px-3 py-1">
                 {b.display_name}
               </li>
@@ -197,7 +427,7 @@ export function CaseFileView({
                     {q.business_name ?? "Empresa"} · {q.request_title}
                   </span>
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {q.status}
+                    {labelFor(q.status, QUOTE_STATUS_LABELS)}
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -205,7 +435,7 @@ export function CaseFileView({
                     ? `${(q.total_amount_cents / 100).toLocaleString("es-MX", { style: "currency", currency: q.currency })}`
                     : "Sin monto"}
                   {q.valid_until
-                    ? ` · Vigente hasta ${new Date(q.valid_until).toLocaleString()}`
+                    ? ` · Vigente hasta ${meridaDateTime(q.valid_until)}`
                     : ""}
                 </p>
                 {q.notes ? <p className="mt-1 text-xs text-foreground/80">{q.notes}</p> : null}
@@ -215,7 +445,7 @@ export function CaseFileView({
         </Section>
       )}
 
-      <ProposalsSection f={f} internal={internal} />
+      {internal && <ProposalsSection f={f} internal />}
 
       {internal && (
         <Section title="Enlaces internos">
@@ -241,9 +471,9 @@ export function CaseFileView({
             {f.timeline.map((t) => (
               <li key={t.id} className="rounded-md border border-border bg-card p-3 text-xs">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium">{t.event_type}</span>
+                  <span className="font-medium">{labelFor(t.event_type, EVENT_TYPE_LABELS)}</span>
                   <span className="text-muted-foreground">
-                    {new Date(t.occurred_at).toLocaleString()}
+                    {meridaDateTime(t.occurred_at)}
                   </span>
                 </div>
                 {t.summary ? <p className="mt-1 text-foreground/80">{t.summary}</p> : null}
@@ -256,24 +486,302 @@ export function CaseFileView({
   );
 }
 
-function Header({ f }: { f: CaseFile }) {
+function Header({ f, internal }: { f: CaseFile; internal: boolean }) {
   return (
     <header className="rounded-lg border border-border bg-card p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="font-mono text-xs text-muted-foreground">{f.case.id.slice(0, 8)}</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Expediente {f.case.id.slice(0, 8).toUpperCase()}
+        </span>
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-          {f.case.status}
+          {labelFor(f.case.status, CASE_STATUS_LABELS)}
         </span>
       </div>
       <h2 className="mt-2 text-lg font-semibold">{f.case.summary ?? "Sin resumen"}</h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        Origen: {f.case.source} · Prioridad: {f.case.priority} · Creado{" "}
-        {new Date(f.case.created_at).toLocaleString()}
+        {internal
+          ? `Origen: ${labelFor(f.case.source, SOURCE_LABELS)} · Prioridad: ${labelFor(f.case.priority, PRIORITY_LABELS)} · `
+          : "Recibido "}
+        {meridaDateTime(f.case.created_at)}
       </p>
-      {f.traveler.display_name && (
+      {internal && f.traveler.display_name && (
         <p className="mt-1 text-xs text-muted-foreground">Viajero: {f.traveler.display_name}</p>
       )}
     </header>
+  );
+}
+
+/**
+ * Datos del viaje que el viajero envió al Concierge: personas, fechas,
+ * duración, notas y los lugares que guardó. Sin claves internas.
+ */
+function TravelPlanSection({ plan }: { plan: CaseFile["travel_plan"] }) {
+  if (!plan) {
+    return (
+      <Section title="Datos del viaje">
+        <Empty>
+          Este expediente no tiene un viaje enlazado. Confirma con el viajero fechas, número de
+          personas y lo que quiere hacer antes de cotizar.
+        </Empty>
+      </Section>
+    );
+  }
+
+  const fmtDate = (value?: string | null) =>
+    value
+      ? new Date(`${value}T12:00:00`).toLocaleDateString("es-MX", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : null;
+  const start = fmtDate(plan.start_date);
+  const end = fmtDate(plan.end_date);
+  let nights: number | null = null;
+  if (plan.start_date && plan.end_date) {
+    const ms =
+      new Date(`${plan.end_date}T12:00:00`).getTime() -
+      new Date(`${plan.start_date}T12:00:00`).getTime();
+    nights = Math.max(0, Math.round(ms / 86_400_000));
+  }
+  const items = plan.items ?? [];
+
+  const facts: Array<{ label: string; value: string }> = [
+    {
+      label: "Personas",
+      value: plan.party_size ? `${plan.party_size} viajero(s)` : "No indicado",
+    },
+    {
+      label: "Fechas",
+      value: start && end ? `${start} → ${end}` : (start ?? "Sin fechas definidas"),
+    },
+    {
+      label: "Duración",
+      value:
+        nights !== null
+          ? `${nights + 1} día(s) · ${nights} noche(s)`
+          : "Pendiente de confirmar con el viajero",
+    },
+    { label: "Experiencias guardadas", value: `${items.length}` },
+  ];
+
+  return (
+    <Section title="Datos del viaje">
+      <div className="grid gap-4">
+        {plan.title ? <p className="text-sm font-medium">{plan.title}</p> : null}
+        <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {facts.map((fact) => (
+            <div key={fact.label} className="rounded-md border border-border bg-card p-3">
+              <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                {fact.label}
+              </dt>
+              <dd className="mt-1 text-sm font-medium">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        {plan.notes ? (
+          <div className="rounded-md border border-dashed border-border bg-background/60 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Notas del viajero
+            </p>
+            <p className="mt-1 whitespace-pre-line text-sm">{plan.notes}</p>
+          </div>
+        ) : null}
+
+        <div>
+          <p className="mb-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+            Lo que guardó en Mi Viaje
+          </p>
+          {items.length === 0 ? (
+            <Empty>Todavía no guardó lugares ni experiencias.</Empty>
+          ) : (
+            <ul className="grid gap-2">
+              {items.map((it) => (
+                <li key={it.id} className="rounded-md border border-border bg-card p-3 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-medium">
+                      {it.title ?? it.subtitle ?? it.slug ?? "Sin nombre"}
+                    </span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                      {labelFor(it.item_kind, ITEM_KIND_LABELS)}
+                    </span>
+                  </div>
+                  {it.subtitle && it.title ? (
+                    <p className="mt-1 text-xs text-muted-foreground">{it.subtitle}</p>
+                  ) : null}
+                  {it.notes ? <p className="mt-1 text-xs">{it.notes}</p> : null}
+                  {typeof it.day_index === "number" ? (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Día {it.day_index + 1} del viaje
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function TravelerContactSection({ traveler }: { traveler: CaseFile["traveler"] }) {
+  const safePhone = traveler.phone?.trim() ?? "";
+  const phoneHref = /^\+?[0-9 ()-]{8,32}$/.test(safePhone)
+    ? `tel:${safePhone.replace(/[^+0-9]/g, "")}`
+    : null;
+  const whatsappHref =
+    traveler.whatsapp_contact_consent && phoneHref
+      ? `https://wa.me/${safePhone.replace(/\D/g, "")}`
+      : null;
+  const emailHref = traveler.email ? `mailto:${encodeURIComponent(traveler.email)}` : null;
+
+  return (
+    <Section title="Cliente y contacto">
+      <div className="grid gap-4 rounded-md border border-border bg-card p-4 sm:grid-cols-[1fr_auto]">
+        <div>
+          <p className="font-semibold text-foreground">
+            {traveler.display_name ?? "Nombre no disponible"}
+          </p>
+          <dl className="mt-2 grid gap-1 text-sm">
+            <div className="flex flex-wrap gap-2">
+              <dt className="text-muted-foreground">Correo:</dt>
+              <dd className="break-all">{traveler.email ?? "No disponible"}</dd>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <dt className="text-muted-foreground">Móvil:</dt>
+              <dd>{safePhone || "No disponible"}</dd>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <dt className="text-muted-foreground">WhatsApp:</dt>
+              <dd>
+                {traveler.whatsapp_contact_consent
+                  ? "Autorizado por el viajero"
+                  : "Sin autorización de contacto"}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div className="flex flex-wrap content-start gap-2">
+          {emailHref ? (
+            <Button asChild size="sm" variant="outline">
+              <a href={emailHref}>
+                <Mail className="size-4" aria-hidden />
+                Correo
+              </a>
+            </Button>
+          ) : null}
+          {phoneHref ? (
+            <Button asChild size="sm" variant="outline">
+              <a href={phoneHref}>
+                <Phone className="size-4" aria-hidden />
+                Llamar
+              </a>
+            </Button>
+          ) : null}
+          {whatsappHref ? (
+            <Button asChild size="sm">
+              <a href={whatsappHref} target="_blank" rel="noreferrer">
+                <MessageCircle className="size-4" aria-hidden />
+                WhatsApp
+              </a>
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function TravelerConciergeProgress({ f }: { f: CaseFile }) {
+  const alux = useAluxBrand();
+  const proposals = f.proposals ?? [];
+  const hasReadyProposal = proposals.some((proposal) =>
+    ["sent", "viewed", "accepted"].includes(proposal.status),
+  );
+  const hasQuoteActivity =
+    f.requests.some((request) => ["quoting", "quoted", "accepted"].includes(request.status)) ||
+    (f.quotes?.length ?? 0) > 0;
+  const isReviewing =
+    hasQuoteActivity ||
+    ["triaged", "in_progress", "waiting_business", "waiting_customer"].includes(f.case.status);
+  const activeStep = hasReadyProposal ? 3 : hasQuoteActivity ? 2 : isReviewing ? 1 : 0;
+  const steps = ["Recibido", "En revisión", "Preparando propuesta", "Propuesta lista"];
+
+  return (
+    <section
+      aria-labelledby="traveler-concierge-progress"
+      className="border-y border-alux-border bg-alux-surface px-4 py-5 sm:px-5"
+    >
+      <div className="flex items-start gap-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-alux text-alux-foreground">
+          {hasReadyProposal ? (
+            <Headset className="size-5" aria-hidden />
+          ) : (
+            <Sparkles className="size-5" aria-hidden />
+          )}
+        </span>
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-alux-surface-foreground/70">
+            {alux.name} · contigo durante la espera
+          </p>
+          <h3
+            id="traveler-concierge-progress"
+            className="mt-1 text-lg font-semibold text-alux-surface-foreground"
+          >
+            {hasReadyProposal
+              ? alux.copy("conciergeProposalReadyTitle")
+              : isReviewing
+                ? alux.copy("conciergeWaitingTitle")
+                : alux.copy("conciergeSentTitle")}
+          </h3>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-alux-surface-foreground/75">
+            {hasReadyProposal
+              ? alux.copy("conciergeProposalReadyBody")
+              : isReviewing
+                ? alux.copy("conciergeWaitingBody")
+                : alux.copy("conciergeSentBody")}
+          </p>
+        </div>
+      </div>
+      <ol
+        className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4"
+        aria-label="Avance de tu solicitud"
+      >
+        {steps.map((step, index) => {
+          const complete = index <= activeStep;
+          return (
+            <li key={step} className="flex items-center gap-2 text-xs">
+              <span
+                className={`grid size-6 shrink-0 place-items-center rounded-full border ${complete ? "border-alux bg-alux text-alux-foreground" : "border-alux-border bg-background text-muted-foreground"}`}
+              >
+                {complete ? (
+                  <Check className="size-3.5" aria-hidden />
+                ) : (
+                  <Circle className="size-3" aria-hidden />
+                )}
+              </span>
+              <span
+                className={
+                  complete
+                    ? "font-medium text-alux-surface-foreground"
+                    : "text-alux-surface-foreground/55"
+                }
+              >
+                {step}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      {!hasReadyProposal ? (
+        <p className="mt-4 border-t border-alux-border pt-3 text-xs text-alux-surface-foreground/70">
+          Cuando esté lista, recibirás un aviso en tu cuenta y podrás revisar qué incluye, el
+          importe y la vigencia antes de decidir.
+        </p>
+      ) : null}
+    </section>
   );
 }
 
@@ -309,7 +817,16 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
   const canCompare = proposals.length >= 2;
 
   return (
-    <Section title="Propuestas" id="case-proposals">
+    <Section
+      title={internal ? "Propuesta económica del Concierge" : "Propuestas"}
+      id="case-proposals"
+    >
+      {internal ? (
+        <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+          Las empresas sólo cotizan sus servicios. Tú seleccionas esas respuestas, preparas la
+          propuesta final y la envías al viajero.
+        </p>
+      ) : null}
       {proposals.length === 0 ? (
         <Empty>Sin propuestas todavía.</Empty>
       ) : (
@@ -333,14 +850,32 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
           ) : (
             <ul className="grid gap-3">
               {proposals.map((p) => (
-                <ProposalCard key={p.proposal_id} p={p} caseId={f.case.id} internal={internal} />
+                <ProposalCard
+                  key={p.proposal_id}
+                  p={p}
+                  caseId={f.case.id}
+                  internal={internal}
+                  traveler={f.traveler}
+                />
               ))}
             </ul>
           )}
         </>
       )}
-      {internal && f.quotes && f.quotes.some((q) => q.status === "submitted") ? (
-        <ProposalComposer caseId={f.case.id} quotes={f.quotes} />
+      {internal ? (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-dashed border-border bg-card/40 p-3">
+          <p className="min-w-[220px] flex-1 text-xs leading-relaxed text-muted-foreground">
+            Arma la propuesta en su propio espacio: partidas con día, hora del destino, duración y
+            precio, más las recomendaciones sin costo para el viajero.
+          </p>
+          <Link
+            to="/concierge/expedientes/$caseId/propuesta"
+            params={{ caseId: f.case.id }}
+            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+          >
+            {proposals.length === 0 ? "Armar propuesta" : "Nueva versión"}
+          </Link>
+        </div>
       ) : null}
     </Section>
   );
@@ -348,12 +883,14 @@ function ProposalsSection({ f, internal }: { f: CaseFile; internal: boolean }) {
 
 function ProposalCard({
   p,
-  caseId: _caseId,
+  caseId,
   internal,
+  traveler,
 }: {
   p: NonNullable<CaseFile["proposals"]>[number];
   caseId: string;
   internal: boolean;
+  traveler?: CaseFile["traveler"];
 }) {
   const router = useRouter();
   const navigate = useNavigate();
@@ -363,6 +900,8 @@ function ProposalCard({
   const acceptFn = useServerFn(acceptConciergeProposal);
   const rejectFn = useServerFn(rejectConciergeProposal);
   const createOrderFn = useServerFn(createOrderFromProposal);
+  const payCashFn = useServerFn(markConciergeOrderPaidCash);
+  const notifyAdminFn = useServerFn(notifyAdminBookingPaid);
   const [busy, setBusy] = useState(false);
 
   async function run(action: () => Promise<unknown>) {
@@ -372,6 +911,29 @@ function ProposalCard({
       await router.invalidate();
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function sendAndNotify() {
+    await sendFn({ data: { proposalId: p.proposal_id } });
+    const email = traveler?.email?.trim();
+    if (!email) return;
+    try {
+      await sendTransactionalEmail({
+        templateName: "concierge-proposal-sent",
+        recipientEmail: email,
+        idempotencyKey: `concierge-proposal-sent-${p.proposal_id}`,
+        templateData: {
+          travelerName: traveler?.display_name ?? undefined,
+          caseReference: `Expediente ${caseId.slice(0, 8).toUpperCase()}`,
+          totalLabel: money(p.total_amount_cents, p.currency),
+          validUntilLabel: p.valid_until
+            ? meridaLongDate(p.valid_until)
+            : undefined,
+        },
+      });
+    } catch {
+      toast.error("La propuesta se envió, pero el correo de aviso no pudo salir.");
     }
   }
 
@@ -390,30 +952,16 @@ function ProposalCard({
           Propuesta v{p.version} · {money(p.total_amount_cents, p.currency)}
         </span>
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-          {p.status}
+          {labelFor(p.status, PROPOSAL_STATUS_LABELS)}
         </span>
       </div>
       {p.summary ? <p className="mt-1 text-xs text-foreground/80">{p.summary}</p> : null}
       {p.valid_until ? (
         <p className="mt-1 text-[11px] text-muted-foreground">
-          Vigente hasta {new Date(p.valid_until).toLocaleString()}
+          Vigente hasta {meridaDateTime(p.valid_until)}
         </p>
       ) : null}
-      {p.items.length > 0 && (
-        <ul className="mt-2 grid gap-1 text-xs">
-          {p.items.map((it) => (
-            <li
-              key={it.item_id}
-              className="flex items-center justify-between gap-2 rounded border border-border/60 bg-background/60 px-2 py-1"
-            >
-              <span>
-                {it.business_name ?? "Empresa"} · {it.request_title}
-              </span>
-              <span className="font-mono">{money(it.amount_cents, it.currency)}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {p.items.length > 0 && <ProposalItemsByDay items={p.items} />}
       {p.terms ? (
         <p className="mt-2 whitespace-pre-line text-[11px] text-muted-foreground">{p.terms}</p>
       ) : null}
@@ -423,7 +971,7 @@ function ProposalCard({
           <ActionButton
             label="Enviar al viajero"
             disabled={busy}
-            onClick={() => run(() => sendFn({ data: { proposalId: p.proposal_id } }))}
+            onClick={() => run(sendAndNotify)}
           />
         )}
         {internal && ["draft", "sent", "viewed"].includes(p.status) && (
@@ -434,6 +982,50 @@ function ProposalCard({
             onClick={() =>
               run(() => withdrawFn({ data: { proposalId: p.proposal_id, reason: null } }))
             }
+          />
+        )}
+        {internal && ["sent", "viewed", "accepted"].includes(p.status) && (
+          <ActionButton
+            label="Registrar pago en efectivo"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                const { orderId } = await createOrderFn({ data: { proposalId: p.proposal_id } });
+                await payCashFn({ data: { orderId, note: "Pago en efectivo con el concierge" } });
+                const travelerEmail = traveler?.email?.trim();
+                if (travelerEmail) {
+                  try {
+                    await sendTransactionalEmail({
+                      templateName: "trip-confirmed",
+                      recipientEmail: travelerEmail,
+                      idempotencyKey: `trip-confirmed-${orderId}`,
+                      templateData: {
+                        travelerName: traveler?.display_name ?? undefined,
+                        totalLabel: money(p.total_amount_cents, p.currency),
+                      },
+                    });
+                  } catch {
+                    toast.error(
+                      "El viaje quedó confirmado, pero el correo de aviso no pudo salir.",
+                    );
+                  }
+                }
+                try {
+                  await notifyAdminFn({ data: { orderId } });
+                } catch {
+                  // El aviso interno puede reintentarse; no bloquea el registro del pago.
+                }
+                await router.invalidate();
+                toast.success("Pago en efectivo registrado. El viaje quedó confirmado.");
+              } catch (err) {
+                toast.error(
+                  err instanceof Error ? err.message : "No se pudo registrar el pago en efectivo",
+                );
+              } finally {
+                setBusy(false);
+              }
+            }}
           />
         )}
         {!internal && ["sent", "viewed", "accepted"].includes(p.status) && (
@@ -517,7 +1109,7 @@ function ProposalCompare({
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${statusTone(p.status)}`}
               >
-                {p.status}
+                {labelFor(p.status, PROPOSAL_STATUS_LABELS)}
               </span>
             </header>
             <div className="text-base font-semibold text-foreground">
@@ -525,7 +1117,7 @@ function ProposalCompare({
             </div>
             {p.valid_until ? (
               <p className="text-[10px] text-muted-foreground">
-                Vigente hasta {new Date(p.valid_until).toLocaleDateString("es-MX")}
+                Vigente hasta {meridaDate(p.valid_until)}
               </p>
             ) : null}
             {p.summary ? (
@@ -570,72 +1162,88 @@ function ProposalCompare({
   );
 }
 
-function ProposalComposer({
-  caseId,
-  quotes,
-}: {
-  caseId: string;
-  quotes: NonNullable<CaseFile["quotes"]>;
-}) {
-  const router = useRouter();
-  const createFn = useServerFn(createConciergeProposal);
-  const submittable = quotes.filter((q) => q.status === "submitted");
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const [summary, setSummary] = useState("");
-  const [busy, setBusy] = useState(false);
+/* El compositor de propuestas vive ahora en su propia pantalla:
+ * /concierge/expedientes/$caseId/propuesta (Estudio de Propuesta). */
 
-  async function onCreate() {
-    const items = Object.entries(selected)
-      .filter(([, v]) => v)
-      .map(([quote_id]) => ({ quote_id }));
-    if (items.length === 0) return;
-    setBusy(true);
-    try {
-      await createFn({
-        data: { caseId, items, summary: summary || null },
-      });
-      setSelected({});
-      setSummary("");
-      await router.invalidate();
-    } finally {
-      setBusy(false);
-    }
+
+/**
+ * Partidas de la propuesta agrupadas por día del viaje, con hora local del
+ * destino. Las recomendaciones sin costo se muestran aparte del total.
+ */
+function ProposalItemsByDay({
+  items,
+}: {
+  items: NonNullable<CaseFile["proposals"]>[number]["items"];
+}) {
+  const priced = items.filter((it) => !it.is_suggestion);
+  const suggestions = items.filter((it) => it.is_suggestion);
+  const days = Array.from(
+    new Set(priced.map((it) => (it.day_index == null ? -1 : it.day_index))),
+  ).sort((a, b) => a - b);
+
+  function titleOf(it: (typeof items)[number]) {
+    return it.business_name ? `${it.business_name} · ${it.request_title}` : it.request_title;
   }
 
   return (
-    <div className="mt-4 rounded-md border border-dashed border-border bg-card/40 p-3 text-xs">
-      <p className="mb-2 font-medium uppercase tracking-wide text-muted-foreground">
-        Componer nueva propuesta
-      </p>
-      <ul className="grid gap-1">
-        {submittable.map((q) => (
-          <li key={q.quote_id} className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={!!selected[q.quote_id]}
-              onChange={(e) => setSelected((s) => ({ ...s, [q.quote_id]: e.target.checked }))}
-            />
-            <span className="flex-1">
-              {q.business_name ?? "Empresa"} · {q.request_title} ·{" "}
-              {money(q.total_amount_cents, q.currency)}
-            </span>
-          </li>
-        ))}
-      </ul>
-      <textarea
-        className="mt-2 w-full rounded border border-border bg-background p-2 text-xs"
-        rows={2}
-        placeholder="Resumen para el viajero (opcional)"
-        value={summary}
-        onChange={(e) => setSummary(e.target.value)}
-      />
-      <div className="mt-2 flex justify-end">
-        <ActionButton
-          label="Crear borrador"
-          disabled={busy || Object.values(selected).every((v) => !v)}
-          onClick={onCreate}
-        />
-      </div>
+    <div className="mt-2 grid gap-2 text-xs">
+      {days.map((day) => {
+        const rows = priced
+          .filter((it) => (it.day_index == null ? -1 : it.day_index) === day)
+          .sort((a, b) =>
+            (a.starts_at_local ?? "99:99").localeCompare(b.starts_at_local ?? "99:99"),
+          );
+        return (
+          <div key={day}>
+            <p className="mb-1 text-[11px] font-semibold text-foreground">
+              {day < 0 ? "Sin día asignado" : `Día ${day + 1}`}
+            </p>
+            <ul className="grid gap-1">
+              {rows.map((it) => (
+                <li
+                  key={it.item_id}
+                  className="flex items-center justify-between gap-2 rounded border border-border/60 bg-background/60 px-2 py-1"
+                >
+                  <span className="min-w-0">
+                    {it.starts_at_local ? (
+                      <span className="mr-2 font-mono text-foreground/80">
+                        {it.starts_at_local.slice(0, 5)}
+                      </span>
+                    ) : null}
+                    {titleOf(it)}
+                    {it.duration_minutes ? (
+                      <span className="ml-2 text-[11px] text-muted-foreground">
+                        {it.duration_minutes} min
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="font-mono">{money(it.amount_cents, it.currency)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+      {suggestions.length > 0 ? (
+        <div>
+          <p className="mb-1 text-[11px] font-semibold text-foreground">
+            Recomendaciones sin costo
+          </p>
+          <ul className="grid gap-1">
+            {suggestions.map((it) => (
+              <li
+                key={it.item_id}
+                className="rounded border border-dashed border-border/70 bg-background/40 px-2 py-1 text-muted-foreground"
+              >
+                {it.starts_at_local ? (
+                  <span className="mr-2 font-mono">{it.starts_at_local.slice(0, 5)}</span>
+                ) : null}
+                {titleOf(it)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -651,15 +1259,102 @@ function ActionButton({
   disabled?: boolean;
   variant?: "primary" | "ghost";
 }) {
-  const base = "rounded-md px-3 py-1.5 text-xs font-medium transition disabled:opacity-50";
-  const cls =
-    variant === "primary"
-      ? `${base} bg-primary text-primary-foreground hover:bg-primary/90`
-      : `${base} border border-border bg-background hover:bg-muted`;
   return (
-    <button type="button" className={cls} onClick={onClick} disabled={disabled}>
+    <Button
+      type="button"
+      size="sm"
+      variant={variant === "primary" ? "default" : "outline"}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {label}
-    </button>
+    </Button>
+  );
+}
+
+function readableConciergeError(error: unknown, action: "assign" | "quote") {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (message.includes("forbidden")) {
+    return action === "assign"
+      ? "Tu perfil actual no puede tomar expedientes. Entra con un perfil Concierge, Concierge Lead o Administrador."
+      : "No tienes permiso para solicitar esta cotización desde el perfil actual.";
+  }
+  if (message.includes("already") || message.includes("duplicate") || message.includes("unique")) {
+    return "Esta solicitud ya tiene una cotización en curso.";
+  }
+  return action === "assign"
+    ? "No fue posible asignarte el expediente. Intenta nuevamente."
+    : "No fue posible solicitar la cotización. Intenta nuevamente.";
+}
+
+function RequestCard({
+  request,
+  f,
+  internal,
+}: {
+  request: CaseFile["requests"][number];
+  f: CaseFile;
+  internal: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const requestQuote = useServerFn(requestConciergeQuote);
+  const [busy, setBusy] = useState(false);
+  const quote = f.quotes?.find((item) => item.request_id === request.id);
+  const canRequestQuote = internal && request.business_id && !quote;
+
+  async function onRequestQuote() {
+    if (!request.business_id) return;
+    setBusy(true);
+    try {
+      await requestQuote({
+        data: { requestId: request.id, businessId: request.business_id, validForHours: 72 },
+      });
+      await queryClient.invalidateQueries({ queryKey: ["concierge", "case-file", f.case.id] });
+      toast.success("Solicitud enviada a la empresa. Te avisaremos cuando responda.");
+    } catch (error) {
+      toast.error(readableConciergeError(error, "quote"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <li className="rounded-md border border-border bg-card p-3 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium">{request.title}</span>
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+          {quote
+            ? labelFor(quote.status, QUOTE_STATUS_LABELS)
+            : labelFor(request.status, REQUEST_STATUS_LABELS)}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {labelFor(request.kind, REQUEST_KIND_LABELS)} · Origen:{" "}
+        {labelFor(request.source_type, SOURCE_LABELS)}
+      </p>
+      {request.notes ? <p className="mt-1 text-xs text-foreground/80">{request.notes}</p> : null}
+      {internal ? (
+        <div className="mt-3 border-t border-border/60 pt-3">
+          {canRequestQuote ? (
+            <ActionButton
+              label={busy ? "Enviando…" : "Solicitar cotización"}
+              onClick={onRequestQuote}
+              disabled={busy}
+            />
+          ) : quote ? (
+            <p className="text-xs text-muted-foreground">
+              {quote.status === "submitted"
+                ? "La empresa respondió. Ya puedes incluir esta cotización en una propuesta."
+                : "Solicitud enviada a la empresa; esperando su respuesta."}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Este elemento no tiene una empresa vinculada; no requiere cotización empresarial.
+            </p>
+          )}
+        </div>
+      ) : null}
+    </li>
   );
 }
 
@@ -668,7 +1363,8 @@ function ActionButton({
  * ============================================================ */
 function SlaAssignmentPanel({ f }: { f: CaseFile }) {
   const router = useRouter();
-  const assignFn = useServerFn(assignConciergeCase);
+  const queryClient = useQueryClient();
+  const assignFn = useServerFn(assignSelfConciergeCase);
   const releaseFn = useServerFn(releaseConciergeCase);
   const setPriorityFn = useServerFn(setConciergeCasePriority);
   const [busy, setBusy] = useState(false);
@@ -690,8 +1386,13 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
   async function doAssignSelf() {
     setBusy(true);
     try {
-      await assignFn({ data: { caseId: f.case.id, conciergeUserId: viewerId } });
-      router.invalidate();
+      await assignFn({ data: { caseId: f.case.id } });
+      await queryClient.invalidateQueries({ queryKey: ["concierge", "case-file", f.case.id] });
+      await queryClient.invalidateQueries({ queryKey: ["concierge", "cases-ext"] });
+      await router.invalidate();
+      toast.success("El expediente quedó asignado a ti.");
+    } catch (error) {
+      toast.error(readableConciergeError(error, "assign"));
     } finally {
       setBusy(false);
     }
@@ -720,20 +1421,25 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className={`rounded-full px-2 py-0.5 font-medium ${slaBadge}`}>
-            SLA · {sla?.sla_status ?? "n/a"}
+            Tiempo de respuesta · {labelFor(sla?.sla_status, SLA_STATUS_LABELS)}
           </span>
           <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
-            Prioridad: <strong className="text-foreground">{f.case.priority}</strong>
-            {f.case.priority_source ? ` · ${f.case.priority_source}` : ""}
+            Prioridad:{" "}
+            <strong className="text-foreground">
+              {labelFor(f.case.priority, PRIORITY_LABELS)}
+            </strong>
+            {f.case.priority_source
+              ? ` · ${labelFor(f.case.priority_source, PRIORITY_SOURCE_LABELS)}`
+              : ""}
           </span>
           {sla?.target_response_at && (
             <span className="text-muted-foreground">
-              Objetivo: {new Date(sla.target_response_at).toLocaleString()}
+              Objetivo: {meridaDateTime(sla.target_response_at)}
             </span>
           )}
           {sla?.last_activity_at && (
             <span className="text-muted-foreground">
-              Última actividad: {new Date(sla.last_activity_at).toLocaleString()}
+              Última actividad: {meridaDateTime(sla.last_activity_at)}
             </span>
           )}
         </div>
@@ -743,9 +1449,7 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
             <ActionButton label="Liberar" variant="ghost" onClick={doRelease} disabled={busy} />
           )}
           {assignment && !isAssignedToMe && (
-            <span className="text-xs text-muted-foreground">
-              Responsable: {assignment.concierge_user_id.slice(0, 8)}
-            </span>
+            <span className="text-xs text-muted-foreground">Asignado a otro concierge</span>
           )}
         </div>
       </div>
@@ -759,7 +1463,7 @@ function SlaAssignmentPanel({ f }: { f: CaseFile }) {
             onClick={() => changePriority(p)}
             className="rounded-md border border-border bg-background px-2 py-1 text-[11px] font-medium hover:bg-muted disabled:opacity-50"
           >
-            {p}
+            {PRIORITY_LABELS[p]}
           </button>
         ))}
       </div>
@@ -790,13 +1494,13 @@ type HandoffPayload = {
       subtitle?: string | null;
     }>;
   } | null;
+  trip_brief?: TripBrief | null;
 };
 
 function HandoffContextCard({ caseId }: { caseId: string }) {
   const fetchFn = useServerFn(getConciergeCaseHandoffContext);
   const [payload, setPayload] = useState<HandoffPayload | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "empty" | "error">("loading");
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -808,12 +1512,26 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
           setState("empty");
           return;
         }
-        setPayload(raw as HandoffPayload);
+        // La operación oficial devuelve un sobre
+        // { event_id, occurred_at, payload }. Aceptamos ambas formas.
+        const envelope = raw as { payload?: unknown; occurred_at?: string };
+        const inner =
+          envelope && typeof envelope === "object" && envelope.payload
+            ? (envelope.payload as HandoffPayload)
+            : (raw as HandoffPayload);
+        if (!inner || Object.keys(inner).length === 0) {
+          setState("empty");
+          return;
+        }
+        setPayload({
+          ...inner,
+          generated_at: inner.generated_at ?? envelope?.occurred_at,
+        });
         setState("idle");
       })
       .catch((e) => {
         if (!alive) return;
-        setError(e instanceof Error ? e.message : String(e));
+        console.error("No se pudo cargar el contexto del viajero", e);
         setState("error");
       });
     return () => {
@@ -827,12 +1545,12 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
         <div>
           <h3 className="text-sm font-semibold">Contexto del viajero (Alux)</h3>
           <p className="text-[11px] text-muted-foreground">
-            Fotografía inmutable capturada al promover el Travel Plan.
+            Información disponible cuando el viajero envió su selección al Concierge.
           </p>
         </div>
         {payload?.generated_at && (
           <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-            {new Date(payload.generated_at).toLocaleString()}
+            {meridaDateTime(payload.generated_at)}
           </span>
         )}
       </header>
@@ -848,17 +1566,23 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
       )}
       {state === "error" && (
         <p className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
-          {error ?? "No se pudo cargar el contexto."}
+          No pudimos cargar la información del viajero. Intenta de nuevo en un momento.
         </p>
       )}
 
       {state === "idle" && payload && (
         <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {payload.trip_brief && (
+            <HandoffBlock title="Brief del viaje (confirmado por el viajero)">
+              <TripBriefBlock brief={payload.trip_brief} />
+            </HandoffBlock>
+          )}
+
           <HandoffBlock title="Perfil del viajero">
             {payload.profile ? (
               <ProfileSummary profile={payload.profile} />
             ) : (
-              <Empty>Sin perfil M2 disponible.</Empty>
+              <Empty>El viajero todavía no ha compartido preferencias personales.</Empty>
             )}
           </HandoffBlock>
 
@@ -877,33 +1601,49 @@ function HandoffContextCard({ caseId }: { caseId: string }) {
             )}
           </HandoffBlock>
 
-          <HandoffBlock title={`Plan (${payload.plan_snapshot?.item_count ?? 0} ítems)`}>
+          <HandoffBlock
+            title={`Experiencias guardadas (${payload.plan_snapshot?.item_count ?? 0})`}
+          >
             {payload.plan_snapshot?.items && payload.plan_snapshot.items.length > 0 ? (
               <ul className="grid gap-1 text-xs">
                 {payload.plan_snapshot.items.slice(0, 8).map((it, i) => (
                   <li key={i} className="truncate">
-                    · <span className="text-muted-foreground">[{it.kind ?? "?"}]</span>{" "}
-                    {it.title ?? it.slug ?? "—"}
+                    <span className="text-muted-foreground">
+                      {labelFor(it.kind, ITEM_KIND_LABELS)}:
+                    </span>{" "}
+                    {it.title ?? it.subtitle ?? it.slug ?? "Sin nombre"}
                   </li>
                 ))}
               </ul>
             ) : (
-              <Empty>Plan vacío al momento del handoff.</Empty>
+              <Empty>No había experiencias guardadas cuando se envió el viaje.</Empty>
             )}
           </HandoffBlock>
 
           <HandoffBlock title="Memoria territorial">
-            {payload.territorial_memory ? (
-              <pre className="whitespace-pre-wrap break-words text-[11px] text-muted-foreground">
-                {JSON.stringify(payload.territorial_memory, null, 2).slice(0, 600)}
-              </pre>
-            ) : (
-              <Empty>Sin historial territorial registrado.</Empty>
-            )}
+            <TerritorialMemory memory={payload.territorial_memory ?? null} />
           </HandoffBlock>
         </div>
       )}
     </section>
+  );
+}
+
+/**
+ * Presentación legible del brief de viaje: composición del grupo,
+ * llegada, transportación y pendientes — en texto humano para el concierge.
+ */
+function TripBriefBlock({ brief }: { brief: TripBrief }) {
+  const rows = briefToDetailRows(brief);
+  return (
+    <dl className="grid gap-1.5 text-xs">
+      {rows.map((r, i) => (
+        <div key={i} className="flex gap-2">
+          <dt className="shrink-0 font-medium text-muted-foreground">{r.label}:</dt>
+          <dd className="text-foreground">{r.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -918,26 +1658,147 @@ function HandoffBlock({ title, children }: { title: string; children: ReactNode 
   );
 }
 
+/**
+ * Presentación legible de la memoria territorial capturada por Alux:
+ * destinos y categorías consultados por el viajero antes del envío,
+ * más el resumen narrativo. Sin claves internas ni datos crudos.
+ */
+function TerritorialMemory({ memory }: { memory: Record<string, unknown> | null }) {
+  if (!memory) {
+    return <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>;
+  }
+  const nameOf = (v: unknown): string => {
+    if (typeof v === "string") return humanizeKey(v);
+    if (v && typeof v === "object") {
+      const o = v as Record<string, unknown>;
+      const raw = (o.label as string) || (o.slug as string) || "";
+      const count = typeof o.count === "number" && o.count > 1 ? ` (${o.count})` : "";
+      return raw ? `${humanizeKey(raw)}${count}` : "";
+    }
+    return "";
+  };
+  const destinations = Array.isArray(memory.visited_destinations)
+    ? (memory.visited_destinations as unknown[]).map(nameOf).filter(Boolean)
+    : [];
+  const categories = Array.isArray(memory.visited_categories)
+    ? (memory.visited_categories as unknown[]).map(nameOf).filter(Boolean)
+    : [];
+  const lastDestination =
+    typeof memory.last_destination_slug === "string"
+      ? humanizeKey(memory.last_destination_slug)
+      : null;
+  const summary = typeof memory.summary === "string" ? memory.summary.trim() : "";
+  const summaryLines = summary
+    .split("\n")
+    .map((line) => line.replace(/^·\s*/, "").trim())
+    .filter(Boolean);
+  // Fichas de negocio que el viajero abrió antes de enviar su viaje.
+  const visitedBusinesses = Array.from(
+    new Set(
+      (Array.isArray(memory.last_signals) ? (memory.last_signals as unknown[]) : [])
+        .filter((s): s is string => typeof s === "string" && s.startsWith("act:view_business:"))
+        .map((s) =>
+          s
+            .replace("act:view_business:", "")
+            .split("-")
+            .filter(Boolean)
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" "),
+        ),
+    ),
+  ).filter(Boolean);
+
+  if (
+    destinations.length === 0 &&
+    categories.length === 0 &&
+    visitedBusinesses.length === 0 &&
+    summaryLines.length === 0
+  ) {
+    return <Empty>Aún no hay destinos o lugares consultados para orientar la atención.</Empty>;
+  }
+
+  return (
+    <div className="grid gap-2 text-xs">
+      {destinations.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Destinos que consultó</span>
+          <div className="flex flex-wrap gap-1">
+            {destinations.map((d) => (
+              <span key={d} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {d}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {categories.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Qué estuvo buscando</span>
+          <div className="flex flex-wrap gap-1">
+            {categories.map((c) => (
+              <span key={c} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {visitedBusinesses.length > 0 ? (
+        <div className="grid gap-1">
+          <span className="text-muted-foreground">Fichas que abrió</span>
+          <div className="flex flex-wrap gap-1">
+            {visitedBusinesses.map((b) => (
+              <span key={b} className="rounded-full bg-muted px-2 py-0.5 text-foreground/90">
+                {b}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {lastDestination ? (
+        <p className="text-foreground/90">
+          <span className="text-muted-foreground">Último destino consultado: </span>
+          {lastDestination}
+        </p>
+      ) : null}
+      {summaryLines.length > 0 ? (
+        <div className="grid gap-1 border-t border-border/60 pt-2">
+          <span className="text-muted-foreground">Lo que Alux entendió del viajero</span>
+          <ul className="grid gap-1">
+            {summaryLines.map((line, i) => (
+              <li key={i} className="text-foreground/90">
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function ProfileSummary({ profile }: { profile: Record<string, unknown> }) {
   const all: Array<[string, unknown]> = [
     ["Idioma", profile.preferred_language],
-    ["País", profile.country_code],
-    ["Moneda", profile.preferred_currency],
-    ["Presupuesto", profile.budget_level],
-    ["Dieta", profile.dietary_preferences],
-    ["Movilidad", profile.mobility_needs],
+    ["País de origen", profile.home_country],
+    ["Estilo de viaje", profile.travel_style ?? profile.travel_style_tags],
+    ["Presupuesto", profile.budget_band ?? profile.budget_range],
+    ["Dieta", profile.dietary ?? profile.dietary_restrictions],
+    ["Accesibilidad", profile.accessibility ?? profile.accessibility_needs],
+    ["Idiomas que habla", profile.languages],
     ["Intereses", profile.interests],
+    ["Acompañantes", profile.travel_party],
   ];
-  const rows = all.filter(([, v]) => v !== undefined && v !== null && v !== "");
-  if (rows.length === 0) return <Empty>Perfil sin campos declarados.</Empty>;
+  const rows = all.filter(
+    ([, v]) => v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && v.length === 0),
+  );
+  if (rows.length === 0) return <Empty>El viajero todavía no ha indicado sus preferencias.</Empty>;
   return (
     <dl className="grid gap-1 text-xs">
       {rows.map(([k, v]) => (
         <div key={k} className="flex gap-2">
           <dt className="min-w-[80px] text-muted-foreground">{k}</dt>
-          <dd className="flex-1 truncate text-foreground/90">
-            {Array.isArray(v) ? (v as unknown[]).join(", ") : String(v)}
-          </dd>
+          <dd className="flex-1 truncate text-foreground/90">{readableValue(v)}</dd>
         </div>
       ))}
     </dl>
@@ -994,7 +1855,8 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
       }
       setResults((s) => ({ ...s, [cap]: res }));
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      console.error("No se pudo generar la sugerencia de Alux", e);
+      setError("Alux no pudo preparar esta lectura. Intenta de nuevo en un momento.");
     } finally {
       setBusy(null);
     }
@@ -1006,11 +1868,11 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
         <div>
           <h3 className="text-sm font-semibold">Asistente Alux</h3>
           <p className="text-[11px] text-muted-foreground">
-            Copiloto operativo en modo consultivo. Toda acción la ejecutas tú.
+            Alux interpreta la información disponible; tú revisas y decides cada acción.
           </p>
         </div>
         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-          read-only
+          Solo sugerencias
         </span>
       </header>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -1043,13 +1905,9 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
                 <span className="font-semibold uppercase tracking-wide text-foreground">
                   {ALUX_LABELS[cap]}
                 </span>
-                <span>
-                  {r.model} · {r.latency_ms} ms
-                </span>
+                <span title={`${r.model} · ${r.latency_ms} ms`}>Generado por Alux</span>
               </header>
-              <pre className="whitespace-pre-wrap break-words text-xs text-foreground/90">
-                {r.text}
-              </pre>
+              <AluxReadableText text={r.text} />
               <footer className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[10px] text-muted-foreground">
                 <span>{r.disclaimer}</span>
                 <button
@@ -1065,5 +1923,35 @@ function AluxAssistantPanel({ caseId }: { caseId: string }) {
         })}
       </div>
     </section>
+  );
+}
+
+function AluxReadableText({ text }: { text: string }) {
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  return (
+    <div className="grid gap-1.5 text-xs leading-relaxed text-foreground/90">
+      {lines.map((line, index) => {
+        const cleaned = line
+          .replace(/^#{1,6}\s*/, "")
+          .replace(/\*\*(.*?)\*\*/g, "$1")
+          .replace(/__(.*?)__/g, "$1")
+          .replace(/`([^`]+)`/g, "$1");
+        const isBullet = /^[-*•]\s+/.test(cleaned);
+        const isNumbered = /^\d+[.)]\s+/.test(cleaned);
+        const content = cleaned.replace(/^[-*•]\s+/, "").replace(/^\d+[.)]\s+/, "");
+        return (
+          <p
+            key={`${index}-${line.slice(0, 12)}`}
+            className={isBullet || isNumbered ? "pl-4" : undefined}
+          >
+            {isBullet ? "• " : isNumbered ? `${cleaned.match(/^\d+/)?.[0]}. ` : ""}
+            {content}
+          </p>
+        );
+      })}
+    </div>
   );
 }

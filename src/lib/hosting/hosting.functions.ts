@@ -306,14 +306,23 @@ export const getVerificationDocumentSignedUrl = createServerFn({ method: "POST" 
   }))
   .handler(async ({ data, context }): Promise<{ url: string | null }> => {
     const { supabase } = context;
-    const { data: biz, error: bErr } = await supabase
+    // Acreditación del solicitante (dueño o administrador) vía RPC con RLS.
+    const { data: state, error: sErr } = await supabase.rpc("business_review_state", {
+      _business_ids: [data.business_id],
+    } as never);
+    if (sErr) throw new Error(sErr.message);
+    const row = (state as { has_verification_document: boolean }[] | null)?.[0];
+    if (!row) throw new Error("forbidden");
+    if (!row.has_verification_document) return { url: null };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: biz, error: bErr } = await supabaseAdmin
       .from("businesses")
       .select("verification_document_url")
       .eq("id", data.business_id)
       .maybeSingle();
     if (bErr) throw new Error(bErr.message);
     if (!biz?.verification_document_url) return { url: null };
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signed, error } = await supabaseAdmin.storage
       .from("business-verification")
       .createSignedUrl(biz.verification_document_url, 60 * 10);
@@ -348,21 +357,26 @@ export const listMyBusinesses = createServerFn({ method: "GET" })
     if (ids.length === 0) return [];
     const { data, error } = await supabase
       .from("businesses")
-      .select(
-        "id, display_name, slug, status, review_notes, submitted_for_review_at, destinations(name)",
-      )
+      .select("id, display_name, slug, status, destinations(name)")
       .in("id", ids)
       .is("deleted_at", null)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
+    const { data: states, error: sErr } = await supabase.rpc("business_review_state", {
+      _business_ids: ids,
+    } as never);
+    if (sErr) throw new Error(sErr.message);
+    const stateById = new Map<string, any>(
+      ((states as any[]) ?? []).map((s) => [s.business_id, s]),
+    );
     return (data ?? []).map((b: any) => ({
       id: b.id,
       display_name: b.display_name,
       slug: b.slug,
       status: b.status,
       destination_name: b.destinations?.name ?? null,
-      review_notes: b.review_notes,
-      submitted_for_review_at: b.submitted_for_review_at,
+      review_notes: stateById.get(b.id)?.review_notes ?? null,
+      submitted_for_review_at: stateById.get(b.id)?.submitted_for_review_at ?? null,
     }));
   });
 
@@ -394,12 +408,17 @@ export const getBusinessPublishChecklist = createServerFn({ method: "GET" })
     const { data: b, error } = await supabase
       .from("businesses")
       .select(
-        "id, display_name, status, review_notes, submitted_for_review_at, logo_media_id, cover_media_id, description, primary_category_id",
+        "id, display_name, status, logo_media_id, cover_media_id, description, primary_category_id",
       )
       .eq("id", data.business_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!b) throw new Error("business_not_found");
+    const { data: states, error: sErr } = await supabase.rpc("business_review_state", {
+      _business_ids: [data.business_id],
+    } as never);
+    if (sErr) throw new Error(sErr.message);
+    const reviewState = ((states as any[]) ?? [])[0] ?? null;
     const [{ count: galleryCount }, { count: locationCount }, { count: contactCount }] =
       await Promise.all([
         supabase
@@ -438,8 +457,8 @@ export const getBusinessPublishChecklist = createServerFn({ method: "GET" })
       business_id: b.id,
       display_name: b.display_name,
       status: b.status,
-      review_notes: b.review_notes,
-      submitted_for_review_at: b.submitted_for_review_at,
+      review_notes: reviewState?.review_notes ?? null,
+      submitted_for_review_at: reviewState?.submitted_for_review_at ?? null,
       checks,
       ready,
     };

@@ -13,12 +13,17 @@ import { useState } from "react";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   getConciergeOrder,
-  startConciergeOrderCheckout,
+  markConciergeOrderPaidCash,
+  startConciergeOnlinePayment,
   cancelConciergeOrder,
   type ConciergeOrderView,
 } from "@/lib/concierge/orders.functions";
+import { notifyAdminBookingPaid } from "@/lib/concierge/booking-admin-notify.functions";
+import { getOrderBooking } from "@/lib/commerce/booking.functions";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
@@ -38,18 +43,21 @@ function CheckoutPage() {
   const navigate = useNavigate();
 
   const fetchOrder = useServerFn(getConciergeOrder);
-  const startCheckout = useServerFn(startConciergeOrderCheckout);
+  const payCash = useServerFn(markConciergeOrderPaidCash);
   const cancelOrder = useServerFn(cancelConciergeOrder);
-  const fetchPaymentsStatus = useServerFn(getPaymentsReadyPublic);
+  const startOnlinePayment = useServerFn(startConciergeOnlinePayment);
+  const fetchPaymentsReady = useServerFn(getPaymentsReadyPublic);
+  const notifyAdmin = useServerFn(notifyAdminBookingPaid);
 
   const orderQ = useQuery({
     queryKey: ["concierge-order", orderId],
     queryFn: () => fetchOrder({ data: { orderId } }),
   });
-  const payQ = useQuery({
-    queryKey: ["payments", "public-status"],
-    queryFn: () => fetchPaymentsStatus(),
-    staleTime: 60_000,
+  const paymentsQ = useQuery({ queryKey: ["payments-ready"], queryFn: () => fetchPaymentsReady() });
+  const fetchBooking = useServerFn(getOrderBooking);
+  const bookingQ = useQuery({
+    queryKey: ["order-booking", orderId],
+    queryFn: () => fetchBooking({ data: { orderId } }),
   });
 
   const [busy, setBusy] = useState(false);
@@ -84,8 +92,6 @@ function CheckoutPage() {
   }
 
   const order: ConciergeOrderView = orderQ.data;
-  const demoMode = payQ.data?.demoMode ?? true;
-  const paymentsReady = payQ.data?.ready ?? false;
 
   const isFinal =
     order.status === "paid" ||
@@ -94,24 +100,49 @@ function CheckoutPage() {
     order.status === "expired" ||
     order.status === "refunded";
 
+  async function notifyConfirmed(current: ConciergeOrderView) {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const email = user?.email?.trim();
+      if (!email) return;
+      await sendTransactionalEmail({
+        templateName: "trip-confirmed",
+        recipientEmail: email,
+        idempotencyKey: `trip-confirmed-${orderId}`,
+        templateData: {
+          travelerName:
+            (user?.user_metadata?.["full_name"] as string | undefined)?.split(" ")[0] ?? undefined,
+          folio: current.folio,
+          totalLabel: money(current.total_amount, current.currency),
+          destinationName: current.destination_name ?? undefined,
+          itinerary: current.items.map((it) => it.title).slice(0, 12),
+        },
+      });
+    } catch {
+      // El viaje ya quedó confirmado; el correo puede reintentarse después.
+    }
+  }
+
   async function handleConfirm() {
     setBusy(true);
     try {
-      const result = await startCheckout({ data: { orderId } });
-      if (result.mode === "demo" || result.status === "paid") {
-        await orderQ.refetch();
-        toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
-        navigate({
-          to: "/cuenta/pagos/exito",
-          search: { order: orderId },
-        });
-        return;
+      // Modalidad vigente: pago en efectivo con el concierge.
+      await payCash({ data: { orderId, note: null } });
+      await notifyConfirmed(order);
+      try {
+        await notifyAdmin({ data: { orderId } });
+      } catch {
+        // El aviso interno puede reintentarse; no bloquea la confirmación.
       }
-      if (result.redirectUrl) {
-        window.location.assign(result.redirectUrl);
-        return;
-      }
-      toast.info("Estamos preparando el cobro con el proveedor…");
+      await orderQ.refetch();
+      toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
+      navigate({
+        to: "/cuenta/pagos/exito",
+        search: { order: orderId },
+      });
+      return;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Ocurrió un problema";
       toast.error(message);
@@ -133,6 +164,18 @@ function CheckoutPage() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo cancelar");
     } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleOnlinePayment() {
+    setBusy(true);
+    try {
+      const result = await startOnlinePayment({ data: { orderId, clientRequestId: crypto.randomUUID() } });
+      if (result.mode === "redirect" && result.redirectUrl) window.location.assign(result.redirectUrl);
+      else throw new Error("No se pudo abrir el pago en línea");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo iniciar el pago");
       setBusy(false);
     }
   }
@@ -187,6 +230,39 @@ function CheckoutPage() {
         </div>
       </section>
 
+      {(bookingQ.data ?? []).length > 0 ? (
+        <section className="mt-6 rounded-lg border border-border bg-card p-5">
+          <h2 className="font-serif text-xl">Fecha y lugares apartados</h2>
+          <ul className="mt-3 space-y-3">
+            {(bookingQ.data ?? []).map((b) => (
+              <li key={b.hold_id} className="text-sm">
+                <p className="font-medium">
+                  {new Intl.DateTimeFormat("es-MX", {
+                    timeZone: b.timezone,
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(new Date(b.starts_at))}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {b.product_name} · {b.quantity}{" "}
+                  {b.quantity === 1 ? "persona" : "personas"} ·{" "}
+                  {b.status === "confirmed"
+                    ? "Lugares confirmados"
+                    : `Lugares apartados hasta las ${new Intl.DateTimeFormat("es-MX", {
+                        timeZone: b.timezone,
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(new Date(b.expires_at))}`}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {isFinal ? (
         <section className="mt-6 rounded-lg border border-border bg-muted/30 p-5">
           <p className="text-sm">
@@ -219,22 +295,45 @@ function CheckoutPage() {
         <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
           <h3 className="font-serif text-lg">Confirmemos tu viaje</h3>
           <p className="mt-2 text-sm text-foreground/80">
-            Al continuar reservamos tu experiencia con los anfitriones seleccionados y activamos el
+            Al confirmar reservamos tu experiencia con los anfitriones seleccionados y activamos el
             acompañamiento de tu concierge para los siguientes pasos.
           </p>
-          {demoMode || !paymentsReady ? (
-            <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
-              Modo demostración: el viaje se confirma al instante sin cobro real. Ideal para
-              recorridos comerciales.
+          <div className="mt-4 space-y-3">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              Forma de pago
             </p>
-          ) : null}
+            <div className="rounded-md border border-primary/40 bg-background px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium">Efectivo con tu concierge</span>
+                <Badge variant="outline" className="text-[10px] uppercase">
+                  Disponible
+                </Badge>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Al confirmar queda registrado el pago de tu viaje y se abre tu itinerario con el
+                acompañamiento de Alux.
+              </p>
+            </div>
+            <div className="rounded-md border border-border bg-background px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium">Pagar con tarjeta</span>
+                <Badge variant="outline" className="text-[10px] uppercase">
+                  {paymentsQ.data?.ready ? "Disponible" : "En preparación"}
+                </Badge>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {paymentsQ.data?.ready
+                  ? "Paga en línea de forma segura. Tu reservación se confirma automáticamente al aprobarse el cobro."
+                  : "El cobro en línea se activará cuando el proveedor de pagos termine su configuración."}
+              </p>
+            </div>
+          </div>
           <div className="mt-5 flex flex-wrap gap-3">
+            <Button onClick={handleOnlinePayment} disabled={busy || !paymentsQ.data?.ready} size="lg">
+              {busy ? "Abriendo pago…" : "Pagar en línea"}
+            </Button>
             <Button onClick={handleConfirm} disabled={busy} size="lg">
-              {busy
-                ? "Confirmando…"
-                : demoMode || !paymentsReady
-                  ? "Confirmar mi viaje (demo)"
-                  : "Confirmar mi viaje"}
+              {busy ? "Confirmando…" : "Confirmar mi viaje (pago en efectivo)"}
             </Button>
             <Button type="button" variant="ghost" onClick={handleCancel} disabled={busy}>
               Cancelar

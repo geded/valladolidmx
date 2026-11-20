@@ -34,7 +34,7 @@ export function businessToHeroDTO(b: MarketplaceBusinessDetail): ExperienceHeroD
   }
   const meta: ExperienceHeroDTO["meta"] = [];
   if (b.destination_slug) {
-    meta.push({ iconKey: "map-pin", label: b.destination_slug.replace(/-/g, " ") });
+    meta.push({ iconKey: "map-pin", label: humanizeSlug(b.destination_slug) });
   }
   meta.push({ iconKey: "tag", label: variant.eyebrow });
 
@@ -97,6 +97,45 @@ export function businessToDescriptionSectionDTO(
 /* ------------------------------------------------------------------ *
  * Info-grid — datos rápidos.
  * ------------------------------------------------------------------ */
+/** Iconografía oficial por eje administrable (sin datos, sólo presentación). */
+const ATTRIBUTE_ICON_BY_KEY: Record<string, string> = {
+  property_type: "home",
+  capacity: "users",
+  bedrooms: "bed",
+  beds: "bed",
+  bathrooms: "droplet",
+  zone: "map-pin",
+  amenities: "sparkles",
+  spaces: "layout",
+  includes: "check",
+  stay_features: "star",
+  traveler_profile: "heart",
+  accessibility: "accessibility",
+  check_in: "log-in",
+  check_out: "log-out",
+  min_nights: "calendar",
+  cancellation_policy: "shield",
+  host_languages: "languages",
+  house_rules: "info",
+  price_level: "tag",
+  hotel_type: "home",
+  services: "concierge-bell",
+  policies: "info",
+  cuisine_type: "utensils",
+  dining_experience: "sparkles",
+  dietary_options: "leaf",
+  meal_period: "clock",
+  reservation_policy: "calendar",
+  languages: "languages",
+  dress_code: "shirt",
+};
+
+function humanizeSlug(slug: string): string {
+  const clean = slug.trim().replace(/-/g, " ").toLowerCase();
+  if (!clean) return "";
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
+}
+
 export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceInfoGridDTO | null {
   const variant = resolveBusinessVariant(b.category_slug);
   const items: ExperienceInfoGridDTO["items"] = [];
@@ -104,15 +143,17 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     items.push({
       iconKey: "map-pin",
       label: "Destino",
-      value: b.destination_slug.replace(/-/g, " "),
+      value: humanizeSlug(b.destination_slug),
       tone: "default",
     });
   }
   if (b.category_slug) {
+    /* La categoría mostrada proviene del slug real declarado en el CMS,
+       no del agrupador editorial del hero. */
     items.push({
       iconKey: "tag",
       label: "Categoría",
-      value: variant.eyebrow,
+      value: humanizeSlug(b.category_slug),
       tone: "default",
     });
   }
@@ -122,21 +163,16 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     value: b.verified ? "Verificado" : "Publicado",
     tone: b.verified ? "primary" : "default",
   });
-  const attributeLabels: Record<string, string> = {
-    property_type: "Tipo de propiedad",
-    capacity: "Capacidad",
-    bedrooms: "Dormitorios",
-    amenities: "Amenidades",
-    stay_features: "Características",
-  };
-  for (const [key, label] of Object.entries(attributeLabels)) {
-    const raw = b.filter_attributes?.[key];
-    const values = Array.isArray(raw) ? raw : typeof raw === "string" ? [raw] : [];
-    if (!values.length) continue;
+  /* Atributos administrables: siempre con la etiqueta del catálogo CMS.
+     Sin catálogo resuelto no se muestran claves crudas. */
+  const resolved = b.attributes ?? [];
+  for (const key of ["property_type", "capacity", "bedrooms", "amenities", "stay_features"]) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
     items.push({
-      iconKey: key === "capacity" ? "users" : key === "bedrooms" ? "bed" : "home",
-      label,
-      value: values.map((value) => value.replace(/-/g, " ")).join(" · "),
+      iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "home",
+      label: attribute.label,
+      value: attribute.values.map((value) => value.label).join(" · "),
       tone: "default",
     });
   }
@@ -149,6 +185,187 @@ export function businessToInfoGridDTO(b: MarketplaceBusinessDetail): ExperienceI
     ariaLabel: "Información clave",
     capabilities: { copyable: false, livePricing: false, liveAvailability: false },
   };
+}
+
+/* ------------------------------------------------------------------ *
+ * Composición Casa de vacaciones — agrupaciones editoriales sobre el
+ * MISMO bloque oficial `vmx.experience.info-grid`. Sin bloques nuevos,
+ * sin datos inventados: sólo ejes administrables con etiqueta CMS.
+ * ------------------------------------------------------------------ */
+function attributesGridDTO(
+  b: MarketplaceBusinessDetail,
+  keys: readonly string[],
+  heading: string,
+  variant: "cards" | "list" | "inline",
+  columns: number,
+): ExperienceInfoGridDTO | null {
+  const resolved = b.attributes ?? [];
+  const items: ExperienceInfoGridDTO["items"] = [];
+  for (const key of keys) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
+    items.push({
+      iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "info",
+      label: attribute.label,
+      value: attribute.values.map((value) => value.label).join(" · "),
+      tone: "default",
+    });
+  }
+  if (items.length === 0) return null;
+  return {
+    variant,
+    heading,
+    columns: Math.min(columns, Math.max(1, items.length)),
+    items,
+    ariaLabel: heading,
+    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+  };
+}
+
+/** Lo esencial del alojamiento (capacidad, dormitorios, camas, baños…). */
+export function businessToStayEssentialsDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    [
+      "property_type",
+      "hotel_type",
+      "capacity",
+      "bedrooms",
+      "beds",
+      "bathrooms",
+      "zone",
+      "price_level",
+    ],
+    "Lo esencial del alojamiento",
+    "cards",
+    3,
+  );
+}
+
+/** Amenidades, espacios y lo que incluye la estancia. */
+export function businessToStayAmenitiesDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  const resolved = b.attributes ?? [];
+  const items: ExperienceInfoGridDTO["items"] = [];
+  for (const key of [
+    "amenities",
+    "services",
+    "spaces",
+    "includes",
+    "stay_features",
+    "accessibility",
+  ]) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
+    /* Cada amenidad se lee como un elemento propio, no como una cadena
+       concatenada; el eje CMS se conserva como título del grupo. */
+    for (const value of attribute.values) {
+      items.push({
+        iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "info",
+        label: attribute.label,
+        value: value.label,
+        tone: "default",
+      });
+    }
+  }
+  if (items.length === 0) return null;
+  return {
+    variant: "checklist",
+    heading: "Amenidades y espacios",
+    columns: 2,
+    items,
+    ariaLabel: "Amenidades y espacios",
+    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+  };
+}
+
+/**
+ * Condiciones de la estancia: llegada, salida, mínimo, anfitrión y reglas.
+ * No se muestra política de cancelación: la plataforma no opera reservación
+ * ni cobro en línea, y ese dato sólo tiene sentido con un pago de por medio.
+ */
+export function businessToStayPolicyDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    [
+      "check_in",
+      "check_out",
+      "min_nights",
+      "host_languages",
+      "house_rules",
+      "policies",
+      "traveler_profile",
+    ],
+    "Tu estancia",
+    "cards",
+    3,
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Composición Restaurante — misma gramática editorial que hospedaje,
+ * sobre el MISMO bloque oficial `vmx.experience.info-grid`. Sin bloques
+ * nuevos ni datos inventados: sólo ejes administrables con etiqueta CMS.
+ * ------------------------------------------------------------------ */
+
+/** Lo esencial del restaurante (cocina, zona, experiencia, precio). */
+export function businessToDiningEssentialsDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["cuisine_type", "dining_experience", "zone", "price_level"],
+    "Lo esencial del restaurante",
+    "cards",
+    3,
+  );
+}
+
+/** Servicios, opciones alimentarias y accesibilidad, como lista escaneable. */
+export function businessToDiningAmenitiesDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  const resolved = b.attributes ?? [];
+  const items: ExperienceInfoGridDTO["items"] = [];
+  for (const key of ["services", "dietary_options", "accessibility", "traveler_profile"]) {
+    const attribute = resolved.find((item) => item.key === key);
+    if (!attribute || attribute.values.length === 0) continue;
+    for (const value of attribute.values) {
+      items.push({
+        iconKey: ATTRIBUTE_ICON_BY_KEY[key] ?? "info",
+        label: attribute.label,
+        value: value.label,
+        tone: "default",
+      });
+    }
+  }
+  if (items.length === 0) return null;
+  return {
+    variant: "checklist",
+    heading: "Servicios y opciones",
+    columns: 2,
+    items,
+    ariaLabel: "Servicios y opciones",
+    capabilities: { copyable: false, livePricing: false, liveAvailability: false },
+  };
+}
+
+/** Condiciones de la visita: horarios de consumo, reservaciones, idiomas. */
+export function businessToDiningVisitDTO(
+  b: MarketplaceBusinessDetail,
+): ExperienceInfoGridDTO | null {
+  return attributesGridDTO(
+    b,
+    ["meal_period", "reservation_policy", "languages", "dress_code", "policies"],
+    "Tu visita",
+    "cards",
+    3,
+  );
 }
 
 /* ------------------------------------------------------------------ *
@@ -179,24 +396,82 @@ export function businessToCtaBarDTO(b: MarketplaceBusinessDetail): ExperienceCta
  * por `vmx.experience.products`. La Plantilla Business no vuelve a
  * pintar `<ul>` — sólo orquesta bloques oficiales.
  * ------------------------------------------------------------------ */
+/* Hospedaje: la tarifa publicada del CMS es por noche. Sólo se declara como
+   pista de precio; nunca implica cobro ni reservación en línea. Las claves son
+   las mismas que usa la Plantilla Business aprobada. */
+const LODGING_KEYS = new Set([
+  "hotel",
+  "hoteles",
+  "hospedaje",
+  "hospedajes",
+  "alojamiento",
+  "vacation_rental",
+  "casas-de-vacaciones",
+  "casa-de-vacaciones",
+]);
+
+export function isLodgingBusiness(b: {
+  category_family_key?: string | null;
+  category_slug?: string | null;
+}): boolean {
+  return (
+    LODGING_KEYS.has((b.category_family_key ?? "").trim().toLowerCase()) ||
+    LODGING_KEYS.has((b.category_slug ?? "").trim().toLowerCase())
+  );
+}
+
+/* Restaurantes: la tarifa publicada del CMS corresponde a un platillo del
+   menú. Igual que en hospedaje, es sólo pista de precio: nunca implica cobro
+   ni reservación en línea. */
+const DINING_KEYS = new Set([
+  "restaurant",
+  "restaurante",
+  "restaurantes",
+  "gastronomia",
+  "gastronomía",
+]);
+
+export function isDiningBusiness(b: {
+  category_family_key?: string | null;
+  category_slug?: string | null;
+}): boolean {
+  return (
+    DINING_KEYS.has((b.category_family_key ?? "").trim().toLowerCase()) ||
+    DINING_KEYS.has((b.category_slug ?? "").trim().toLowerCase())
+  );
+}
+
 export function businessToProductsDTO(b: MarketplaceBusinessDetail): ExperienceProductsDTO {
   const variant = resolveBusinessVariant(b.category_slug);
+  const isLodging = isLodgingBusiness(b);
+  const isDining = isDiningBusiness(b);
+  const compact = isLodging || isDining;
+  const priceHint = isLodging ? "por noche" : isDining ? "por platillo" : null;
   return {
-    variant: "grid",
+    /* Hospedaje y restaurante: una sola fila horizontal deslizable con
+       tarjetas compactas para armonizar con el resto de la ficha. */
+    variant: compact ? "carousel" : "grid",
     heading: variant.productsHeading,
     subheading: null,
     emptyMessage: variant.productsEmpty,
-    columns: 2,
+    columns: compact ? 3 : 2,
+
     groupBy: "none",
     ariaLabel: variant.productsHeading,
-    items: b.products.map(marketplaceProductToItem),
+    items: b.products.map((p) => {
+      const item = marketplaceProductToItem(p);
+      return priceHint && item.priceAmount != null ? { ...item, priceHint } : item;
+    }),
     capabilities: {
       showPrice: true,
       showFavorite: true,
       showActions: true,
       showBusiness: false,
-      showMedia: false,
-      compact: false,
+      /* La portada CMS de cada producto (`product_media` role=cover) ya
+         llega firmada en el DTO: la tarjeta oficial la muestra y, sin
+         medio acreditado, usa su fallback editorial aprobado. */
+      showMedia: true,
+      compact,
       contextAware: false,
       livePricing: false,
       liveAvailability: false,

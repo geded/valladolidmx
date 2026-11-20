@@ -28,4 +28,9 @@ export {
   useNavigationSession,
   type NavigationSessionSnapshot,
   type NavigationSessionSlot,
+  describeJourneyStep,
+  pushJourneyStep,
+  readJourneyTrail,
+  readJourneyPrefix,
+  type JourneyStep,
 } from "./session-context";

@@ -1,0 +1,309 @@
+export type EventRecurrenceFrequency = "daily" | "weekly" | "monthly" | "yearly";
+
+export interface EventScheduleTime {
+  time: string;
+  label?: string | null;
+}
+
+export interface EventExceptionDate {
+  date: string;
+  note?: string | null;
+}
+
+export interface EventRecurrenceInput {
+  starts_at: string;
+  ends_at?: string | null;
+  recurrence_frequency?: EventRecurrenceFrequency | null;
+  recurrence_interval?: number | null;
+  recurrence_weekdays?: number[] | null;
+  recurrence_until?: string | null;
+  schedule_times?: EventScheduleTime[] | null;
+  exception_dates?: EventExceptionDate[] | null;
+  event_timezone?: string | null;
+}
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+const EVENT_TIME_ZONE = "America/Merida";
+
+function dateKey(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function utcDate(key: string): Date {
+  return new Date(`${key}T12:00:00.000Z`);
+}
+
+function addDays(key: string, amount: number): string {
+  const date = utcDate(key);
+  date.setUTCDate(date.getUTCDate() + amount);
+  return dateKey(date);
+}
+
+function dayDistance(from: string, to: string): number {
+  return Math.floor((utcDate(to).getTime() - utcDate(from).getTime()) / 86_400_000);
+}
+
+function monthDistance(from: string, to: string): number {
+  const a = utcDate(from);
+  const b = utcDate(to);
+  return (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + b.getUTCMonth() - a.getUTCMonth();
+}
+
+function localDateInMerida(now: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Merida",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}
+
+function localTimeInMerida(now: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Merida",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(now);
+}
+
+function localDateTimeIso(date: string, time: string): string {
+  // Yucatán no observa horario de verano. El offset se obtiene igualmente
+  // desde IANA para que la fuente de verdad sea la zona editorial declarada.
+  const probe = new Date(`${date}T${time}:00.000Z`);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: EVENT_TIME_ZONE,
+    timeZoneName: "longOffset",
+  }).formatToParts(probe);
+  const offset = parts.find((part) => part.type === "timeZoneName")?.value.replace("GMT", "") || "-06:00";
+  return `${date}T${time}:00${offset}`;
+}
+
+function meridaTimeOfIso(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "00:00";
+  return localTimeInMerida(date);
+}
+
+export function normalizeScheduleTimes(value: unknown): EventScheduleTime[] {
+  if (!Array.isArray(value)) return [];
+  const unique = new Map<string, EventScheduleTime>();
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const raw = item as { time?: unknown; label?: unknown };
+    const time = typeof raw.time === "string" ? raw.time.trim() : "";
+    if (!TIME_RE.test(time)) continue;
+    const label = typeof raw.label === "string" ? raw.label.trim().slice(0, 40) : "";
+    unique.set(`${time}|${label}`, { time, label: label || null });
+  }
+  return [...unique.values()].sort((a, b) => a.time.localeCompare(b.time));
+}
+
+export function normalizeExceptionDates(value: unknown): EventExceptionDate[] {
+  if (!Array.isArray(value)) return [];
+  const unique = new Map<string, EventExceptionDate>();
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const raw = item as { date?: unknown; note?: unknown };
+    const date = typeof raw.date === "string" ? raw.date.trim() : "";
+    if (!DATE_RE.test(date)) continue;
+    const note = typeof raw.note === "string" ? raw.note.trim().slice(0, 100) : "";
+    unique.set(date, { date, note: note || null });
+  }
+  return [...unique.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function isOccurrenceDate(input: EventRecurrenceInput, candidate: string, startDate: string): boolean {
+  const interval = Math.max(1, Math.floor(input.recurrence_interval ?? 1));
+  const distance = dayDistance(startDate, candidate);
+  if (distance < 0) return false;
+  switch (input.recurrence_frequency) {
+    case "daily":
+      return distance % interval === 0;
+    case "weekly": {
+      const weekdays = input.recurrence_weekdays?.length
+        ? input.recurrence_weekdays
+        : [utcDate(startDate).getUTCDay()];
+      return Math.floor(distance / 7) % interval === 0 && weekdays.includes(utcDate(candidate).getUTCDay());
+    }
+    case "monthly": {
+      const months = monthDistance(startDate, candidate);
+      return months >= 0 && months % interval === 0 && utcDate(candidate).getUTCDate() === utcDate(startDate).getUTCDate();
+    }
+    case "yearly": {
+      const start = utcDate(startDate);
+      const current = utcDate(candidate);
+      return (
+        (current.getUTCFullYear() - start.getUTCFullYear()) % interval === 0 &&
+        current.getUTCMonth() === start.getUTCMonth() &&
+        current.getUTCDate() === start.getUTCDate()
+      );
+    }
+    default:
+      return false;
+  }
+}
+
+export function nextEventOccurrence(
+  input: EventRecurrenceInput,
+  now = new Date(),
+): { startsAt: string; endsAt: string | null; date: string } | null {
+  const base = new Date(input.starts_at);
+  if (Number.isNaN(base.getTime())) return null;
+  if (!input.recurrence_frequency) {
+    if (base.getTime() < now.getTime()) return null;
+    return { startsAt: input.starts_at, endsAt: input.ends_at ?? null, date: input.starts_at.slice(0, 10) };
+  }
+
+  const startDate = input.starts_at.slice(0, 10);
+  const today = localDateInMerida(now);
+  const currentTime = localTimeInMerida(now);
+  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
+  const fallbackTime = meridaTimeOfIso(input.starts_at);
+  const times = normalizeScheduleTimes(input.schedule_times);
+  const schedule = times.length ? times : [{ time: fallbackTime, label: null }];
+
+  for (let offset = 0; offset <= 3660; offset += 1) {
+    const candidate = addDays(today, offset);
+    if (until && candidate > until) return null;
+    if (excluded.has(candidate) || !isOccurrenceDate(input, candidate, startDate)) continue;
+    const nextTime = schedule.find((item) => offset > 0 || item.time >= currentTime);
+    if (!nextTime) continue;
+    const startsAt = localDateTimeIso(candidate, nextTime.time);
+    return { startsAt, endsAt: null, date: candidate };
+  }
+  return null;
+}
+
+export function recurrenceLabel(input: EventRecurrenceInput): string | null {
+  const every = Math.max(1, Math.floor(input.recurrence_interval ?? 1));
+  if (!input.recurrence_frequency) return null;
+  const labels: Record<EventRecurrenceFrequency, [string, string]> = {
+    daily: ["Todos los días", `Cada ${every} días`],
+    weekly: ["Cada semana", `Cada ${every} semanas`],
+    monthly: ["Cada mes", `Cada ${every} meses`],
+    yearly: ["Cada año", `Cada ${every} años`],
+  };
+  return labels[input.recurrence_frequency][every === 1 ? 0 : 1];
+}
+
+export function scheduleLabel(value: unknown): string | null {
+  const times = normalizeScheduleTimes(value);
+  if (!times.length) return null;
+  return times.map((item) => `${item.time} h${item.label ? ` (${item.label})` : ""}`).join(" y ");
+}
+/**
+ * Próximas funciones del evento (recurrente o de fecha única).
+ * Reutiliza exclusivamente la lógica de ocurrencia ya aprobada.
+ */
+export function upcomingEventOccurrences(
+  input: EventRecurrenceInput,
+  limit = 8,
+  now = new Date(),
+): { startsAt: string; date: string; time: string; label: string | null }[] {
+  const base = new Date(input.starts_at);
+  if (Number.isNaN(base.getTime())) return [];
+
+  if (!input.recurrence_frequency) {
+    if (base.getTime() < now.getTime()) return [];
+    return [
+      {
+        startsAt: input.starts_at,
+        date: input.starts_at.slice(0, 10),
+        time: meridaTimeOfIso(input.starts_at),
+        label: null,
+      },
+    ];
+  }
+
+  const startDate = input.starts_at.slice(0, 10);
+  const today = localDateInMerida(now);
+  const currentTime = localTimeInMerida(now);
+  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
+  const times = normalizeScheduleTimes(input.schedule_times);
+  const schedule = times.length ? times : [{ time: meridaTimeOfIso(input.starts_at), label: null }];
+
+  const out: { startsAt: string; date: string; time: string; label: string | null }[] = [];
+  for (let offset = 0; offset <= 3660 && out.length < limit; offset += 1) {
+    const candidate = addDays(today, offset);
+    if (until && candidate > until) break;
+    if (excluded.has(candidate) || !isOccurrenceDate(input, candidate, startDate)) continue;
+    for (const item of schedule) {
+      if (offset === 0 && item.time < currentTime) continue;
+      out.push({
+        startsAt: localDateTimeIso(candidate, item.time),
+        date: candidate,
+        time: item.time,
+        label: item.label ?? null,
+      });
+      if (out.length >= limit) break;
+    }
+  }
+  return out;
+}
+
+/**
+ * ¿El evento ocurre en el día calendario indicado (zona del destino)?
+ * Reutiliza la misma autoridad de recurrencia (intervalos, días de la
+ * semana, fecha final y fechas suspendidas) que el resto del sistema.
+ * A diferencia de `nextEventOccurrence`, no descarta el día en curso por
+ * la hora: un evento de hoy sigue siendo un evento de hoy.
+ */
+export function eventOccursOnDate(input: EventRecurrenceInput, dateKey: string): boolean {
+  if (!DATE_RE.test(dateKey)) return false;
+  const base = new Date(input.starts_at);
+  if (Number.isNaN(base.getTime())) return false;
+  const startDate = input.starts_at.slice(0, 10);
+
+  if (!input.recurrence_frequency) {
+    const endKey = input.ends_at ? input.ends_at.slice(0, 10) : startDate;
+    return dateKey >= startDate && dateKey <= (endKey >= startDate ? endKey : startDate);
+  }
+
+  const until = input.recurrence_until && DATE_RE.test(input.recurrence_until) ? input.recurrence_until : null;
+  if (until && dateKey > until) return false;
+  const excluded = new Set(normalizeExceptionDates(input.exception_dates).map((item) => item.date));
+  if (excluded.has(dateKey)) return false;
+  return isOccurrenceDate(input, dateKey, startDate);
+}
+
+/** Datos mínimos de recurrencia que viajan a las superficies públicas. */
+export interface EventRecurrencePayload {
+  startsAt: string;
+  frequency: EventRecurrenceFrequency | null;
+  interval: number;
+  weekdays: number[];
+  until: string | null;
+  endsAt: string | null;
+  exceptions: string[];
+}
+
+export function toRecurrencePayload(input: EventRecurrenceInput): EventRecurrencePayload {
+  return {
+    startsAt: input.starts_at,
+    frequency: input.recurrence_frequency ?? null,
+    interval: Math.max(1, Math.floor(input.recurrence_interval ?? 1)),
+    weekdays: input.recurrence_weekdays ?? [],
+    until: input.recurrence_until ?? null,
+    endsAt: input.ends_at ?? null,
+    exceptions: normalizeExceptionDates(input.exception_dates).map((item) => item.date),
+  };
+}
+
+export function payloadOccursOnDate(payload: EventRecurrencePayload, dateKey: string): boolean {
+  return eventOccursOnDate(
+    {
+      starts_at: payload.startsAt,
+      ends_at: payload.endsAt,
+      recurrence_frequency: payload.frequency,
+      recurrence_interval: payload.interval,
+      recurrence_weekdays: payload.weekdays,
+      recurrence_until: payload.until,
+      exception_dates: payload.exceptions.map((date) => ({ date })),
+    },
+    dateKey,
+  );
+}

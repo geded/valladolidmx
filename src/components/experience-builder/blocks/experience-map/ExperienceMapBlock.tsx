@@ -33,6 +33,8 @@ const InteractiveMap = lazy(() =>
   })),
 );
 
+const LIST_PAGE_SIZE = 6;
+
 function directionsHref(p: { lat: number; lng: number }) {
   return `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
 }
@@ -68,6 +70,7 @@ export function ExperienceMapBlock({
   const dto = useMemo(() => applyExperienceMapDefaults(rawDto), [rawDto]);
   const [interactive, setInteractive] = useState(interactiveOnly);
   const [activeId, setActiveId] = useState<string | null>(dto.points[0]?.id ?? null);
+  const [listPage, setListPage] = useState(1);
 
   const center = useMemo(() => {
     if (dto.center) return dto.center;
@@ -91,6 +94,17 @@ export function ExperienceMapBlock({
   const primary = dto.points.find((p) => p.id === activeId) ?? dto.points[0];
   const isMulti = dto.variant !== "single";
   const labelOf = (idx: number) => String.fromCharCode(65 + (idx % 26));
+  // Lista paginada: evita una columna interminable en celular y tableta.
+  const totalPages = Math.max(1, Math.ceil(dto.points.length / LIST_PAGE_SIZE));
+  const safePage = Math.min(listPage, totalPages);
+  const pageStart = (safePage - 1) * LIST_PAGE_SIZE;
+  const pagePoints = dto.points.slice(pageStart, pageStart + LIST_PAGE_SIZE);
+  const goToPage = (next: number) => {
+    const n = Math.max(1, Math.min(totalPages, next));
+    setListPage(n);
+    const first = dto.points[(n - 1) * LIST_PAGE_SIZE];
+    if (first) setActiveId(first.id);
+  };
 
   return (
     <section className={cn("space-y-4", immersive && "space-y-5", className)}>
@@ -102,10 +116,8 @@ export function ExperienceMapBlock({
         className={cn(
           "grid gap-6",
           immersive
-            ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-stretch"
-            : isMulti
-              ? "md:grid-cols-[minmax(0,1fr)_320px]"
-              : "md:grid-cols-[minmax(0,1fr)_320px]",
+            ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start"
+            : "lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start",
         )}
       >
         <div className="min-w-0 space-y-3">
@@ -163,22 +175,23 @@ export function ExperienceMapBlock({
 
         <aside
           className={cn(
-            "space-y-4",
+            "space-y-4 self-start",
             immersive && "rounded-2xl border border-border bg-background/70 p-3 backdrop-blur",
           )}
         >
           <ul
             className={cn(
-              "space-y-3",
+              "grid gap-3 sm:grid-cols-2 lg:grid-cols-1 lg:space-y-0",
               isMulti
                 ? immersive
-                  ? "max-h-[36rem] overflow-y-auto pr-1"
-                  : "max-h-[560px] overflow-y-auto pr-1"
+                  ? "lg:max-h-[36rem] lg:overflow-y-auto lg:pr-1"
+                  : "lg:max-h-[560px] lg:overflow-y-auto lg:pr-1"
                 : undefined,
             )}
             aria-label="Puntos en el mapa"
           >
-            {dto.points.map((p, i) => {
+            {pagePoints.map((p, j) => {
+              const i = pageStart + j;
               const isActive = p.id === primary.id;
               const label = labelOf(i);
               return (
@@ -207,7 +220,7 @@ export function ExperienceMapBlock({
                           </span>
                         ) : null}
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-foreground">
+                          <p className="line-clamp-2 text-sm font-semibold text-foreground">
                             {p.title}
                           </p>
                           {p.subtitle ? (
@@ -251,6 +264,34 @@ export function ExperienceMapBlock({
               );
             })}
           </ul>
+          {totalPages > 1 ? (
+            <nav
+              aria-label="Paginación de puntos en el mapa"
+              className="flex items-center justify-between gap-2"
+            >
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={listPage <= 1}
+                onClick={() => goToPage(listPage - 1)}
+              >
+                ← Anterior
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {pageStart + 1}–{pageStart + pagePoints.length} de {dto.points.length}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={listPage >= totalPages}
+                onClick={() => goToPage(listPage + 1)}
+              >
+                Siguiente →
+              </Button>
+            </nav>
+          ) : null}
         </aside>
       </div>
     </section>

@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SeoPreview } from "./SeoPreview";
 import { OnboardingTour, HelpButton, hasSeenOnboarding } from "./OnboardingTour";
 import {
@@ -34,11 +34,17 @@ import {
   GripVertical,
   Loader2,
   Lock,
+  Maximize2,
+  Minimize2,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelsTopLeft,
   Pencil,
   Plus,
   Redo2,
   Search,
   Share2,
+  RefreshCw,
   Trash2,
   Undo2,
   Clock,
@@ -48,7 +54,8 @@ import {
 import {
   DndContext,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
@@ -74,6 +81,7 @@ import {
   schedulePublishComposition,
   cancelScheduledPublish,
   listCompositionRevisions,
+  createCompositionRevision,
   restoreCompositionRevision,
   issueCompositionPreviewLink,
   getPublishedTree,
@@ -93,6 +101,14 @@ import {
   HOME_PREMIUM_FALLBACK_TREE,
   resolveHomePremiumAuthorityTree,
 } from "@/components/home-premium/home-premium-config";
+import {
+  HOME_RAIL_CONFIG_KEY,
+  buildHomeRailEditorRows,
+  compactHomeRailEditorOverrides,
+  type HomeEditableRail,
+} from "@/components/home-premium/home-premium-real";
+
+import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
 import { getBlock, listAuthorableBlocks } from "@/lib/experience-builder/block-registry";
 import {
   canListEditorialBlock,
@@ -104,6 +120,21 @@ import {
 import type { BlockContract } from "@/lib/experience-builder/block-contract";
 import { diffCompositions, type SectionChange } from "@/lib/experience-builder/composition-diff";
 import { AutoInspector } from "@/components/experience-builder/AutoInspector";
+import {
+  fieldBelongsToSection,
+  getCompositeSections,
+  nextCompositeOrder,
+  orderedCompositeSections,
+  type CompositeSectionDef,
+} from "@/lib/experience-builder/composite-sections";
+import {
+  SEO_LANDING_SURFACE_KEY,
+  getSurfaceSlots,
+  slotOfNodeId,
+  surfaceReorderableSlots,
+  surfaceSlotLabels,
+} from "@/lib/experience-builder/studio-standard";
+import { readSeoLandingChrome } from "@/lib/experience-builder/seo-landing/seo-landing-template";
 import { BlockCommentsPanel } from "@/components/experience-builder/BlockCommentsPanel";
 import { PagesPanel } from "@/components/experience-builder/PagesPanel";
 import { PublicFooter, PublicHeader } from "@/components/discovery";
@@ -116,6 +147,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { FONT_FAMILY_OPTIONS, type BlockAppearance } from "@/lib/experience-builder/appearance";
 import { useEditingLock, formatRelativeSince } from "./useEditingLock";
+import { useWorkspace } from "@/components/workspace/WorkspaceProvider";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type ChromeArea = "header" | "footer";
@@ -585,8 +617,10 @@ export function VisualStudio({
   onSelectPage,
   advanced = false,
 }: VisualStudioProps = {}) {
+  const list = useServerFn(listCompositions);
   const [internalKey, setInternalKey] = useState<string | null>(page);
   const [customPages, setCustomPages] = useState<SitePage[]>([]);
+  const [resolvingDirectPage, setResolvingDirectPage] = useState(false);
   const openKey = normalizePageKey(page ?? internalKey);
   const setOpen = (k: string | null) => {
     const next = normalizePageKey(k);
@@ -597,9 +631,49 @@ export function VisualStudio({
   const activePage = openKey
     ? (allPages.find((p) => normalizePageKey(p.key) === openKey) ?? null)
     : null;
+  useEffect(() => {
+    if (!openKey || activePage) return;
+    let cancelled = false;
+    setResolvingDirectPage(true);
+    void list()
+      .then((rows) => {
+        if (cancelled) return;
+        const row = rows.find((candidate) => normalizePageKey(candidate.slug) === openKey);
+        if (!row) return;
+        const directPage: SitePage = {
+          key: row.slug,
+          slug: row.slug,
+          title: row.title,
+          description: row.description ?? "",
+          page_type: row.page_type,
+          publicPath: `/p/${row.slug}`,
+          status: "editable",
+          custom: true,
+          compositionId: row.id,
+        };
+        setCustomPages((current) =>
+          current.some((candidate) => normalizePageKey(candidate.key) === openKey)
+            ? current
+            : [...current, directPage],
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setResolvingDirectPage(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activePage, list, openKey]);
   if (activePage) {
     return (
       <PageVisualEditor pageDef={activePage} onExit={() => setOpen(null)} advanced={advanced} />
+    );
+  }
+  if (openKey && resolvingDirectPage) {
+    return (
+      <div className="flex min-h-0 flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" aria-hidden /> Preparando la página…
+      </div>
     );
   }
   return (
@@ -1013,11 +1087,14 @@ function PageVisualEditor({
   const cancelSchedule = useServerFn(cancelScheduledPublish);
   const fetchPublishedTree = useServerFn(getPublishedTree);
   const listRevs = useServerFn(listCompositionRevisions);
+  const createRevision = useServerFn(createCompositionRevision);
   const restore = useServerFn(restoreCompositionRevision);
   const issuePreview = useServerFn(issueCompositionPreviewLink);
   const setWorkflow = useServerFn(setCompositionWorkflowState);
+  const resolveHomeReal = useServerFn(resolveHomePremiumRealContent);
   const queryClient = useQueryClient();
   const { roles, user } = useAuth();
+  const workspace = useWorkspace();
   const editorialSurface = resolveEditorialSurface(pageDef.page_type);
   const editorialActor = resolveEditorialActor(roles);
   const canPublish = roles.includes("admin") || roles.includes("super_admin");
@@ -1026,11 +1103,52 @@ function PageVisualEditor({
   const [workflowBusy, setWorkflowBusy] = useState(false);
   // US-03 · Conteo de comentarios abiertos por bloque (para badge en overlay).
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const { data: homeRealContent } = useQuery({
+    queryKey: ["home-premium-real-content"],
+    queryFn: () => resolveHomeReal(),
+    staleTime: 60_000,
+    enabled: pageDef.page_type === "home",
+  });
+
+  /**
+   * Reconciliación explícita del conflicto de borrador: trae la versión
+   * vigente del servidor y la adopta como base de edición. No publica, no
+   * sobrescribe el servidor y no toca la página publicada.
+   */
+  const reloadDraftFromServer = async () => {
+    if (!page) return;
+    setReloadingDraft(true);
+    try {
+      const refreshed = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+      if (refreshed) {
+        draftHashRef.current = refreshed.draft_hash;
+        setPage(refreshed);
+        skipNextAutoSave.current = true;
+        savedSignatureRef.current = canonicalizeClient(refreshed.current_draft);
+        setTree(refreshed.current_draft);
+        resetHistory();
+        setDraftConflict(false);
+        setSaveStatus("idle");
+        setMessage("Borrador actualizado con la versión del servidor.");
+      }
+    } catch (e) {
+      setMessage(`No se pudo recargar el borrador: ${(e as Error).message}`);
+    } finally {
+      setReloadingDraft(false);
+    }
+  };
 
   const changeWorkflow = async (next: "draft" | "in_review" | "approved") => {
     if (!page) return;
     setWorkflowBusy(true);
     try {
+      // La máquina oficial no permite draft → approved directo
+      // (draft → in_review → approved). Cuando un administrador aprueba desde
+      // borrador, se ejecutan ambas transiciones válidas en orden, sin
+      // saltarse la máquina ni su auditoría.
+      if (next === "approved" && page.workflow_state === "draft") {
+        await setWorkflow({ data: { id: page.id, next_state: "in_review" } });
+      }
       const res = await setWorkflow({ data: { id: page.id, next_state: next } });
       setPage((p) =>
         p
@@ -1061,6 +1179,8 @@ function PageVisualEditor({
 
   const [page, setPage] = useState<CompositionDetail | null>(null);
   const [tree, setTree] = useState<CompositionTree | null>(null);
+  /** Composición ya cargada en este montaje; evita recargas que pisan la edición. */
+  const loadedCompositionKeyRef = useRef<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [publishing, setPublishing] = useState(false);
@@ -1071,14 +1191,81 @@ function PageVisualEditor({
   const [scheduling, setScheduling] = useState(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // Conflicto de borrador: el servidor tiene una versión más nueva. No se
+  // sobrescribe nada de forma silenciosa; el editor decide recargar.
+  const [draftConflict, setDraftConflict] = useState(false);
+  const [reloadingDraft, setReloadingDraft] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
+  /** Posición donde se insertará el elemento elegido en la biblioteca. */
+  const [insertAt, setInsertAt] = useState<number | null>(null);
+  const openLibrary = (atIndex?: number) => {
+    setInsertAt(typeof atIndex === "number" ? atIndex : null);
+    setShowLibrary(true);
+  };
   const [showVersions, setShowVersions] = useState(false);
+  const [restoringPublished, setRestoringPublished] = useState(false);
   const [versions, setVersions] = useState<CompositionRevisionSummary[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shareLink, setShareLink] = useState<{ url: string; expires_at: string } | null>(null);
   const [showTour, setShowTour] = useState(false);
+  // El panel de estructura ya no ocupa una columna fija: se abre como capa
+  // superpuesta bajo demanda para que el lienzo use todo el ancho disponible.
+  const [structureCollapsed, setStructureCollapsed] = useState(true);
+  // Sección interna activa dentro de una plantilla compuesta.
+  const [subSectionKey, setSubSectionKey] = useState<string | null>(null);
+  const [focusMode, setFocusMode] = useState(false);
+  const focusModeRef = useRef(false);
+  const previousSidebarRef = useRef(workspace.sidebar);
+  const currentSidebarRef = useRef(workspace.sidebar);
+  const setSidebarRef = useRef(workspace.setSidebar);
+  currentSidebarRef.current = workspace.sidebar;
+  setSidebarRef.current = workspace.setSidebar;
+
+  // En tablet el menú general del CMS deja menos de la mitad de la pantalla
+  // para el lienzo. El Studio toma temporalmente todo el ancho disponible y
+  // restaura exactamente el estado anterior al salir o volver a escritorio.
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1279px)");
+    let hiddenByStudio = false;
+    let sidebarBeforeStudio = currentSidebarRef.current;
+    const syncWorkspaceSidebar = () => {
+      if (media.matches) {
+        if (!hiddenByStudio) sidebarBeforeStudio = currentSidebarRef.current;
+        hiddenByStudio = true;
+        setSidebarRef.current("hidden");
+      } else if (hiddenByStudio && !focusModeRef.current) {
+        hiddenByStudio = false;
+        setSidebarRef.current(sidebarBeforeStudio);
+      }
+    };
+    syncWorkspaceSidebar();
+    media.addEventListener("change", syncWorkspaceSidebar);
+    return () => {
+      media.removeEventListener("change", syncWorkspaceSidebar);
+      if (hiddenByStudio && !focusModeRef.current) setSidebarRef.current(sidebarBeforeStudio);
+    };
+  }, []);
+
+  const toggleFocusMode = useCallback(() => {
+    const next = !focusMode;
+    focusModeRef.current = next;
+    if (next) {
+      previousSidebarRef.current = workspace.sidebar;
+      workspace.setSidebar("hidden");
+      setStructureCollapsed(true);
+    } else {
+      workspace.setSidebar(previousSidebarRef.current);
+    }
+    setFocusMode(next);
+  }, [focusMode, workspace]);
+
+  useEffect(() => {
+    return () => {
+      if (focusModeRef.current) setSidebarRef.current(previousSidebarRef.current);
+    };
+  }, []);
   // US-R3 · Sub-ola 2.2b — Preview data para plantillas dinámicas.
   // Se resuelve por `page_type`/`slug` desde el Preview Registry. Cuando
   // no aplica (Home, landings estáticos), `previewProvider` es null y ni
@@ -1206,7 +1393,14 @@ function PageVisualEditor({
   }, [deviceViewport]);
 
   useEffect(() => {
+    // Una recarga del efecto (por re-render o cambio de identidad de funciones)
+    // jamás debe sustituir el árbol en edición: sólo cargamos una vez por
+    // composición. Cambiar de página sí vuelve a cargar.
+    const loadKey = `${pageDef.compositionId ?? ""}|${pageDef.slug}|${pageDef.page_type}`;
+    if (loadedCompositionKeyRef.current === loadKey) return;
+    loadedCompositionKeyRef.current = loadKey;
     let cancelled = false;
+    let settled = false;
     void (async () => {
       try {
         let detail: CompositionDetail | null = null;
@@ -1233,7 +1427,14 @@ function PageVisualEditor({
             detail = (await get({ data: { id } })) as CompositionDetail | null;
           }
         }
-        if (cancelled || !detail) return;
+        if (cancelled) return;
+        if (!detail) {
+          // Sin autoridad no hay editor: fail-closed visible en vez de spinner.
+          setLoadError("No se encontró la composición de esta página.");
+          return;
+        }
+        settled = true;
+        draftHashRef.current = detail.draft_hash;
         setPage(detail);
         skipNextAutoSave.current = true;
         savedSignatureRef.current = canonicalizeClient(detail.current_draft);
@@ -1241,11 +1442,22 @@ function PageVisualEditor({
         resetHistory();
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message);
+      } finally {
+        // Si el efecto se desmontó o falló antes de aplicar el borrador, la
+        // clave debe liberarse para que el siguiente montaje vuelva a cargar
+        // (de lo contrario el editor se queda en "Preparando el editor…").
+        if (!settled && loadedCompositionKeyRef.current === loadKey) {
+          loadedCompositionKeyRef.current = null;
+        }
       }
     })();
     return () => {
       cancelled = true;
+      if (!settled && loadedCompositionKeyRef.current === loadKey) {
+        loadedCompositionKeyRef.current = null;
+      }
     };
+
   }, [
     list,
     get,
@@ -1258,6 +1470,43 @@ function PageVisualEditor({
   ]);
 
   const saveTimer = useRef<number | null>(null);
+  /**
+   * Huella vigente del borrador en el servidor. Se mantiene en ref para que
+   * guardados encadenados usen siempre la última firma devuelta y no la del
+   * render anterior (causa real del falso `draft_conflict`).
+   */
+  const draftHashRef = useRef<string | null>(null);
+  const draftHashPageIdRef = useRef<string | null>(null);
+  const draftVersionRef = useRef(-1);
+  const saveChainRef = useRef<Promise<unknown>>(Promise.resolve());
+  const pendingSaveRef = useRef<{
+    pageId: string;
+    tree: CompositionTree;
+    signature: string;
+  } | null>(null);
+  const saveDrainActiveRef = useRef(false);
+  useEffect(() => {
+    // Sólo una huella emitida por el servidor es un token de concurrencia.
+    // `draftHash` corresponde al árbol local (posiblemente aún sin guardar) y
+    // nunca debe sustituir la base esperada por el servidor.
+    if (!page) {
+      draftHashPageIdRef.current = null;
+      draftVersionRef.current = -1;
+      draftHashRef.current = null;
+      return;
+    }
+    // Una respuesta anterior (por ejemplo, un refresh iniciado antes del
+    // autoguardado) nunca puede rebajar el token de concurrencia ya confirmado.
+    if (
+      draftHashPageIdRef.current !== page.id ||
+      page.draft_version >= draftVersionRef.current
+    ) {
+      draftHashPageIdRef.current = page.id;
+      draftVersionRef.current = page.draft_version;
+      draftHashRef.current = page?.draft_hash ?? null;
+    }
+  }, [page]);
+
   useEffect(() => {
     if (!page || !tree) return;
     if (skipNextAutoSave.current) {
@@ -1269,26 +1518,65 @@ function PageVisualEditor({
     setSaveStatus("saving");
     saveTimer.current = window.setTimeout(() => {
       const signature = canonicalizeClient(tree);
-      void save({ data: { id: page.id, tree, expected_hash: page.draft_hash ?? draftHash ?? "" } })
-        .then((res) => {
-          setPage((current) =>
-            current
-              ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
-              : current,
-          );
-          savedSignatureRef.current = signature;
-          setSaveStatus("saved");
-        })
+      // Latest-wins: mientras un guardado está en vuelo conservamos sólo el árbol
+      // más reciente. Así una edición rápida no genera una cola de escrituras que
+      // compiten por el mismo bloqueo de la composición.
+      pendingSaveRef.current = { pageId: page.id, tree, signature };
+      if (saveDrainActiveRef.current) return;
+      saveDrainActiveRef.current = true;
 
-        .catch((e) => {
-          setSaveStatus("error");
-          const msg = e instanceof Error ? e.message : String(e);
-          if (msg.includes("draft_conflict")) {
-            setMessage(
-              "Conflicto de edición: el borrador cambió en el servidor. Recarga antes de guardar.",
-            );
+
+      const drainPendingSaves = async () => {
+        try {
+          while (pendingSaveRef.current) {
+            const pending = pendingSaveRef.current;
+            pendingSaveRef.current = null;
+            try {
+              const res = await save({
+                data: {
+                  id: pending.pageId,
+                  tree: pending.tree,
+                  expected_hash: draftHashRef.current ?? "",
+                },
+              });
+              draftHashRef.current = res.draft_hash;
+              draftHashPageIdRef.current = pending.pageId;
+              draftVersionRef.current = res.draft_version;
+              setPage((current) =>
+                current?.id === pending.pageId
+                  ? { ...current, draft_hash: res.draft_hash, draft_version: res.draft_version }
+                  : current,
+              );
+              savedSignatureRef.current = pending.signature;
+              setSaveStatus(pendingSaveRef.current ? "saving" : "saved");
+            } catch (e) {
+              setSaveStatus("error");
+              const msg = e instanceof Error ? e.message : String(e);
+              if (msg.includes("draft_busy")) {
+                // Otra petición está terminando el mismo borrador. Conservamos
+                // cualquier cambio más nuevo y reintentamos sin bloquear la UI.
+                pendingSaveRef.current ??= pending;
+                setSaveStatus("saving");
+                await new Promise((resolve) => window.setTimeout(resolve, 700));
+                continue;
+              }
+              if (msg.includes("draft_conflict")) {
+                setDraftConflict(true);
+                setMessage(
+                  "Conflicto de edición: el borrador cambió en el servidor. Recarga el borrador para seguir trabajando.",
+                );
+              }
+              break;
+            }
           }
-        });
+        } finally {
+          saveDrainActiveRef.current = false;
+        }
+      };
+
+      saveChainRef.current = saveChainRef.current
+        .catch(() => undefined)
+        .then(drainPendingSaves);
     }, 900);
     return () => {
       if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -1322,6 +1610,206 @@ function PageVisualEditor({
     if (selectedChrome === "seo") return getSeoConfig(tree);
     return selectedNode?.config as Record<string, unknown> | null;
   }, [selectedChrome, selectedNode, tree]);
+
+  /**
+   * Plantillas compuestas: sus secciones internas se tratan como secciones de
+   * trabajo reales (registro `composite-sections`). Las plantillas con varias
+   * secciones siguen funcionando exactamente igual.
+   */
+  const compositeEntry = useMemo(
+    () => (selectedNode ? getCompositeSections(selectedNode.type) : null),
+    [selectedNode],
+  );
+  const compositeSections = useMemo(
+    () => (compositeEntry ? orderedCompositeSections(compositeEntry, selectedConfig) : []),
+    [compositeEntry, selectedConfig],
+  );
+  const activeSection: CompositeSectionDef | null =
+    compositeSections.find((s) => s.key === subSectionKey) ?? compositeSections[0] ?? null;
+  /**
+   * Puente editable del corpus real: cada carril del Home muestra en el
+   * inspector las tarjetas publicadas y permite ajustar texto, imagen y
+   * enlace sin crear contenido ni sustituir el catálogo del CMS.
+   */
+  const sectionRails: HomeEditableRail[] = useMemo(() => {
+    if (selectedNode?.type !== "vmx.home.premium-g4") return [];
+    switch (activeSection?.key) {
+      case "destinos":
+        return ["destinos"];
+      case "rutas":
+        return ["rutas"];
+      case "experiencias":
+        return ["experiencias"];
+      case "servicios":
+        return ["stays", "food"];
+      case "eventos":
+        return ["eventos"];
+      default:
+        return [];
+    }
+  }, [activeSection?.key, selectedNode?.type]);
+
+  const inspectorConfig = useMemo(() => {
+    if (!selectedConfig || sectionRails.length === 0) return selectedConfig;
+    const next = { ...selectedConfig };
+    for (const rail of sectionRails) {
+      const key = HOME_RAIL_CONFIG_KEY[rail];
+      next[key] = buildHomeRailEditorRows(rail, homeRealContent, selectedConfig[key]);
+    }
+    return next;
+  }, [homeRealContent, sectionRails, selectedConfig]);
+
+  const updateInspectorConfig = (next: Record<string, unknown>) => {
+    if (!selectedConfig || sectionRails.length === 0) {
+      updateSelectedConfig(next);
+      return;
+    }
+    const compacted = { ...next };
+    for (const rail of sectionRails) {
+      const key = HOME_RAIL_CONFIG_KEY[rail];
+      compacted[key] = compactHomeRailEditorOverrides(rail, homeRealContent, next[key]);
+    }
+    updateSelectedConfig(compacted);
+  };
+
+  /**
+   * Reordenar tarjetas arrastrándolas dentro de la propia sección del lienzo.
+   * Usa exactamente el mismo puente editable que el inspector: sólo cambia el
+   * orden y se guardan diferencias explícitas sobre el corpus del CMS.
+   */
+  const RAIL_BY_SECTION: Record<string, HomeEditableRail> = {
+    destinos: "destinos",
+    rutas: "rutas",
+    experiencias: "experiencias",
+  };
+
+  const reorderRailCard = (sectionKey: string, from: number, to: number) => {
+    const rail = RAIL_BY_SECTION[sectionKey];
+    const node = tree?.root.children.find((n) => n.id === compositeStructure?.nodeId);
+    if (!rail || !node) return;
+    const config = (node.config as Record<string, unknown> | null) ?? {};
+    const key = HOME_RAIL_CONFIG_KEY[rail];
+    const rows = buildHomeRailEditorRows(rail, homeRealContent, config[key]);
+    if (!Array.isArray(rows) || from === to) return;
+    if (from < 0 || to < 0 || from >= rows.length || to >= rows.length) return;
+    const next = arrayMove(rows as unknown[], from, to);
+    commitTree(
+      updateNodeConfig(tree!, node.id, {
+        ...config,
+        [key]: compactHomeRailEditorOverrides(rail, homeRealContent, next),
+      }),
+    );
+  };
+
+
+
+
+  const selectUnit = (id: string, sub: string | null) => {
+    setSelectedId(id);
+    setSubSectionKey(sub);
+  };
+
+  /**
+   * Navegación sección por sección: lista ordenada de secciones editables,
+   * incluidas las secciones internas de las plantillas compuestas.
+   */
+  const sectionNav = useMemo(() => {
+    const items: Array<{ id: string; sub: string | null; value: string; label: string }> = [];
+    for (const n of tree?.root.children ?? []) {
+      const entry = getCompositeSections(n.type);
+      if (entry) {
+        for (const section of orderedCompositeSections(
+          entry,
+          n.config as Record<string, unknown> | null,
+        )) {
+          items.push({
+            id: n.id,
+            sub: section.key,
+            value: `${n.id}::${section.key}`,
+            label: section.label,
+          });
+        }
+      } else {
+        items.push({
+          id: n.id,
+          sub: null,
+          value: n.id,
+          label: getBlock(n.type)?.display_name ?? n.type,
+        });
+      }
+    }
+    const current = selectedNode
+      ? activeSection
+        ? `${selectedNode.id}::${activeSection.key}`
+        : selectedNode.id
+      : "";
+    const index = current ? items.findIndex((i) => i.value === current) : -1;
+    return { items, index, current };
+  }, [tree, selectedNode, activeSection]);
+
+  const moveCompositeSection = (dir: -1 | 1) => {
+    if (!compositeEntry?.orderKey || !activeSection || !selectedConfig) return;
+    const keys = orderedCompositeSections(compositeEntry, selectedConfig)
+      .filter((s) => s.reorderable)
+      .map((s) => s.key);
+    const i = keys.indexOf(activeSection.key);
+    const target = keys[i + dir];
+    if (i < 0 || !target) return;
+    const order = nextCompositeOrder(compositeEntry, selectedConfig, activeSection.key, target);
+    if (!order) return;
+    updateSelectedConfig({ ...selectedConfig, [compositeEntry.orderKey]: order });
+  };
+
+  const toggleCompositeSection = () => {
+    const key = activeSection?.visibilityKey;
+    if (!key || !selectedConfig) return;
+    updateSelectedConfig({ ...selectedConfig, [key]: selectedConfig[key] === false });
+  };
+
+  /**
+   * Estructura de una plantilla publicada como un único bloque compuesto:
+   * se listan sus secciones internas en lugar de "una sola sección".
+   */
+  const compositeStructure = useMemo(() => {
+    const structureTree =
+      pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree;
+    const children = structureTree?.root.children ?? [];
+    if (children.length !== 1) return null;
+    const node = children[0]!;
+    const entry = getCompositeSections(node.type);
+    if (!entry) return null;
+    const config = (node.config ?? {}) as Record<string, unknown>;
+    return {
+      nodeId: node.id,
+      orderKey: entry.orderKey,
+      entry,
+      config,
+      sections: orderedCompositeSections(entry, config),
+    };
+  }, [pageDef.page_type, tree]);
+
+  const onCompositeDragEnd = (e: DragEndEvent) => {
+    if (!tree || !compositeStructure || !e.over || e.active.id === e.over.id) return;
+    const { entry, config, nodeId, orderKey } = compositeStructure;
+    if (!orderKey) return;
+    const order = nextCompositeOrder(entry, config, String(e.active.id), String(e.over.id));
+    if (!order) return;
+    commitTree(updateNodeConfig(tree, nodeId, { ...config, [orderKey]: order }));
+  };
+
+  // Escape cierra el panel de edición desde cualquier punto del scroll.
+  useEffect(() => {
+    if (!selectedId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+      setSelectedId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedId]);
 
   /**
    * 18.51 · Publicar/programar NUNCA guarda de forma implícita. Sólo se
@@ -1701,11 +2189,26 @@ function PageVisualEditor({
       )
     )
       return;
-    await restore({
-      data: { id: page.id, revision_id: rev.id, expected_hash: page.draft_hash ?? draftHash ?? "" },
-    });
+    // Una restauración no puede competir con un autoguardado pendiente. Se
+    // incorpora a la misma cola y toma la huella vigente al comenzar.
+    if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    const restoreTask = saveChainRef.current.catch(() => undefined).then(() =>
+      restore({
+        data: {
+          id: page.id,
+          revision_id: rev.id,
+          expected_hash: draftHashRef.current ?? "",
+        },
+      }),
+    );
+    saveChainRef.current = restoreTask;
+    const restored = await restoreTask;
+    draftHashRef.current = restored.draft_hash;
+    draftHashPageIdRef.current = page.id;
+    draftVersionRef.current = restored.draft_version;
     const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
     if (detail) {
+      skipNextAutoSave.current = true;
       setPage(detail);
       setTree(detail.current_draft);
       resetHistory();
@@ -1717,8 +2220,64 @@ function PageVisualEditor({
     }
   };
 
+  const restorePublishedAsDraft = async () => {
+    if (!page || pageDef.page_type !== "home" || !page.active_revision_id) return;
+    const activeRevisionId = page.active_revision_id;
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        "¿Usar la Home publicada como nuevo borrador editable?\n\n" +
+          "Guardaremos primero el borrador actual en Versiones. El sitio público no cambiará hasta que vuelvas a publicar.",
+      )
+    )
+      return;
+    setRestoringPublished(true);
+    setMessage(null);
+    try {
+      if (saveTimer.current) window.clearTimeout(saveTimer.current);
+      const restoreTask = saveChainRef.current.catch(() => undefined).then(async () => {
+        await createRevision({
+          data: { id: page.id, notes: "Respaldo automático antes de recuperar la Home publicada" },
+        });
+        return restore({
+          data: {
+            id: page.id,
+            revision_id: activeRevisionId,
+            expected_hash: draftHashRef.current ?? "",
+          },
+        });
+      });
+      saveChainRef.current = restoreTask;
+      const restored = await restoreTask;
+      draftHashRef.current = restored.draft_hash;
+      draftHashPageIdRef.current = page.id;
+      draftVersionRef.current = restored.draft_version;
+      const detail = (await get({ data: { id: page.id } })) as CompositionDetail | null;
+      if (detail) {
+        skipNextAutoSave.current = true;
+        savedSignatureRef.current = canonicalizeClient(detail.current_draft);
+        setPage(detail);
+        setTree(detail.current_draft);
+        resetHistory();
+        setSelectedId(null);
+        setMessage(
+          "La Home publicada ya es el borrador editable. El borrador anterior quedó respaldado en Versiones.",
+        );
+        void refreshVersions();
+      }
+    } catch (e) {
+      setMessage(`No se pudo recuperar la Home publicada: ${(e as Error).message}`);
+    } finally {
+      setRestoringPublished(false);
+    }
+  };
+
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    // dnd-kit no admite PointerSensor y TouchSensor a la vez: en Safari/iOS
+    // ambos compiten por el mismo gesto y el arrastre se vuelve intermitente.
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
   const onDragEnd = (e: DragEndEvent) => {
@@ -1784,27 +2343,30 @@ function PageVisualEditor({
   }, [tree]);
 
   // G7-C · Altura acotada real del editor: el shell del Studio se mide contra
-  // la ventana (sin alturas mágicas) para que el canvas nunca sobresalga del
-  // área visible y exista un único scrollport.
+  // el viewport de layout. `getBoundingClientRect().top` ya está expresado en
+  // coordenadas de viewport; sumarle `window.scrollY` acortaba el editor al
+  // desplazarse dentro del Workspace y hacía que Safari pareciera atorarse.
   const shellRef = useRef<HTMLDivElement | null>(null);
   const [shellHeight, setShellHeight] = useState<number | null>(null);
   useEffect(() => {
     const measure = () => {
       const el = shellRef.current;
       if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY;
-      const height = Math.max(360, Math.round(window.innerHeight - top));
+      const top = Math.max(0, el.getBoundingClientRect().top);
+      const viewportHeight = document.documentElement.clientHeight;
+      const height = Math.max(360, Math.round(viewportHeight - top));
       setShellHeight((current) =>
         current === null || Math.abs(current - height) > 1 ? height : current,
       );
     };
     measure();
-    const observer = new ResizeObserver(measure);
-    if (shellRef.current) observer.observe(shellRef.current);
+    // No se observa el propio shell: su altura es la que este efecto escribe y
+    // observarla provoca un bucle de medición (parpadeo/vibración del editor).
     window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
     return () => {
-      observer.disconnect();
       window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
     };
   }, [page, tree]);
 
@@ -1827,9 +2389,9 @@ function PageVisualEditor({
       ref={shellRef}
       data-eb-studio-shell=""
       style={shellHeight ? { height: shellHeight } : undefined}
-      className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-background"
+      className={`flex h-[100svh] min-h-0 flex-col overflow-hidden bg-background lg:h-[100dvh] ${focusMode ? "fixed inset-0 z-[70]" : ""}`}
     >
-      <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
+      <div className="sticky top-0 z-40 flex shrink-0 flex-nowrap items-center gap-3 overflow-x-auto border-b border-border bg-background/95 px-4 py-2 backdrop-blur [-webkit-overflow-scrolling:touch]">
         <button
           type="button"
           onClick={onExit}
@@ -1846,7 +2408,37 @@ function PageVisualEditor({
           <h1 className="truncate text-sm font-semibold">{pageDef.title}</h1>
           <p className="truncate text-[10px] text-muted-foreground">{pageDef.publicPath}</p>
         </div>
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-2">
+          {!previewMode ? (
+            <button
+              type="button"
+              onClick={() => setStructureCollapsed((current) => !current)}
+              title={structureCollapsed ? "Mostrar estructura" : "Ocultar estructura"}
+              aria-label={structureCollapsed ? "Mostrar estructura" : "Ocultar estructura"}
+              aria-pressed={structureCollapsed}
+              className="inline-flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground hover:bg-accent"
+            >
+              {structureCollapsed ? (
+                <PanelLeftOpen className="size-3.5" aria-hidden />
+              ) : (
+                <PanelLeftClose className="size-3.5" aria-hidden />
+              )}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={toggleFocusMode}
+            title={focusMode ? "Salir del área amplia" : "Ampliar área de trabajo"}
+            aria-label={focusMode ? "Salir del área amplia" : "Ampliar área de trabajo"}
+            aria-pressed={focusMode}
+            className="inline-flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground hover:bg-accent"
+          >
+            {focusMode ? (
+              <Minimize2 className="size-3.5" aria-hidden />
+            ) : (
+              <Maximize2 className="size-3.5" aria-hidden />
+            )}
+          </button>
           <SaveIndicator status={saveStatus} />
           <div
             className="inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5"
@@ -1917,6 +2509,22 @@ function PageVisualEditor({
             <History className="size-3.5" aria-hidden />
             Versiones
           </button>
+          {pageDef.page_type === "home" && publishState === "dirty" ? (
+            <button
+              type="button"
+              onClick={() => void restorePublishedAsDraft()}
+              disabled={restoringPublished || saveStatus === "saving"}
+              title="Respalda el borrador actual y recupera como borrador la Home que hoy ve el público"
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-60"
+            >
+              {restoringPublished ? (
+                <Loader2 className="size-3.5 animate-spin" aria-hidden />
+              ) : (
+                <RefreshCw className="size-3.5" aria-hidden />
+              )}
+              Usar versión publicada
+            </button>
+          ) : null}
           <PublishStateBadge state={publishState} publishedAt={page?.published_at ?? null} />
           {page ? (
             <WorkflowChip
@@ -2053,74 +2661,170 @@ function PageVisualEditor({
       ) : null}
 
       {message ? (
-        <div className="border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">
-          {message}
+        <div className="flex flex-wrap items-center justify-center gap-2 border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-foreground">
+          <span>{message}</span>
+          {draftConflict ? (
+            <button
+              type="button"
+              onClick={() => void reloadDraftFromServer()}
+              disabled={reloadingDraft}
+              className="rounded-pill border border-border bg-background px-3 py-1 font-semibold ring-focus disabled:opacity-60"
+            >
+              {reloadingDraft ? "Recargando…" : "Recargar borrador"}
+            </button>
+          ) : null}
         </div>
       ) : null}
 
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
-        {!previewMode ? (
-          <aside
-            className="hidden w-72 shrink-0 border-r border-border bg-card/40 md:flex md:flex-col"
-            aria-label="Estructura de la página"
+        {!previewMode && structureCollapsed ? (
+          <button
+            type="button"
+            onClick={() => setStructureCollapsed(false)}
+            className="absolute bottom-4 left-4 z-[65] inline-flex h-11 items-center gap-2 rounded-pill border border-border bg-background px-4 text-xs font-semibold text-foreground shadow-floating hover:bg-accent"
+            aria-label="Mostrar estructura de la página"
+            title="Mostrar estructura de la página"
           >
-            <div className="border-b border-border p-3">
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Estructura
-              </p>
-              <h2 className="mt-1 text-sm font-semibold">Secciones de la Home</h2>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                Arrastra para reordenar. Clic para editar.
-              </p>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2">
-              <ChromeItem
-                label="Encabezado"
-                note="Menú, enlaces y botón destacado"
-                selected={selectedId === HEADER_CHROME_ID}
-                onSelect={() => setSelectedId(HEADER_CHROME_ID)}
-              />
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={onDragEnd}
-              >
-                <SortableContext
-                  items={tree.root.children.map((n) => n.id)}
-                  strategy={verticalListSortingStrategy}
+            <PanelsTopLeft className="size-4" aria-hidden />
+            Estructura
+          </button>
+        ) : null}
+        {!previewMode && structureCollapsed ? (
+          <button
+            type="button"
+            onClick={() => openLibrary()}
+            className="absolute bottom-4 left-36 z-[65] inline-flex h-11 items-center gap-2 rounded-pill border border-border bg-background px-4 text-xs font-semibold text-foreground shadow-floating hover:bg-accent"
+            aria-label="Ver elementos que puedo añadir"
+            title="Ver elementos que puedo añadir"
+          >
+            <Plus className="size-4" aria-hidden />
+            Elementos
+          </button>
+        ) : null}
+        {!previewMode && !structureCollapsed ? (
+          <>
+            <button
+              type="button"
+              aria-label="Cerrar estructura"
+              onClick={() => setStructureCollapsed(true)}
+              className="absolute inset-0 z-[70] bg-foreground/20"
+            />
+            <aside
+              className="absolute inset-y-0 left-0 z-[75] flex w-[86vw] max-w-[18rem] flex-col border-r border-border bg-card shadow-xl"
+              aria-label="Estructura de la página"
+            >
+              <div className="flex items-start gap-2 border-b border-border p-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    Estructura
+                  </p>
+                  <h2 className="mt-1 text-sm font-semibold">Secciones de la página</h2>
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    Arrastra para reordenar. Clic para editar.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStructureCollapsed(true)}
+                  className="shrink-0 rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent hover:text-foreground"
                 >
-                  {tree.root.children.map((n) => (
-                    <SortableSectionItem
-                      key={n.id}
-                      node={n}
-                      selected={selectedId === n.id}
-                      onSelect={() => setSelectedId(n.id)}
-                      onToggleHidden={() => toggleHiddenNode(n.id)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-              <ChromeItem
-                label="Pie de página"
-                note="Columnas, enlaces y textos legales"
-                selected={selectedId === FOOTER_CHROME_ID}
-                onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
-              />
-              <ChromeItem
-                label="SEO y compartir"
-                note="Título, descripción, imagen social, canonical"
-                selected={selectedId === SEO_CHROME_ID}
-                onSelect={() => setSelectedId(SEO_CHROME_ID)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowLibrary(true)}
-                className="mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-              >
-                <Plus className="size-3.5" aria-hidden /> Añadir sección
-              </button>
-            </div>
-          </aside>
+                  Cerrar
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2">
+                <ChromeItem
+                  label="Encabezado"
+                  note="Menú, enlaces y botón destacado"
+                  selected={selectedId === HEADER_CHROME_ID}
+                  onSelect={() => setSelectedId(HEADER_CHROME_ID)}
+                />
+                {compositeStructure ? (
+                  // Plantilla compuesta: la estructura muestra sus secciones
+                  // internas reales, con arrastre entre las reordenables.
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={onCompositeDragEnd}
+                  >
+                    <SortableContext
+                      items={compositeStructure.sections.map((s) => s.key)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {compositeStructure.sections.map((section) => (
+                        <SortableCompositeItem
+                          key={section.key}
+                          section={section}
+                          draggable={Boolean(compositeStructure.orderKey && section.reorderable)}
+                          hidden={
+                            section.visibilityKey
+                              ? compositeStructure.config[section.visibilityKey] === false
+                              : false
+                          }
+                          selected={
+                            selectedId === compositeStructure.nodeId &&
+                            activeSection?.key === section.key
+                          }
+                          onSelect={() => selectUnit(compositeStructure.nodeId, section.key)}
+                          onToggleHidden={() => {
+                            const key = section.visibilityKey;
+                            if (!key) return;
+                            selectUnit(compositeStructure.nodeId, section.key);
+                            updateSelectedConfig({
+                              ...compositeStructure.config,
+                              [key]: compositeStructure.config[key] === false,
+                            });
+                          }}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={onDragEnd}
+                  >
+                    <SortableContext
+                      items={tree.root.children.map((n) => n.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {tree.root.children.map((n, index) => (
+                        <div key={n.id}>
+                          <InsertHere onClick={() => openLibrary(index)} />
+                          <SortableSectionItem
+                            node={n}
+                            selected={selectedId === n.id}
+                            onSelect={() => selectUnit(n.id, null)}
+                            onToggleHidden={() => toggleHiddenNode(n.id)}
+                          />
+                        </div>
+                      ))}
+                      <InsertHere onClick={() => openLibrary(tree.root.children.length)} />
+                    </SortableContext>
+                  </DndContext>
+                )}
+                <ChromeItem
+                  label="Pie de página"
+                  note="Columnas, enlaces y textos legales"
+                  selected={selectedId === FOOTER_CHROME_ID}
+                  onSelect={() => setSelectedId(FOOTER_CHROME_ID)}
+                />
+                <ChromeItem
+                  label="SEO y compartir"
+                  note="Título, descripción, imagen social, canonical"
+                  selected={selectedId === SEO_CHROME_ID}
+                  onSelect={() => setSelectedId(SEO_CHROME_ID)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLibrary(true)}
+                  className="mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-border bg-background px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <Plus className="size-3.5" aria-hidden /> Añadir sección
+                </button>
+              </div>
+            </aside>
+          </>
         ) : null}
 
         {(() => {
@@ -2131,7 +2835,8 @@ function PageVisualEditor({
               previewMode={previewMode}
               deviceViewport={deviceViewport}
               selectedId={selectedId}
-              onSelect={(id) => setSelectedId(id)}
+              selectedCompositeSectionKey={activeSection?.key ?? null}
+              onSelect={(id) => selectUnit(id, null)}
               onSelectChrome={(area) =>
                 setSelectedId(area === "header" ? HEADER_CHROME_ID : FOOTER_CHROME_ID)
               }
@@ -2162,6 +2867,53 @@ function PageVisualEditor({
                 const next = arrayMove(tree.root.children, oldIdx, newIdx);
                 commitTree({ ...tree, root: { children: next } });
               }}
+              onSelectCompositeSection={(nodeId, sectionKey) => selectUnit(nodeId, sectionKey)}
+              onReorderCard={reorderRailCard}
+              onReorderCompositeSection={(activeKey, overKey) => {
+                if (!tree || !compositeStructure?.orderKey) return;
+                const order = nextCompositeOrder(
+                  compositeStructure.entry,
+                  compositeStructure.config,
+                  activeKey,
+                  overKey,
+                );
+                if (!order) return;
+                commitTree(
+                  updateNodeConfig(tree, compositeStructure.nodeId, {
+                    ...compositeStructure.config,
+                    [compositeStructure.orderKey]: order,
+                  }),
+                );
+              }}
+              onReorderLandingBody={(activeId, overId) => {
+                /* Landing SEO: el cuerpo se ordena con el campo `order` que ya
+                   declara cada bloque de la maqueta aprobada. No se crean
+                   campos nuevos ni se altera la maqueta. */
+                if (!tree) return;
+                const BODY = ["intro", "offers", "infoGrid", "map"];
+                const slotOf = (id: string) => id.split("-").pop() ?? "";
+                const bodyNodes = tree.root.children.filter((n) => BODY.includes(slotOf(n.id)));
+                const ordered = [...bodyNodes].sort((a, b) => {
+                  const ao = Number((a.config as Record<string, unknown>)?.["order"]);
+                  const bo = Number((b.config as Record<string, unknown>)?.["order"]);
+                  const av = Number.isFinite(ao) ? ao : BODY.indexOf(slotOf(a.id)) + 1;
+                  const bv = Number.isFinite(bo) ? bo : BODY.indexOf(slotOf(b.id)) + 1;
+                  return av - bv;
+                });
+                const from = ordered.findIndex((n) => n.id === activeId);
+                const to = ordered.findIndex((n) => n.id === overId);
+                if (from < 0 || to < 0 || from === to) return;
+                if (!canMutateEditorialNode(ordered[from])) return;
+                const next = arrayMove(ordered, from, to);
+                let draft = tree;
+                next.forEach((node, index) => {
+                  draft = updateNodeConfig(draft, node.id, {
+                    ...((node.config ?? {}) as Record<string, unknown>),
+                    order: index + 1,
+                  });
+                });
+                commitTree(draft);
+              }}
               commentCounts={commentCounts}
             />
           );
@@ -2180,119 +2932,244 @@ function PageVisualEditor({
           );
         })()}
 
-        {!previewMode && selectedContract && selectedConfig ? (
+        {!previewMode && structureCollapsed && selectedContract && selectedConfig ? (
           <aside
-            className="fixed right-0 top-[52px] z-40 flex h-[calc(100vh-52px)] w-[360px] max-w-[92vw] flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4 shadow-xl"
+            className="fixed inset-x-0 bottom-0 z-[80] flex h-[42dvh] max-h-[42dvh] w-full flex-col border-t border-border bg-card shadow-xl xl:static xl:inset-auto xl:h-full xl:max-h-none xl:w-[360px] xl:max-w-[32vw] xl:shrink-0 xl:border-l xl:border-t-0 xl:shadow-none"
             aria-label="Herramientas para editar el bloque seleccionado"
           >
-            <header className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
-                  Sección seleccionada
-                </p>
-                <h2 className="truncate text-base font-semibold">
-                  {selectedContract.display_name}
-                </h2>
+            <header className="shrink-0 border-b border-border bg-card p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+                    Editando sección
+                    {sectionNav.index >= 0
+                      ? ` ${sectionNav.index + 1} de ${sectionNav.items.length}`
+                      : ""}
+                  </p>
+                  <h2 className="truncate text-base font-semibold">
+                    {activeSection?.label ?? selectedContract.display_name}
+                  </h2>
+                  {activeSection ? (
+                    <p className="truncate text-[11px] text-muted-foreground">
+                      {selectedContract.display_name}
+                    </p>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(null)}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-pill border border-border px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                  aria-label="Cerrar edición de la sección"
+                  title="Cerrar (Esc)"
+                >
+                  <X className="size-3.5" aria-hidden /> Cerrar
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setSelectedId(null)}
-                className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-                aria-label="Cerrar"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
+
+              {sectionNav.items.length > 1 ? (
+                <div className="mt-3 flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={sectionNav.index <= 0}
+                    onClick={() => {
+                      const prev = sectionNav.items[sectionNav.index - 1];
+                      if (prev) selectUnit(prev.id, prev.sub);
+                    }}
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+                    aria-label="Sección anterior"
+                    title="Sección anterior"
+                  >
+                    <ChevronUp className="size-3.5" aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={
+                      sectionNav.index < 0 || sectionNav.index >= sectionNav.items.length - 1
+                    }
+                    onClick={() => {
+                      const next = sectionNav.items[sectionNav.index + 1];
+                      if (next) selectUnit(next.id, next.sub);
+                    }}
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+                    aria-label="Sección siguiente"
+                    title="Sección siguiente"
+                  >
+                    <ChevronDown className="size-3.5" aria-hidden />
+                  </button>
+                  <select
+                    value={sectionNav.index >= 0 ? sectionNav.current : ""}
+                    onChange={(e) => {
+                      const item = sectionNav.items.find((i) => i.value === e.target.value);
+                      if (item) selectUnit(item.id, item.sub);
+                    }}
+                    className="h-8 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs"
+                    aria-label="Ir a otra sección de la página"
+                  >
+                    {sectionNav.index < 0 ? <option value="">Ir a una sección…</option> : null}
+                    {sectionNav.items.map((item, i) => (
+                      <option key={item.value} value={item.value}>
+                        {i + 1}. {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
             </header>
 
-            {selectedNode ? (
-              <div className="flex flex-wrap gap-1.5">
-                <ToolBtn
-                  onClick={() => moveNode(selectedNode.id, -1)}
-                  icon={<ChevronUp className="size-3" />}
-                  label="Subir"
-                />
-                <ToolBtn
-                  onClick={() => moveNode(selectedNode.id, 1)}
-                  icon={<ChevronDown className="size-3" />}
-                  label="Bajar"
-                />
-                <ToolBtn
-                  onClick={() => duplicateNode(selectedNode.id)}
-                  icon={<Copy className="size-3" />}
-                  label="Duplicar"
-                />
-                <ToolBtn
-                  onClick={() => toggleHiddenNode(selectedNode.id)}
-                  icon={
-                    selectedNode.hidden ? <Eye className="size-3" /> : <EyeOff className="size-3" />
-                  }
-                  label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
-                />
-                <ToolBtn
-                  onClick={() => {
-                    const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
-                    if (
-                      typeof window !== "undefined" &&
-                      !window.confirm(
-                        `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+              {selectedNode && activeSection ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {compositeEntry?.orderKey && activeSection.reorderable ? (
+                    <>
+                      <ToolBtn
+                        onClick={() => moveCompositeSection(-1)}
+                        icon={<ChevronUp className="size-3" />}
+                        label="Subir"
+                      />
+                      <ToolBtn
+                        onClick={() => moveCompositeSection(1)}
+                        icon={<ChevronDown className="size-3" />}
+                        label="Bajar"
+                      />
+                    </>
+                  ) : null}
+                  {activeSection.visibilityKey ? (
+                    <ToolBtn
+                      onClick={toggleCompositeSection}
+                      icon={
+                        selectedConfig[activeSection.visibilityKey] === false ? (
+                          <Eye className="size-3" />
+                        ) : (
+                          <EyeOff className="size-3" />
+                        )
+                      }
+                      label={
+                        selectedConfig[activeSection.visibilityKey] === false
+                          ? "Mostrar"
+                          : "Ocultar"
+                      }
+                    />
+                  ) : null}
+                </div>
+              ) : selectedNode ? (
+                <div className="flex flex-wrap gap-1.5">
+                  <ToolBtn
+                    onClick={() => moveNode(selectedNode.id, -1)}
+                    icon={<ChevronUp className="size-3" />}
+                    label="Subir"
+                  />
+                  <ToolBtn
+                    onClick={() => moveNode(selectedNode.id, 1)}
+                    icon={<ChevronDown className="size-3" />}
+                    label="Bajar"
+                  />
+                  <ToolBtn
+                    onClick={() => duplicateNode(selectedNode.id)}
+                    icon={<Copy className="size-3" />}
+                    label="Duplicar"
+                  />
+                  <ToolBtn
+                    onClick={() => toggleHiddenNode(selectedNode.id)}
+                    icon={
+                      selectedNode.hidden ? (
+                        <Eye className="size-3" />
+                      ) : (
+                        <EyeOff className="size-3" />
                       )
-                    )
-                      return;
-                    removeNodeById(selectedNode.id);
-                  }}
-                  icon={<Trash2 className="size-3" />}
-                  label="Eliminar"
-                  tone="danger"
+                    }
+                    label={selectedNode.hidden ? "Mostrar" : "Ocultar"}
+                  />
+                  <ToolBtn
+                    onClick={() => {
+                      const label = getBlock(selectedNode.type)?.display_name ?? selectedNode.type;
+                      if (
+                        typeof window !== "undefined" &&
+                        !window.confirm(
+                          `¿Eliminar "${label}"?\n\nPodrás deshacerlo durante 10 segundos.`,
+                        )
+                      )
+                        return;
+                      removeNodeById(selectedNode.id);
+                    }}
+                    icon={<Trash2 className="size-3" />}
+                    label="Eliminar"
+                    tone="danger"
+                  />
+                </div>
+              ) : null}
+
+              {selectedChrome === "seo" ? (
+                <SeoPreview
+                  config={selectedConfig as Parameters<typeof SeoPreview>[0]["config"]}
+                  slug={pageDef.slug}
                 />
-              </div>
-            ) : null}
+              ) : null}
 
-            {selectedChrome === "seo" ? (
-              <SeoPreview
-                config={selectedConfig as Parameters<typeof SeoPreview>[0]["config"]}
-                slug={pageDef.slug}
+              <AutoInspector
+                contract={selectedContract}
+                config={inspectorConfig ?? selectedConfig}
+                onChange={updateInspectorConfig}
+                simple={!advanced}
+                hideHeader={Boolean(activeSection)}
+                fieldFilter={
+                  activeSection ? (field) => fieldBelongsToSection(field, activeSection) : undefined
+                }
+                activeBreakpoint={
+                  deviceViewport === "tablet"
+                    ? "md"
+                    : deviceViewport === "mobile" || deviceViewport === "mobile430"
+                      ? "base"
+                      : "lg"
+                }
               />
-            ) : null}
 
-            <AutoInspector
-              contract={selectedContract}
-              config={selectedConfig}
-              onChange={(next) => updateSelectedConfig(next)}
-              simple={!advanced}
-              activeBreakpoint={
-                deviceViewport === "tablet"
-                  ? "md"
-                  : deviceViewport === "mobile" || deviceViewport === "mobile430"
-                    ? "base"
-                    : "lg"
-              }
-            />
+              {selectedNode ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Apariencia
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <AppearancePanel
+                      config={selectedConfig}
+                      onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
+                    />
+                  </div>
+                </details>
+              ) : null}
 
-            {selectedNode ? (
-              <AppearancePanel
-                config={selectedConfig}
-                onChange={(next: Record<string, unknown>) => updateSelectedConfig(next)}
-              />
-            ) : null}
+              {advanced && selectedNode ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Avanzado
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <AdvancedPanel
+                      node={selectedNode}
+                      config={selectedConfig}
+                      onChange={(next) => updateSelectedConfig(next)}
+                    />
+                  </div>
+                </details>
+              ) : null}
 
-            {advanced && selectedNode ? (
-              <AdvancedPanel
-                node={selectedNode}
-                config={selectedConfig}
-                onChange={(next) => updateSelectedConfig(next)}
-              />
-            ) : null}
-
-            {selectedNode && page ? (
-              <BlockCommentsPanel
-                compositionId={page.id}
-                blockId={selectedNode.id}
-                blockLabel={selectedContract?.display_name ?? selectedNode.type}
-                currentUserId={user?.id ?? null}
-                isAdmin={isAdmin}
-                onCountsChange={setCommentCounts}
-              />
-            ) : null}
+              {selectedNode && page ? (
+                <details className="rounded-md border border-border">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                    Comentarios
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    <BlockCommentsPanel
+                      compositionId={page.id}
+                      blockId={selectedNode.id}
+                      blockLabel={selectedContract?.display_name ?? selectedNode.type}
+                      currentUserId={user?.id ?? null}
+                      isAdmin={isAdmin}
+                      onCountsChange={setCommentCounts}
+                    />
+                  </div>
+                </details>
+              ) : null}
+            </div>
           </aside>
         ) : null}
 
@@ -2302,7 +3179,8 @@ function PageVisualEditor({
             surface={editorialSurface}
             actor={editorialActor}
             onClose={() => setShowLibrary(false)}
-            onPick={(type) => insertBlock(type)}
+            insertAt={insertAt}
+            onPick={(type) => insertBlock(type, insertAt ?? undefined)}
             onPickReusable={(entry) => insertReusable(entry)}
           />
         ) : null}
@@ -2558,7 +3436,14 @@ const HOME_CANVAS_WIDTH = 1280;
  * menos espacio se aplica una escala visual externa que NO altera container
  * queries, breakpoints ni medidas internas del documento aislado.
  */
-type DeviceViewport = "mobile" | "mobile430" | "tablet" | "w1024" | "desktop" | "w1440";
+type DeviceViewport =
+  | "auto"
+  | "mobile"
+  | "mobile430"
+  | "tablet"
+  | "w1024"
+  | "desktop"
+  | "w1440";
 
 interface DevicePreset {
   id: DeviceViewport;
@@ -2575,6 +3460,10 @@ const DEVICE_PRESETS: readonly DevicePreset[] = [
   { id: "w1024", width: 1024, height: 1366, short: "1024", label: "iPad Pro · 1024 × 1366" },
   { id: "desktop", width: 1280, height: 800, short: "1280", label: "Escritorio · 1280 × 800" },
   { id: "w1440", width: 1440, height: 900, short: "1440", label: "Escritorio amplio · 1440 × 900" },
+  // "Real": el documento se compone al ancho real disponible del editor y
+  // SIEMPRE al 100%. Es la única vista que reproduce 1:1 la página publicada
+  // tal como la ve el usuario en este dispositivo (sin reducción de escala).
+  { id: "auto", width: 0, height: 900, short: "Real", label: "Ancho real · 100%" },
 ] as const;
 
 const DEVICE_PRESET_BY_ID = new Map<DeviceViewport, DevicePreset>(
@@ -2648,7 +3537,7 @@ function DeviceToggle({
       role="group"
       aria-label="Vista previa por dispositivo"
       data-eb-device-presets={DEVICE_PRESETS.length}
-      className="inline-flex items-center overflow-hidden rounded-md border border-border bg-background"
+      className="flex max-w-full items-center overflow-x-auto rounded-md border border-border bg-background"
     >
       {DEVICE_PRESETS.map((preset) => {
         const active = preset.id === value;
@@ -2672,12 +3561,48 @@ function DeviceToggle({
   );
 }
 
+/**
+ * Escala mínima del escenario. El documento conserva su ancho lógico; sólo
+ * cambia el tamaño con el que se presenta. Por debajo de
+ * `CANVAS_PRECISE_EDIT_SCALE` el lienzo avisa que conviene acercar o usar el
+ * panel Estructura en vez de comportarse de forma imprecisa.
+ */
+const CANVAS_MIN_SCALE = 0.2;
+const CANVAS_PRECISE_EDIT_SCALE = 0.45;
+
+/**
+ * Familia `premium-seo-landing`: la maqueta aprobada se edita región por
+ * región sobre la MISMA superficie pública. Las declaraciones ya NO viven
+ * aquí: son parte del Studio Standard (`studio-standard.ts`), de modo que
+ * cualquier familia futura obtenga selección, inspector y arrastrar/pegar
+ * sólo por declararse.
+ */
+const SEO_LANDING_SECTION_LABELS: Record<string, string> =
+  surfaceSlotLabels(SEO_LANDING_SURFACE_KEY);
+/**
+ * Sólo el cuerpo editorial admite reordenamiento: la maqueta aprobada fija la
+ * posición de portada, señales de confianza, Alux y galería.
+ */
+const SEO_LANDING_REORDERABLE_SLOTS: readonly string[] =
+  surfaceReorderableSlots(SEO_LANDING_SURFACE_KEY);
+/** Ancla lógica del lienzo cuando la maqueta se edita por regiones. */
+const SEO_LANDING_CANVAS_ID =
+  getSurfaceSlots(SEO_LANDING_SURFACE_KEY)?.canvasId ?? "__seo_landing_surface__";
+
+/** Slot declarado por el identificador persistido del nodo (`...-hero`). */
+const seoLandingSlotOf = slotOfNodeId;
+
+function roundScale(value: number): number {
+  return Math.round(Math.min(1, Math.max(CANVAS_MIN_SCALE, value)) * 1000) / 1000;
+}
+
 function HomeCanvas({
   tree,
   pageType,
   previewMode,
   deviceViewport,
   selectedId,
+  selectedCompositeSectionKey,
   onSelect,
   onSelectChrome,
   onDelete,
@@ -2685,6 +3610,10 @@ function HomeCanvas({
   onToggleHidden,
   onMove,
   onReorderRoot,
+  onSelectCompositeSection,
+  onReorderCompositeSection,
+  onReorderLandingBody,
+  onReorderCard,
   commentCounts,
 }: {
   tree: CompositionTree;
@@ -2692,6 +3621,7 @@ function HomeCanvas({
   previewMode: boolean;
   deviceViewport: DeviceViewport;
   selectedId: string | null;
+  selectedCompositeSectionKey: string | null;
   onSelect: (id: string) => void;
   onSelectChrome: (area: ChromeArea) => void;
   onDelete: (id: string) => void;
@@ -2699,15 +3629,20 @@ function HomeCanvas({
   onToggleHidden: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
   onReorderRoot: (activeId: string, overId: string) => void;
+  onSelectCompositeSection: (nodeId: string, sectionKey: string) => void;
+  onReorderCompositeSection: (activeKey: string, overKey: string) => void;
+  onReorderLandingBody: (activeId: string, overId: string) => void;
+  onReorderCard?: (sectionKey: string, from: number, to: number) => void;
   commentCounts?: Record<string, number>;
 }) {
-  const outerRef = useRef<HTMLDivElement | null>(null);
   const preset = getDevicePreset(deviceViewport);
-  const [available, setAvailable] = useState({ width: preset.width, height: preset.height });
+  const [zoomOverride, setZoomOverride] = useState<number | null>(null);
   const rootIds = tree.root.children.map((n) => n.id);
   const rootIdSet = new Set(rootIds);
   const canvasSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
   const handleCanvasDragEnd = (e: DragEndEvent) => {
@@ -2715,54 +3650,153 @@ function HomeCanvas({
     onReorderRoot(String(e.active.id), String(e.over.id));
   };
 
-  // G7-C · La altura del canvas se deriva SIEMPRE del contenedor acotado del
-  // editor (medición + ResizeObserver), nunca de una altura mágica.
+  // El documento interno SIEMPRE se compone contra el ancho lógico del preset:
+  // la vista elegida manda y el espacio libre del editor jamás re-responsiviza
+  // la plantilla. "Ajustar" reduce sólo el tamaño de presentación del conjunto.
+  const scrollportRef = useRef<HTMLDivElement | null>(null);
+  const [availableWidth, setAvailableWidth] = useState<number | null>(null);
   useEffect(() => {
-    const measure = () => {
-      const el = outerRef.current;
-      if (!el) return;
-      const width = Math.max(120, el.clientWidth - 24);
-      // 24px de padding + 32px reservados para la barra indicadora del canvas.
-      const height = Math.max(240, el.clientHeight - 24 - 32);
-      setAvailable((current) =>
-        Math.abs(current.width - width) > 1 || Math.abs(current.height - height) > 1
-          ? { width, height }
-          : current,
-      );
-    };
-    measure();
-    const outer = outerRef.current;
-    const observer = new ResizeObserver(measure);
-    if (outer) observer.observe(outer);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
+    const el = scrollportRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const read = () => setAvailableWidth(el.clientWidth);
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const usableWidth = availableWidth == null ? null : Math.max(0, availableWidth - 24);
+  // Vista "Real": el ancho lógico ES el ancho disponible del editor y la escala
+  // queda fija en 1. Así la plantilla se compone exactamente igual que en la
+  // página publicada vista en este mismo dispositivo.
+  const isAutoWidth = deviceViewport === "auto";
+  const logicalWidth = isAutoWidth
+    ? Math.max(320, Math.round(usableWidth && usableWidth > 0 ? usableWidth : 1024))
+    : preset.width;
+  const fitScale =
+    isAutoWidth || usableWidth == null || usableWidth <= 0 || usableWidth >= logicalWidth
+      ? 1
+      : roundScale(usableWidth / logicalWidth);
+  const scale = isAutoWidth ? 1 : roundScale(zoomOverride ?? fitScale);
+  useEffect(() => setZoomOverride(null), [deviceViewport]);
+  useEffect(() => {
+    const scrollport = scrollportRef.current;
+    if (!scrollport) return;
+    // Cada vista abre desde su borde inicial. Conservar el desplazamiento de
+    // una vista más ancha hacía que Safari mostrara el centro recortado.
+    scrollport.scrollTo({ left: 0, top: 0 });
   }, [deviceViewport]);
-
-  // G7-C · Escala proporcional sólo cuando el espacio visible es menor que el
-  // preset. El iframe conserva SIEMPRE el ancho y alto lógicos del dispositivo,
-  // por lo que container queries y breakpoints no se ven alterados.
-  const scale = Math.min(1, available.width / preset.width, available.height / preset.height);
+  const changeZoom = (delta: number) => {
+    // En vista "Real" la escala es siempre 100%: no hay zoom que desvirtúe la
+    // correspondencia con la página publicada.
+    if (isAutoWidth) return;
+    setZoomOverride((current) => roundScale((current ?? fitScale) + delta));
+  };
   const headerVariant = resolveCanvasHeaderVariant(tree);
+  // R1-F1L-R2 · La autoridad Premium de Home se aísla de composiciones antiguas.
+  // El caso `previewMode && pageType === "home"` queda cubierto porque la
+  // resolución se aplica a TODA la superficie Home (edición y vista previa),
+  // nunca a otras familias de plantilla.
   const renderedTree =
-    previewMode && pageType === "home"
+    pageType === "home"
       ? (resolveHomePremiumAuthorityTree(tree) ?? HOME_PREMIUM_FALLBACK_TREE)
       : tree;
+  const renderedCompositeNode =
+    renderedTree.root.children.length === 1 ? renderedTree.root.children[0] : undefined;
+  const renderedCompositeEntry = renderedCompositeNode
+    ? getCompositeSections(renderedCompositeNode.type)
+    : null;
+  const reorderableSectionKeys = renderedCompositeEntry
+    ? orderedCompositeSections(
+        renderedCompositeEntry,
+        renderedCompositeNode?.config as Record<string, unknown> | null,
+      )
+        .filter((section) => section.reorderable)
+        .map((section) => section.key)
+    : [];
+  const sectionLabels = renderedCompositeEntry
+    ? Object.fromEntries(
+        orderedCompositeSections(
+          renderedCompositeEntry,
+          renderedCompositeNode?.config as Record<string, unknown> | null,
+        ).map((section) => [section.key, section.label]),
+      )
+    : {};
+
+  /* Landing SEO Premium: la maqueta aprobada se conserva intacta y cada región
+     visible se vuelve punto de selección. El nodo real se resuelve por slot,
+     de modo que el inspector edita exactamente el bloque de esa región. */
+  const landingSlotNodes: Record<string, string> | null = readSeoLandingChrome(renderedTree)
+    ? Object.fromEntries(
+        renderedTree.root.children
+          .map((node) => [seoLandingSlotOf(node.id), node.id] as const)
+          .filter(([slot]) => slot.length > 0),
+      )
+    : null;
+  const landingSectionLabels = landingSlotNodes
+    ? Object.fromEntries(
+        Object.keys(landingSlotNodes)
+          .filter((slot) => SEO_LANDING_SECTION_LABELS[slot])
+          .map((slot) => [slot, SEO_LANDING_SECTION_LABELS[slot] as string]),
+      )
+    : null;
+  const landingSelectedSlot =
+    landingSlotNodes && selectedId
+      ? (Object.entries(landingSlotNodes).find(([, id]) => id === selectedId)?.[0] ?? null)
+      : null;
 
   return (
     <div
-      ref={outerRef}
+      ref={scrollportRef}
       data-eb-canvas-scrollport="editor"
-      className="flex min-h-0 min-w-0 flex-1 items-start justify-center overflow-hidden bg-muted/20 p-3"
+      className="flex min-h-0 min-w-0 flex-1 touch-pan-x touch-pan-y items-start justify-start overflow-auto overscroll-contain bg-muted/20 p-3 [-webkit-overflow-scrolling:touch]"
     >
       <CanvasViewport
+        key={deviceViewport}
         device={deviceViewport}
-        width={preset.width}
-        height={preset.height}
+        width={logicalWidth}
+        minimumHeight={preset.height}
         scale={scale}
+        fitScale={fitScale}
+        minimumScale={CANVAS_MIN_SCALE}
+        isFit={zoomOverride === null}
+        onZoomIn={() => changeZoom(0.1)}
+        onZoomOut={() => changeZoom(-0.1)}
+        onFit={() => setZoomOverride(null)}
         presetLabel={preset.label}
+        compositeNodeId={
+          landingSlotNodes ? SEO_LANDING_CANVAS_ID : (renderedCompositeNode?.id ?? null)
+        }
+        selectedSectionKey={landingSlotNodes ? landingSelectedSlot : selectedCompositeSectionKey}
+        reorderableSectionKeys={
+          landingSlotNodes
+            ? SEO_LANDING_REORDERABLE_SLOTS.filter((slot) => landingSlotNodes[slot])
+            : reorderableSectionKeys
+        }
+        sectionLabels={landingSectionLabels ?? sectionLabels}
+        editingEnabled={!previewMode}
+        onSelectSection={
+          landingSlotNodes
+            ? (_nodeId, sectionKey) => {
+                const targetId = landingSlotNodes[sectionKey];
+                if (targetId) onSelect(targetId);
+              }
+            : onSelectCompositeSection
+        }
+        onReorderSection={
+          landingSlotNodes
+            ? (activeKey, overKey) => {
+                /* Landing: el cuerpo se ordena con el campo `order` que ya
+                   declara cada bloque de la maqueta aprobada. No se altera la
+                   maqueta, sólo la posición persistida de esas columnas. */
+                const activeId = landingSlotNodes[activeKey];
+                const overId = landingSlotNodes[overKey];
+                if (activeId && overId && activeId !== overId) {
+                  onReorderLandingBody(activeId, overId);
+                }
+              }
+            : onReorderCompositeSection
+        }
+        onReorderCard={onReorderCard}
       >
         <InertChrome
           label="Encabezado"
@@ -2770,7 +3804,11 @@ function HomeCanvas({
           onSelect={() => onSelectChrome("header")}
           sticky
         >
-          <PublicHeader variant={headerVariant} config={getChromeConfig(tree, "header")} />
+          <PublicHeader
+            variant={headerVariant}
+            config={getChromeConfig(tree, "header")}
+            interactionMode="editor"
+          />
         </InertChrome>
         <DndContext
           sensors={canvasSensors}
@@ -2788,14 +3826,17 @@ function HomeCanvas({
                       <BlockOverlay
                         key={node.id}
                         node={node}
-                        selected={selectedId === node.id}
+                        selected={
+                          selectedId === node.id && node.id !== renderedCompositeNode?.id
+                        }
                         onSelect={() => onSelect(node.id)}
                         onDelete={() => onDelete(node.id)}
                         onDuplicate={() => onDuplicate(node.id)}
                         onToggleHidden={() => onToggleHidden(node.id)}
                         onMoveUp={() => onMove(node.id, -1)}
                         onMoveDown={() => onMove(node.id, 1)}
-                        sortable={rootIdSet.has(node.id)}
+                        sortable={rootIdSet.has(node.id) && node.id !== renderedCompositeNode?.id}
+                        sectionManaged={node.id === renderedCompositeNode?.id}
                         commentCount={commentCounts?.[node.id] ?? 0}
                       >
                         {content}
@@ -2817,37 +3858,88 @@ function HomeCanvas({
   );
 }
 
+/** Geometría medida de una sección editable dentro del documento lógico. */
+interface CanvasSectionRect {
+  key: string;
+  top: number;
+  height: number;
+}
+
 /**
- * CanvasViewport — viewport aislado del Studio (18.54).
+ * CanvasViewport — escenario aislado del Studio.
  *
  * Renderiza el árbol del canvas dentro de un `<iframe>` same-origin con el
- * ancho real del dispositivo seleccionado. Al ser un documento propio:
+ * ancho lógico exacto del dispositivo elegido. Al ser un documento propio:
  *  - las media queries (`sm:`, `md:`, `lg:`) se resuelven contra 390/768/1280
  *    y no contra la ventana del editor;
- *  - el scroll y el `sticky` del encabezado se comportan como en producción;
+ *  - la distribución, proporciones y tipografía son las reales de ese ancho;
  *  - el overflow horizontal aparece (o no) exactamente igual que en público.
  *
- * No duplica componentes: el árbol React se porta al documento del iframe,
- * conservando providers, contextos y los componentes canónicos.
- * El canvas permanece inerte: se cancelan navegaciones y envíos de formulario.
+ * El zoom sólo escala el conjunto; nunca recalcula la plantilla por sección.
+ * Toda la capa de edición (contornos, etiquetas y asas) vive FUERA del
+ * documento de la plantilla, proyectada sobre coordenadas medidas.
  */
 function CanvasViewport({
   device,
   width,
-  height,
+  minimumHeight,
   scale,
-  presetLabel,
+  fitScale,
+  minimumScale,
+  isFit,
+  onZoomIn,
+  onZoomOut,
+  onFit,
+  presetLabel: _presetLabel,
+  compositeNodeId,
+  selectedSectionKey,
+  reorderableSectionKeys,
+  sectionLabels,
+  editingEnabled,
+  onSelectSection,
+  onReorderSection,
+  onReorderCard,
+
   children,
 }: {
   device: DeviceViewport;
   width: number;
-  height: number;
+  minimumHeight: number;
   scale: number;
+  fitScale: number;
+  minimumScale: number;
+  isFit: boolean;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onFit: () => void;
   presetLabel: string;
+  compositeNodeId: string | null;
+  selectedSectionKey: string | null;
+  reorderableSectionKeys: string[];
+  sectionLabels: Record<string, string>;
+  editingEnabled: boolean;
+  onSelectSection: (nodeId: string, sectionKey: string) => void;
+  onReorderSection: (activeKey: string, overKey: string) => void;
+  onReorderCard?: (sectionKey: string, from: number, to: number) => void;
+
   children: React.ReactNode;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [iframeLoadVersion, setIframeLoadVersion] = useState(0);
   const [mount, setMount] = useState<HTMLElement | null>(null);
+  const [documentHeight, setDocumentHeight] = useState(minimumHeight);
+  const [sectionRects, setSectionRects] = useState<CanvasSectionRect[]>([]);
+  const [stylesReady, setStylesReady] = useState(false);
+  const [canvasReady, setCanvasReady] = useState(false);
+  const [geometryWidth, setGeometryWidth] = useState<number | null>(null);
+  const [canvasScrollTop, setCanvasScrollTop] = useState(0);
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [dropKey, setDropKey] = useState<string | null>(null);
+  // Punto de inserción explícito: `before` indica si la sección arrastrada
+  // quedará arriba de la sección destino. Da control real de destino en vez de
+  // "soltar sobre el bloque" sin retroalimentación.
+  const [dropBefore, setDropBefore] = useState(true);
+  const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -2858,35 +3950,73 @@ function CanvasViewport({
     doc.body.style.margin = "0";
     doc.body.style.background = "";
 
-    // El componente canónico conserva sus contratos. Esta normalización sólo
-    // actúa dentro del viewport aislado: Safari respeta el ancho útil de 390 px
-    // aunque los controles flex tengan contenido intrínseco más largo.
+    // El documento conserva el ancho lógico exacto. El elemento raíz mantiene
+    // el scroll nativo del viewport del iframe; `body` conserva el flujo normal
+    // de la página. Forzar `body { height:100%; overflow:auto }` crea en WebKit
+    // una segunda caja de composición y deja secciones parcialmente pintadas.
     const viewportStyle = doc.createElement("style");
     viewportStyle.setAttribute("data-eb-canvas-viewport-style", "");
     viewportStyle.textContent = `
-      html, body { overflow-x: hidden; }
-      form[role="search"],
-      form[role="search"] > div,
-      form[role="search"] > div > button {
-        min-width: 0;
-        max-width: 100%;
+      html, body {
+        width: ${width}px;
+        min-width: ${width}px;
+        max-width: ${width}px;
       }
-      /* G7-C · El pie de página respeta la safe area inferior del móvil. */
-      footer { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
+      html {
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+      body {
+        min-height: 100%;
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: visible;
+      }
+      [data-eb-canvas-root] { width: ${width}px; min-width: ${width}px; }
     `;
     doc.head.appendChild(viewportStyle);
 
     let frame = 0;
+    let styleGeneration = 0;
     const syncStyles = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         doc.documentElement.className = document.documentElement.className;
-        doc.head.querySelectorAll("[data-eb-canvas-style]").forEach((n) => n.remove());
+        const generation = String(++styleGeneration);
+        const nextStyles: HTMLElement[] = [];
         document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
           const clone = node.cloneNode(true) as HTMLElement;
           clone.setAttribute("data-eb-canvas-style", "");
+          clone.setAttribute("data-eb-canvas-style-generation", generation);
+          nextStyles.push(clone);
           doc.head.appendChild(clone);
         });
+        // El nuevo juego se inserta antes de retirar el anterior. Así el
+        // documento nunca queda un fotograma sin estilos mientras el editor
+        // o Vite actualizan el <head> anfitrión.
+        doc.head
+          .querySelectorAll<HTMLElement>(
+            `[data-eb-canvas-style]:not([data-eb-canvas-style-generation="${generation}"])`,
+          )
+          .forEach((node) => node.remove());
+        if (nextStyles.length > 0) {
+          const activeGeneration = styleGeneration;
+          // `document.fonts.ready` puede resolverse antes de que las hojas
+          // clonadas registren Fraunces/Inter en Safari. Solicitar las familias
+          // explícitamente evita mostrar primero la fuente de respaldo y el
+          // posterior salto de líneas del Hero.
+          void Promise.all([
+            doc.fonts.load("400 16px Fraunces"),
+            doc.fonts.load("600 16px Fraunces"),
+            doc.fonts.load("400 16px Inter"),
+            doc.fonts.load("600 16px Inter"),
+          ]).finally(() => {
+            if (activeGeneration === styleGeneration) setStylesReady(true);
+          });
+        }
       });
     };
     syncStyles();
@@ -2905,18 +4035,314 @@ function CanvasViewport({
     doc.addEventListener("click", blockNavigation, true);
     doc.addEventListener("submit", blockNavigation, true);
 
-    setMount(doc.body);
+    const canvasRoot = doc.createElement("div");
+    canvasRoot.setAttribute("data-eb-canvas-root", "");
+    doc.body.appendChild(canvasRoot);
+    setMount(canvasRoot);
     return () => {
+      setMount(null);
       cancelAnimationFrame(frame);
       observer.disconnect();
       doc.removeEventListener("click", blockNavigation, true);
       doc.removeEventListener("submit", blockNavigation, true);
       viewportStyle.remove();
+      canvasRoot.remove();
     };
-  }, []);
+  }, [iframeLoadVersion, width]);
 
-  // HUD de medición (sólo entornos no productivos): innerWidth real del
-  // iframe, overflow horizontal y posición efectiva del encabezado.
+  useEffect(() => {
+    setDocumentHeight(minimumHeight);
+    setSectionRects([]);
+    setGeometryWidth(null);
+    setCanvasReady(false);
+    setCanvasScrollTop(0);
+  }, [device, minimumHeight, width]);
+
+  // Fuente ÚNICA de altura y de geometría de secciones. Una sola lectura por
+  // fotograma evita que la medición compita con el desplazamiento (causa de
+  // los saltos y bloqueos al bajar por el lienzo).
+  useEffect(() => {
+    if (!mount) return;
+    const doc = mount.ownerDocument;
+    const win = doc.defaultView;
+    let frame = 0;
+    let cancelled = false;
+    let fontsSettled = !doc.fonts;
+    let forceReady = false;
+    const trackedImages = new WeakSet<HTMLImageElement>();
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (cancelled) return;
+        const images = Array.from(mount.querySelectorAll("img"));
+        images.forEach((image) => {
+          // El documento del canvas no tiene desplazamiento propio: el único
+          // scroll vive fuera del iframe. Safari/WebKit no vuelve a evaluar
+          // de forma fiable las imágenes lazy cuando sólo crece la altura del
+          // iframe, por lo que podían quedarse en blanco indefinidamente.
+          // Esta promoción ocurre únicamente en el DOM editorial; la página
+          // pública conserva intacta su estrategia de carga diferida.
+          if (image.loading === "lazy") image.loading = "eager";
+          if (trackedImages.has(image)) return;
+          trackedImages.add(image);
+          image.addEventListener("load", measure, { once: true });
+          image.addEventListener("error", measure, { once: true });
+        });
+        const nextHeight = Math.max(minimumHeight, Math.ceil(mount.scrollHeight));
+        setDocumentHeight((current) => (Math.abs(current - nextHeight) > 2 ? nextHeight : current));
+        const base = mount.getBoundingClientRect().top;
+        const next = Array.from(doc.querySelectorAll<HTMLElement>("[data-eb-section]"))
+          .map((section) => {
+            const rect = section.getBoundingClientRect();
+            return {
+              key: section.dataset.ebSection ?? "",
+              // Ambas cajas se mueven juntas dentro de la misma ventana. Su
+              // diferencia ya es la coordenada lógica de la sección; sumar
+              // `scrollY` otra vez enviaba la selección hacia otra sección.
+              top: Math.max(0, Math.round(rect.top - base)),
+              height: Math.round(rect.height),
+            };
+          })
+          .filter((section) => section.key.length > 0);
+        setSectionRects((current) =>
+          current.length === next.length &&
+          current.every(
+            (item, index) =>
+              item.key === next[index].key &&
+              Math.abs(item.top - next[index].top) <= 1 &&
+              Math.abs(item.height - next[index].height) <= 1,
+          )
+            ? current
+            : next,
+        );
+        setGeometryWidth(width);
+        if (stylesReady && fontsSettled && (forceReady || images.every((image) => image.complete))) {
+          setCanvasReady(true);
+        }
+      });
+    };
+    measure();
+    void doc.fonts?.ready.then(() => {
+      fontsSettled = true;
+      measure();
+    });
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(mount);
+    const mutationObserver = new MutationObserver(measure);
+    mutationObserver.observe(mount, { childList: true, subtree: true, attributes: true });
+    // Un medio remoto no debe bloquear indefinidamente el editor. Tras este
+    // límite mostramos la geometría medida; cualquier carga posterior vuelve
+    // a medir mediante los listeners dinámicos anteriores.
+    const readyTimer = win?.setTimeout(() => {
+      forceReady = true;
+      measure();
+    }, 2500);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      if (readyTimer != null) win?.clearTimeout(readyTimer);
+    };
+  }, [device, minimumHeight, mount, stylesReady, width]);
+
+  // El scroll pertenece al viewport lógico del iframe. Sólo reflejamos su
+  // posición para proyectar los controles externos; no vuelve a medir layout.
+  useEffect(() => {
+    if (!mount) return;
+    const doc = mount.ownerDocument;
+    const win = doc.defaultView;
+    if (!win) return;
+    let frame = 0;
+    const read = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        setCanvasScrollTop(win.scrollY);
+      });
+    };
+    read();
+    doc.addEventListener("scroll", read, { passive: true, capture: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      doc.removeEventListener("scroll", read, true);
+    };
+  }, [mount]);
+
+  // Seleccionar tocando el contenido real de la sección.
+  useEffect(() => {
+    if (!mount || !compositeNodeId || !editingEnabled) return;
+    const doc = mount.ownerDocument;
+    const onClick = (event: MouseEvent) => {
+      const key = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-section]")
+        ?.dataset.ebSection;
+      if (!key) return;
+      onSelectSection(compositeNodeId, key);
+    };
+    doc.addEventListener("click", onClick, true);
+    return () => doc.removeEventListener("click", onClick, true);
+  }, [compositeNodeId, editingEnabled, mount, onSelectSection]);
+
+  /**
+   * Arrastrar y soltar DENTRO de una sección: mantén pulsada una tarjeta del
+   * carril (destinos, rutas, experiencias) y suéltala sobre otra para cambiar
+   * su posición. Sólo actúa en el documento editorial; la plantilla pública y
+   * su contenido permanecen intactos y sólo se guarda el nuevo orden.
+   */
+  useEffect(() => {
+    if (!mount || !compositeNodeId || !editingEnabled || !onReorderCard) return;
+    const doc = mount.ownerDocument;
+    const win = doc.defaultView;
+    if (!win) return;
+    const view = win;
+    let pressTimer: number | null = null;
+    let active: { sectionKey: string; from: number; el: HTMLElement } | null = null;
+    let target: number | null = null;
+    let marked: HTMLElement | null = null;
+    let suppressClick = false;
+
+    const clearMark = () => {
+      if (!marked) return;
+      marked.style.outline = "";
+      marked.style.outlineOffset = "";
+      marked = null;
+    };
+
+    function cardAt(x: number, y: number): HTMLElement | null {
+      const el = doc.elementFromPoint(x, y) as HTMLElement | null;
+      return el?.closest<HTMLElement>("[data-eb-card]") ?? null;
+    }
+
+    function cleanup() {
+      if (pressTimer != null) {
+        view.clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+      if (active) {
+        active.el.style.opacity = "";
+        doc.body.style.touchAction = "";
+        doc.body.style.userSelect = "";
+      }
+      clearMark();
+      active = null;
+      target = null;
+      doc.removeEventListener("pointermove", onMove, true);
+      doc.removeEventListener("pointerup", onUp, true);
+      doc.removeEventListener("pointercancel", onCancel, true);
+    }
+
+    function onMove(event: PointerEvent) {
+      if (!active) {
+        // Un desplazamiento antes de que se cumpla la pulsación larga es
+        // scroll normal del lienzo, no un arrastre.
+        cleanup();
+        return;
+      }
+      event.preventDefault();
+      const over = cardAt(event.clientX, event.clientY);
+      const overSection = over?.closest<HTMLElement>("[data-eb-section]")?.dataset.ebSection;
+      if (!over || overSection !== active.sectionKey) return;
+      const index = Number(over.dataset.ebCard);
+      if (!Number.isInteger(index)) return;
+      if (marked !== over) {
+        clearMark();
+        marked = over;
+        over.style.outline = "3px solid var(--primary, #a1662f)";
+        over.style.outlineOffset = "2px";
+      }
+      target = index;
+    }
+
+    function onUp() {
+      if (active && target != null && target !== active.from) {
+        suppressClick = true;
+        onReorderCard?.(active.sectionKey, active.from, target);
+      }
+      cleanup();
+    }
+
+    function onCancel() {
+      cleanup();
+    }
+
+    const onDown = (event: PointerEvent) => {
+      const card = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-eb-card]");
+      if (!card) return;
+      const sectionKey = card.closest<HTMLElement>("[data-eb-section]")?.dataset.ebSection;
+      const from = Number(card.dataset.ebCard);
+      if (!sectionKey || !Number.isInteger(from)) return;
+      doc.addEventListener("pointermove", onMove, true);
+      doc.addEventListener("pointerup", onUp, true);
+      doc.addEventListener("pointercancel", onCancel, true);
+      pressTimer = view.setTimeout(() => {
+        pressTimer = null;
+        active = { sectionKey, from, el: card };
+        target = from;
+        card.style.opacity = "0.6";
+        doc.body.style.touchAction = "none";
+        doc.body.style.userSelect = "none";
+      }, 320);
+    };
+
+    const onClickCapture = (event: MouseEvent) => {
+      if (!suppressClick) return;
+      suppressClick = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    doc.addEventListener("pointerdown", onDown, true);
+    doc.addEventListener("click", onClickCapture, true);
+    return () => {
+      doc.removeEventListener("pointerdown", onDown, true);
+      doc.removeEventListener("click", onClickCapture, true);
+      cleanup();
+    };
+  }, [compositeNodeId, editingEnabled, mount, onReorderCard]);
+
+
+  // Revelar la sección activa SÓLO si está fuera de pantalla. Antes el lienzo
+  // saltaba siempre al borde superior de la sección al seleccionarla, de modo
+  // que el editor perdía de vista justo lo que estaba por modificar.
+  useEffect(() => {
+    if (!mount || !selectedSectionKey) return;
+    const target = sectionRects.find((section) => section.key === selectedSectionKey);
+    if (!target) return;
+    const win = mount.ownerDocument.defaultView;
+    if (!win) return;
+    let frame = 0;
+    frame = requestAnimationFrame(() => {
+      const iframeRect = iframeRef.current?.getBoundingClientRect();
+      const inspector = document.querySelector<HTMLElement>(
+        '[aria-label="Herramientas para editar el bloque seleccionado"]',
+      );
+      const inspectorRect = inspector?.getBoundingClientRect();
+      const visiblePhysicalBottom = iframeRect
+        ? Math.min(
+            iframeRect.bottom,
+            inspectorRect && inspectorRect.top > iframeRect.top
+              ? inspectorRect.top - 8
+              : iframeRect.bottom,
+          )
+        : null;
+      const visibleLogicalHeight =
+        iframeRect && visiblePhysicalBottom != null
+          ? Math.max(0, (visiblePhysicalBottom - iframeRect.top) / scale)
+          : win.innerHeight;
+      const viewportTop = win.scrollY;
+      const viewportBottom = viewportTop + Math.min(win.innerHeight, visibleLogicalHeight);
+      const visibleOverlap = Math.max(
+        0,
+        Math.min(target.top + target.height, viewportBottom - 24) -
+          Math.max(target.top, viewportTop + 24),
+      );
+      const requiredOverlap = Math.min(target.height, 160);
+      if (visibleOverlap >= requiredOverlap) return;
+      win.scrollTo({ top: Math.max(0, Math.round(target.top - 16)), behavior: "smooth" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [mount, scale, sectionRects, selectedSectionKey]);
+
+  // HUD de medición (sólo entornos no productivos).
   const [hud, setHud] = useState(false);
   const [metrics, setMetrics] = useState<{
     innerWidth: number;
@@ -2949,59 +4375,379 @@ function CanvasViewport({
     };
     read();
     const id = win.setInterval(read, 250);
-    win.addEventListener("scroll", read, true);
+    doc.addEventListener("scroll", read, true);
     win.addEventListener("resize", read);
     return () => {
       win.clearInterval(id);
-      win.removeEventListener("scroll", read, true);
+      doc.removeEventListener("scroll", read, true);
       win.removeEventListener("resize", read);
     };
   }, [hud, mount, width]);
 
-  const scaled = Math.min(1, Math.max(0.2, scale));
+  // Geometría única: marco, iframe y capa de edición comparten el mismo valor.
+  const scaled = scale;
+  const frameWidth = Math.round(width * scaled);
+  // El documento lógico completo define la altura del marco: el escenario del
+  // editor es la única superficie con scroll, de modo que cada sección visible
+  // conserva su asa de arrastre sin quedar recortada.
+  const canvasHeight = Math.max(minimumHeight, documentHeight);
+  const frameHeight = Math.round(canvasHeight * scaled);
+  const editableRects = sectionRects.filter((section) =>
+    reorderableSectionKeys.includes(section.key),
+  );
+  const preciseEditing = scaled >= CANVAS_PRECISE_EDIT_SCALE;
+  const geometryIsCurrent = canvasReady && geometryWidth === width;
+  const showEditingLayer = editingEnabled && Boolean(compositeNodeId) && geometryIsCurrent;
+
+  /**
+   * Arrastrar y soltar ÚNICO del lienzo: gestos de puntero (ratón, lápiz y
+   * táctil) resueltos contra la geometría proyectada, con auto-desplazamiento
+   * del escenario y una sola confirmación del cambio.
+   */
+  const resolveDropPlacement = (clientY: number): { key: string; before: boolean } | null => {
+    const frame = iframeRef.current;
+    if (!frame || editableRects.length === 0) return null;
+    const frameTop = frame.getBoundingClientRect().top;
+    let last: { key: string; before: boolean } | null = null;
+    for (const section of editableRects) {
+      const top = frameTop + (section.top - canvasScrollTop) * scaled;
+      const bottom = top + section.height * scaled;
+      const middle = top + (bottom - top) / 2;
+      if (clientY < top) return last ?? { key: section.key, before: true };
+      if (clientY <= bottom) return { key: section.key, before: clientY < middle };
+      last = { key: section.key, before: false };
+    }
+    return last;
+  };
+
+  /**
+   * Traduce el punto de inserción al contrato existente de reordenamiento
+   * (`activeKey` toma la posición de `overKey`). Así el usuario decide el lugar
+   * exacto y el contrato de orden del bloque compuesto no cambia.
+   */
+  const resolveReorderTarget = (
+    sourceKey: string,
+    placement: { key: string; before: boolean },
+  ): string | null => {
+    const keys = editableRects.map((s) => s.key);
+    const from = keys.indexOf(sourceKey);
+    const overIndex = keys.indexOf(placement.key);
+    if (from < 0 || overIndex < 0) return null;
+    let insertAt = placement.before ? overIndex : overIndex + 1;
+    if (insertAt > from) insertAt -= 1;
+    if (insertAt === from) return null;
+    const bounded = Math.max(0, Math.min(keys.length - 1, insertAt));
+    return keys[bounded] ?? null;
+  };
+
+  const startSectionDrag = (event: React.PointerEvent<HTMLButtonElement>, key: string) => {
+    if (!compositeNodeId) return;
+    event.preventDefault();
+    const handle = event.currentTarget;
+    const pointerId = event.pointerId;
+    handle.setPointerCapture(pointerId);
+    setDragKey(key);
+    setDropKey(key);
+    setDropBefore(true);
+    setDragPointer({ x: event.clientX, y: event.clientY });
+    const canvasScroller = mount?.ownerDocument.defaultView;
+
+    const applyPlacement = (clientY: number) => {
+      const placement = resolveDropPlacement(clientY);
+      if (!placement) return null;
+      setDropKey(placement.key);
+      setDropBefore(placement.before);
+      return placement;
+    };
+
+    const onMove = (moveEvent: PointerEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
+      moveEvent.preventDefault();
+      setDragPointer({ x: moveEvent.clientX, y: moveEvent.clientY });
+      applyPlacement(moveEvent.clientY);
+      const frame = iframeRef.current;
+      if (!canvasScroller || !frame) return;
+      const rect = frame.getBoundingClientRect();
+      const edge = 56;
+      const logicalStep = 18 / scaled;
+       if (moveEvent.clientY < rect.top + edge)
+         canvasScroller.scrollBy({ top: -logicalStep, behavior: "auto" });
+      else if (moveEvent.clientY > rect.bottom - edge)
+         canvasScroller.scrollBy({ top: logicalStep, behavior: "auto" });
+    };
+    const cleanup = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
+      window.removeEventListener("dragstart", blockNativeDrag, true);
+      setDragKey(null);
+      setDropKey(null);
+      setDragPointer(null);
+    };
+    const onUp = (upEvent: PointerEvent) => {
+      if (upEvent.pointerId !== pointerId) return;
+      if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
+      const placement = resolveDropPlacement(upEvent.clientY);
+      cleanup();
+      if (!placement) return;
+      const target = resolveReorderTarget(key, placement);
+      if (target && target !== key) onReorderSection(key, target);
+    };
+    const onCancel = (cancelEvent: PointerEvent) => {
+      if (cancelEvent.pointerId !== pointerId) return;
+      cleanup();
+    };
+    // WebKit intenta iniciar su propio arrastre nativo del documento/iframe y
+    // "levanta" la plantilla completa. Bloquearlo mientras dura el gesto deja
+    // sólo la sección en movimiento.
+    const blockNativeDrag = (dragEvent: Event) => dragEvent.preventDefault();
+    // Safari cancela la captura cuando el asa sale del área visible durante el
+    // auto-scroll. Escuchar en la ventana mantiene vivo el gesto hasta soltarlo.
+    window.addEventListener("pointermove", onMove, { passive: false });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onCancel);
+    window.addEventListener("dragstart", blockNativeDrag, true);
+  };
+
   return (
     <div className="flex min-h-0 min-w-0 flex-col items-center gap-1.5">
-      <div
-        data-eb-canvas-indicator=""
-        className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-md bg-foreground/85 px-2 py-0.5 font-mono text-[10px] leading-tight text-background"
-      >
-        <span>{presetLabel}</span>
-        <span>{scaled < 1 ? `escala ${Math.round(scaled * 100)}%` : "escala 100%"}</span>
-        {hud && metrics ? (
-          <span data-eb-canvas-hud="">
-            innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
-            {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
-            {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
-          </span>
-        ) : null}
+      <div className="sticky left-0 z-20 flex max-w-full items-center gap-1 self-start rounded-md bg-foreground/90 p-1 text-background shadow-sm">
+        <div
+          data-eb-canvas-indicator=""
+          className="flex min-w-0 flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-1 font-mono text-[10px] leading-tight"
+        >
+          <span>{`${width} px · ${Math.round(scaled * 100)}%`}</span>
+          {isFit ? <span>Ajustado</span> : null}
+          {hud && metrics ? (
+            <span data-eb-canvas-hud="">
+              innerWidth {metrics.innerWidth}px · overflowX {metrics.overflowX}px · header{" "}
+              {metrics.headerPosition} top {metrics.headerTop}px ·{" "}
+              {metrics.headerVisible ? "visible" : "OCULTO"} · scrollY {metrics.scrollY}px
+            </span>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={onZoomOut}
+          disabled={scaled <= minimumScale}
+          className="inline-flex size-7 items-center justify-center rounded text-sm font-semibold hover:bg-background/15 disabled:opacity-40"
+          aria-label="Alejar lienzo"
+          title="Alejar"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          onClick={onFit}
+          disabled={isFit && Math.abs(scaled - fitScale) < 0.01}
+          className="inline-flex h-7 items-center justify-center rounded px-2 text-[10px] font-semibold hover:bg-background/15 disabled:opacity-60"
+          aria-label="Ajustar lienzo al espacio de trabajo"
+          title="Ajustar al espacio de trabajo"
+        >
+          Ajustar
+        </button>
+        <button
+          type="button"
+          onClick={onZoomIn}
+          disabled={scaled >= 1}
+          className="inline-flex size-7 items-center justify-center rounded text-sm font-semibold hover:bg-background/15 disabled:opacity-40"
+          aria-label="Acercar lienzo"
+          title="Acercar"
+        >
+          +
+        </button>
       </div>
+      {showEditingLayer && !preciseEditing ? (
+        <p
+          data-eb-canvas-precision-notice=""
+          className="max-w-full self-start rounded-md border border-border bg-background px-2.5 py-1.5 text-[11px] leading-snug text-muted-foreground"
+        >
+          La plantilla se ve muy reducida a este tamaño. Puedes acercar con “+”, reordenar desde el
+          panel Estructura, o continuar en una computadora para trabajar con más precisión.
+        </p>
+      ) : null}
       <div
         data-eb-canvas-frame=""
-        className="relative shrink-0 overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
-        style={{ width: Math.round(width * scaled), height: Math.round(height * scaled) }}
+        className="relative shrink-0 select-none overflow-hidden rounded-lg bg-background shadow-sm ring-1 ring-border/70"
+        style={{ width: frameWidth, height: frameHeight }}
+        onDragStartCapture={(event) => event.preventDefault()}
       >
         <iframe
           ref={iframeRef}
           title="Vista previa del canvas"
+          srcDoc="<!doctype html><html><head></head><body></body></html>"
+          onLoad={() => setIframeLoadVersion((version) => version + 1)}
           data-eb-canvas-device={device}
           data-eb-canvas-width={width}
-          data-eb-canvas-height={height}
+          data-eb-canvas-height={documentHeight}
           data-eb-canvas-scale={scaled}
-          className="block border-0 bg-background"
+          className={`absolute left-0 top-0 block origin-top-left border-0 bg-background transition-opacity ${geometryIsCurrent ? "opacity-100" : "opacity-0"}`}
           style={{
             width,
-            height,
+            height: canvasHeight,
+            // El transform se aplica a un viewport acotado, no al documento
+            // completo. Conserva ancho lógico, media queries y tipografía sin
+            // activar el fallo de pintura de WebKit en capas gigantes.
             transform: `scale(${scaled})`,
-            transformOrigin: "top left",
           }}
         />
         {mount ? createPortal(children, mount) : null}
+        {!geometryIsCurrent ? (
+          <div
+            className="absolute inset-x-0 top-0 grid min-h-40 place-items-center bg-background text-xs font-medium text-muted-foreground"
+            aria-live="polite"
+          >
+            Preparando la vista de {width} px…
+          </div>
+        ) : null}
+        {showEditingLayer ? (
+          <div
+            data-eb-canvas-edit-layer=""
+            data-eb-debug-rects={sectionRects.map((s) => s.key).join(",")}
+            data-eb-debug-reorderable={reorderableSectionKeys.join(",")}
+            className="pointer-events-none absolute inset-0 z-50"
+            aria-label="Controles de secciones"
+          >
+            {editableRects.map((section) => {
+               const top = (section.top - canvasScrollTop) * scaled;
+              const height = Math.max(24, section.height * scaled);
+               const visible = top + height > 0 && top < frameHeight;
+               // No desmontar el asa origen durante el auto-scroll: Safari
+               // perdería la captura y nunca entregaría el `pointerup` final.
+               if (!visible && dragKey !== section.key) return null;
+              const selected = selectedSectionKey === section.key;
+              const isDropTarget = dragKey !== null && dropKey === section.key;
+              const isDragSource = dragKey === section.key;
+              // El asa acompaña la parte visible de la sección: si su inicio ya
+              // quedó arriba del borde, el control permanece a la vista en vez
+              // de desaparecer mientras la sección sigue en pantalla.
+              const controlsOffset = Math.min(
+                Math.max(8, 8 - top),
+                Math.max(8, height - 52),
+              );
+              return (
+                <div key={section.key} className="absolute inset-x-0" style={{ top, height }}>
+                  <div
+                    aria-hidden
+                    className={`pointer-events-none absolute inset-0 rounded-md transition-colors ${
+                      isDragSource
+                        ? "bg-foreground/5 outline outline-2 outline-dashed outline-primary/70"
+                        : isDropTarget
+                          ? "bg-primary/10 outline outline-2 outline-primary"
+                          : selected
+                            ? "outline outline-2 outline-primary"
+                            : "outline outline-1 outline-border/60"
+                    }`}
+                  />
+                  {isDropTarget && !isDragSource ? (
+                    <div
+                      aria-hidden
+                      data-eb-canvas-drop-indicator={dropBefore ? "before" : "after"}
+                      className="pointer-events-none absolute inset-x-1 h-1 rounded-full bg-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.25)]"
+                      style={dropBefore ? { top: -2 } : { top: height - 2 }}
+                    />
+                  ) : null}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute left-2 max-w-[60%] truncate rounded bg-foreground/85 px-1.5 py-0.5 text-[10px] font-medium text-background"
+                    style={{ top: controlsOffset }}
+                  >
+                    {sectionLabels[section.key] ?? section.key}
+                  </span>
+                  <button
+                    type="button"
+                    data-eb-external-section-handle={section.key}
+                    aria-label={`Mover o editar ${sectionLabels[section.key] ?? section.key}`}
+                    title="Arrastra para reordenar; pulsa para editar"
+                    draggable={false}
+                    style={{ touchAction: "none", top: controlsOffset }}
+                    onPointerDown={(event) => startSectionDrag(event, section.key)}
+                    onDragStart={(event) => event.preventDefault()}
+                    onClick={() =>
+                      compositeNodeId && onSelectSection(compositeNodeId, section.key)
+                    }
+                    className="pointer-events-auto absolute right-2 inline-flex size-11 cursor-grab items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg active:cursor-grabbing"
+                  >
+                    <GripVertical className="size-4" aria-hidden />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
+      {dragKey && dragPointer
+        ? createPortal(
+            <div
+              aria-hidden
+              data-eb-canvas-drag-ghost={dragKey}
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary bg-background px-3 py-1.5 text-[11px] font-semibold text-foreground shadow-lg"
+              style={{ left: dragPointer.x, top: dragPointer.y - 28 }}
+            >
+              {sectionLabels[dragKey] ?? dragKey}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
 
 /* --------------------------------------------------------------------- */
+
+/**
+ * G9 · Contenido vivo del lienzo (comportamiento tipo Wix).
+ *
+ * Antes el contenido se envolvía con `pointer-events-none`, lo que congelaba
+ * los carruseles horizontales de la plantilla (destinos, experiencias,
+ * hoteles, eventos) y hacía que el lienzo pareciera una imagen fija.
+ * Ahora el contenido conserva sus gestos reales y sólo se neutraliza la
+ * navegación/envío en fase de captura, de modo que el clic siga seleccionando
+ * la sección para editarla en vez de salir de la página.
+ */
+function CanvasLiveContent({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      data-eb-canvas-live-content=""
+      className={`select-none ${className ?? ""}`}
+      onClickCapture={(event) => {
+        const target = event.target as HTMLElement | null;
+        const control = target?.closest(
+          "a,button,input,select,textarea,label,summary,[role='button'],[role='link']",
+        ) as HTMLElement | null;
+        // El envoltorio de selección de bloque también expone `role="button"`.
+        // Si es el coincidente más cercano, el clic es editorial (seleccionar la
+        // sección) y NO debe neutralizarse; de lo contrario las plantillas por
+        // bloques quedan inseleccionables.
+        if (control && !control.hasAttribute("data-eb-block-overlay")) {
+          // `preventDefault()` sólo cancela navegación/envío; no impide que
+          // los handlers React del sitio abran menús, diálogos o cambien el
+          // estado de la plantilla dentro del canvas. El documento debe
+          // conservar gestos de desplazamiento, pero sus controles públicos
+          // son inertes mientras se edita.
+          event.preventDefault();
+          // Los campos de formulario sí se aíslan; enlaces y botones dejan
+          // burbujear el clic para que la sección quede seleccionada.
+          if (control.closest("input,select,textarea,label")) event.stopPropagation();
+        }
+      }}
+      onAuxClickCapture={(event) => event.preventDefault()}
+      onSubmitCapture={(event) => event.preventDefault()}
+      onDragStartCapture={(event) => event.preventDefault()}
+      onKeyDownCapture={(event) => {
+        if (event.key === "Enter" || event.key === " ") event.preventDefault();
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 function InertChrome({
   label,
@@ -3020,8 +4766,9 @@ function InertChrome({
     <div
       role="button"
       tabIndex={0}
-      onClick={(event) => {
+      onClickCapture={(event) => {
         event.stopPropagation();
+        event.preventDefault();
         onSelect();
       }}
       onKeyDown={(event) => {
@@ -3033,9 +4780,7 @@ function InertChrome({
       className={`group cursor-pointer outline-none ring-inset ${sticky ? "sticky top-0 z-30" : "relative"} ${selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"}`}
       aria-label={`Editar ${label}`}
     >
-      <div className="pointer-events-none select-none" aria-hidden>
-        {children}
-      </div>
+      <CanvasLiveContent>{children}</CanvasLiveContent>
       <span
         className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
       >
@@ -3065,6 +4810,79 @@ function ChromeItem({
       <p className="text-[11px] font-semibold text-foreground">{label}</p>
       <p className="text-[10px] text-muted-foreground">{note}</p>
     </button>
+  );
+}
+
+/** Sección interna de una plantilla compuesta dentro del panel de estructura. */
+function SortableCompositeItem({
+  section,
+  draggable,
+  hidden,
+  selected,
+  onSelect,
+  onToggleHidden,
+}: {
+  section: CompositeSectionDef;
+  draggable: boolean;
+  hidden: boolean;
+  selected: boolean;
+  onSelect: () => void;
+  onToggleHidden: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: section.key,
+    disabled: !draggable,
+  });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`mb-1 flex items-center gap-1 rounded-md border px-2 py-1.5 text-left text-xs ${
+        selected ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-accent"
+      } ${hidden ? "opacity-60" : ""}`}
+    >
+      {draggable ? (
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Arrastrar para reordenar"
+          title="Arrastra para mover la sección"
+          style={{ touchAction: "none" }}
+          className="inline-flex size-7 shrink-0 cursor-grab items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+        >
+          <GripVertical className="size-3.5" aria-hidden />
+        </button>
+      ) : (
+        <span className="inline-flex size-7 shrink-0" aria-hidden />
+      )}
+      <button
+        type="button"
+        onClick={onSelect}
+        className={`min-w-0 flex-1 truncate text-left font-medium ${hidden ? "line-through" : ""}`}
+      >
+        {section.label}
+      </button>
+      {section.visibilityKey ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleHidden();
+          }}
+          aria-label={hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+          title={hidden ? "Mostrar en el sitio" : "Ocultar en el sitio"}
+          className="inline-flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          {hidden ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -3101,10 +4919,13 @@ function SortableSectionItem({
         {...attributes}
         {...listeners}
         aria-label="Arrastrar para reordenar"
-        className="cursor-grab text-muted-foreground active:cursor-grabbing"
+        title="Arrastra para mover la sección"
+        style={{ touchAction: "none" }}
+        className="inline-flex size-7 shrink-0 cursor-grab items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
       >
-        ⋮⋮
+        <GripVertical className="size-3.5" aria-hidden />
       </button>
+
       <button
         type="button"
         onClick={onSelect}
@@ -3139,6 +4960,7 @@ function BlockOverlay({
   onMoveDown,
   children,
   sortable = false,
+  sectionManaged = false,
   commentCount = 0,
 }: {
   node: CompositionNode;
@@ -3151,6 +4973,7 @@ function BlockOverlay({
   onMoveDown: () => void;
   children: React.ReactNode;
   sortable?: boolean;
+  sectionManaged?: boolean;
   commentCount?: number;
 }) {
   const contract = getBlock(node.type);
@@ -3178,31 +5001,50 @@ function BlockOverlay({
     <div
       ref={composedRef}
       data-node-id={node.id}
+      data-eb-block-overlay={sectionManaged ? undefined : ""}
       style={dndStyle}
-      role="button"
-      tabIndex={0}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-      onDoubleClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        onSelect();
-        // Notifica al Inspector para enfocar el primer campo de texto
-        // (edición inline "estilo doble-clic" — US-10).
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("eb:inline-edit", { detail: { nodeId: node.id } }));
-        }
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onSelect();
-        }
-      }}
-      className={`group relative cursor-pointer outline-none ring-inset transition-shadow ${
-        selected ? "ring-4 ring-primary" : "hover:ring-2 hover:ring-primary/40"
+      role={sectionManaged ? undefined : "button"}
+      tabIndex={sectionManaged ? undefined : 0}
+      onClick={
+        sectionManaged
+          ? undefined
+          : (e) => {
+              e.stopPropagation();
+              onSelect();
+            }
+      }
+      onDoubleClick={
+        sectionManaged
+          ? undefined
+          : (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onSelect();
+              // Notifica al Inspector para enfocar el primer campo de texto
+              // (edición inline "estilo doble-clic" — US-10).
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(
+                  new CustomEvent("eb:inline-edit", { detail: { nodeId: node.id } }),
+                );
+              }
+            }
+      }
+      onKeyDown={
+        sectionManaged
+          ? undefined
+          : (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelect();
+              }
+            }
+      }
+      className={`group relative outline-none ring-inset transition-shadow ${
+        sectionManaged
+          ? ""
+          : selected
+            ? "cursor-pointer ring-4 ring-primary"
+            : "cursor-pointer hover:ring-2 hover:ring-primary/40"
       }`}
       aria-label={`Editar ${contract?.display_name ?? node.type}`}
     >
@@ -3211,13 +5053,13 @@ function BlockOverlay({
           <EyeOff className="size-3" aria-hidden /> Oculto en el sitio publicado
         </span>
       ) : null}
-      <span
+      {!sectionManaged ? <span
         className={`pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-lg transition-opacity ${
           selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         }`}
       >
         {contract?.display_name ?? node.type}
-      </span>
+      </span> : null}
       {commentCount > 0 ? (
         <span
           className="pointer-events-none absolute left-3 top-10 z-30 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg"
@@ -3226,7 +5068,7 @@ function BlockOverlay({
           💬 {commentCount}
         </span>
       ) : null}
-      {selected ? (
+      {selected && !sectionManaged ? (
         <div className="pointer-events-auto absolute right-3 top-3 z-30 flex gap-1 rounded-full bg-background/95 p-1 shadow-lg ring-1 ring-border">
           {sortable ? (
             <button
@@ -3236,7 +5078,8 @@ function BlockOverlay({
               onClick={(e) => e.stopPropagation()}
               aria-label="Arrastrar para reordenar"
               title="Arrastrar para reordenar"
-              className="inline-flex h-6 w-6 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
+              style={{ touchAction: "none" }}
+              className="inline-flex size-7 cursor-grab items-center justify-center rounded-full text-foreground hover:bg-accent active:cursor-grabbing"
             >
               <GripVertical className="size-3" />
             </button>
@@ -3284,13 +5127,12 @@ function BlockOverlay({
           />
         </div>
       ) : null}
-      {/* Bloqueamos interacciones internas: en modo edición los clics
-          siempre seleccionan el bloque en vez de navegar/enviar. */}
-      <div
-        className={`pointer-events-none select-none ${node.hidden ? "opacity-40 grayscale" : ""}`}
-      >
+      {/* G9 · El contenido queda vivo (carruseles y desplazamiento lateral
+          funcionan como en el sitio real). Sólo se neutraliza la navegación
+          en fase de captura para que el clic seleccione el bloque. */}
+      <CanvasLiveContent className={node.hidden ? "opacity-40 grayscale" : ""}>
         {children}
-      </div>
+      </CanvasLiveContent>
     </div>
   );
 }
@@ -3342,6 +5184,27 @@ function ToolBtn({
   );
 }
 
+/**
+ * Zona de inserción entre secciones: abre la biblioteca de elementos
+ * aprobados y coloca el elegido exactamente en esa posición.
+ */
+function InsertHere({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex h-5 w-full items-center gap-1 text-[10px] font-medium uppercase tracking-[0.12em] text-transparent transition hover:text-primary"
+      aria-label="Insertar un elemento aquí"
+      title="Insertar un elemento aquí"
+    >
+      <span className="h-px flex-1 bg-transparent transition group-hover:bg-primary/40" />
+      <Plus className="size-3" aria-hidden />
+      Insertar aquí
+      <span className="h-px flex-1 bg-transparent transition group-hover:bg-primary/40" />
+    </button>
+  );
+}
+
 function BlockLibraryModal({
   onClose,
   onPick,
@@ -3349,9 +5212,12 @@ function BlockLibraryModal({
   onPickReusable,
   surface,
   actor,
+  insertAt = null,
 }: {
   onClose: () => void;
   onPick: (type: string) => void;
+  /** Posición donde se colocará el elemento; `null` ⇒ al final. */
+  insertAt?: number | null;
   advanced?: boolean;
   onPickReusable?: (entry: ReusableBlock) => void;
   surface: EditorialSurface | null;
@@ -3415,9 +5281,11 @@ function BlockLibraryModal({
       <div className="flex max-h-[85vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-card p-4 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold">Añadir una sección</h3>
+            <h3 className="text-sm font-semibold">Elementos que puedes añadir</h3>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Elige un tipo de sección para insertarlo al final de la página.
+              {insertAt === null
+                ? "Elige un elemento para colocarlo al final de la página."
+                : `Elige un elemento para colocarlo en la posición ${insertAt + 1}.`}
             </p>
           </div>
           <button

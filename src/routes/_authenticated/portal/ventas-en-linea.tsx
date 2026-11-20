@@ -23,6 +23,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { DirectSaleBuyButton } from "@/components/commerce/DirectSaleBuyButton";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
+import {
+  listDirectSaleRequests,
+  submitDirectSaleRequest,
+  cancelDirectSaleRequest,
+  DIRECT_SALE_REQUEST_LABEL,
+  type DirectSaleRequestRow,
+} from "@/lib/commerce/direct-sale-authorizations.functions";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -68,6 +75,21 @@ function DirectSalesPage() {
     staleTime: 30_000,
   });
 
+  const fetchRequests = useServerFn(listDirectSaleRequests);
+  const { data: requests = [] } = useQuery({
+    queryKey: ["portal", "direct-sale-requests", businessId],
+    queryFn: () =>
+      fetchRequests({ data: { status: "all", businessId: businessId as string, limit: 200 } }),
+    enabled: Boolean(businessId),
+    staleTime: 15_000,
+  });
+
+  const latestByProduct = useMemo(() => {
+    const map = new Map<string, DirectSaleRequestRow>();
+    for (const r of requests) if (!map.has(r.product_id)) map.set(r.product_id, r);
+    return map;
+  }, [requests]);
+
   if (!businessId) {
     return (
       <EmptyState
@@ -87,10 +109,10 @@ function DirectSalesPage() {
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Ventas en línea</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Activa la venta directa de tus experiencias: precio final para el viajero, moneda,
-          comisión de la plataforma, políticas y anticipación mínima. Sólo las experiencias que
-          marques aquí podrán venderse directo desde su ficha y desde los recorridos que arme el
-          Concierge en el Oriente Maya de Yucatán.
+          Prepara el precio, las políticas y los términos de tus experiencias. La activación de
+          la venta en línea y la comisión de la plataforma las autoriza y fija Administración tras
+          revisión. Una vez activada, la experiencia se vende directo desde su ficha y llega al
+          Concierge como reservación con folio ERL.
         </p>
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{enabledCount} activas</Badge>
@@ -122,7 +144,12 @@ function DirectSalesPage() {
       ) : (
         <ul className="space-y-4">
           {products.map((p) => (
-            <ProductDirectSaleCard key={p.id} product={p} businessId={businessId} />
+            <ProductDirectSaleCard
+              key={p.id}
+              product={p}
+              businessId={businessId}
+              request={latestByProduct.get(p.id) ?? null}
+            />
           ))}
         </ul>
       )}
@@ -160,25 +187,22 @@ function PaymentsStatusBanner({ ready }: { ready: boolean }) {
 function ProductDirectSaleCard({
   product,
   businessId,
+  request,
 }: {
   product: PortalProduct;
   businessId: string;
+  request: DirectSaleRequestRow | null;
 }) {
   const qc = useQueryClient();
   const update = useServerFn(updateProductDirectSaleSettings);
 
-  const [enabled, setEnabled] = useState(product.direct_sale_enabled);
+  const [enabled] = useState(product.direct_sale_enabled);
   const [price, setPrice] = useState<string>(
     product.direct_sale_price_amount != null
       ? String((product.direct_sale_price_amount / 100).toFixed(2))
       : "",
   );
   const [currency, setCurrency] = useState(product.direct_sale_currency ?? "MXN");
-  const [commissionPct, setCommissionPct] = useState<string>(
-    product.direct_sale_commission_bps != null
-      ? String((product.direct_sale_commission_bps / 100).toFixed(2))
-      : "10",
-  );
   const [cancellationPolicy, setCancellationPolicy] = useState(
     product.direct_sale_cancellation_policy ?? "",
   );
@@ -192,22 +216,17 @@ function ProductDirectSaleCard({
 
   const dirty = useMemo(() => {
     const priceCents = price ? Math.round(Number(price) * 100) : null;
-    const commissionBps = commissionPct ? Math.round(Number(commissionPct) * 100) : null;
     return (
-      enabled !== product.direct_sale_enabled ||
       priceCents !== product.direct_sale_price_amount ||
       currency !== (product.direct_sale_currency ?? "MXN") ||
-      commissionBps !== product.direct_sale_commission_bps ||
       cancellationPolicy !== (product.direct_sale_cancellation_policy ?? "") ||
       terms !== (product.direct_sale_terms ?? "") ||
       (minLeadHours ? Number(minLeadHours) : null) !== product.direct_sale_min_lead_hours ||
       (maxQuantity ? Number(maxQuantity) : null) !== product.direct_sale_max_quantity
     );
   }, [
-    enabled,
     price,
     currency,
-    commissionPct,
     cancellationPolicy,
     terms,
     minLeadHours,
@@ -218,14 +237,13 @@ function ProductDirectSaleCard({
   const mutation = useMutation({
     mutationFn: async () => {
       const priceCents = price ? Math.round(Number(price) * 100) : null;
-      const commissionBps = commissionPct ? Math.round(Number(commissionPct) * 100) : null;
       return update({
         data: {
           productId: product.id,
-          enabled,
+          enabled: product.direct_sale_enabled,
           priceAmount: priceCents,
           currency: currency || "MXN",
-          commissionBps,
+          commissionBps: null,
           cancellationPolicy: cancellationPolicy || null,
           terms: terms || null,
           minLeadHours: minLeadHours ? Number(minLeadHours) : null,
@@ -242,12 +260,52 @@ function ProductDirectSaleCard({
       const label =
         msg === "direct_sale_price_required"
           ? "Ingresa un precio para activar la venta en línea."
-          : msg === "invalid_commission_bps"
-            ? "La comisión debe estar entre 0 y 100%."
+          : msg === "forbidden_direct_sale_authorization_required"
+            ? "Sólo Administración puede activar la venta en línea o cambiar la comisión."
             : msg;
       toast.error(label);
     },
   });
+
+  const submit = useServerFn(submitDirectSaleRequest);
+  const cancelRequest = useServerFn(cancelDirectSaleRequest);
+
+  const invalidateRequests = () => {
+    qc.invalidateQueries({ queryKey: ["portal", "direct-sale-requests", businessId] });
+    qc.invalidateQueries({ queryKey: ["portal", "products", businessId] });
+  };
+
+  const requestError = (e: unknown) => {
+    const msg = e instanceof Error ? e.message : "No se pudo completar la solicitud.";
+    const label = msg.includes("direct_sale_price_required")
+      ? "Captura y guarda el precio antes de solicitar la venta en línea."
+      : msg.includes("direct_sale_request_pending")
+        ? "Ya tienes una solicitud en revisión para esta experiencia."
+        : msg.includes("direct_sale_already_enabled")
+          ? "Esta experiencia ya tiene la venta en línea autorizada."
+          : msg;
+    toast.error(label);
+  };
+
+  const submitMutation = useMutation({
+    mutationFn: () => submit({ data: { productId: product.id } }),
+    onSuccess: () => {
+      toast.success("Solicitud enviada a Administración.");
+      invalidateRequests();
+    },
+    onError: requestError,
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: () => cancelRequest({ data: { requestId: request?.id as string } }),
+    onSuccess: () => {
+      toast.success("Solicitud retirada.");
+      invalidateRequests();
+    },
+    onError: requestError,
+  });
+
+  const pending = request?.status === "pending";
 
   return (
     <li className="rounded-xl border border-border bg-card p-5 shadow-soft">
@@ -269,12 +327,66 @@ function ProductDirectSaleCard({
             <p className="mt-1 text-xs text-muted-foreground">{product.tagline}</p>
           ) : null}
         </div>
-        <label className="flex items-center gap-2 text-sm">
-          <Switch checked={enabled} onCheckedChange={setEnabled} />
-          <span className="font-medium">
-            {enabled ? "Venta en línea activa" : "Venta en línea inactiva"}
-          </span>
-        </label>
+        <div className="flex flex-col items-end gap-1">
+          <label className="flex items-center gap-2 text-sm">
+            <Switch checked={enabled} disabled />
+            <span className="font-medium">
+              {enabled ? "Venta en línea activa" : "Venta en línea inactiva"}
+            </span>
+          </label>
+          <p className="text-[11px] text-muted-foreground">
+            {enabled
+              ? "Activada por Administración."
+              : "La activa Administración tras revisión."}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-border/70 bg-muted/30 p-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium">
+            {request ? (
+              <>
+                Solicitud: {DIRECT_SALE_REQUEST_LABEL[request.status]}
+                {request.decided_at ? (
+                  <span className="ml-1 font-normal text-muted-foreground">
+                    · {new Date(request.decided_at).toLocaleDateString("es-MX")}
+                  </span>
+                ) : null}
+              </>
+            ) : (
+              "Sin solicitud de venta en línea"
+            )}
+          </p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {request?.decision_note
+              ? request.decision_note
+              : pending
+                ? "Administración revisará el precio y definirá la comisión."
+                : enabled
+                  ? "La venta en línea está autorizada por Administración."
+                  : "Guarda el precio y solicita la autorización de venta en línea."}
+          </p>
+        </div>
+        {enabled ? null : pending ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => cancelMutation.mutate()}
+            disabled={cancelMutation.isPending}
+          >
+            Retirar solicitud
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            onClick={() => submitMutation.mutate()}
+            disabled={submitMutation.isPending || dirty}
+            title={dirty ? "Guarda los cambios antes de solicitar" : undefined}
+          >
+            {submitMutation.isPending ? "Enviando…" : "Solicitar venta en línea"}
+          </Button>
+        )}
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -307,7 +419,7 @@ function ProductDirectSaleCard({
 
         <Field
           label="Comisión de la plataforma"
-          hint="Porcentaje que Valladolid.mx retiene por cada venta directa."
+          hint="La fija Administración al autorizar la venta."
         >
           <div className="flex items-center gap-2">
             <Input
@@ -316,8 +428,13 @@ function ProductDirectSaleCard({
               min="0"
               max="100"
               step="0.5"
-              value={commissionPct}
-              onChange={(e) => setCommissionPct(e.target.value)}
+              value={
+                product.direct_sale_commission_bps != null
+                  ? String((product.direct_sale_commission_bps / 100).toFixed(2))
+                  : ""
+              }
+              disabled
+              placeholder="Por definir"
             />
             <span className="text-sm text-muted-foreground">%</span>
           </div>

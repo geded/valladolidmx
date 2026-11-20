@@ -5,7 +5,8 @@ import {
   getBusinessAttributeEditor,
   updateBusinessAttributes,
 } from "@/lib/portal/business-attributes.functions";
-import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
+import type { TourismAttributeDefinition, TourismFilterAttributes } from "@/lib/business-attributes/types";
+import { QuickCreateAttributeOptionDialog } from "@/components/cms/QuickCreateAttributeOptionDialog";
 
 export function BusinessAttributesPanel({ businessId }: { businessId: string }) {
   const getEditor = useServerFn(getBusinessAttributeEditor);
@@ -17,11 +18,31 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
   });
   const [values, setValues] = useState<TourismFilterAttributes>({});
   const [dirty, setDirty] = useState(false);
+  const [quickCreateFor, setQuickCreateFor] = useState<TourismAttributeDefinition | null>(null);
+  const [optionSearch, setOptionSearch] = useState<Record<string, string>>({});
+
+  const handleOptionCreated = (definition: TourismAttributeDefinition, value: string) => {
+    setValues((current) => {
+      const next = { ...current };
+      if (definition.inputType === "single") {
+        next[definition.key] = value;
+      } else {
+        const previous = Array.isArray(current[definition.key])
+          ? (current[definition.key] as string[])
+          : [];
+        next[definition.key] = Array.from(new Set([...previous, value]));
+      }
+      return next;
+    });
+    setDirty(true);
+    void queryClient.invalidateQueries({ queryKey: ["business-attribute-editor", businessId] });
+  };
 
   useEffect(() => {
-    if (!query.data) return;
+    if (!query.data || dirty) return; // no pisar cambios sin guardar (p. ej. opción recién creada)
     setValues(query.data.values);
     setDirty(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- dirty se evalúa al llegar data
   }, [query.data]);
 
   const mutation = useMutation({
@@ -65,19 +86,45 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
       </div>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2">
-        {query.data.definitions.map((definition) => {
+        {/* La zona se captura una sola vez, junto al Destino (zonas reales del destino). */}
+        {query.data.definitions.filter((d) => d.key !== "zone").map((definition) => {
           const selected = values[definition.key];
           if (definition.inputType === "single") {
             return (
               <label key={definition.key} className="block">
-                <span className="text-sm font-semibold">
-                  {definition.label}
-                  {definition.required ? " *" : ""}
+                <span className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold">
+                    {definition.label}
+                    {definition.required ? " *" : ""}
+                  </span>
+                  {definition.id ? (
+                    <button
+                      type="button"
+                      onClick={() => setQuickCreateFor(definition)}
+                      className="text-xs font-semibold text-primary hover:underline"
+                    >
+                      + Agregar
+                    </button>
+                  ) : null}
                 </span>
                 {definition.helpText ? (
                   <span className="mt-1 block text-xs text-muted-foreground">
                     {definition.helpText}
                   </span>
+                ) : null}
+                {definition.options.length > 6 ? (
+                  <input
+                    type="search"
+                    value={optionSearch[definition.key] ?? ""}
+                    onChange={(event) =>
+                      setOptionSearch((current) => ({
+                        ...current,
+                        [definition.key]: event.target.value,
+                      }))
+                    }
+                    placeholder={`Buscar en ${definition.label.toLowerCase()}…`}
+                    className="mt-2 min-h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  />
                 ) : null}
                 <select
                   value={typeof selected === "string" ? selected : ""}
@@ -94,11 +141,17 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
                   className="mt-2 min-h-11 w-full rounded-lg border border-border bg-background px-3 text-sm"
                 >
                   <option value="">Sin especificar</option>
-                  {definition.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
+                  {definition.options
+                    .filter((option) => {
+                      const term = (optionSearch[definition.key] ?? "").trim().toLowerCase();
+                      if (!term) return true;
+                      return option.label.toLowerCase().includes(term);
+                    })
+                    .map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
                 </select>
               </label>
             );
@@ -106,7 +159,18 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
           const chosen = Array.isArray(selected) ? selected : [];
           return (
             <fieldset key={definition.key} className="rounded-lg border border-border p-4">
-              <legend className="px-1 text-sm font-semibold">{definition.label}</legend>
+              <legend className="px-1 text-sm font-semibold">
+                {definition.label}
+                {definition.id ? (
+                  <button
+                    type="button"
+                    onClick={() => setQuickCreateFor(definition)}
+                    className="ml-2 text-xs font-semibold text-primary hover:underline"
+                  >
+                    + Agregar
+                  </button>
+                ) : null}
+              </legend>
               {definition.helpText ? (
                 <p className="mb-3 text-xs text-muted-foreground">{definition.helpText}</p>
               ) : null}
@@ -160,6 +224,17 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
       >
         {mutation.isPending ? "Guardando…" : "Guardar características"}
       </button>
+      {quickCreateFor?.id ? (
+        <QuickCreateAttributeOptionDialog
+          open={!!quickCreateFor}
+          onOpenChange={(open) => {
+            if (!open) setQuickCreateFor(null);
+          }}
+          definitionId={quickCreateFor.id}
+          attributeLabel={quickCreateFor.label}
+          onCreated={(option) => handleOptionCreated(quickCreateFor, option.value)}
+        />
+      ) : null}
     </section>
   );
 }

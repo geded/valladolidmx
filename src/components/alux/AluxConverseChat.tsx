@@ -58,6 +58,7 @@ import {
 import { useAnonymousTrip, type AnonymousItemKind } from "@/lib/traveler/anonymous-draft";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 /* ─────────────────────────── persistencia local del hilo ─────────────────────────── */
 
@@ -136,11 +137,24 @@ export interface AluxConverseChatProps {
   readonly locale: AluxConverseInput["locale"];
   /** Preguntas sugeridas cuando el hilo está vacío. */
   readonly starters?: readonly string[];
+  /**
+   * Preferencia que el viajero acaba de marcar en la superficie invocante.
+   * Se envía una sola vez como primer turno real de la conversación para que
+   * la recomendación la tome en cuenta. Cada valor se envía una única vez.
+   */
+  readonly autoAsk?: string | null;
+  /**
+   * Notifica la última secuencia propuesta por Alux (títulos canónicos en
+   * orden) para que la superficie invocante pueda ofrecer verla en su mapa.
+   * No crea otro motor: sólo transporta lo que la respuesta ya contiene.
+   */
+  readonly onProposal?: (titles: readonly string[]) => void;
 }
 
 /* ─────────────────────────── componente ─────────────────────────── */
 
 export function AluxConverseChat(props: AluxConverseChatProps) {
+  const alux = useAluxBrand();
   const { user } = useAuth();
   const isAuthed = Boolean(user?.id);
   const queryClient = useQueryClient();
@@ -283,6 +297,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
                 ? {
                     entityRef: props.selection.entityRef,
                     title: props.selection.title,
+                    summary: props.selection.summary,
                     destinationSlug: props.selection.destinationSlug,
                     destinationLabel: props.selection.destinationLabel,
                     familySlug: props.selection.familySlug,
@@ -301,11 +316,19 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           { id: newId(), role: "assistant", content: res.text, response: res },
         ]);
         setUnderstood(res.understood ?? {});
+        // Transporta la secuencia ya propuesta (sin reinterpretarla) para que
+        // la superficie con mapa pueda representarla con sus puntos canónicos.
+        if (res.sequence && res.sequence.length > 0) {
+          const titles = res.sequence
+            .flatMap((step) => step.refs.map((r) => r.title))
+            .filter((t): t is string => Boolean(t && t.trim()));
+          if (titles.length > 0) props.onProposal?.(titles);
+        }
         setStatus("idle");
         setLiveNote(
           res.recommendations.length
-            ? `Alux respondió con ${res.recommendations.length} opción${res.recommendations.length === 1 ? "" : "es"}.`
-            : "Alux respondió.",
+            ? `${alux.name} respondió con ${res.recommendations.length} opción${res.recommendations.length === 1 ? "" : "es"}.`
+            : `${alux.name} respondió.`,
         );
       } catch (err) {
         console.error("[alux.converse] fallo", err);
@@ -325,10 +348,25 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       messages,
       converseFn,
       props,
+      alux.name,
       understood,
       tripMeta,
     ],
   );
+
+  /* ── preferencia marcada en la superficie → primer turno real ──
+     Sin esto la opción elegida sólo abría el panel y nunca llegaba a la
+     recomendación. Cada preferencia se envía una única vez. */
+  const autoAskSentRef = useRef<string | null>(null);
+  useEffect(() => {
+    const ask = props.autoAsk?.trim();
+    if (!ask || !hydrated || !sessionKey) return;
+    if (autoAskSentRef.current === ask) return;
+    if (status === "thinking") return;
+    if (isAuthed && (isPlanPending || isPlanError)) return;
+    autoAskSentRef.current = ask;
+    void send(ask);
+  }, [props.autoAsk, hydrated, sessionKey, status, isAuthed, isPlanPending, isPlanError, send]);
 
   const lastFailed = [...messages].reverse().find((m) => m.role === "user" && m.failed);
 
@@ -395,11 +433,11 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
   return (
     <section
       aria-labelledby="alux-converse"
-      className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+      className="rounded-2xl border border-alux-border bg-alux-surface p-4 text-alux-surface-foreground shadow-soft"
     >
-      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-alux">
         <MessageCircle className="size-3.5" aria-hidden />
-        <span id="alux-converse">Conversa con Alux</span>
+         <span id="alux-converse">{alux.copy("conversationTitle")}</span>
         {messages.length > 0 ? (
           <button
             type="button"
@@ -413,13 +451,12 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
             className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-full px-2 text-[10px] font-medium normal-case tracking-normal text-muted-foreground hover:text-foreground"
           >
             <RotateCcw className="size-3" aria-hidden />
-            Nueva conversación
+            {alux.copy("newConversation")}
           </button>
         ) : null}
       </div>
       <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-        Pregunta libre. Alux responde sólo con el catálogo publicado y te dice cuándo un dato no
-        está disponible.
+        {alux.copy("conversationDescription")}
       </p>
       {isAuthed && isPlanPending ? (
         <p role="status" className="mt-3 flex items-center gap-2 text-[12px] text-muted-foreground">
@@ -433,7 +470,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-[12px] text-foreground"
         >
           <AlertCircle className="size-3.5 text-destructive" aria-hidden />
-          <span>No pude cargar tu viaje. Alux no enviará un contexto incompleto.</span>
+          <span>No pude cargar tu viaje. {alux.name} no enviará un contexto incompleto.</span>
           <button
             type="button"
             onClick={() => void refetchPlan()}
@@ -456,7 +493,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         role="log"
         aria-live="polite"
         aria-relevant="additions"
-        aria-label="Conversación con Alux"
+        aria-label={alux.copy("conversationTitle")}
         className={[
           "mt-3 flex flex-col gap-3 overflow-y-auto pr-1",
           messages.length > 0 || thinking ? "max-h-[46vh] min-h-[6rem]" : "",
@@ -470,7 +507,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
                   "max-w-[88%] rounded-2xl rounded-br-md px-3 py-2 text-[13px] leading-snug",
                   m.failed
                     ? "border border-destructive/40 bg-destructive/5 text-foreground"
-                    : "bg-primary/10 text-foreground",
+                    : "bg-alux/10 text-foreground",
                 ].join(" ")}
               >
                 {m.content}
@@ -494,11 +531,11 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
 
         {thinking ? (
           <div role="status" className="flex items-center gap-2 text-[12px] text-muted-foreground">
-            <span className="grid size-6 place-items-center rounded-full bg-primary/15">
+            <span className="grid size-6 place-items-center rounded-full bg-alux/15">
               <AluxMark family="avatar" size={20} decorative />
             </span>
             <Loader2 className="size-3.5 animate-spin" aria-hidden />
-            {ALUX_CONVERSE_COPY.thinking}
+            {alux.copy("thinking")}
           </div>
         ) : null}
 
@@ -526,14 +563,20 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       </div>
 
       {/* Sugerencias iniciales */}
-      {hydrated && messages.length === 0 && !thinking && !planBlocked ? (
+      {/* Acciones rápidas contextuales: cuando la superficie entrega las suyas
+          permanecen disponibles durante toda la conversación (ciclo iterativo);
+          las sugerencias genéricas siguen apareciendo sólo con el hilo vacío. */}
+      {hydrated &&
+      !thinking &&
+      !planBlocked &&
+      (Boolean(props.starters?.length) || messages.length === 0) ? (
         <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Preguntas sugeridas">
           {starters.map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => void send(s)}
-              className="inline-flex min-h-11 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
+              className="inline-flex min-h-11 items-center rounded-full border border-alux/25 bg-alux/5 px-3 text-[12px] font-medium text-alux transition-colors hover:bg-alux/10"
             >
               {s}
             </button>
@@ -567,8 +610,8 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
           maxLength={ALUX_CONVERSE_LIMITS.maxMessageChars}
           placeholder={
             props.destination?.label
-              ? `Pregúntale a Alux sobre ${props.destination.label}…`
-              : "¿Qué viaje tienes en mente?"
+              ? `${alux.copy("inputPlaceholder")} · ${props.destination.label}`
+              : alux.copy("inputPlaceholder")
           }
           disabled={thinking || planBlocked}
           className="min-h-11 flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-[13px] leading-snug text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-focus disabled:opacity-60"
@@ -576,8 +619,8 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         <button
           type="submit"
           disabled={thinking || planBlocked || input.trim().length === 0}
-          aria-label="Enviar a Alux"
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+          aria-label={alux.copy("sendLabel")}
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-alux text-alux-foreground transition-colors hover:bg-alux/90 disabled:opacity-50"
         >
           {thinking ? (
             <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -587,8 +630,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
         </button>
       </form>
       <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
-        Alux propone; tú decides con un toque. No reserva ni inventa precios, horarios o
-        disponibilidad.
+        {alux.copy("disclaimer")}
       </p>
     </section>
   );
@@ -635,7 +677,7 @@ function AssistantTurn({
   const res = message.response;
   return (
     <article className="flex gap-2" aria-label="Respuesta de Alux">
-      <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary/15">
+      <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-alux/15">
         <AluxMark family="avatar" size={20} decorative />
       </span>
       <div className="min-w-0 flex-1 space-y-2">
@@ -660,7 +702,7 @@ function AssistantTurn({
                 key={q}
                 type="button"
                 onClick={() => onAsk(q)}
-                className="inline-flex min-h-11 items-center rounded-full border border-primary/25 bg-primary/5 px-3 text-left text-[12px] font-medium text-primary hover:bg-primary/10"
+                className="inline-flex min-h-11 items-center rounded-full border border-alux/25 bg-alux/5 px-3 text-left text-[12px] font-medium text-alux hover:bg-alux/10"
               >
                 {q}
               </button>
@@ -686,14 +728,16 @@ function AssistantTurn({
 
         {res?.sequence?.length ? (
           <div className="rounded-xl border border-border bg-background/70 p-3">
-            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-alux">
               <ListOrdered className="size-3.5" aria-hidden />
               Propuesta por día
             </p>
             <ol className="mt-1.5 space-y-1 text-[12px] text-foreground">
-              {res.sequence.map((step) => (
-                <li key={step.day} className="flex gap-2">
-                  <span className="shrink-0 font-semibold">Día {step.day}</span>
+              {res.sequence.map((step, index) => (
+                <li key={step.day ?? `unassigned-${index}`} className="flex gap-2">
+                  <span className="shrink-0 font-semibold">
+                    {step.day === null ? "Sin día asignado" : `Día ${step.day}`}
+                  </span>
                   <span className="text-muted-foreground">
                     {step.refs.map((r) => r.title).join(" → ")}
                   </span>
@@ -707,8 +751,8 @@ function AssistantTurn({
         ) : null}
 
         {res?.reorderProposal ? (
-          <div className="rounded-xl border border-primary/25 bg-primary/5 p-3">
-            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+          <div className="rounded-xl border border-alux/25 bg-alux/5 p-3">
+            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-alux">
               <ListOrdered className="size-3.5" aria-hidden />
               Nuevo orden sugerido
             </p>
@@ -725,7 +769,7 @@ function AssistantTurn({
                 type="button"
                 disabled={applyingOrder}
                 onClick={() => onApplyOrder(res.reorderProposal!.orderedKeys)}
-                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-primary bg-primary/10 px-3 text-[12px] font-medium text-primary hover:bg-primary/15 disabled:opacity-60"
+                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-alux bg-alux/10 px-3 text-[12px] font-medium text-alux hover:bg-alux/15 disabled:opacity-60"
               >
                 {applyingOrder ? (
                   <Loader2 className="size-3.5 animate-spin" aria-hidden />
@@ -800,7 +844,7 @@ function RecommendationCard({
           </span>
         ) : null}
         {inTrip ? (
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary normal-case tracking-normal">
+          <span className="rounded-full bg-alux/10 px-2 py-0.5 text-alux normal-case tracking-normal">
             En Mi Viaje
           </span>
         ) : null}
@@ -814,7 +858,7 @@ function RecommendationCard({
       </a>
       {rec.subtitle ? <p className="text-[11px] text-muted-foreground">{rec.subtitle}</p> : null}
       <p className="mt-1 flex items-start gap-1.5 text-[12px] leading-snug text-foreground/85">
-        <Sparkles className="mt-0.5 size-3 shrink-0 text-primary" aria-hidden />
+        <Sparkles className="mt-0.5 size-3 shrink-0 text-alux" aria-hidden />
         <span>{rec.reason}</span>
       </p>
       {rec.confirmedFacts.length > 0 ? (

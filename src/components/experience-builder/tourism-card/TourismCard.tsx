@@ -21,6 +21,7 @@
  */
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
 
 /* ------------------------------------------------------------------ *
@@ -73,6 +74,12 @@ export interface TourismCardAction {
 
 export interface TourismCardVM {
   id: string;
+  /**
+   * Empresa operadora acreditada de la ficha (cuando existe). Permite
+   * atribuir exposición y clics en `business_view_events` sin alterar
+   * la presentación aprobada. Nunca se infiere.
+   */
+  operatorId?: string | null;
   entityKind: TourismEntityKind | null;
   /** Override manual del eyebrow (ej. tipo de producto o categoría). */
   eyebrow?: string | null;
@@ -84,6 +91,7 @@ export interface TourismCardVM {
   businessName: string | null;
   mediaUrl: string | null;
   mediaAlt: string | null;
+  mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
   rating: { value: number; count: number } | null;
   location: { label: string; distanceKm: number | null } | null;
   /**
@@ -311,6 +319,8 @@ export interface TourismCardProps {
   className?: string;
   /** Slot para inyectar acciones interactivas (FavoriteButton, etc.). */
   renderActions?: (vm: TourismCardVM) => ReactNode;
+  /** Acción contextual superpuesta al medio, por ejemplo Guardar. */
+  renderMediaActions?: (vm: TourismCardVM) => ReactNode;
   /** Contrato semántico I2; ausente conserva el renderer legacy. */
   contractFamily?: "destination";
   contractVariant?: "compact" | "standard" | "editorial" | "featured";
@@ -321,6 +331,7 @@ export function TourismCard({
   capabilities,
   className,
   renderActions,
+  renderMediaActions,
   contractFamily,
   contractVariant,
 }: TourismCardProps) {
@@ -346,15 +357,18 @@ export function TourismCard({
         <div
           className={cn(
             "relative w-full overflow-hidden bg-muted",
-            caps.compact ? "aspect-[16/9] max-h-36" : "aspect-[4/3]",
+            !vm.mediaUrl
+              ? "h-24 sm:h-28"
+              : caps.compact
+                ? "aspect-[16/9] max-h-36"
+                : "aspect-[4/3]",
           )}
         >
           {vm.mediaUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={vm.mediaUrl}
-              alt={vm.mediaAlt ?? vm.name}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name, asset: vm.mediaAsset }}
+              context="card"
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
           ) : (
@@ -418,6 +432,9 @@ export function TourismCard({
             <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-pill bg-success/90 px-2.5 py-1 text-[11px] font-semibold text-success-foreground shadow-soft backdrop-blur">
               {vm.availabilityLabel}
             </span>
+          ) : null}
+          {renderMediaActions ? (
+            <div className="absolute right-3 top-3 z-10">{renderMediaActions(vm)}</div>
           ) : null}
         </div>
       ) : null}
@@ -501,7 +518,16 @@ export function TourismCard({
             secondary={caps.showSecondaryAction ? vm.secondaryAction : null}
           />
           {caps.showFavorite && renderActions ? (
-            <div className="mt-2 flex flex-col gap-2">{renderActions(vm)}</div>
+            <div
+              className={cn(
+                "mt-2 flex gap-2",
+                /* Compacta (hospedaje): acciones en una sola línea que envuelve,
+                   para que la ficha no crezca en tablet y celular. */
+                caps.compact ? "flex-wrap items-center" : "flex-col",
+              )}
+            >
+              {renderActions(vm)}
+            </div>
           ) : null}
         </div>
       </div>
@@ -570,11 +596,10 @@ export function TourismCardRow({
       {caps.showMedia ? (
         <div className={cn("shrink-0 overflow-hidden rounded-xl bg-muted", size)}>
           {vm.mediaUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={vm.mediaUrl}
-              alt={vm.mediaAlt ?? vm.name}
-              loading="lazy"
+            <EditorialMediaFrame
+              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name, asset: vm.mediaAsset }}
+              context="thumbnail"
+              sizes="96px"
               className="h-full w-full object-cover"
             />
           ) : (

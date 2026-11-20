@@ -232,7 +232,18 @@ export async function prepareImageForRole(file: File, role: ImageRole): Promise<
   const keepPng = isPng && (await pngHasAlpha(file));
   const outType = keepPng ? "image/png" : file.type === "image/jpeg" ? "image/jpeg" : "image/webp";
 
-  const blob = await canvasToBlob(canvas, outType, outType === "image/png" ? 1 : spec.quality);
+  // Techo de peso compartido: ninguna subida (portada, galería, logo) debe
+  // entrar por encima de `INGEST_TARGET_BYTES`, aunque su rol lo permitiera.
+  let blob: Blob;
+  if (outType === "image/png") {
+    blob = await canvasToBlob(canvas, outType, 1);
+  } else {
+    blob = await canvasToBlob(canvas, outType, spec.quality);
+    for (const quality of INGEST_QUALITY_STEPS) {
+      if (blob.size <= INGEST_TARGET_BYTES || quality >= spec.quality) break;
+      blob = await canvasToBlob(canvas, outType, quality);
+    }
+  }
 
   // Si tras procesar sigue pesando más que el original Y ya está dentro
   // de los límites de dimensión, devuelve el original.
@@ -246,6 +257,185 @@ export async function prepareImageForRole(file: File, role: ImageRole): Promise<
     type: outType,
     lastModified: Date.now(),
   });
+}
+
+/* ───────────────  Carga inteligente para la Biblioteca  ─────────────── */
+
+/**
+ * Ingreso gobernado (H3·A4): la Biblioteca conserva un ORIGINAL, pero ese
+ * original no debe ser un archivo de cámara sin procesar. Antes de subir se
+ * normaliza de forma NO destructiva:
+ *   · Nunca recorta: preserva encuadre y proporción del archivo elegido.
+ *   · Limita el lado mayor a `INGEST_MAX_LONG_SIDE`.
+ *   · Recomprime en pasos de calidad hasta quedar bajo `INGEST_TARGET_BYTES`.
+ *   · Respeta PNG con transparencia (logos) y no toca GIF/AVIF.
+ *   · Si el resultado no mejora al archivo elegido, devuelve el archivo tal cual.
+ *
+ * El pipeline de variantes derivadas sigue siendo la única autoridad de los
+ * tamaños de entrega; esto sólo evita que entren archivos innecesariamente
+ * pesados a la plataforma cuando cientos de empresas suben fotos el mismo día.
+ */
+export const INGEST_MAX_LONG_SIDE = 2560;
+export const INGEST_TARGET_BYTES = 2.5 * 1024 * 1024;
+const INGEST_QUALITY_STEPS = [0.85, 0.75, 0.65];
+
+export interface IngestResult {
+  file: File;
+  originalBytes: number;
+  bytes: number;
+  width: number | null;
+  height: number | null;
+  optimized: boolean;
+}
+
+export async function prepareImageForIngest(file: File): Promise<IngestResult> {
+  const invalid = validateImageFile(file);
+  if (invalid) throw new Error(invalid.reason);
+
+  const untouched: IngestResult = {
+    file,
+    originalBytes: file.size,
+    bytes: file.size,
+    width: null,
+    height: null,
+    optimized: false,
+  };
+
+  if (file.type === "image/gif" || file.type === "image/avif") return untouched;
+
+  let img: HTMLImageElement;
+  try {
+    img = await loadImage(file);
+  } catch {
+    return untouched;
+  }
+  const srcW = img.naturalWidth;
+  const srcH = img.naturalHeight;
+  if (!srcW || !srcH) return untouched;
+
+  const longest = Math.max(srcW, srcH);
+  const needsResize = longest > INGEST_MAX_LONG_SIDE;
+  const needsRecompress = file.size > INGEST_TARGET_BYTES;
+  if (!needsResize && !needsRecompress) {
+    return { ...untouched, width: srcW, height: srcH };
+  }
+
+  const scale = needsResize ? INGEST_MAX_LONG_SIDE / longest : 1;
+  const targetW = Math.max(1, Math.round(srcW * scale));
+  const targetH = Math.max(1, Math.round(srcH * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return { ...untouched, width: srcW, height: srcH };
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, targetW, targetH);
+
+  const keepPng = file.type === "image/png" && (await pngHasAlpha(file));
+  const outType = keepPng ? "image/png" : file.type === "image/jpeg" ? "image/jpeg" : "image/webp";
+
+  let blob: Blob | null = null;
+  if (outType === "image/png") {
+    blob = await canvasToBlob(canvas, outType, 1).catch(() => null);
+  } else {
+    for (const quality of INGEST_QUALITY_STEPS) {
+      const candidate = await canvasToBlob(canvas, outType, quality).catch(() => null);
+      if (!candidate) break;
+      blob = candidate;
+      if (candidate.size <= INGEST_TARGET_BYTES) break;
+    }
+  }
+
+  if (!blob || blob.size >= file.size) {
+    return { ...untouched, width: srcW, height: srcH };
+  }
+
+  const ext = outType === "image/jpeg" ? "jpg" : outType === "image/png" ? "png" : "webp";
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
+  const prepared = new File([blob], `${baseName}.${ext}`, {
+    type: outType,
+    lastModified: Date.now(),
+  });
+
+  return {
+    file: prepared,
+    originalBytes: file.size,
+    bytes: prepared.size,
+    width: targetW,
+    height: targetH,
+    optimized: true,
+  };
+}
+
+/** Texto legible para editores: "6.4 MB → 1.2 MB (−81%)". */
+export function describeIngestSavings(result: IngestResult): string | null {
+  if (!result.optimized) return null;
+  const mb = (n: number) => `${(n / 1024 / 1024).toFixed(1)} MB`;
+  const pct = Math.round((1 - result.bytes / result.originalBytes) * 100);
+  return `${mb(result.originalBytes)} → ${mb(result.bytes)} (−${pct}%)`;
+}
+
+/* ───────────  Detección de foto pequeña para el uso (Alux IA)  ─────────── */
+
+/**
+ * Ancho mínimo recomendado por uso. Si la foto elegida queda por debajo,
+ * la Biblioteca ofrece ampliarla con Alux IA (asistente editorial).
+ * Nunca se amplía de forma automática ni silenciosa.
+ */
+export const ROLE_MIN_LONG_SIDE: Record<ImageRole, number> = {
+  hero: 2400,
+  cover: 1600,
+  gallery: 1600,
+  logo: 512,
+  thumbnail: 400,
+};
+
+export interface RoleFit {
+  role: ImageRole;
+  width: number;
+  height: number;
+  /** Lado mayor recomendado para este uso. */
+  recommendedLongSide: number;
+  /** Proporción del tamaño recomendado que cubre la foto (0-1+). */
+  coverage: number;
+  /** La foto no alcanza el tamaño recomendado. */
+  undersized: boolean;
+  /** Queda muy por debajo (<60%): la ampliación con Alux IA es aconsejable. */
+  severelyUndersized: boolean;
+}
+
+export function evaluateRoleFit(
+  width: number | null,
+  height: number | null,
+  role: ImageRole,
+): RoleFit | null {
+  if (!width || !height) return null;
+  const recommendedLongSide = ROLE_MIN_LONG_SIDE[role];
+  const longest = Math.max(width, height);
+  const coverage = longest / recommendedLongSide;
+  return {
+    role,
+    width,
+    height,
+    recommendedLongSide,
+    coverage,
+    undersized: coverage < 1,
+    severelyUndersized: coverage < 0.6,
+  };
+}
+
+export const ROLE_LABELS: Record<ImageRole, string> = {
+  hero: "portada principal",
+  cover: "portada",
+  gallery: "galería",
+  logo: "logotipo",
+  thumbnail: "miniatura",
+};
+
+export function describeRoleFit(fit: RoleFit): string {
+  return `La foto mide ${fit.width}×${fit.height} px y para ${ROLE_LABELS[fit.role]} se recomiendan al menos ${fit.recommendedLongSide} px de lado mayor.`;
 }
 
 export interface RetryOptions {
@@ -270,4 +460,25 @@ export async function withRetry<T>(fn: () => Promise<T>, opts: RetryOptions = {}
     }
   }
   throw lastErr instanceof Error ? lastErr : new Error("Subida fallida.");
+}
+
+/**
+ * Lee ancho/alto reales de un archivo de imagen ya preparado.
+ * Aditivo y fail-safe: si no puede leerse, devuelve nulls (comportamiento previo).
+ */
+export async function readImageDimensions(
+  file: Blob,
+): Promise<{ width: number | null; height: number | null }> {
+  try {
+    if (typeof createImageBitmap === "function") {
+      const bmp = await createImageBitmap(file);
+      const out = { width: bmp.width || null, height: bmp.height || null };
+      bmp.close?.();
+      return out;
+    }
+    const img = await loadImage(file as File);
+    return { width: img.naturalWidth || null, height: img.naturalHeight || null };
+  } catch {
+    return { width: null, height: null };
+  }
 }

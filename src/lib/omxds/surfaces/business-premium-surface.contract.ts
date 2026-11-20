@@ -158,9 +158,9 @@ export function createBusinessPremiumSurfaceContract(
     "policies",
     "schedule",
     "reservation",
-    "reputation",
     "delivery",
   ];
+  if ((input.publishedReviewCount ?? 0) <= 0) omissions.push("reputation");
   if (input.relatedCount === 0) omissions.push("collection");
 
   const contract = createOmxdsSurfaceContract({

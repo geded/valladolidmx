@@ -23,6 +23,7 @@ import type { ContextNode, ResolvedContext } from "@/lib/context-engine";
 const STORAGE_KEY = "vll:nav:session:v1";
 const TTL_MS = 30 * 60_000;
 const SCHEMA_VERSION = 1;
+const AUTH_RETURN_KEY = "vmx.auth.next";
 
 /** Slot territorial mínimo persistido. */
 export interface NavigationSessionSlot {
@@ -45,6 +46,48 @@ export interface NavigationSessionSnapshot {
 
 function hasWindow(): boolean {
   return typeof window !== "undefined" && typeof sessionStorage !== "undefined";
+}
+
+/**
+ * Valida destinos internos usados al volver de autenticación. Nunca acepta
+ * URLs externas, endpoints ni la propia pantalla de acceso.
+ */
+export function isSafeAuthReturnPath(path: string | null | undefined): path is string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) return false;
+  return !/^\/(?:auth|~oauth|api)(?:\/|$|\?)/.test(path);
+}
+
+/** Registra la superficie que invocó el acceso para volver tras autenticar. */
+export function rememberAuthReturnPath(path: string): void {
+  if (!hasWindow() || !isSafeAuthReturnPath(path)) return;
+  try {
+    sessionStorage.setItem(AUTH_RETURN_KEY, path);
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+/** Consulta el retorno sin consumirlo; permite mostrar una salida en /auth. */
+export function readAuthReturnPath(): string | null {
+  if (!hasWindow()) return null;
+  try {
+    const path = sessionStorage.getItem(AUTH_RETURN_KEY);
+    return isSafeAuthReturnPath(path) ? path : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Consume el retorno únicamente cuando la sesión ya fue autenticada. */
+export function consumeAuthReturnPath(): string | null {
+  const path = readAuthReturnPath();
+  if (!hasWindow()) return path;
+  try {
+    sessionStorage.removeItem(AUTH_RETURN_KEY);
+  } catch {
+    // storage bloqueado → silencioso
+  }
+  return path;
 }
 
 function toSlot(node: ContextNode | undefined): NavigationSessionSlot | undefined {
@@ -120,6 +163,259 @@ export function writeNavigationSession(snapshot: NavigationSessionSnapshot): voi
   } catch {
     // storage lleno / bloqueado → silencioso
   }
+}
+
+/**
+ * Continuidad de ubicación en app instalada (PWA).
+ *
+ * iOS/Android relanzan la app instalada en `start_url` ("/") cuando el
+ * sistema descarta el proceso (teléfono trabado, reinicio, cambio de
+ * ajustes). Para no perder la ubicación del explorador guardamos la
+ * última ruta pública visitada en `localStorage` (sobrevive al
+ * relanzamiento, a diferencia de `sessionStorage`) y la restauramos
+ * únicamente en ese arranque en frío.
+ *
+ * No afecta SSR, SEO ni la navegación normal del navegador.
+ */
+const LAST_ROUTE_KEY = "vll:nav:last-route:v1";
+
+/** Rutas privadas/operativas que nunca se restauran automáticamente. */
+const NON_RESTORABLE =
+  /^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa|offline)(?:\/|$)/;
+
+export function isRestorablePath(path: string): boolean {
+  if (!path.startsWith("/")) return false;
+  if (path === "/") return false;
+  return !NON_RESTORABLE.test(path);
+}
+
+export function writeLastRoute(path: string): void {
+  if (typeof window === "undefined" || typeof localStorage === "undefined") return;
+  if (!isRestorablePath(path)) return;
+  try {
+    localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ path, at: Date.now() }));
+  } catch {
+    // storage lleno / bloqueado → silencioso
+  }
+}
+
+export function readLastRoute(): string | null {
+  if (typeof window === "undefined" || typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(LAST_ROUTE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { path?: string; at?: number };
+    if (!parsed?.path || typeof parsed.at !== "number") return null;
+    if (Date.now() - parsed.at > TTL_MS) {
+      localStorage.removeItem(LAST_ROUTE_KEY);
+      return null;
+    }
+    return isRestorablePath(parsed.path) ? parsed.path : null;
+  } catch {
+    return null;
+  }
+}
+
+/** `true` cuando la app corre instalada (standalone), no en pestaña. */
+export function isStandaloneDisplay(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const iosStandalone = (window.navigator as { standalone?: boolean }).standalone === true;
+    return iosStandalone || window.matchMedia("(display-mode: standalone)").matches;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * `true` cuando la app se muestra dentro del panel de vista previa de
+ * Lovable (iframe sobre un host de preview). Ese panel siempre recarga
+ * en `/`, por lo que el explorador perdía su ubicación al refrescar.
+ * No aplica al sitio publicado ni a la navegación normal.
+ */
+export function isLovablePreviewFrame(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (window.top === window.self) return false;
+    const h = window.location.hostname;
+    return (
+      h.startsWith("id-preview--") ||
+      h.startsWith("preview--") ||
+      h === "lovableproject.com" ||
+      h.endsWith(".lovableproject.com") ||
+      h === "lovableproject-dev.com" ||
+      h.endsWith(".lovableproject-dev.com") ||
+      h.endsWith(".beta.lovable.dev") ||
+      h === "localhost" ||
+      h === "127.0.0.1"
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Rastro de navegación (ruta anterior → ruta actual).
+ *
+ * La navegación del router es client-side, por lo que `document.referrer`
+ * no refleja el paso previo. Guardamos únicamente el pathname anterior
+ * para que superficies transversales (Alux, Arma tu Viaje) puedan
+ * conservar el paso desde el que llegó el explorador en su ruta
+ * territorial. Sin impacto SSR ni SEO.
+ */
+const ROUTE_TRAIL_KEY = "vll:nav:route-trail:v1";
+
+const PLANNER_VISITED_KEY = "vll:nav:planner-visited:v1";
+
+export function trackRouteTrail(path: string): void {
+  if (!hasWindow()) return;
+  // La pantalla de acceso es una transición, no un nuevo origen público.
+  // Ignorarla conserva Arma tu Viaje/Alux como paso real del recorrido.
+  if (path === "/auth" || path.startsWith("/auth?")) return;
+  try {
+    if (path === "/arma-tu-viaje" || path.startsWith("/arma-tu-viaje/")) {
+      sessionStorage.setItem(PLANNER_VISITED_KEY, "1");
+    }
+    pushJourneyStep(path);
+    const raw = sessionStorage.getItem(ROUTE_TRAIL_KEY);
+    const parsed = raw ? (JSON.parse(raw) as { prev?: string; cur?: string }) : {};
+    if (parsed.cur === path) return;
+    sessionStorage.setItem(
+      ROUTE_TRAIL_KEY,
+      JSON.stringify({ prev: parsed.cur ?? null, cur: path }),
+    );
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+/**
+ * Indica si el visitante ya pasó por Arma tu Viaje en esta sesión.
+ * Sobrevive a recargas y a la restauración de ruta del preview, donde el
+ * rastro inmediato se pierde.
+ */
+export function hasVisitedTravelPlanner(): boolean {
+  if (!hasWindow()) return false;
+  try {
+    return sessionStorage.getItem(PLANNER_VISITED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+
+/**
+ * Devuelve el pathname anterior al actual. Los efectos de la página se
+ * ejecutan antes que el puente global, por lo que el rastro puede no
+ * haberse actualizado todavía: en ese caso `cur` ES la ruta anterior.
+ */
+export function readPreviousRoute(): string | null {
+  if (!hasWindow()) return null;
+  try {
+    const raw = sessionStorage.getItem(ROUTE_TRAIL_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { prev?: string | null; cur?: string | null };
+    const here = window.location.pathname;
+    if (typeof parsed.cur === "string" && parsed.cur !== here) return parsed.cur;
+    return typeof parsed.prev === "string" ? parsed.prev : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Recorrido del explorador (journey trail).
+ *
+ * Rastro ordenado de las superficies transversales por las que pasó el
+ * visitante en esta sesión (Arma tu Viaje, Alux, Mapa, Mi Viaje, Cuenta…).
+ * Permite que cualquier superficie reconstruya "de dónde vengo" y lo
+ * agregue a su ruta territorial sin inventar niveles, y que Alux disponga
+ * del recorrido real por el territorio.
+ *
+ * · Sólo pathnames públicos conocidos (vocabulario cerrado).
+ * · Sin PII, sin query strings, máximo 5 pasos.
+ * · sessionStorage, SSR-safe, cero impacto SEO.
+ */
+const JOURNEY_KEY = "vll:nav:journey:v1";
+const JOURNEY_MAX = 5;
+
+/** Vocabulario cerrado de superficies transversales rastreables. */
+const JOURNEY_STEPS: ReadonlyArray<{ path: string; label: string }> = [
+  { path: "/arma-tu-viaje", label: "Arma tu Viaje" },
+  { path: "/alux", label: "Alux" },
+  { path: "/cuenta/mi-viaje", label: "Mi Viaje" },
+  { path: "/cuenta", label: "Mi Cuenta" },
+  { path: "/mapa", label: "Mapa" },
+  { path: "/rutas", label: "Rutas" },
+  { path: "/que-hacer", label: "Qué hacer" },
+  { path: "/eventos", label: "Eventos" },
+  { path: "/hoteles", label: "Hoteles" },
+  { path: "/restaurantes", label: "Restaurantes" },
+  { path: "/casas-de-vacaciones", label: "Casas de vacaciones" },
+  { path: "/experiencias", label: "Experiencias" },
+  { path: "/lugares", label: "Lugares y sitios de interés" },
+  { path: "/promociones", label: "Promociones" },
+  { path: "/empresas", label: "Empresas" },
+];
+
+export interface JourneyStep {
+  readonly path: string;
+  readonly label: string;
+}
+
+/** Describe una ruta transversal conocida; `null` si no forma parte del vocabulario. */
+export function describeJourneyStep(path: string): JourneyStep | null {
+  const clean = path.split("?")[0].replace(/\/+$/, "") || "/";
+  const match = JOURNEY_STEPS.find((s) => clean === s.path || clean.startsWith(`${s.path}/`));
+  return match ? { path: match.path, label: match.label } : null;
+}
+
+function writeJourney(steps: readonly JourneyStep[]): void {
+  try {
+    sessionStorage.setItem(JOURNEY_KEY, JSON.stringify(steps.slice(-JOURNEY_MAX)));
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+/** Registra la superficie actual en el recorrido, sin duplicar ni retroceder. */
+export function pushJourneyStep(path: string): void {
+  if (!hasWindow()) return;
+  const step = describeJourneyStep(path);
+  if (!step) return;
+  const trail = readJourneyTrail();
+  const existing = trail.findIndex((s) => s.path === step.path);
+  // Si vuelve a un paso ya recorrido, el recorrido se trunca ahí (sin bucles).
+  const next = existing >= 0 ? trail.slice(0, existing + 1) : [...trail, step];
+  writeJourney(next);
+}
+
+/** Recorrido vigente del explorador en esta sesión. */
+export function readJourneyTrail(): JourneyStep[] {
+  if (!hasWindow()) return [];
+  try {
+    const raw = sessionStorage.getItem(JOURNEY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as JourneyStep[];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (s) => s && typeof s.path === "string" && typeof s.label === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Pasos previos del recorrido para componer una ruta territorial: excluye
+ * la superficie actual y todo lo posterior a ella.
+ */
+export function readJourneyPrefix(currentPath: string): JourneyStep[] {
+  const current = describeJourneyStep(currentPath);
+  const trail = readJourneyTrail();
+  if (!current) return trail;
+  const idx = trail.findIndex((s) => s.path === current.path);
+  return idx >= 0 ? trail.slice(0, idx) : trail;
 }
 
 export function clearNavigationSession(): void {

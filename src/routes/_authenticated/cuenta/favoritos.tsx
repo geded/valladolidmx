@@ -21,6 +21,9 @@ const KIND_LABEL: Record<FavoriteEntityKind, string> = {
   business: "Empresa",
   product: "Producto",
   promotion: "Promoción",
+  place: "Lugar",
+  event: "Evento",
+  route: "Ruta",
 };
 
 function FavoritosPage() {

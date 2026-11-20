@@ -27,7 +27,15 @@ function formatDuration(seconds: number) {
   return m === 0 ? `${h} h` : `${h} h ${m} min`;
 }
 
-export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: number }) {
+export function DistanceBadge({
+  destLat,
+  destLng,
+  compact = false,
+}: {
+  destLat: number;
+  destLng: number;
+  compact?: boolean;
+}) {
   const { location, status, request } = useVisitorGeolocation();
   const fn = useServerFn(computeRoute);
 
@@ -48,34 +56,76 @@ export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: 
   });
 
   if (!location) {
+    const label =
+      status === "prompting"
+        ? "Solicitando ubicación…"
+        : status === "imprecise"
+          ? "Ubicación imprecisa · reintentar"
+          : status === "denied" || status === "unavailable"
+            ? "Reintentar ubicación"
+            : "Compartir mi ubicación";
+    const hint =
+      status === "denied"
+        ? "Permitiste no compartir la ubicación. Actívala en los permisos del navegador y vuelve a intentarlo."
+        : status === "imprecise"
+          ? "Tu navegador entregó una ubicación aproximada por red, muy lejana de donde estás. Activa la ubicación precisa y vuelve a intentarlo."
+          : undefined;
+
+    if (compact) {
+      return (
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-10 max-w-full justify-start px-2.5"
+          onClick={request}
+          disabled={status === "prompting"}
+          title={hint}
+        >
+          <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+          <span className="truncate">{label}</span>
+        </Button>
+      );
+    }
+
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <MapPin className="h-4 w-4" aria-hidden />
-        <span>¿Qué tan lejos estás?</span>
-        <Button size="sm" variant="outline" onClick={request} disabled={status === "prompting"}>
-          {status === "prompting"
-            ? "Solicitando…"
-            : status === "denied"
-              ? "Permiso denegado"
-              : status === "unavailable"
-                ? "No disponible"
-                : "Compartir mi ubicación"}
+        <span>{status === "imprecise" ? "No pudimos ubicarte con precisión" : "¿Qué tan lejos estás?"}</span>
+        <Button size="sm" variant="outline" onClick={request} disabled={status === "prompting"} title={hint}>
+          {label}
         </Button>
       </div>
     );
   }
 
+
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Calculando distancia…</p>;
+    return (
+      <p
+        className={
+          compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"
+        }
+      >
+        Calculando distancia…
+      </p>
+    );
   }
 
   if (isError || !data?.ok || data.distanceMeters == null) {
-    return <p className="text-sm text-muted-foreground">No pudimos calcular la ruta ahora.</p>;
+    return (
+      <p
+        className={
+          compact ? "truncate text-xs text-muted-foreground" : "text-sm text-muted-foreground"
+        }
+      >
+        Ruta no disponible
+      </p>
+    );
   }
 
   return (
-    <p className="text-sm text-foreground">
-      <MapPin className="mr-1.5 inline h-4 w-4 text-primary" aria-hidden />
+    <p className={compact ? "truncate text-xs text-foreground" : "text-sm text-foreground"}>
+      <MapPin className="mr-1.5 inline h-4 w-4 shrink-0 text-primary" aria-hidden />
       <span className="font-medium">{formatDistance(data.distanceMeters)}</span>
       {data.durationSeconds != null ? (
         <>
@@ -83,7 +133,7 @@ export function DistanceBadge({ destLat, destLng }: { destLat: number; destLng: 
           <span>{formatDuration(data.durationSeconds)} en auto</span>
         </>
       ) : null}
-      <span className="text-muted-foreground"> desde tu ubicación</span>
+      {compact ? null : <span className="text-muted-foreground"> desde tu ubicación</span>}
     </p>
   );
 }

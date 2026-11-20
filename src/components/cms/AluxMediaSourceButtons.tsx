@@ -1,0 +1,104 @@
+/**
+ * AluxMediaSourceButtons — Dos accesos de apoyo junto al botón de subir
+ * de los paneles de imágenes del CMS: buscar una foto en internet/acervos
+ * abiertos, o crear una imagen con IA a partir de una descripción.
+ *
+ * No crea flujo paralelo: la imagen elegida se entrega como archivo al mismo
+ * `onUpload` que ya usa la subida desde el equipo (optimización, ampliación
+ * opcional con Alux IA y registro gobernado).
+ */
+import { useEffect, useState } from "react";
+import {
+  clearMediaFinder,
+  mediaFinderKey,
+  readMediaFinder,
+  writeMediaFinder,
+} from "@/lib/cms/media-finder-session";
+import { Search, Wand2 } from "lucide-react";
+import {
+  AluxPhotoFinderDialog,
+  type AluxPickedPhoto,
+} from "@/components/cms/AluxPhotoFinderDialog";
+
+interface Props {
+  /** Nombre de la ficha (destino, empresa, producto, zona…) para la consulta. */
+  hint: string;
+  /**
+   * Identificador del espacio de imagen (logo, cover, gallery…). Hace única
+   * la clave de sesión: sin él, todos los paneles de la página comparten la
+   * misma clave y al recargar se reabría el buscador en todos a la vez,
+   * pudiendo soltar la foto en el espacio equivocado.
+   */
+  slot: string;
+  /** Sitio web del negocio, si aplica. */
+  website?: string | null;
+  disabled?: boolean;
+  onFile: (file: File, source?: AluxPickedPhoto) => void;
+  /** Selección múltiple (galería): recibe todas las fotos marcadas de una vez. */
+  onFiles?: (files: File[], sources?: AluxPickedPhoto[]) => void;
+}
+
+export function AluxMediaSourceButtons({ hint, slot, website, disabled, onFile, onFiles }: Props) {
+  const [mode, setModeState] = useState<"search" | "generate" | null>(null);
+  const sessionKey = mediaFinderKey(`${slot}:${hint}`);
+
+  // Al volver de otra app/pestaña, reabrir donde estaba el editor.
+  useEffect(() => {
+    const saved = readMediaFinder<"search" | "generate">(`${sessionKey}:mode`);
+    if (saved === "search" || saved === "generate") setModeState(saved);
+  }, [sessionKey]);
+
+  const setMode = (next: "search" | "generate" | null) => {
+    setModeState(next);
+    if (next) writeMediaFinder(`${sessionKey}:mode`, next);
+    else clearMediaFinder(sessionKey);
+  };
+
+  const handlePick = (photo: AluxPickedPhoto) => {
+    onFile(photo.file, photo);
+    setMode(null);
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setMode("search")}
+        disabled={disabled}
+        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent disabled:opacity-60"
+      >
+        <Search className="size-3.5 text-alux" aria-hidden />
+        Buscar con IA
+      </button>
+      <button
+        type="button"
+        onClick={() => setMode("generate")}
+        disabled={disabled}
+        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-xs font-medium hover:bg-accent disabled:opacity-60"
+      >
+        <Wand2 className="size-3.5 text-alux" aria-hidden />
+        Crear con IA
+      </button>
+
+      {mode ? (
+        <AluxPhotoFinderDialog
+          open
+          initialMode={mode}
+          initialQuery={hint}
+          sessionKeyOverride={sessionKey}
+          website={website ?? null}
+          onClose={() => setMode(null)}
+          onPick={handlePick}
+          onPickMany={
+            onFiles
+              ? (photos) => {
+                  onFiles(photos.map((p) => p.file), photos);
+                  setMode(null);
+                }
+              : undefined
+          }
+        />
+      ) : null}
+    </>
+  );
+}

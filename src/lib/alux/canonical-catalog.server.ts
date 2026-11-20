@@ -117,6 +117,10 @@ export interface LoadCanonicalCandidatesInput {
    * `aluxContextualSuggest` y cualquier otro consumidor existente.
    */
   readonly includeDemoSeed?: boolean;
+  /** IDs exigidos por una selección CMS; conserva los mismos filtros fail-closed. */
+  readonly requiredEntityIds?: Partial<
+    Readonly<Record<"place" | "product" | "event" | "destination", readonly string[]>>
+  >;
 }
 
 export interface CanonicalCatalogResult {
@@ -151,6 +155,10 @@ export async function loadAluxCanonicalCandidates(
   const candidates: AluxCanonicalCandidate[] = [];
   const rejected: AluxRejectedCandidate[] = [];
   const familyReport: Record<string, { loaded: number; eligible: number; note: string }> = {};
+  const requiredIds = (kind: "place" | "product" | "event" | "destination") =>
+    input.requiredEntityIds ? [...(input.requiredEntityIds[kind] ?? [])] : null;
+  const requiredOrSentinel = (kind: "place" | "product" | "event" | "destination") =>
+    requiredIds(kind) ?? [];
 
   /**
    * DEF-R1E-002 · Ubicación canónica publicada de las empresas del destino.
@@ -174,7 +182,7 @@ export async function loadAluxCanonicalCandidates(
 
   // ── Lugares y atractivos (points_of_interest → premium-entity-place) ──
   {
-    const { data, error } = await sb
+    let query = sb
       .from("points_of_interest")
       .select(
         "id, slug, name, official_name, short_description, description, destination_zone_id, latitude, longitude, place_types ( slug, name ), destination_zones ( slug, destination_id )",
@@ -183,8 +191,10 @@ export async function loadAluxCanonicalCandidates(
       .eq("status", "published")
       .is("deleted_at", null)
       .or(demoFilter)
-      .order("name", { ascending: true })
-      .limit(limit);
+      .order("name", { ascending: true });
+    const selected = requiredIds("place");
+    if (selected) query = query.in("id", requiredOrSentinel("place"));
+    const { data, error } = await query.limit(selected ? Math.max(1, selected.length) : limit);
 
     const rows = error ? [] : (data ?? []);
     let eligible = 0;
@@ -258,15 +268,17 @@ export async function loadAluxCanonicalCandidates(
 
   // ── Productos: experiencias, tours y producto genérico ──
   if (input.publishedBusinessIds.length) {
-    const { data, error } = await sb
+    let query = sb
       .from("products")
       .select("id, slug, name, tagline, description, product_type, business_id")
       .in("business_id", input.publishedBusinessIds as string[])
       .eq("status", "published")
       .is("deleted_at", null)
       .or(demoFilter)
-      .order("name", { ascending: true })
-      .limit(limit * 2);
+      .order("name", { ascending: true });
+    const selected = requiredIds("product");
+    if (selected) query = query.in("id", requiredOrSentinel("product"));
+    const { data, error } = await query.limit(selected ? Math.max(1, selected.length) : limit * 2);
 
     const rows = error ? [] : (data ?? []);
     let eligible = 0;
@@ -358,15 +370,17 @@ export async function loadAluxCanonicalCandidates(
   // ── Eventos ──
   {
     const nowIso = new Date().toISOString();
-    const { data, error } = await sb
+    let query = sb
       .from("events")
       .select("id, slug, title, summary, starts_at, ends_at")
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
       .is("deleted_at", null)
       .or(demoFilter)
-      .order("starts_at", { ascending: true })
-      .limit(limit);
+      .order("starts_at", { ascending: true });
+    const selected = requiredIds("event");
+    if (selected) query = query.in("id", requiredOrSentinel("event"));
+    const { data, error } = await query.limit(selected ? Math.max(1, selected.length) : limit);
 
     const rows = error ? [] : (data ?? []);
     let eligible = 0;

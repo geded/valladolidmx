@@ -1,18 +1,85 @@
 import { PremiumAction } from "./PremiumAction";
 import type { PremiumHeroVM } from "./types";
 import { cn } from "@/lib/utils";
+import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 
 export function PremiumHero({
   vm,
   layout = "default",
 }: {
   vm: PremiumHeroVM;
-  /** La variante listing pertenece al mismo bloque; no crea otro hero. */
-  layout?: "default" | "listing";
+  /** Las variantes pertenecen al mismo bloque; no crean otro hero. */
+  layout?: "default" | "listing" | "entity";
 }) {
   const cinematic = vm.presentation === "cinematic";
   const hasMedia = Boolean(vm.media);
   const listing = layout === "listing";
+
+  if (layout === "entity") {
+    return (
+      <section
+        data-premium-presentation={vm.presentation}
+        data-premium-media={hasMedia ? "governed" : "fallback"}
+        data-premium-layout="entity"
+        className="overflow-hidden rounded-3xl border border-border bg-card shadow-elevated"
+      >
+        <div className={cn("grid", hasMedia && "lg:grid-cols-[.9fr_1.1fr]")}>
+          <div
+            className={cn(
+              "order-2 flex min-h-72 flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 lg:order-1 lg:px-12",
+              hasMedia ? "lg:min-h-[30rem]" : "lg:min-h-80",
+            )}
+          >
+            {vm.eyebrow ? (
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                {vm.eyebrow}
+              </p>
+            ) : null}
+            <div className="mt-3 flex min-w-0 items-center gap-4 sm:gap-5">
+              {vm.identity ? <span className="shrink-0">{vm.identity}</span> : null}
+              <h1 className="min-w-0 text-balance font-serif text-4xl leading-tight text-foreground sm:text-5xl lg:text-5xl">
+                {vm.title}
+              </h1>
+            </div>
+            {vm.description ? (
+              <p className="mt-4 max-w-xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
+                {vm.description}
+              </p>
+            ) : null}
+            {vm.badges?.length ? (
+              <ul className="mt-5 flex flex-wrap gap-2" aria-label="Distinciones">
+                {vm.badges.map((badge) => (
+                  <li
+                    key={badge.label}
+                    className="rounded-pill border border-border bg-muted px-3 py-1 text-xs text-foreground"
+                  >
+                    {badge.label}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          {vm.media ? (
+            <figure className="order-1 min-h-64 overflow-hidden bg-muted sm:min-h-80 lg:order-2 lg:min-h-[30rem]">
+              <EditorialMediaFrame
+                media={{ url: vm.media.url, alt: vm.media.alt ?? "", asset: vm.media.asset ?? null }}
+                context="hero"
+                loading="eager"
+                fetchPriority="high"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="size-full object-cover"
+              />
+              {vm.media.caption || vm.media.credit ? (
+                <figcaption className="sr-only">
+                  {[vm.media.caption, vm.media.credit].filter(Boolean).join(" · ")}
+                </figcaption>
+              ) : null}
+            </figure>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
 
   if (listing) {
     return (
@@ -36,9 +103,12 @@ export function PremiumHero({
                 cinematic && "absolute inset-0 -z-20 min-h-0",
               )}
             >
-              <img
-                src={vm.media?.url}
-                alt={vm.media?.alt ?? ""}
+              <EditorialMediaFrame
+                media={vm.media ? { url: vm.media.url, alt: vm.media.alt ?? "", asset: vm.media.asset ?? null } : null}
+                context="hero"
+                loading="eager"
+                fetchPriority="high"
+                sizes="100vw"
                 className="size-full object-cover"
               />
               <div
@@ -86,21 +156,24 @@ export function PremiumHero({
       data-premium-presentation={vm.presentation}
       data-premium-media={hasMedia ? "governed" : "fallback"}
       className={cn(
-        "relative isolate overflow-hidden text-white",
+        "relative isolate overflow-hidden rounded-3xl text-white shadow-soft",
         // D-05 · sin medio gobernado no se muestra un rectángulo negro:
         // degradado cálido piedra/caliza que conserva contraste AA.
         hasMedia ? "bg-stone-950" : "bg-gradient-to-br from-stone-800 via-stone-700 to-amber-900",
-        // Móvil ≤639px: proporción ~4:5 acotada a 500px para evitar el
-        // hero-tira; desde `sm` se conserva la altura aprobada.
+        // Móvil ≤639px: portada más compacta para mostrar contenido útil en
+        // el primer viewport; desde `sm` se conserva la altura aprobada.
         cinematic
           ? "min-h-[min(125vw,500px)] sm:min-h-[78svh]"
-          : "min-h-[min(125vw,500px)] sm:min-h-[34rem] lg:min-h-[42rem]",
+          : "min-h-[min(108vw,430px)] sm:min-h-[34rem] lg:min-h-[42rem]",
       )}
     >
       {vm.media ? (
-        <img
-          src={vm.media.url}
-          alt={vm.media.alt ?? ""}
+        <EditorialMediaFrame
+          media={{ url: vm.media.url, alt: vm.media.alt ?? "", asset: vm.media.asset ?? null }}
+          context="hero"
+          loading="eager"
+          fetchPriority="high"
+          sizes="100vw"
           className="absolute inset-0 -z-20 size-full object-cover"
         />
       ) : null}

@@ -12,9 +12,10 @@
  *  - Esquema abierto: nuevas acciones secundarias pueden agregarse sin
  *    cambios al modelo de datos (mode es texto).
  */
-import { AddToCartButton } from "@/components/commerce/AddToCartButton";
+import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { RequestConciergeButton } from "@/components/concierge/RequestConciergeButton";
+import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 
 export interface ProductActionsProduct {
   id: string;
@@ -23,6 +24,11 @@ export interface ProductActionsProduct {
   secondary_action_mode: string | null;
   secondary_action_label: string | null;
   accepts_online_payment: boolean;
+  /** Datos CMS reales para materializar "Agregar a Mi Viaje" (opcionales). */
+  name?: string | null;
+  slug?: string | null;
+  imageUrl?: string | null;
+  subtitle?: string | null;
 }
 
 const PRIMARY_DEFAULT_LABEL: Record<string, string> = {
@@ -47,7 +53,26 @@ const SECONDARY_DEFAULT_LABEL: Record<string, string> = {
 function PrimaryButton({ product }: { product: ProductActionsProduct }) {
   const mode = product.conversion_mode || "informacion";
   if (mode === "reservar_en_linea" && product.accepts_online_payment) {
-    return <AddToCartButton productId={product.id} />;
+    return (
+      <ReserveOnlineButton
+        productId={product.id}
+        label={product.primary_action_label ?? PRIMARY_DEFAULT_LABEL["reservar_en_linea"]!}
+      />
+    );
+  }
+  /* `arma_tu_viaje` se materializa con el botón oficial de Mi Viaje cuando la
+     tarjeta aporta el nombre CMS; sin él conserva el comportamiento previo. */
+  if (mode === "arma_tu_viaje" && product.name) {
+    return (
+      <AddToTravelPlanButton
+        kind="product"
+        targetId={product.id}
+        title={product.name}
+        slug={product.slug ?? null}
+        imageUrl={product.imageUrl ?? null}
+        subtitle={product.subtitle ?? null}
+      />
+    );
   }
   const label = product.primary_action_label ?? PRIMARY_DEFAULT_LABEL[mode] ?? "Ver más";
   return (
@@ -84,12 +109,23 @@ function SecondaryAction({ product }: { product: ProductActionsProduct }) {
   );
 }
 
-export function ProductActions({ product }: { product: ProductActionsProduct }) {
+export function ProductActions({
+  product,
+  compact = false,
+}: {
+  product: ProductActionsProduct;
+  /**
+   * Modo compacto (tarjetas de hospedaje): conserva la acción principal y la
+   * secundaria del CMS, y omite el apoyo de concierge, que ya se ofrece en la
+   * banda final de la ficha. No altera la Estrategia de Conversión.
+   */
+  compact?: boolean;
+}) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PrimaryButton product={product} />
       <SecondaryAction product={product} />
-      <RequestConciergeButton kind="product" productId={product.id} />
+      {compact ? null : <RequestConciergeButton kind="product" productId={product.id} />}
     </div>
   );
 }

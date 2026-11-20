@@ -8,7 +8,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Menu,
   X,
@@ -44,6 +44,11 @@ import { cn } from "@/lib/utils";
 interface Props {
   variant?: "solid" | "overlay";
   config?: Record<string, unknown>;
+  /**
+   * El constructor renderiza la cabecera real para conservar su geometría,
+   * pero sus controles públicos no deben abrir menús ni bloquear el Studio.
+   */
+  interactionMode?: "public" | "editor";
 }
 
 interface HeaderNavItem {
@@ -126,7 +131,7 @@ function linkItems(value: unknown, fallback: HeaderNavItem[]): HeaderNavItem[] {
     .filter((item): item is HeaderNavItem => Boolean(item));
 }
 
-export function SiteHeader({ variant = "solid", config }: Props) {
+export function SiteHeader({ variant = "solid", config, interactionMode = "public" }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -136,6 +141,14 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => setMounted(true), []);
+
+  // El drawer se cierra al cambiar de ruta. Sin esto, al pulsar "Iniciar
+  // sesión" la navegación era cliente-side y el panel quedaba abierto
+  // encima de /auth.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (variant !== "overlay") return;
@@ -154,9 +167,11 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   // El drawer se porta al body para escapar del stacking context del Header:
   // así el Hero nunca atraviesa el panel móvil (12C.1).
   useEffect(() => {
-    if (!open) return;
-    const { body, documentElement } = document;
-    const scrollY = window.scrollY;
+    if (!open || interactionMode === "editor") return;
+    const ownerDocument = headerRef.current?.ownerDocument ?? document;
+    const ownerWindow = ownerDocument.defaultView ?? window;
+    const { body, documentElement } = ownerDocument;
+    const scrollY = ownerWindow.scrollY;
     const prevBody = body.style.overflow;
     const prevBodyPosition = body.style.position;
     const prevBodyTop = body.style.top;
@@ -184,7 +199,7 @@ export function SiteHeader({ variant = "solid", config }: Props) {
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      const active = document.activeElement;
+      const active = ownerDocument.activeElement;
 
       if (e.shiftKey && active === first) {
         e.preventDefault();
@@ -194,10 +209,10 @@ export function SiteHeader({ variant = "solid", config }: Props) {
         first.focus();
       }
     };
-    window.addEventListener("keydown", onKey);
+    ownerWindow.addEventListener("keydown", onKey);
 
     // Mover foco al panel para lectores de pantalla y navegación por teclado.
-    const t = window.setTimeout(() => drawerRef.current?.focus(), 0);
+    const t = ownerWindow.setTimeout(() => drawerRef.current?.focus(), 0);
 
     return () => {
       body.style.overflow = prevBody;
@@ -205,12 +220,12 @@ export function SiteHeader({ variant = "solid", config }: Props) {
       body.style.top = prevBodyTop;
       body.style.width = prevBodyWidth;
       documentElement.style.overflow = prevHtml;
-      window.removeEventListener("keydown", onKey);
-      window.clearTimeout(t);
-      window.scrollTo(0, scrollY);
+      ownerWindow.removeEventListener("keydown", onKey);
+      ownerWindow.clearTimeout(t);
+      ownerWindow.scrollTo(0, scrollY);
       menuButtonRef.current?.focus();
     };
-  }, [open]);
+  }, [interactionMode, open]);
 
   const isOverlay = variant === "overlay" && !scrolled && !open;
 
@@ -254,12 +269,12 @@ export function SiteHeader({ variant = "solid", config }: Props) {
   const visibleButtons = buttons.filter((b) => b.visible);
 
   const mobileDrawer =
-    mounted && open
+    interactionMode === "public" && mounted && open
       ? createPortal(
           <>
             <div
               aria-hidden
-              className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[998] bg-foreground/58 backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
             <aside
@@ -270,38 +285,51 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               aria-label="Navegación principal"
               tabIndex={-1}
               style={{ backgroundColor: "var(--background)" }}
-              className="fixed right-3 top-3 z-[999] flex max-h-[calc(100dvh-1.5rem)] w-[min(86vw,23rem)] flex-col overflow-y-auto rounded-[1.75rem] border border-border/70 shadow-2xl outline-none lg:hidden"
+              /* 18.55 · Safari iOS/iPadOS resuelve `bottom` contra el viewport
+                 grande y el pie del menú (CTA + sesión) quedaba bajo la barra
+                 del navegador. Altura fijada con `svh` para que el pie sea
+                 siempre visible. */
+              className="fixed inset-x-2 top-2 z-[999] flex h-[calc(100svh-1rem)] max-h-[calc(100svh-1rem)] flex-col overflow-hidden rounded-[1.75rem] border border-border/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)] outline-none sm:inset-x-auto sm:right-3 sm:w-[min(86vw,24rem)]"
             >
-              <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-4">
+              <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/60 px-5">
                 <BrandLogo tone="dark" size="sm" />
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Cerrar menú"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all active:scale-[0.98]"
+                  className="inline-flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent active:scale-[0.98]"
                 >
-                  <X className="size-4" />
+                  <X className="size-5" />
                 </button>
               </div>
-              <nav aria-label="Menú móvil" className="flex flex-col gap-0.5 px-4 py-5">
+              <nav
+                aria-label="Menú móvil"
+                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-3"
+              >
                 <PrimaryMegaMenu variant="mobile" onNavigate={() => setOpen(false)} />
+              </nav>
+              <div className="shrink-0 space-y-3 border-t border-border/60 bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
                 <a
                   href={ctaHref}
                   onClick={() => setOpen(false)}
-                  className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-[0.9375rem] font-medium text-background transition-all hover:opacity-90 active:scale-[0.98]"
                 >
                   <Compass className="size-4" aria-hidden />
                   {ctaLabel}
                 </a>
                 {showUserMenu ? (
-                  <div className="mt-4 border-t border-border/70 pt-4 sm:hidden">
-                    <UserMenu />
+                  <div className="relative [&_a]:w-full [&_a]:justify-center [&_a]:rounded-full [&_a]:border [&_a]:border-border [&_a]:bg-transparent [&_a]:text-foreground [&_a]:hover:bg-accent/10 [&_button]:w-full [&_button]:justify-center [&_button]:rounded-full [&_button]:border [&_button]:border-border [&_button]:bg-transparent [&_button]:text-foreground [&_button]:hover:bg-accent/10">
+                    <UserMenu
+                      placement="above"
+                      mobileLabel
+                      onNavigate={() => setOpen(false)}
+                    />
                   </div>
                 ) : null}
-              </nav>
+              </div>
             </aside>
           </>,
-          document.body,
+          headerRef.current?.ownerDocument.body ?? document.body,
         )
       : null;
 
@@ -343,13 +371,14 @@ export function SiteHeader({ variant = "solid", config }: Props) {
               <PrimaryMegaMenu variant="desktop" isOverlay={isOverlay} />
             </div>
 
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="relative z-10 flex min-w-0 items-center gap-2">
               <MiViajeChip isOverlay={isOverlay} />
               {visibleButtons.map((btn, idx) =>
                 renderHeaderButton(btn, idx, {
                   isOverlay,
                   open,
                   setOpen,
+                  interactive: interactionMode === "public",
                   menuButtonRef,
                   ctaFallback: { label: ctaLabel, href: ctaHref },
                 }),
@@ -367,28 +396,27 @@ interface RenderCtx {
   isOverlay: boolean;
   open: boolean;
   setOpen: (updater: (v: boolean) => boolean) => void;
+  interactive: boolean;
   menuButtonRef: React.RefObject<HTMLButtonElement | null>;
   ctaFallback: { label: string; href: string };
 }
 
 function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
   const key = `${btn.kind}-${idx}`;
-  const { isOverlay, open, setOpen, menuButtonRef, ctaFallback } = ctx;
+  const { isOverlay, open, setOpen, interactive, menuButtonRef, ctaFallback } = ctx;
 
   if (btn.kind === "language") {
-    // v1.1: el selector de idioma vive en SiteTopBar (desktop) y en el drawer
-    // (mobile). En la fila principal sólo se muestra bajo `lg` cuando la
-    // topbar está oculta, para preservar acceso al cambio de idioma sobre
-    // el Hero (overlay) o en tabletas.
+    // El selector permanece en SiteTopBar y en la fila principal cuando la
+    // topbar no está disponible. No se duplica dentro del menú hamburguesa.
     return (
-      <div key={key} className="lg:hidden">
+      <div key={key} className="xl:hidden">
         <LanguageSwitcher />
       </div>
     );
   }
   if (btn.kind === "user_menu") {
     return (
-      <div key={key} data-header-button-kind={btn.kind} className="hidden sm:block">
+      <div key={key} data-header-button-kind={btn.kind} className="hidden xl:block">
         <UserMenu />
       </div>
     );
@@ -400,7 +428,12 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         ref={menuButtonRef}
         type="button"
         className={cn(
-          "inline-flex h-11 w-11 items-center justify-center rounded-full border transition-all active:scale-[0.98] xl:hidden",
+          // Safari iOS/iPadOS: el header usa backdrop-blur sobre un sticky y
+          // el hit-testing del botón podía caer en la capa del Hero de abajo
+          // (el toque "no hacía nada"). `relative z-10` fija la capa de
+          // pulsación sin cambiar diseño; `touch-manipulation` evita el
+          // retraso de doble-toque/zoom en móvil.
+          "relative z-10 inline-flex h-11 w-11 cursor-pointer touch-manipulation items-center justify-center rounded-full border transition-all active:scale-[0.98]",
           isOverlay
             ? "border-white/30 bg-white/10 text-white"
             : "border-border bg-card text-foreground",
@@ -409,7 +442,8 @@ function renderHeaderButton(btn: HeaderButton, idx: number, ctx: RenderCtx) {
         aria-label={btn.label || "Menú"}
         aria-expanded={open}
         aria-controls="mobile-drawer"
-        onClick={() => setOpen((v) => !v)}
+        aria-disabled={!interactive}
+        onClick={interactive ? () => setOpen((v) => !v) : undefined}
       >
         {open ? <X className="size-5" /> : <Menu className="size-5" />}
       </button>

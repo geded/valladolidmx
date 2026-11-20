@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   CloudUpload,
+  GripVertical,
   ImageIcon,
   Languages,
   Loader2,
@@ -66,6 +67,14 @@ export interface AutoInspectorProps {
    * para que "lo que ves en el canvas" sea lo que editas.
    */
   activeBreakpoint?: TypographyBreakpoint;
+  /**
+   * Filtro opcional de campos. Cuando se pasa, el inspector sólo muestra los
+   * campos aceptados: permite trabajar sección por sección dentro de una
+   * plantilla compuesta sin duplicar el inspector.
+   */
+  fieldFilter?: (field: string) => boolean;
+  /** Oculta el encabezado del bloque cuando el panel ya lo muestra. */
+  hideHeader?: boolean;
 }
 
 export function AutoInspector({
@@ -74,6 +83,8 @@ export function AutoInspector({
   onChange,
   simple = false,
   activeBreakpoint,
+  fieldFilter,
+  hideHeader = false,
 }: AutoInspectorProps) {
   const set = (key: string, value: unknown) => onChange({ ...config, [key]: value });
   const formRef = useRef<HTMLDivElement | null>(null);
@@ -116,33 +127,40 @@ export function AutoInspector({
     onChange({ ...config, __typography: nextMap });
   };
   const typoDefaults = getTypographyDefaults(contract.type) ?? {};
+  const visibleFields = Object.entries(contract.schema).filter(([key]) =>
+    fieldFilter ? fieldFilter(key) : true,
+  );
   return (
     <div ref={formRef} className="space-y-3">
-      <header className="space-y-1">
-        <h3 className="text-sm font-semibold">{contract.display_name}</h3>
-        {simple ? null : (
-          <p className="text-[11px] text-muted-foreground">
-            {contract.type} · v{contract.version}
-          </p>
-        )}
-        {contract.description ? (
-          <p className="text-xs text-muted-foreground">{contract.description}</p>
-        ) : null}
-        {simple ? null : <CapabilityChips contract={contract} />}
-      </header>
-      <DeviceVisibilityRow
-        value={
-          Array.isArray(config.__hidden_on)
-            ? (config.__hidden_on as unknown[]).filter(
-                (v): v is "mobile" | "tablet" | "desktop" =>
-                  v === "mobile" || v === "tablet" || v === "desktop",
-              )
-            : []
-        }
-        onChange={(next) => onChange({ ...config, __hidden_on: next })}
-      />
+      {hideHeader ? null : (
+        <header className="space-y-1">
+          <h3 className="text-sm font-semibold">{contract.display_name}</h3>
+          {simple ? null : (
+            <p className="text-[11px] text-muted-foreground">
+              {contract.type} · v{contract.version}
+            </p>
+          )}
+          {contract.description ? (
+            <p className="text-xs text-muted-foreground">{contract.description}</p>
+          ) : null}
+          {simple ? null : <CapabilityChips contract={contract} />}
+        </header>
+      )}
+      {hideHeader ? null : (
+        <DeviceVisibilityRow
+          value={
+            Array.isArray(config.__hidden_on)
+              ? (config.__hidden_on as unknown[]).filter(
+                  (v): v is "mobile" | "tablet" | "desktop" =>
+                    v === "mobile" || v === "tablet" || v === "desktop",
+                )
+              : []
+          }
+          onChange={(next) => onChange({ ...config, __hidden_on: next })}
+        />
+      )}
       <div className="space-y-3">
-        {Object.entries(contract.schema).map(([key, def]) => (
+        {visibleFields.map(([key, def]) => (
           <FieldRow
             key={key}
             name={key}
@@ -158,7 +176,7 @@ export function AutoInspector({
             activeBreakpoint={activeBreakpoint}
           />
         ))}
-        {Object.keys(contract.schema).length === 0 ? (
+        {visibleFields.length === 0 ? (
           <p className="text-xs text-muted-foreground">Este bloque no tiene campos editables.</p>
         ) : null}
       </div>
@@ -964,8 +982,13 @@ function StructuredListControl({
   simple?: boolean;
 }) {
   const rows = Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const fields = def.item?.fields ?? {};
   const defaultRows = Array.isArray(def.default) ? (def.default as Record<string, unknown>[]) : [];
+  const rowWithDefaults = (row: Record<string, unknown>, index: number) => ({
+    ...(defaultRows[index] ?? {}),
+    ...row,
+  });
   const makeDefault = () =>
     Object.fromEntries(
       Object.entries(fields).map(([key, field]) => [
@@ -986,6 +1009,58 @@ function StructuredListControl({
     next.splice(target, 0, item);
     onChange(next);
   };
+  // Arrastrar y soltar (aditivo): no sustituye Subir/Bajar, que siguen siendo
+  // la vía accesible. Usa Pointer Events para que también funcione con el dedo
+  // en iPad/Safari, donde el arrastre nativo HTML5 no se dispara.
+  const moveTo = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0 || to >= rows.length) return;
+    const next = [...rows];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    onChange(next);
+  };
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const indexAtPoint = (x: number, y: number): number | null => {
+    if (typeof document === "undefined") return null;
+    const el = document.elementFromPoint(x, y);
+    const host = el?.closest<HTMLElement>("[data-omx-row-index]");
+    if (!host) return null;
+    const parsed = Number(host.dataset.omxRowIndex);
+    return Number.isInteger(parsed) ? parsed : null;
+  };
+  const startPointerDrag = (index: number) => (event: React.PointerEvent<HTMLElement>) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const handle = event.currentTarget;
+    handle.setPointerCapture?.(event.pointerId);
+    setDragIndex(index);
+    setOverIndex(index);
+    let target = index;
+    const onMove = (moveEvent: PointerEvent) => {
+      moveEvent.preventDefault();
+      const next = indexAtPoint(moveEvent.clientX, moveEvent.clientY);
+      if (next !== null) {
+        target = next;
+        setOverIndex(next);
+      }
+    };
+    const finish = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onCancel);
+      setDragIndex(null);
+      setOverIndex(null);
+    };
+    const onUp = () => {
+      moveTo(index, target);
+      finish();
+    };
+    const onCancel = () => finish();
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointercancel", onCancel);
+  };
   return (
     <div className="space-y-2">
       {rows.length === 0 && defaultRows.length > 0 ? (
@@ -998,47 +1073,83 @@ function StructuredListControl({
           <Plus className="size-3.5" aria-hidden /> Cargar valores por defecto
         </button>
       ) : null}
-      {rows.map((row, index) => (
-        <div key={index} className="rounded-lg border border-border bg-background p-2">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <p className="text-[11px] font-semibold">
-              {def.item?.label ?? "Elemento"} {index + 1}
-            </p>
-            <div className="flex items-center gap-1">
-              <MiniIconButton
-                label="Subir"
-                disabled={index === 0}
-                onClick={() => move(index, -1)}
-                icon={<ChevronUp className="size-3" />}
-              />
-              <MiniIconButton
-                label="Bajar"
-                disabled={index === rows.length - 1}
-                onClick={() => move(index, 1)}
-                icon={<ChevronDown className="size-3" />}
-              />
-              <MiniIconButton
-                label="Eliminar"
-                onClick={() => onChange(rows.filter((_, i) => i !== index))}
-                icon={<Trash2 className="size-3" />}
-                tone="danger"
-              />
+      {rows.map((row, index) => {
+        const displayRow = rowWithDefaults(row, index);
+        return (
+          <div
+            key={index}
+            data-omx-row-index={index}
+            className={`rounded-lg border bg-background p-2 ${
+              dragIndex !== null && overIndex === index
+                ? "border-primary ring-2 ring-primary/30"
+                : "border-border"
+            }`}
+            onDragOver={(e) => {
+              if (dragIndex === null) return;
+              e.preventDefault();
+            }}
+            onDrop={(e) => {
+              if (dragIndex === null) return;
+              e.preventDefault();
+              moveTo(dragIndex, index);
+              setDragIndex(null);
+            }}
+          >
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold">
+                <span
+                  draggable
+                  onDragStart={() => setDragIndex(index)}
+                  onDragEnd={() => setDragIndex(null)}
+                  onPointerDown={startPointerDrag(index)}
+                  role="button"
+                  tabIndex={-1}
+                  aria-label="Arrastrar para reordenar"
+                  title="Arrastrar para reordenar"
+                  style={{ touchAction: "none" }}
+                  className="inline-flex size-7 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground hover:bg-accent active:cursor-grabbing"
+                >
+                  <GripVertical className="size-3.5" aria-hidden />
+                </span>
+                {def.item?.label ?? "Elemento"} {index + 1}
+              </p>
+
+              <div className="flex items-center gap-1">
+                <MiniIconButton
+                  label="Subir"
+                  disabled={index === 0}
+                  onClick={() => move(index, -1)}
+                  icon={<ChevronUp className="size-3" />}
+                />
+                <MiniIconButton
+                  label="Bajar"
+                  disabled={index === rows.length - 1}
+                  onClick={() => move(index, 1)}
+                  icon={<ChevronDown className="size-3" />}
+                />
+                <MiniIconButton
+                  label="Eliminar"
+                  onClick={() => onChange(rows.filter((_, i) => i !== index))}
+                  icon={<Trash2 className="size-3" />}
+                  tone="danger"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(fields).map(([key, field]) => (
+                <FieldRow
+                  key={key}
+                  name={key}
+                  def={field}
+                  value={displayRow[key]}
+                  onChange={(nextValue) => setRow(index, { ...displayRow, [key]: nextValue })}
+                  simple={simple}
+                />
+              ))}
             </div>
           </div>
-          <div className="space-y-2">
-            {Object.entries(fields).map(([key, field]) => (
-              <FieldRow
-                key={key}
-                name={key}
-                def={field}
-                value={row?.[key]}
-                onChange={(nextValue) => setRow(index, { ...row, [key]: nextValue })}
-                simple={simple}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
+        );
+      })}
       <button
         type="button"
         onClick={() => onChange([...rows, makeDefault()])}

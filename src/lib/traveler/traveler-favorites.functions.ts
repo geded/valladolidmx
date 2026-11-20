@@ -13,9 +13,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type FavoriteEntityKind = "business" | "product" | "promotion";
+export type FavoriteEntityKind =
+  | "business"
+  | "product"
+  | "promotion"
+  | "place"
+  | "event"
+  | "route";
 
-const KINDS = new Set<FavoriteEntityKind>(["business", "product", "promotion"]);
+const KINDS = new Set<FavoriteEntityKind>([
+  "business",
+  "product",
+  "promotion",
+  "place",
+  "event",
+  "route",
+]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface FavoriteRow {
@@ -64,6 +77,9 @@ export const listMyFavorites = createServerFn({ method: "GET" })
       business: [],
       product: [],
       promotion: [],
+      place: [],
+      event: [],
+      route: [],
     };
     for (const r of rows) byKind[r.entity_kind].push(r.entity_id);
 
@@ -111,6 +127,52 @@ export const listMyFavorites = createServerFn({ method: "GET" })
           title: visible ? pr.title : "",
           slug: visible ? pr.slug : null,
           subtitle: visible ? (pr.description ?? null) : null,
+        });
+      }
+    }
+
+    if (byKind.place.length > 0) {
+      const { data } = await context.supabase
+        .from("points_of_interest")
+        .select("id, slug, name, short_description, status")
+        .in("id", byKind.place);
+      for (const pl of data ?? []) {
+        const visible = pl.status === "published";
+        lookup.set(`place:${pl.id}`, {
+          title: visible ? pl.name : "",
+          slug: visible ? pl.slug : null,
+          subtitle: visible ? (pl.short_description ?? null) : null,
+        });
+      }
+    }
+
+    if (byKind.event.length > 0) {
+      const { data } = await context.supabase
+        .from("events")
+        .select("id, slug, title, summary, status, deleted_at")
+        .in("id", byKind.event);
+      for (const ev of data ?? []) {
+        const visible = ev.status === "published" && !ev.deleted_at;
+        lookup.set(`event:${ev.id}`, {
+          title: visible ? ev.title : "",
+          slug: visible ? ev.slug : null,
+          subtitle: visible ? (ev.summary ?? null) : null,
+        });
+      }
+    }
+
+
+    if (byKind.route.length > 0) {
+      const { data } = await context.supabase
+        .from("editorial_routes")
+        .select("id, slug, name, summary, status, deleted_at")
+        .in("id", byKind.route);
+      for (const rt of data ?? []) {
+        const visible = rt.status === "published" && !rt.deleted_at;
+        lookup.set(`route:${rt.id}`, {
+          title: visible ? rt.name : "",
+          slug: visible ? rt.slug : null,
+          subtitle: visible ? (rt.summary ?? null) : null,
         });
       }
     }

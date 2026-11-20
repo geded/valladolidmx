@@ -23,31 +23,41 @@
  * empresa en el loader — patrón consistente con Region/Destination).
  */
 /* eslint-disable react-refresh/only-export-components -- I3-B keeps the legacy contexts and pure category resolver in the authorized surface module. */
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { PublicShell } from "@/components/discovery";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 import type { BusinessRelatedDTO } from "@/lib/catalog/business-related.functions";
 import { planAllows } from "@/lib/plans/plans-catalog";
-import { ExperienceHero } from "@/components/experience-builder/blocks/experience-hero/ExperienceHero";
 import { ExperienceSubnav } from "@/components/experience-builder/blocks/experience-subnav/ExperienceSubnav";
 import { ExperienceSection } from "@/components/experience-builder/blocks/experience-section/ExperienceSection";
 import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/experience-info-grid/ExperienceInfoGrid";
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
+import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { ExperienceGallery } from "@/components/experience-builder/blocks/experience-gallery/ExperienceGallery";
 import {
-  businessToHeroDTO,
   businessToSubnavDTO,
   businessToDescriptionSectionDTO,
-  businessToInfoGridDTO,
   businessToCtaBarDTO,
+  businessToStayEssentialsDTO,
+  businessToStayAmenitiesDTO,
+  businessToStayPolicyDTO,
+  businessToDiningEssentialsDTO,
+  businessToDiningAmenitiesDTO,
+  businessToDiningVisitDTO,
 } from "@/lib/experience-builder/adapters/business-to-blocks";
 import { BusinessLocationBlock } from "@/components/maps/BusinessLocationBlock";
-import { Share2 } from "lucide-react";
+import { Share2, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ShareSheet } from "@/components/share/ShareSheet";
+import {
+  BusinessImpressionTracker,
+  TrackClick,
+} from "@/components/visibility/BusinessEventTrackers";
 import { AluxContextChip } from "@/components/alux/AluxContextChip";
 import { TourismAluxPanel } from "@/components/alux/TourismAluxPanel";
 import {
@@ -66,6 +76,8 @@ import {
   type BusinessPremiumEligibilityResult,
 } from "@/lib/omxds/surfaces/business-premium-surface.contract";
 import { PremiumHero } from "@/components/premium";
+import { BusinessLogo } from "@/components/common/BusinessLogo";
+import { cn } from "@/lib/utils";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { DEFAULT_PREMIUM_PRESENTATION } from "@/lib/omxds/presentation/presentation";
 
@@ -124,7 +136,7 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
   },
   restaurante: {
     eyebrow: "Gastronomía",
-    productsHeading: "Menú y reservaciones",
+    productsHeading: "Menú de la casa",
     productsEmpty: "Sin menú publicado.",
   },
   cafeteria: {
@@ -182,11 +194,67 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
     productsHeading: "Estancias y servicios",
     productsEmpty: "Sin opciones de estancia publicadas.",
   },
+  /* Slugs reales declarados en el CMS (`business_categories.slug`). */
+  restaurantes: {
+    eyebrow: "Gastronomía",
+    productsHeading: "Menú de la casa",
+    productsEmpty: "Sin menú publicado.",
+  },
+  gastronomia: {
+    eyebrow: "Gastronomía",
+    productsHeading: "Menú de la casa",
+    productsEmpty: "Sin menú publicado.",
+  },
+  hoteles: {
+    eyebrow: "Hospedaje",
+    productsHeading: "Habitaciones y experiencias",
+    productsEmpty: "Sin habitaciones publicadas.",
+  },
+  cenotes: {
+    eyebrow: "Naturaleza",
+    productsHeading: "Accesos y experiencias",
+    productsEmpty: "Sin accesos publicados.",
+  },
+  tours: {
+    eyebrow: "Experiencia",
+    productsHeading: "Tours disponibles",
+    productsEmpty: "Sin tours publicados.",
+  },
+  experiencias: {
+    eyebrow: "Experiencia",
+    productsHeading: "Experiencias disponibles",
+    productsEmpty: "Sin experiencias publicadas.",
+  },
+  "experiencias-tours": {
+    eyebrow: "Experiencia",
+    productsHeading: "Experiencias y tours",
+    productsEmpty: "Sin experiencias publicadas.",
+  },
+  "servicios-turisticos": {
+    eyebrow: "Servicio",
+    productsHeading: "Servicios",
+    productsEmpty: "Sin servicios publicados.",
+  },
+  artesanias: {
+    eyebrow: "Tienda",
+    productsHeading: "Catálogo",
+    productsEmpty: "Sin productos publicados.",
+  },
+  naturaleza: {
+    eyebrow: "Naturaleza",
+    productsHeading: "Accesos y experiencias",
+    productsEmpty: "Sin accesos publicados.",
+  },
+  cultura: {
+    eyebrow: "Cultura",
+    productsHeading: "Entradas y visitas guiadas",
+    productsEmpty: "Sin entradas publicadas.",
+  },
 };
 
 export function resolveBusinessVariant(categorySlug: string): CategoryVariant {
   return (
-    CATEGORY_VARIANTS[categorySlug] ?? {
+    CATEGORY_VARIANTS[categorySlug.trim().toLowerCase()] ?? {
       eyebrow: "Catálogo Oriente Maya",
       productsHeading: "Productos y experiencias",
       productsEmpty: "Sin productos publicados.",
@@ -240,6 +308,12 @@ export function resolveApprovedBusinessFamily(
  * Surface
  * ------------------------------------------------------------------ */
 
+import {
+  BUSINESS_PREMIUM_COPY_DEFAULTS,
+  fillBusinessCopy,
+  type BusinessPremiumCopy,
+} from "./business-premium-copy";
+
 export interface BusinessSurfaceProps {
   /** Cuando falta, se lee del `BusinessSurfaceContext`. */
   business?: MarketplaceBusinessDetail | null;
@@ -247,6 +321,8 @@ export interface BusinessSurfaceProps {
   surfaceContract?: OmxdsSurfaceContract;
   /** I3-D · presentación Premium sólo después de elegibilidad SSR completa. */
   premiumEligibility?: BusinessPremiumEligibilityResult | null;
+  /** Textos de sección editables desde el constructor. Fail-closed. */
+  copy?: BusinessPremiumCopy;
 }
 
 function businessRelatedCount(related?: BusinessRelatedDTO | null): number {
@@ -268,6 +344,9 @@ function businessToSurfaceContractInput(
     longitude: business.primary_location?.longitude ?? null,
     verified: business.verified,
     relatedCount: businessRelatedCount(related),
+    publishedProductCount: business.products.length,
+    publishedPromotionCount: business.promotions.length,
+    publishedReviewCount: business.reviews?.count ?? 0,
   };
 }
 
@@ -334,6 +413,7 @@ export function BusinessSurface({
   business: propBusiness,
   surfaceContract,
   premiumEligibility,
+  copy = BUSINESS_PREMIUM_COPY_DEFAULTS,
 }: BusinessSurfaceProps = {}) {
   const ctxBusiness = useContext(BusinessSurfaceContext);
   const sourceBusiness = propBusiness ?? ctxBusiness;
@@ -375,7 +455,10 @@ export function BusinessSurface({
     sourceBusiness.category_slug,
     activeContract?.family,
   );
-  const usesApprovedFamilyTemplate = approvedFamily !== null;
+  /* Una sola gramática Premium para toda ficha empresarial. La familia
+     conserva su semántica y bloques especializados, pero una categoría nueva
+     o sin `listing_family_key` nunca degrada a la presentación genérica. */
+  const usesApprovedFamilyTemplate = true;
 
   const b: MarketplaceBusinessDetail = activePremium
     ? {
@@ -396,7 +479,9 @@ export function BusinessSurface({
   const variant = resolveBusinessVariant(b.category_slug);
   const tier = b.plan_tier;
   const showPromotions =
-    !activeContract && planAllows(tier, "promotions") && b.promotions.length > 0;
+    planAllows(tier, "promotions") &&
+    b.promotions.length > 0 &&
+    !activeContract?.omissions.includes("offer");
 
   // H-03 · Ola I2.d — Refactor final: BusinessSurface es orquestador
   // puro. Cero JSX visual propio. Toda la presentación proviene
@@ -404,29 +489,73 @@ export function BusinessSurface({
   // Responsabilidades restantes: proveer contexto (BusinessSurfaceProvider),
   // adaptar datos (adapters), y componer la secuencia declarativa de
   // bloques + anchors que la sub-navegación necesita.
-  const heroDto = businessToHeroDTO(b);
   const subnavDto = businessToSubnavDTO(b);
-  const effectiveSubnavDto = activeContract
-    ? {
-        ...subnavDto,
-        anchors: subnavDto.anchors.filter((anchor) => {
-          if (
-            activeContract.omissions.includes("offer") &&
-            ["servicios", "promociones"].includes(anchor.id)
-          )
-            return false;
-          if (activeContract.omissions.includes("media") && anchor.id === "galeria") return false;
-          if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
-          if (activeContract.omissions.includes("reputation") && anchor.id === "opiniones")
-            return false;
-          if (activeContract.omissions.includes("collection") && anchor.id === "descubre")
-            return false;
-          return true;
-        }),
-      }
-    : subnavDto;
+  /* Contacto acreditado: dato Premium cuando existe y, si no, el contacto
+     público ya publicado en el CMS. Autoridad única para la sección
+     `#contacto`, su ancla en la sub-navegación y la acción "Contactar". */
+  const contactSource = activePremium?.contact ?? b.primary_contact ?? null;
+  /* Enlaces territoriales sólo cuando el slug real existe: nunca se emite
+     una URL con segmento vacío desde una ficha. */
+  const destinationHref = b.destination_slug
+    ? `/oriente-maya/${encodeURIComponent(b.destination_slug)}`
+    : null;
+  const categoryHref =
+    destinationHref && b.category_slug
+      ? `${destinationHref}/${encodeURIComponent(b.category_slug)}`
+      : null;
+  const hasLocation = b.primary_location?.latitude != null && b.primary_location?.longitude != null;
+  const hasGalleryMedia = Boolean(activePremium) || (b.media ?? []).length >= 2;
+  const isVacationRental = approvedFamily === "vacation_rental";
+  /* Hospedaje (hotel y casa de vacaciones) comparten la misma composición
+     editorial de alojamiento sobre la plantilla madre: fotografía primero,
+     tarifa orientativa "desde", datos de estancia y Mi Viaje como acción.
+     Ninguna de las dos familias ofrece reserva ni cobro en línea. */
+  const isLodging = isVacationRental || approvedFamily === "hotel";
+  /* Restaurante: misma composición editorial (fotografía primero, precio
+     orientativo del menú, datos escaneables y Mi Viaje como acción). Tampoco
+     hay reserva ni cobro en línea. */
+  const isDining = approvedFamily === "restaurant";
+  /* Familias con composición editorial de ficha completa. */
+  const isImmersive = isLodging || isDining;
+  const priceUnitLabel = isLodging ? "por noche" : "por platillo";
+  const priceOwnerLabel = isVacationRental
+    ? "el anfitrión"
+    : isDining
+      ? "el restaurante"
+      : "el hotel";
+  /* Casa de vacaciones con una sola tarifa publicada: la tarifa vive en el
+     bloque de estancia y no se repite como tarjeta genérica de producto. */
+  const hidesGenericOffer =
+    isVacationRental &&
+    (b.products ?? []).length <= 1 &&
+    (b.products ?? []).some((p) => typeof p.price_amount === "number" && p.price_amount > 0);
+  const hasRelated = Boolean(
+    related && (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0),
+  );
+  const effectiveSubnavDto = {
+    ...subnavDto,
+    anchors: subnavDto.anchors.filter((anchor) => {
+      // Ningún ancla visible puede apuntar a una sección que no se renderiza.
+      if (anchor.id === "contacto" && !contactSource) return false;
+      if (anchor.id === "galeria" && !hasGalleryMedia) return false;
+      if (anchor.id === "ubicacion" && !hasLocation) return false;
+      if (anchor.id === "descubre" && !hasRelated) return false;
+      if (anchor.id === "promociones" && !showPromotions) return false;
+      if (anchor.id === "servicios" && hidesGenericOffer) return false;
+      if (!activeContract) return true;
+      if (
+        activeContract.omissions.includes("offer") &&
+        ["servicios", "promociones"].includes(anchor.id)
+      )
+        return false;
+      if (activeContract.omissions.includes("media") && anchor.id === "galeria") return false;
+      if (activeContract.omissions.includes("map") && anchor.id === "ubicacion") return false;
+      if (activeContract.omissions.includes("reputation") && anchor.id === "resenas") return false;
+      if (activeContract.omissions.includes("collection") && anchor.id === "descubre") return false;
+      return true;
+    }),
+  };
   const descriptionSection = businessToDescriptionSectionDTO(b);
-  const infoGridDto = businessToInfoGridDTO(b);
   const legacyCtaBarDto = businessToCtaBarDTO(b);
   const dominantAction = activeContract?.actions.find((action) => action.role === "dominant");
   const ctaBarDto = activeContract
@@ -447,11 +576,15 @@ export function BusinessSurface({
             ]
           : [],
       }
-    : legacyCtaBarDto;
+    : {
+        ...legacyCtaBarDto,
+        // Sin contacto acreditado no se muestra una acción sin destino.
+        actions: contactSource ? legacyCtaBarDto.actions : [],
+      };
   const premiumGalleryDto = activePremium
     ? {
         variant: "mosaic" as const,
-        heading: `Conoce ${b.display_name}`,
+        heading: fillBusinessCopy(copy.galleryHeading, b.display_name),
         subheading: null,
         items: [activePremium.cover, ...activePremium.gallery]
           .filter((item): item is NonNullable<typeof item> => item !== null)
@@ -477,22 +610,129 @@ export function BusinessSurface({
         },
       }
     : null;
-  const premiumContactDto = activePremium?.contact
+  /* Sin composición Premium activa, la ficha conserva su galería editorial a
+     partir de las fotografías publicadas en CMS (`business_media`). Sin
+     fotografías no se renderiza nada: jamás se inventan medios. */
+  /* El logotipo es identidad de marca, no fotografía de la ficha: se muestra
+     junto al nombre y queda fuera del mosaico editorial. */
+  const businessLogo = (b.media ?? []).find((m) => m.role === "logo" && m.url);
+  const businessLogoUrl = businessLogo?.url ?? null;
+  const cmsGalleryItems = (b.media ?? [])
+    .filter((m) => Boolean(m.url) && m.role !== "logo")
+    .map((m) => ({
+      kind: "image" as const,
+      url: m.url,
+      alt: m.alt || b.display_name,
+      ...(m.asset ? { asset: m.asset } : {}),
+    }));
+  const galleryDto =
+    premiumGalleryDto ??
+    (cmsGalleryItems.length >= 2
+      ? {
+          variant: "mosaic" as const,
+          heading: fillBusinessCopy(copy.galleryHeading, b.display_name),
+          subheading: null,
+          items: cmsGalleryItems,
+          maxVisible: 5,
+          aspect: "landscape" as const,
+          ariaLabel: `Galería de ${b.display_name}`,
+          capabilities: {
+            lightbox: true,
+            captions: false,
+            video: false,
+            panorama360: false,
+            model3d: false,
+            ar: false,
+            ugc: false,
+          },
+        }
+      : null);
+  const premiumContactDto = contactSource
     ? {
         variant: "cards" as const,
-        heading: "Contacto",
+        heading: copy.contactHeading,
         columns: 1,
         items: [
           {
             iconKey: "message-circle",
-            label: activePremium.contact.label || "Contacto público",
-            value: activePremium.contact.value,
+            label: contactSource.label || "Contacto público",
+            value: contactSource.value,
             tone: "default" as const,
           },
         ],
         ariaLabel: `Contacto de ${b.display_name}`,
         capabilities: { copyable: true, livePricing: false, liveAvailability: false },
       }
+    : null;
+  const descriptionBeforeGallery = false;
+  /* Hospedaje y restaurante: composición editorial propia de la familia
+     sobre los mismos bloques oficiales. Sin ejes administrables capturados,
+     cada sección simplemente no se renderiza. */
+  const stayEssentialsDto = isLodging
+    ? businessToStayEssentialsDTO(b)
+    : isDining
+      ? businessToDiningEssentialsDTO(b)
+      : null;
+  const stayAmenitiesDto = isLodging
+    ? businessToStayAmenitiesDTO(b)
+    : isDining
+      ? businessToDiningAmenitiesDTO(b)
+      : null;
+  const stayPolicyDto = isLodging
+    ? businessToStayPolicyDTO(b)
+    : isDining
+      ? businessToDiningVisitDTO(b)
+      : null;
+  /* Precio orientativo "desde": se toma exclusivamente del catálogo publicado
+     en CMS (`products.price_amount`). Sin precio real no se renderiza nada y
+     nunca se ofrece cobro ni reservación en línea: la acción es Mi Viaje. */
+  const stayFromPrice = (() => {
+    if (!isImmersive) return null;
+    const priced = (b.products ?? []).filter(
+      (p) => typeof p.price_amount === "number" && (p.price_amount as number) > 0,
+    );
+    if (priced.length === 0) return null;
+    const cheapest = priced.reduce((min, p) =>
+      (p.price_amount as number) < (min.price_amount as number) ? p : min,
+    );
+    return {
+      amount: cheapest.price_amount as number,
+      currency: cheapest.price_currency || "MXN",
+    };
+  })();
+  /* Resumen escaneable de la estancia: sólo ejes administrables con valor
+     real en CMS; sin dato capturado la línea simplemente no se muestra. */
+  const stayHighlightLine = (() => {
+    if (!isImmersive) return null;
+    const resolved = b.attributes ?? [];
+    const parts = (
+      isVacationRental
+        ? ["capacity", "bedrooms", "beds", "bathrooms"]
+        : isDining
+          ? ["cuisine_type", "dining_experience", "price_level"]
+          : ["hotel_type", "zone", "price_level"]
+    )
+      .map((key) => resolved.find((item) => item.key === key))
+      .filter((attribute): attribute is NonNullable<typeof attribute> =>
+        Boolean(attribute && attribute.values.length > 0),
+      )
+      .map((attribute) => {
+        const value = attribute.values.map((item) => item.label).join(" · ");
+        const label = attribute.label.toLowerCase();
+        /* El valor administrable suele venir ya redactado ("3 dormitorios",
+           "5–6 huéspedes"). Sólo se añade la etiqueta del catálogo cuando el
+           valor es puramente numérico y quedaría sin contexto. */
+        const numericOnly = /^[\d\s.,/–-]+$/.test(value);
+        return numericOnly ? `${value} ${label}` : value;
+      });
+    return parts.length > 0 ? parts.join(" · ") : null;
+  })();
+  const stayFromPriceLabel = stayFromPrice
+    ? new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: stayFromPrice.currency,
+        maximumFractionDigits: 0,
+      }).format(stayFromPrice.amount)
     : null;
 
   return (
@@ -501,33 +741,52 @@ export function BusinessSurface({
       useContextCrumbs
       compactCrumbsOnMobile
     >
-      {usesApprovedFamilyTemplate ? (
-        <>
-          <PremiumHero
-            vm={{
-              presentation: DEFAULT_PREMIUM_PRESENTATION,
-              // D-03 · La ruta territorial navegable la emite PublicShell.
-              // El Hero no repite el breadcrumb decorativo.
-              eyebrow: variant.eyebrow,
-              title: b.display_name,
-              description: b.tagline || undefined,
-              media: activePremium?.cover
-                ? {
-                    url: activePremium.cover.url,
-                    alt: activePremium.cover.alt,
-                  }
-                : b.cover_url
-                  ? {
-                      url: b.cover_url,
-                      alt: b.display_name,
-                    }
-                  : null,
-              badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
-            }}
-          />
-          <div className="mx-auto mt-4 flex w-full max-w-7xl justify-end gap-2 px-5 sm:px-8 lg:px-12">
+      <PremiumHero
+        layout="entity"
+        vm={{
+          presentation: DEFAULT_PREMIUM_PRESENTATION,
+          // D-03 · La ruta territorial navegable la emite PublicShell.
+          // El Hero no repite el breadcrumb decorativo.
+          eyebrow: variant.eyebrow,
+          identity: businessLogoUrl ? (
+            <BusinessLogo url={businessLogoUrl} asset={businessLogo?.asset} businessName={b.display_name} size="lg" />
+          ) : undefined,
+          title: b.display_name,
+          description: b.tagline || undefined,
+          media: activePremium?.cover
+            ? {
+                url: activePremium.cover.url,
+                alt: activePremium.cover.alt,
+              }
+            : b.cover_url
+              ? {
+                  url: b.cover_url,
+                  alt: b.display_name,
+                  asset: (b.media ?? []).find((m) => m.role === "cover" && m.url === b.cover_url)?.asset,
+                }
+              : null,
+          badges: b.verified ? [{ label: "Empresa verificada", tone: "success" }] : [],
+        }}
+      />
+      <BusinessImpressionTracker
+        businessId={b.id}
+        surface="perfil-empresa"
+        entityKind="business"
+        entityId={b.id}
+      />
+      <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center justify-end gap-2 px-5 sm:px-8 lg:px-12">
+        <span className="flex flex-wrap items-center justify-end gap-2">
+          <TrackClick businessId={b.id} surface="perfil-empresa" eventType="share">
             <ShareButton title={b.display_name} />
-            <FavoriteButton entityKind="business" entityId={b.id} />
+          </TrackClick>
+          <FavoriteButton entityKind="business" entityId={b.id} />
+          <TrackClick
+            businessId={b.id}
+            surface="perfil-empresa"
+            eventType="add_to_trip"
+            entityKind="business"
+            entityId={b.id}
+          >
             <AddToTravelPlanButton
               kind="business"
               targetId={b.id}
@@ -535,35 +794,14 @@ export function BusinessSurface({
               slug={b.slug}
               {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
             />
-          </div>
-        </>
-      ) : (
-        <ExperienceHero
-          dto={heroDto}
-          headingLevel="h1"
-          headerActionsSlot={null}
-          extensionsSlot={null}
-        />
-      )}
-
-      {usesApprovedFamilyTemplate ? null : (
-        <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap justify-end gap-2 px-5 sm:px-8 lg:px-12">
-          <ShareButton title={b.display_name} />
-          <FavoriteButton entityKind="business" entityId={b.id} />
-          <AddToTravelPlanButton
-            kind="business"
-            targetId={b.id}
-            title={b.display_name}
-            slug={b.slug}
-            {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
-          />
-        </div>
-      )}
+          </TrackClick>
+        </span>
+      </div>
 
       <TourismAluxPanel
         className="mx-auto mt-4 w-full max-w-7xl"
-        title={`Planear con ${b.display_name}`}
-        description="Alux te ayuda a integrar esta opción en tu viaje por el Oriente Maya."
+        title={fillBusinessCopy(copy.aluxTitle, b.display_name)}
+        description={copy.aluxDescription}
         task={`Ayúdame a integrar ${b.display_name} en mi viaje por el Oriente Maya.`}
         selection={{
           entityRef: `business:${b.id}`,
@@ -582,29 +820,157 @@ export function BusinessSurface({
         longitude={b.primary_location?.longitude ?? b.longitude ?? null}
       />
 
+      {/* La galería acreditada conserva una posición única en toda ficha
+          empresarial Premium, inmediatamente después de identidad y Alux. */}
+      {galleryDto ? (
+        <section id="galeria" data-eb-anchor className="mt-6 scroll-mt-24">
+          <ExperienceGallery dto={galleryDto} />
+        </section>
+      ) : null}
+
+      {isImmersive && stayFromPriceLabel ? (
+        <section
+          data-eb-anchor
+          className="mx-auto mt-6 w-full max-w-7xl px-5 sm:px-8 lg:px-12"
+          aria-label="Tarifa orientativa"
+        >
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-elevated">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+              <div className="min-w-0">
+                <p className="text-3xl font-semibold tracking-tight text-foreground">
+                  <span className="text-base font-normal text-muted-foreground">Desde </span>
+                  {stayFromPriceLabel}{" "}
+                  <span className="text-base font-normal text-muted-foreground">
+                    {priceUnitLabel}
+                  </span>
+                </p>
+                {stayHighlightLine ? (
+                  <p className="mt-2 text-sm text-muted-foreground">{stayHighlightLine}</p>
+                ) : null}
+                {b.reviews && b.reviews.count > 0 ? (
+                  <p className="mt-2 flex items-center gap-1.5 text-sm text-foreground">
+                    <Star className="h-4 w-4 shrink-0 fill-current text-primary" aria-hidden />
+                    <span className="font-medium">{b.reviews.average.toFixed(1)}</span>
+                    <span className="text-muted-foreground">
+                      · {b.reviews.count} {b.reviews.count === 1 ? "reseña" : "reseñas"}
+                    </span>
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto lg:flex-col lg:min-w-[15rem]">
+                <AddToTravelPlanButton
+                  kind="business"
+                  targetId={b.id}
+                  title={b.display_name}
+                  slug={b.slug}
+                  {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+                />
+                <div className="flex gap-2">
+                  <FavoriteButton entityKind="business" entityId={b.id} />
+                  <ShareButton title={b.display_name} />
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
+              Tarifa orientativa publicada por {priceOwnerLabel}. Sin cobro ni reservación en línea.
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Móvil: barra inferior persistente con la tarifa orientativa y la
+          acción principal de la ficha. No hay reserva ni cobro en línea. */}
+      {isImmersive && stayFromPriceLabel ? (
+        <>
+          <MobileStickyCtaRegistrar />
+          <div aria-hidden className="h-24 lg:hidden" />
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-5 py-3 shadow-floating backdrop-blur lg:hidden">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-base font-semibold text-foreground">
+                  <span className="font-normal text-muted-foreground">Desde </span>
+                  {stayFromPriceLabel}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {priceUnitLabel} · sin cobro en línea
+                </p>
+              </div>
+              <div className="shrink-0">
+                <AddToTravelPlanButton
+                  kind="business"
+                  targetId={b.id}
+                  title={b.display_name}
+                  slug={b.slug}
+                  {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      ) : null}
+
       <ExperienceSubnav dto={effectiveSubnavDto} className="mt-6 mb-6" />
 
-      {descriptionSection || infoGridDto ? (
+      {isImmersive ? (
+        stayEssentialsDto || descriptionSection ? (
+          <section id="resumen" data-eb-anchor className="scroll-mt-24">
+            {stayEssentialsDto ? <ExperienceInfoGrid dto={stayEssentialsDto} /> : null}
+            {descriptionSection ? (
+              <ExperienceSection dto={descriptionSection} className="mt-6 sm:mt-8" />
+            ) : null}
+          </section>
+        ) : null
+      ) : descriptionBeforeGallery && descriptionSection ? (
         <section id="resumen" data-eb-anchor className="scroll-mt-24">
-          {descriptionSection ? <ExperienceSection dto={descriptionSection} /> : null}
-          {infoGridDto ? <ExperienceInfoGrid dto={infoGridDto} className="mt-6" /> : null}
+          <ExperienceSection dto={descriptionSection} />
         </section>
       ) : null}
 
-      {premiumGalleryDto ? (
-        <section id="galeria" data-eb-anchor className="mt-10 scroll-mt-24">
-          <ExperienceGallery dto={premiumGalleryDto} />
+      {!isImmersive && !descriptionBeforeGallery && descriptionSection ? (
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
+          <ExperienceSection dto={descriptionSection} />
         </section>
       ) : null}
 
-      {!activeContract?.omissions.includes("offer") ? (
-        <section id="servicios" data-eb-anchor className="mt-10 scroll-mt-24">
+      {stayAmenitiesDto ? (
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
+          <ExperienceInfoGrid dto={stayAmenitiesDto} />
+        </section>
+      ) : null}
+
+      {stayPolicyDto ? (
+        <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
+          <ExperienceInfoGrid dto={stayPolicyDto} />
+        </section>
+      ) : null}
+
+      {/* Casa de vacaciones: si la única tarifa publicada ya se presenta en el
+          bloque de estancia, no se repite la tarjeta genérica de producto.
+          Con dos o más servicios publicados el catálogo se mantiene. */}
+      {!activeContract?.omissions.includes("offer") && !hidesGenericOffer ? (
+        <section id="servicios" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceProductsBlock
             config={{
               source: "business",
-              variant: "grid",
+              /* Una sola fila horizontal y compacta permite explorar la oferta
+                 sin convertir el perfil en un catálogo de tarjetas gigantes. */
+              variant: "carousel",
               heading: variant.productsHeading,
               emptyMessage: variant.productsEmpty,
+              columns: 3,
+              capabilities: { compact: true },
+            }}
+          />
+        </section>
+      ) : null}
+
+      {showPromotions ? (
+        <section id="promociones" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
+          <ExperiencePromotionsBlock
+            config={{
+              source: "business",
+              variant: "grid",
+              heading: copy.promotionsHeading,
               columns: 2,
             }}
           />
@@ -614,7 +980,7 @@ export function BusinessSurface({
       {!activeContract?.omissions.includes("map") &&
       b.primary_location?.latitude != null &&
       b.primary_location?.longitude != null ? (
-        <section id="ubicacion" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="ubicacion" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <BusinessLocationBlock
             lat={b.primary_location.latitude}
             lng={b.primary_location.longitude}
@@ -622,32 +988,19 @@ export function BusinessSurface({
             addressLine1={b.primary_location.address_line1}
             addressLine2={b.primary_location.address_line2}
             presentation={usesApprovedFamilyTemplate ? "premium" : "standard"}
-          />
-        </section>
-      ) : null}
-
-      {showPromotions ? (
-        <section id="promociones" data-eb-anchor className="mt-10 scroll-mt-24">
-          <ExperiencePromotionsBlock
-            config={{
-              source: "business",
-              variant: "grid",
-              heading: "Promociones vigentes",
-              columns: 2,
-            }}
+            layout={usesApprovedFamilyTemplate ? "stacked" : "split"}
           />
         </section>
       ) : null}
 
       {!activeContract?.omissions.includes("reputation") ? (
-        <section id="opiniones" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="resenas" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceReviewsBlock
             config={{
               source: "business",
               variant: "list",
-              heading: "Opiniones de viajeros",
-              emptyMessage:
-                "Aún no hay reseñas publicadas de esta empresa. Sé la primera persona en compartir tu experiencia.",
+              heading: copy.reviewsHeading,
+              emptyMessage: copy.reviewsEmpty,
             }}
           />
         </section>
@@ -656,7 +1009,7 @@ export function BusinessSurface({
       {related &&
       !activeContract?.omissions.includes("collection") &&
       (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0) ? (
-        <section id="descubre" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="descubre" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceRelatedCollectionBlock
             config={{
               source: "business",
@@ -665,10 +1018,10 @@ export function BusinessSurface({
               columns: usesApprovedFamilyTemplate ? 4 : 2,
               density: usesApprovedFamilyTemplate ? "compact" : "comfortable",
               heading: usesApprovedFamilyTemplate
-                ? `Explora cerca de ${b.display_name}`
+                ? fillBusinessCopy(copy.relatedHeading, b.display_name)
                 : "Sigue descubriendo",
               subheading: usesApprovedFamilyTemplate
-                ? `Opciones del mismo destino para continuar tu viaje por ${b.destination_slug || "el Oriente Maya"}.`
+                ? copy.relatedSubheading
                 : `Otras opciones en ${b.destination_slug || "el destino"} para continuar armando tu viaje.`,
               emptyMessage: "Aún no hay empresas hermanas publicadas en este destino.",
               ariaLabel: `Descubrimiento contextual desde ${b.display_name}`,
@@ -679,8 +1032,11 @@ export function BusinessSurface({
                       entityKind: "business",
                       maxItems: 4,
                       variant: "carousel",
-                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
-                      seeAllLabel: "Ver destino",
+                      // Sólo enlazamos cuando el destino real existe: nunca
+                      // se emite una URL con segmento vacío.
+                      ...(destinationHref
+                        ? { seeAllHref: destinationHref, seeAllLabel: "Ver destino" }
+                        : {}),
                     },
                   ]
                 : [
@@ -691,8 +1047,9 @@ export function BusinessSurface({
                       maxItems: 6,
                       variant: "grid",
                       categorySlug: b.category_slug || null,
-                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}/${encodeURIComponent(b.category_slug || "")}`,
-                      seeAllLabel: "Ver todas",
+                      ...(categoryHref
+                        ? { seeAllHref: categoryHref, seeAllLabel: "Ver todas" }
+                        : {}),
                     },
                     {
                       id: "otras-categorias",
@@ -700,8 +1057,9 @@ export function BusinessSurface({
                       heading: "Otras experiencias del destino",
                       maxItems: 6,
                       variant: "grid",
-                      seeAllHref: `/oriente-maya/${encodeURIComponent(b.destination_slug || "")}`,
-                      seeAllLabel: "Ver destino",
+                      ...(destinationHref
+                        ? { seeAllHref: destinationHref, seeAllLabel: "Ver destino" }
+                        : {}),
                     },
                   ],
               capabilities: {
@@ -724,12 +1082,38 @@ export function BusinessSurface({
       ) : null}
 
       {premiumContactDto ? (
-        <section id="contacto" data-eb-anchor className="mt-10 scroll-mt-24">
+        <section id="contacto" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceInfoGrid dto={premiumContactDto} />
         </section>
       ) : null}
 
-      <ExperienceCtaBar dto={ctaBarDto} />
+      {/* Casas de vacaciones no ofrecen reserva ni cobro en línea: la acción
+          final invita a sumar el hospedaje a Mi Viaje para que el concierge
+          arme el itinerario completo. */}
+      {isImmersive ? (
+        <section className="mx-auto mt-8 w-full max-w-7xl px-5 pb-4 sm:mt-10 sm:px-8 lg:px-12">
+          <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-lg font-semibold text-foreground">
+                {fillBusinessCopy(copy.ctaTitle, b.display_name)}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{copy.ctaSubtitle}</p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <AddToTravelPlanButton
+                kind="business"
+                targetId={b.id}
+                title={b.display_name}
+                slug={b.slug}
+                {...(b.destination_slug ? { subtitle: b.destination_slug } : {})}
+              />
+              <ShareButton title={b.display_name} />
+            </div>
+          </div>
+        </section>
+      ) : (
+        <ExperienceCtaBar dto={ctaBarDto} />
+      )}
     </PublicShell>
   );
 }
@@ -739,30 +1123,41 @@ export function BusinessSurface({
  * clipboard). Se usa en el overlay del Hero "gallery".
  */
 function ShareButton({ title }: { title: string }) {
-  async function handleShare() {
-    if (typeof navigator === "undefined") return;
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    try {
-      const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
-      if (nav.share) {
-        await nav.share({ title, url });
-        return;
-      }
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-      }
-    } catch {
-      /* usuario canceló */
-    }
-  }
+  const [open, setOpen] = useState(false);
   return (
-    <button
-      type="button"
-      onClick={handleShare}
-      aria-label="Compartir"
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur-sm transition hover:bg-background focus-visible:outline-none focus-visible:ring-focus"
-    >
-      <Share2 className="h-5 w-5" aria-hidden="true" />
-    </button>
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => setOpen(true)}
+        aria-label="Compartir perfil"
+        className="rounded-pill border border-border bg-background shadow-soft"
+      >
+        <Share2 className="h-5 w-5" aria-hidden="true" />
+      </Button>
+      <ShareSheet
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        url={typeof window !== "undefined" ? window.location.href : ""}
+        text="Descubre este perfil en el Oriente Maya."
+        heading="Compartir perfil"
+      />
+    </>
   );
+}
+
+/**
+ * MobileStickyCtaRegistrar — registra la barra inferior móvil de la ficha
+ * (tarifa + Agregar a Mi Viaje) en el canal de presencia de CTAs stickies,
+ * para que el dock flotante de Mi Viaje y Alux se eleven sobre ella sin
+ * solaparse. Patrón idéntico al de `ExperienceCtaBar`.
+ */
+function MobileStickyCtaRegistrar() {
+  useEffect(() => {
+    const release = registerStickyCta();
+    return release;
+  }, []);
+  return null;
 }

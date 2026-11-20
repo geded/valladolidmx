@@ -27,6 +27,7 @@ import {
   anonymousImportNoteId,
   prepareAnonymousDraftImport,
 } from "./anonymous-draft/import-contract";
+import { tripBriefSchema, type TripBrief } from "./trip-brief";
 
 // -------------------------------------------------------------------------
 // Contrato público (estable)
@@ -73,6 +74,9 @@ export interface TravelPlanItemSnapshot {
   subtitle?: string | null;
 }
 
+/** Origen del horario de una actividad (CV6.7 · Itinerario con horas). */
+export type ItemScheduleSource = "concierge" | "alux" | "traveler";
+
 export interface TravelPlanItem {
   id: string;
   plan_id: string;
@@ -82,6 +86,10 @@ export interface TravelPlanItem {
   day_index: number | null;
   notes: string | null;
   snapshot: TravelPlanItemSnapshot;
+  /** Hora local del destino (America/Merida) en formato HH:MM. */
+  starts_at_local: string | null;
+  duration_minutes: number | null;
+  schedule_source: ItemScheduleSource | null;
   created_at: string;
   updated_at: string;
 }
@@ -202,7 +210,20 @@ function mapPlan(r: PlanRow): TravelPlan {
   };
 }
 
+/** Normaliza `time` de Postgres (`09:00:00`) a `HH:MM`. */
+export function normalizeLocalTime(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const m = /^(\d{1,2}):(\d{2})/.exec(v.trim());
+  if (!m) return null;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  if (!Number.isFinite(h) || !Number.isFinite(min) || h > 23 || min > 59) return null;
+  return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+}
+
 function mapItem(r: ItemRow): TravelPlanItem {
+  const rec = r as unknown as Record<string, unknown>;
+  const source = rec.schedule_source;
   return {
     id: r.id,
     plan_id: r.plan_id,
@@ -212,6 +233,13 @@ function mapItem(r: ItemRow): TravelPlanItem {
     day_index: r.day_index,
     notes: r.notes,
     snapshot: (r.snapshot as unknown as TravelPlanItemSnapshot) ?? {},
+    starts_at_local: normalizeLocalTime(rec.starts_at_local),
+    duration_minutes:
+      typeof rec.duration_minutes === "number" ? (rec.duration_minutes as number) : null,
+    schedule_source:
+      source === "concierge" || source === "alux" || source === "traveler"
+        ? (source as ItemScheduleSource)
+        : null,
     created_at: r.created_at,
     updated_at: r.updated_at,
   };
@@ -571,9 +599,13 @@ export const removePlanItem = createServerFn({ method: "POST" })
   });
 
 /**
- * updatePlanItem — Actualiza notas / snapshot / day_index de un item.
- * Whitelist estricta; no permite cambiar `plan_id`, `item_kind`,
+ * updatePlanItem — Actualiza notas / snapshot / day_index / horario de un
+ * item. Whitelist estricta; no permite cambiar `plan_id`, `item_kind`,
  * `target_id`, `position` (reorden va por RPC dedicado).
+ *
+ * CV6.7 · Cuando el viajero ajusta la hora o la duración, el horario deja
+ * de ser "sugerido" y queda confirmado (`schedule_source = 'traveler'`),
+ * salvo que el llamador declare otro origen explícito.
  */
 export const updatePlanItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -583,11 +615,17 @@ export const updatePlanItem = createServerFn({ method: "POST" })
       notes?: unknown;
       snapshot?: unknown;
       dayIndex?: unknown;
+      startsAtLocal?: unknown;
+      durationMinutes?: unknown;
+      scheduleSource?: unknown;
     };
     const patch: {
       notes?: string | null;
       snapshot?: Json;
       day_index?: number | null;
+      starts_at_local?: string | null;
+      duration_minutes?: number | null;
+      schedule_source?: string | null;
     } = {};
     if ("notes" in src) patch.notes = clampStr(src.notes, 2000);
     if ("snapshot" in src) patch.snapshot = clampSnapshot(src.snapshot) as unknown as Json;
@@ -596,6 +634,32 @@ export const updatePlanItem = createServerFn({ method: "POST" })
         src.dayIndex === null || src.dayIndex === undefined
           ? null
           : Math.max(0, Math.min(365, Math.round(Number(src.dayIndex) || 0)));
+    }
+    let touchedSchedule = false;
+    if ("startsAtLocal" in src) {
+      if (src.startsAtLocal === null || src.startsAtLocal === "" || src.startsAtLocal === undefined) {
+        patch.starts_at_local = null;
+      } else {
+        const t = normalizeLocalTime(src.startsAtLocal);
+        if (!t) throw new Error("invalid_starts_at_local");
+        patch.starts_at_local = t;
+      }
+      touchedSchedule = true;
+    }
+    if ("durationMinutes" in src) {
+      if (src.durationMinutes === null || src.durationMinutes === undefined) {
+        patch.duration_minutes = null;
+      } else {
+        const n = Math.round(Number(src.durationMinutes));
+        if (!Number.isFinite(n) || n <= 0 || n > 1440) throw new Error("invalid_duration_minutes");
+        patch.duration_minutes = n;
+      }
+      touchedSchedule = true;
+    }
+    if (touchedSchedule) {
+      const s = src.scheduleSource;
+      patch.schedule_source =
+        s === "concierge" || s === "alux" || s === "traveler" ? s : "traveler";
     }
     return {
       itemId: assertUuid(src.itemId, "item_id"),
@@ -717,6 +781,51 @@ export const updatePlanMeta = createServerFn({ method: "POST" })
   });
 
 // =========================================================================
+// BRIEF DE VIAJE (confirmación antes de enviar al Concierge)
+// =========================================================================
+
+/**
+ * saveTripBrief — Guarda el brief de viaje en `travel_plans.meta.trip_brief`.
+ * Lee el meta existente, lo fusiona y actualiza `party_size` con adultos+menores.
+ * Sin tablas nuevas; usa el jsonb `meta` ya existente.
+ */
+export const saveTripBrief = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const src = (d ?? {}) as { planId?: unknown; brief?: unknown };
+    const planId = assertUuid(src.planId, "plan_id");
+    const brief = tripBriefSchema.parse(src.brief);
+    return { planId, brief };
+  })
+  .handler(async ({ context, data }): Promise<{ ok: true }> => {
+    // Leer meta existente
+    const { data: row, error: readErr } = await context.supabase
+      .from("travel_plans")
+      .select("meta")
+      .eq("id", data.planId)
+      .single();
+    if (readErr) throw new Error(`plan_read_failed: ${readErr.message}`);
+    const meta =
+      row.meta && typeof row.meta === "object" && !Array.isArray(row.meta)
+        ? { ...(row.meta as Record<string, Json>) }
+        : {};
+
+    // Fusionar trip_brief
+    meta["trip_brief"] = data.brief as unknown as Json;
+
+    // Actualizar party_size coherente: adultos + menores
+    const minorsCount = data.brief.hasMinors && data.brief.minorAges ? data.brief.minorAges.length : 0;
+    const partySize = data.brief.adults + minorsCount;
+
+    const { error: updErr } = await context.supabase
+      .from("travel_plans")
+      .update({ meta, party_size: partySize })
+      .eq("id", data.planId);
+    if (updErr) throw new Error(`plan_brief_update_failed: ${updErr.message}`);
+    return { ok: true };
+  });
+
+// =========================================================================
 // ACCIONES
 // =========================================================================
 
@@ -796,6 +905,29 @@ export const promotePlanToCase = createServerFn({ method: "POST" })
     return { planId: assertUuid(src.planId, "plan_id"), summary };
   })
   .handler(async ({ context, data }): Promise<{ caseId: string; planId: string }> => {
+    const [{ data: profile, error: profileError }, { data: traveler, error: travelerError }] =
+      await Promise.all([
+        context.supabase
+          .from("profiles")
+          .select("display_name,email,phone")
+          .eq("user_id", context.userId)
+          .maybeSingle(),
+        context.supabase
+          .from("traveler_profiles")
+          .select("whatsapp_contact_consent")
+          .eq("user_id", context.userId)
+          .maybeSingle(),
+      ]);
+    if (profileError || travelerError) throw new Error("concierge_contact_read_failed");
+    if (!profile?.display_name?.trim()) throw new Error("concierge_contact_name_required");
+    if (!profile.email?.trim()) throw new Error("concierge_contact_email_required");
+    if (!profile.phone?.trim() || !/^\+?[0-9 ()-]{8,32}$/.test(profile.phone.trim())) {
+      throw new Error("concierge_contact_phone_required");
+    }
+    if (!traveler?.whatsapp_contact_consent) {
+      throw new Error("concierge_whatsapp_consent_required");
+    }
+
     // 1. Snapshot vía RPC (aplica RLS/visibility).
     const { data: snapJson, error: snapErr } = await context.supabase.rpc(
       "travel_plan_build_snapshot",
@@ -872,6 +1004,23 @@ async function attachHandoffContext(args: {
 }): Promise<void> {
   const { caseId, planId, userId, userSupabase, planItems } = args;
 
+  // Brief de viaje (si el viajero lo completó antes de enviar).
+  let tripBrief: TripBrief | null = null;
+  try {
+    const { data: planRow } = await userSupabase
+      .from("travel_plans")
+      .select("meta")
+      .eq("id", planId)
+      .maybeSingle();
+    const meta = planRow?.meta as Record<string, unknown> | null;
+    if (meta && meta["trip_brief"]) {
+      tripBrief = tripBriefSchema.parse(meta["trip_brief"]);
+    }
+  } catch {
+    tripBrief = null;
+  }
+
+
   // Perfil M2 (subset operativo, sin PII).
   const profilePromise = userSupabase
     .from("traveler_profiles")
@@ -885,9 +1034,9 @@ async function attachHandoffContext(args: {
   const nowIso = new Date().toISOString();
   const couponsPromise = userSupabase
     .from("traveler_coupons")
-    .select("id,title,code,business_slug,promotion_slug,discount_percent,valid_until,status")
+    .select("id,title,code,business_id,promotion_slug,discount_percent,valid_until,status")
     .eq("user_id", userId)
-    .eq("status", "issued")
+    .eq("status", "active")
     .gte("valid_until", nowIso)
     .order("valid_until", { ascending: true })
     .limit(20);
@@ -935,6 +1084,7 @@ async function attachHandoffContext(args: {
       item_count: planItems.length,
       items: planSnapshotItems,
     },
+    trip_brief: tripBrief,
   };
 
   const { error } = await userSupabase.rpc(

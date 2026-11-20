@@ -2,7 +2,8 @@
  * AluxCopilotPanel — capa transversal del Workspace Engine.
  * Lee el contexto Alux del workspace activo desde el Alux Registry.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { Sparkles, ArrowUpRight, Info, Undo2, ChevronDown, ChevronUp } from "lucide-react";
 import { useWorkspace } from "./WorkspaceProvider";
 import {
@@ -15,19 +16,34 @@ import type { AluxAction } from "@/lib/workspace/types";
 import { workspaceToast } from "@/lib/workspace/toast-bus";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAluxBrand } from "@/lib/brand/brand-context";
+import { AluxWorkspaceChat } from "./AluxWorkspaceChat";
 
 const IMPACT_TONE: Record<NonNullable<AluxAction["impact"]>, string> = {
   low: "bg-muted text-muted-foreground",
   medium: "bg-info/15 text-info",
-  high: "bg-primary/15 text-primary",
+  high: "bg-alux/15 text-alux",
 };
 
 export function AluxCopilotPanel({ className }: { className?: string }) {
   const { workspace } = useWorkspace();
+  const alux = useAluxBrand();
   const [headline, setHeadline] = useState<string>("");
   const [summary, setSummary] = useState<string | undefined>();
   const [actions, setActions] = useState<AluxAction[]>([]);
   const [openExpl, setOpenExpl] = useState<Record<string, boolean>>({});
+  const [chatOpen, setChatOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Si la pantalla activa es un expediente o una reservación, Alux puede
+  // consultar ese caso concreto (sólo lectura).
+  const chatSubject = useMemo(() => {
+    const uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+    const caseMatch = new RegExp(`/concierge/expedientes/(${uuid})`, "i").exec(pathname);
+    if (caseMatch?.[1]) return { kind: "case" as const, id: caseMatch[1] };
+    const orderMatch = new RegExp(`/concierge/reservaciones/(${uuid})`, "i").exec(pathname);
+    if (orderMatch?.[1]) return { kind: "order" as const, id: orderMatch[1] };
+    return undefined;
+  }, [pathname]);
 
   useEffect(() => {
     if (!workspace) return;
@@ -74,15 +90,15 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
   return (
     <section
       className={cn("flex h-full flex-col gap-4 border-l border-border bg-surface p-4", className)}
-      aria-label="Copiloto Alux"
+      aria-label={alux.copy("workspaceTitle")}
     >
       <header className="flex items-center gap-2">
-        <span className="grid size-8 place-items-center rounded-full bg-primary/15 text-primary">
+        <span className="grid size-8 place-items-center rounded-full bg-alux/15 text-alux">
           <Sparkles className="h-4 w-4" aria-hidden />
         </span>
         <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            Copiloto · Alux
+            {alux.copy("workspaceTitle")}
           </div>
           <div className="truncate font-display text-sm">{workspace?.label ?? "Workspace"}</div>
         </div>
@@ -90,19 +106,19 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
 
       <div className="rounded-2xl border border-border bg-surface-raised p-4">
         <p className="font-display text-base leading-snug">
-          {headline || "Alux está observando el pulso de este workspace."}
+          {headline || alux.copy("workspaceEmpty")}
         </p>
         {summary ? <p className="mt-2 text-sm text-muted-foreground">{summary}</p> : null}
       </div>
 
       <div className="flex-1 overflow-y-auto">
         <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Próxima acción de alto impacto
+          {alux.copy("workspaceActionTitle")}
         </div>
         <ul className="mt-2 space-y-2">
           {actions.length === 0 ? (
             <li className="rounded-xl border border-dashed border-border bg-surface p-4 text-sm text-muted-foreground">
-              Sin acciones sugeridas por ahora.
+              {alux.copy("workspaceNoActions")}
             </li>
           ) : (
             actions.map((a) => {
@@ -139,7 +155,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
                     {a.reversible ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-success">
-                        <Undo2 className="h-3 w-3" aria-hidden /> Reversible
+                        <Undo2 className="h-3 w-3" aria-hidden /> {alux.copy("workspaceReversible")}
                       </span>
                     ) : null}
                     {explainable ? (
@@ -149,7 +165,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                         className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 hover:bg-muted/80"
                       >
                         <Info className="h-3 w-3" aria-hidden />
-                        ¿Por qué?
+                        {alux.copy("workspaceWhy")}
                         {isOpen ? (
                           <ChevronUp className="h-3 w-3" aria-hidden />
                         ) : (
@@ -164,7 +180,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.rationale ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                            Razón
+                             {alux.copy("workspaceRationale")}
                           </div>
                           <p className="mt-0.5">{a.rationale}</p>
                         </div>
@@ -172,7 +188,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.effect ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                            Efecto
+                             {alux.copy("workspaceEffect")}
                           </div>
                           <p className="mt-0.5">{a.effect}</p>
                         </div>
@@ -180,7 +196,7 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
                       {a.sources && a.sources.length > 0 ? (
                         <div>
                           <div className="font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
-                            Fuentes
+                             {alux.copy("workspaceSources")}
                           </div>
                           <ul className="mt-1 flex flex-wrap gap-1">
                             {a.sources.map((s) => (
@@ -208,10 +224,16 @@ export function AluxCopilotPanel({ className }: { className?: string }) {
       </div>
 
       <footer>
-        <Button variant="outline" className="w-full" size="sm">
-          Abrir conversación con Alux
+        <Button
+          variant="outline"
+          className="w-full"
+          size="sm"
+          onClick={() => setChatOpen(true)}
+        >
+          {alux.copy("workspaceOpen")}
         </Button>
       </footer>
+      <AluxWorkspaceChat open={chatOpen} onOpenChange={setChatOpen} subject={chatSubject} />
     </section>
   );
 }

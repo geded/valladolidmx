@@ -25,7 +25,7 @@ export const Route = createFileRoute("/resenar/negocio/$slug")({
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-lg p-6 text-center">
       <p className="text-destructive">No pudimos abrir el formulario de reseña.</p>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
     </div>
   ),
   notFoundComponent: () => (

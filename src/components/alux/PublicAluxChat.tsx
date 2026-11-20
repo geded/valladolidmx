@@ -16,7 +16,13 @@ import {
   RotateCcw,
   Plus,
   Check,
+  Volume2,
+  CircleStop,
+  Mic,
+  Square,
 } from "lucide-react";
+import { useTTS } from "@/lib/hooks/useTTS";
+import { useSTT } from "@/lib/hooks/useSTT";
 import { AluxMark } from "@/components/alux/AluxMark";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +36,8 @@ import { toast } from "@/lib/toast";
 import { useTranslation } from "@/i18n/context";
 import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { selectAnonymousTravelItems } from "@/lib/traveler/anonymous-draft/items";
+import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -57,14 +65,14 @@ function ensureSessionKey(): string {
   return key;
 }
 
-const SUGGESTIONS = [
-  "¿Cuál es la mejor época para visitar Valladolid?",
-  "¿Qué hacer en 3 días en el Oriente Maya?",
-  "¿Cómo llego a Chichén Itzá desde Valladolid?",
-  "¿Qué son los Pueblos Mágicos de la región?",
-];
-
 export function PublicAluxChat() {
+  const alux = useAluxBrand();
+  const suggestions = [
+    alux.copy("publicStarterSeason"),
+    alux.copy("publicStarterDays"),
+    alux.copy("publicStarterDestinations"),
+    alux.copy("publicStarterExperiences"),
+  ];
   const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -74,6 +82,31 @@ export function PublicAluxChat() {
   const [rateInfo, setRateInfo] = useState<{ used: number; limit: number } | null>(null);
   const [nearbyUsed, setNearbyUsed] = useState<number | null>(null);
   const [hasMemory, setHasMemory] = useState(false);
+  const [ttsIdx, setTtsIdx] = useState<number | null>(null);
+  const tts = useTTS();
+  const stt = useSTT();
+  const handleMicClick = useCallback(async () => {
+    if (stt.state === "idle") {
+      stt.start();
+    } else if (stt.state === "recording") {
+      const text = await stt.stop();
+      if (text) setInput((prev) => (prev ? prev + " " + text : text));
+    }
+  }, [stt]);
+
+  const toggleTTS = useCallback(
+    (idx: number, text: string) => {
+      if (ttsIdx === idx && tts.state !== "idle") {
+        tts.stop();
+        setTtsIdx(null);
+      } else {
+        tts.stop();
+        setTtsIdx(idx);
+        tts.speak(text);
+      }
+    },
+    [tts, ttsIdx],
+  );
   const { location, status, request: requestLocation } = useVisitorGeolocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const anonymous = useAnonymousTrip();
@@ -176,8 +209,9 @@ export function PublicAluxChat() {
               : undefined,
           }),
         });
-        const data = await res.json().catch(() => ({}));
+
         if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
           setMessages(nextHistory);
           setError(
             data?.message ||
@@ -192,19 +226,75 @@ export function PublicAluxChat() {
           }
           return;
         }
-        setMessages([
-          ...nextHistory,
-          {
-            role: "assistant",
-            content: data.text,
-            proposals: Array.isArray(data.proposals) ? (data.proposals as Proposal[]) : [],
-          },
-        ]);
-        if (data?.rate) {
-          setRateInfo({ used: data.rate.day_count, limit: data.rate.day_limit });
+
+        // SSE streaming — el texto llega en tiempo real
+        const reader = res.body?.getReader();
+        if (!reader) {
+          setMessages(nextHistory);
+          setError("No se pudo leer la respuesta de Alux.");
+          return;
         }
-        if (typeof data?.nearby_used === "number") setNearbyUsed(data.nearby_used);
-        if (data?.memory?.has_summary) setHasMemory(true);
+
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let assistantText = "";
+        setMessages([...nextHistory, { role: "assistant", content: "" }]);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const events = buffer.split("\n\n");
+          buffer = events.pop() ?? "";
+          for (const event of events) {
+            if (!event.startsWith("data: ")) continue;
+            let parsed: Record<string, unknown>;
+            try {
+              parsed = JSON.parse(event.slice(6));
+            } catch {
+              continue;
+            }
+            if (parsed.type === "text" && typeof parsed.chunk === "string") {
+              assistantText += parsed.chunk;
+              setMessages((prev) => {
+                const next = [...prev];
+                next[next.length - 1] = { role: "assistant" as const, content: assistantText };
+                return next;
+              });
+            } else if (parsed.type === "done") {
+              const proposals = Array.isArray(parsed.proposals)
+                ? (parsed.proposals as Proposal[])
+                : [];
+              setMessages((prev) => {
+                const next = [...prev];
+                next[next.length - 1] = {
+                  role: "assistant" as const,
+                  content: typeof parsed.text === "string" ? parsed.text : assistantText,
+                  proposals,
+                };
+                return next;
+              });
+              if (parsed.rate && typeof parsed.rate === "object") {
+                const rate = parsed.rate as { day_count: number; day_limit: number };
+                setRateInfo({ used: rate.day_count, limit: rate.day_limit });
+              }
+              if (typeof parsed.nearby_used === "number") setNearbyUsed(parsed.nearby_used);
+              if (
+                parsed.memory &&
+                typeof parsed.memory === "object" &&
+                (parsed.memory as { has_summary?: boolean }).has_summary
+              )
+                setHasMemory(true);
+            } else if (parsed.type === "error") {
+              setMessages(nextHistory);
+              setError(
+                typeof parsed.message === "string"
+                  ? parsed.message
+                  : "No pude responder ahora.",
+              );
+            }
+          }
+        }
       } catch {
         setError("Sin conexión. Revisa tu red e inténtalo de nuevo.");
       } finally {
@@ -216,19 +306,19 @@ export function PublicAluxChat() {
 
   return (
     <section
-      aria-label="Habla con Alux"
-      className="rounded-3xl border border-border/60 bg-card shadow-elevated overflow-hidden"
+      aria-label={alux.copy("conversationTitle")}
+      className="rounded-3xl border border-alux-border bg-alux-surface text-alux-surface-foreground shadow-elevated overflow-hidden"
     >
       <header className="flex items-center gap-3 border-b border-border/60 bg-muted/40 px-5 py-4">
         {/* G8-R1-D3 · Identidad canónica: activo gobernado de /brand/alux/. */}
-        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary/10">
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-alux/10">
           <AluxMark family="avatar" size={40} decorative loading="eager" />
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2 className="font-serif text-lg leading-none">Habla con Alux</h2>
+          <h2 className="font-serif text-lg leading-none">{alux.copy("conversationTitle")}</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Concierge IA del Oriente Maya · disponible sin registro
+            {alux.copy("publicAvailability")}
           </p>
         </div>
         {rateInfo && (
@@ -241,18 +331,18 @@ export function PublicAluxChat() {
             type="button"
             onClick={resetConversation}
             className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
-            title="Iniciar una conversación nueva"
+             title={alux.copy("newConversation")}
           >
             <RotateCcw className="h-3 w-3" />
-            Nueva
+             {alux.copy("newConversation")}
           </button>
         )}
       </header>
 
       {hasMemory && (
-        <div className="flex items-center gap-2 border-b border-border/60 bg-primary/5 px-5 py-2 text-[11px] text-primary">
+        <div className="flex items-center gap-2 border-b border-border/60 bg-alux/5 px-5 py-2 text-[11px] text-alux">
           <BrainCircuit className="h-3 w-3" />
-          Alux recuerda tu conversación previa · no necesitas repetir contexto
+          {alux.copy("conversationMemory")}
         </div>
       )}
 
@@ -261,13 +351,13 @@ export function PublicAluxChat() {
         {status === "granted" && location ? (
           <span className="inline-flex items-center gap-1.5 rounded-pill bg-success/10 px-2.5 py-1 text-success">
             <MapPin className="h-3 w-3" />
-            Ordenando por cercanía a tu ubicación
+            {alux.copy("locationGranted")}
             {nearbyUsed != null && nearbyUsed > 0 ? ` · ${nearbyUsed} cerca` : ""}
           </span>
         ) : status === "denied" || status === "unavailable" ? (
           <span className="inline-flex items-center gap-1.5 text-muted-foreground">
             <MapPinOff className="h-3 w-3" />
-            Sin ubicación · recomiendo por relevancia territorial
+            {alux.copy("locationGeneral")}
           </span>
         ) : (
           <button
@@ -278,8 +368,8 @@ export function PublicAluxChat() {
           >
             <MapPin className="h-3 w-3" />
             {status === "prompting"
-              ? "Solicitando ubicación…"
-              : "Compartir mi ubicación para sugerencias cercanas"}
+              ? alux.copy("requestingLocation")
+              : alux.copy("locationNearbyCta")}
           </button>
         )}
       </div>
@@ -291,11 +381,10 @@ export function PublicAluxChat() {
         {messages.length === 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Pregúntame lo que quieras sobre Valladolid, Izamal, Espita, los cenotes, Chichén Itzá
-              o cómo armar tu viaje al Oriente Maya.
+              {alux.copy("publicIntro")}
             </p>
             <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -319,12 +408,33 @@ export function PublicAluxChat() {
               className={[
                 "max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed",
                 m.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  ? "bg-alux text-alux-foreground rounded-br-md"
                   : "bg-muted text-foreground rounded-bl-md",
               ].join(" ")}
             >
               {m.content}
             </div>
+            {m.role === "assistant" && m.content && (
+              <button
+                type="button"
+                onClick={() => toggleTTS(i, m.content)}
+                className="inline-flex items-center gap-1.5 rounded-pill border border-border/60 bg-background px-2.5 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition"
+                title={ttsIdx === i && tts.state !== "idle" ? "Detener" : "Escuchar"}
+              >
+                {ttsIdx === i && tts.state === "loading" ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : ttsIdx === i && tts.state === "playing" ? (
+                  <CircleStop className="h-3 w-3" />
+                ) : (
+                  <Volume2 className="h-3 w-3" />
+                )}
+                {ttsIdx === i && tts.state === "loading"
+                  ? "Generando…"
+                  : ttsIdx === i && tts.state === "playing"
+                    ? "Detener"
+                    : "Escuchar"}
+              </button>
+            )}
             {m.role === "assistant" && m.proposals && m.proposals.length > 0 && (
               <AluxProposals items={m.proposals} />
             )}
@@ -334,7 +444,7 @@ export function PublicAluxChat() {
         {sending && (
           <div className="flex justify-start">
             <div className="rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Alux está pensando…
+              <Loader2 className="h-4 w-4 animate-spin" /> {alux.copy("thinking")}
             </div>
           </div>
         )}
@@ -342,8 +452,12 @@ export function PublicAluxChat() {
         {error && (
           <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
             {error}{" "}
-            <Link to="/auth" className="underline font-medium">
-              Crear cuenta gratuita
+            <Link
+              to="/auth"
+              onClick={() => rememberAuthReturnPath("/alux")}
+              className="underline font-medium"
+            >
+               {alux.copy("createAccount")}
             </Link>
           </div>
         )}
@@ -359,7 +473,7 @@ export function PublicAluxChat() {
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Escribe tu pregunta…"
+          placeholder={alux.copy("inputPlaceholder")}
           rows={1}
           maxLength={800}
           disabled={!anonymousTripReady}
@@ -372,19 +486,50 @@ export function PublicAluxChat() {
           className="min-h-[44px] max-h-40 resize-none bg-background"
         />
         <Button
+          type="button"
+          size="icon"
+          variant="outline"
+          onClick={handleMicClick}
+          disabled={!anonymousTripReady || stt.state === "transcribing"}
+          title={
+            stt.state === "recording"
+              ? "Detener y transcribir"
+              : stt.state === "transcribing"
+                ? "Transcribiendo…"
+                : "Hablar a Alux"
+          }
+          className={
+            stt.state === "recording"
+              ? "border-destructive/40 bg-destructive/5 text-destructive animate-pulse"
+              : ""
+          }
+        >
+          {stt.state === "recording" ? (
+            <Square className="h-4 w-4" />
+          ) : stt.state === "transcribing" ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
+          <span className="sr-only">Hablar a Alux</span>
+        </Button>
+        <Button
           type="submit"
           size="icon"
           disabled={sending || !input.trim() || !anonymousTripReady}
         >
           <Send className="h-4 w-4" />
-          <span className="sr-only">Enviar</span>
+          <span className="sr-only">{alux.copy("sendLabel")}</span>
         </Button>
       </form>
 
       <p className="px-5 pb-4 pt-2 text-[11px] text-muted-foreground bg-muted/30">
-        Alux es una guía inspiracional. Nunca reserva ni cotiza sin tu confirmación. Para armar tu
-        viaje completo,{" "}
-        <Link to="/auth" className="underline">
+        {alux.copy("disclaimer")} Para armar tu viaje completo,{" "}
+        <Link
+          to="/auth"
+          onClick={() => rememberAuthReturnPath("/alux")}
+          className="underline"
+        >
           crea tu cuenta gratuita
         </Link>
         .
@@ -394,6 +539,7 @@ export function PublicAluxChat() {
 }
 
 function AluxProposals({ items }: { items: Proposal[] }) {
+  const alux = useAluxBrand();
   const { user } = useAuth();
   const proposeFn = useServerFn(proposeAluxPlanAddition);
   const [pending, setPending] = useState<string | null>(null);
@@ -435,17 +581,17 @@ function AluxProposals({ items }: { items: Proposal[] }) {
             type="button"
             disabled={added || pending === p.entity_id}
             onClick={() => handleAdd(p)}
-            className="inline-flex items-center gap-1.5 rounded-pill border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs text-primary hover:bg-primary/10 transition disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-pill border border-alux/30 bg-alux/5 px-3 py-1.5 text-xs text-alux hover:bg-alux/10 transition disabled:opacity-60"
             title={p.rationale ?? undefined}
           >
             {added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
             <span className="truncate max-w-[180px]">{p.title}</span>
-            {p.subtitle && <span className="text-[10px] text-primary/70">· {p.subtitle}</span>}
+            {p.subtitle && <span className="text-[10px] text-alux/70">· {p.subtitle}</span>}
           </button>
         );
       })}
       <p className="basis-full text-[10px] text-muted-foreground">
-        Alux propone · tú confirmas en{" "}
+        {alux.copy("proposalFooter").replace("Mi Viaje.", "")} {" "}
         <Link to="/cuenta/mi-viaje" className="underline">
           Mi Viaje
         </Link>

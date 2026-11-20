@@ -47,7 +47,9 @@ describe("I4-C preview, concurrency, audit and rollback authority", () => {
 
   test("consumers pass expected hashes and preview keeps noindex with Merida time", () => {
     expect(server).toContain("expected_hash: string");
-    expect(studio).toContain("expected_hash: page.draft_hash ?? draftHash ??");
+    expect(studio).toContain('expected_hash: draftHashRef.current ?? ""');
+    expect(studio).toContain("pendingSaveRef.current");
+    expect(studio).toContain('msg.includes("draft_busy")');
     expect(studio).toContain("draft_conflict");
     expect(previewRoute).toContain("noindex: true");
     expect(previewRoute).toContain('timeZone: "America/Merida"');

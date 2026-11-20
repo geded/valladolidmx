@@ -30,6 +30,7 @@ import type {
 /* ─────────────────────────────  DTO público  ───────────────────────────── */
 
 export interface PublicPlaceMediaDTO {
+  asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   mediaAssetId: string | null;
   url: string | null;
   alt: string | null;
@@ -57,6 +58,21 @@ export interface PublicPlaceRelatedDTO {
   eyebrow: string;
   description: string;
   media: PublicPlaceMediaDTO | null;
+}
+
+/** Empresa publicada cercana por coordenadas reales (CMS). */
+export interface PublicPlaceNearbyBusinessDTO {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  categorySlug: string | null;
+  categoryLabel: string | null;
+  href: string | null;
+  distanceKm: number;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  groupKey: "comer" | "dormir" | "hacer" | "comprar" | "otros";
 }
 
 export interface PublicPlaceDTO {
@@ -110,6 +126,8 @@ export interface PublicPlaceDTO {
   authorities: Array<{ kind: string; name: string; isPrimary: boolean }>;
   products: PublicPlaceRelatedDTO[];
   events: PublicPlaceRelatedDTO[];
+  /** Empresas publicadas cercanas (distancia real, nunca texto libre). */
+  nearbyBusinesses: PublicPlaceNearbyBusinessDTO[];
   /** Dirección persistida por el administrador (`metadata.presentation_mode`). */
   presentationMode: PremiumPresentation | null;
   seo: { title: string | null; description: string | null } | null;
@@ -147,6 +165,7 @@ export interface PublicPlaceCard {
   categories: Array<{ slug: string; name: string }>;
   /** Portada gobernada y aprobada del propio lugar; nunca medios ajenos. */
   cover_url: string | null;
+  cover_asset?: import("@/lib/media/resolve-source").MediaAssetInput;
   /**
    * Atributos estructurados derivados EXCLUSIVAMENTE de columnas reales
    * (place_type, experience_category, admission_type, zone, accessibility,
@@ -215,6 +234,7 @@ export function toSurfaceMedia(
   if (!media || !media.url) return neutralPlaceholder(fallbackLabel);
   return {
     url: media.url,
+    asset: media.asset,
     alt: safeAlt(media.alt, fallbackLabel),
     credit: (media.credit ?? "").trim(),
   };
@@ -263,16 +283,38 @@ export function placeCanonicalPath(dto: { destination: { slug: string }; slug: s
 
 const DAY_LABELS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
+/** `08:00:00` → `08:00` (el dato de segundos no aporta al visitante). */
+function hhmm(value: string): string {
+  const match = /^(\d{2}):(\d{2})/u.exec(value.trim());
+  return match ? `${match[1]}:${match[2]}` : value.trim();
+}
+
+function hoursValue(h: PublicPlaceHoursDTO): string {
+  if (h.isClosed) return "cerrado";
+  if (h.opensAt && h.closesAt) {
+    const opens = hhmm(h.opensAt);
+    const closes = hhmm(h.closesAt);
+    /* Paseo público abierto 24 h: se dice en lenguaje del visitante. */
+    if (opens === "00:00" && (closes === "23:59" || closes === "24:00"))
+      return "abierto todo el día";
+    return `${opens} – ${closes}`;
+  }
+  return h.notes?.trim() || "horario por confirmar";
+}
+
 export function formatPlaceHours(hours: readonly PublicPlaceHoursDTO[]): string[] {
-  return hours
-    .slice()
-    .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
-    .map((h) => {
-      const day = DAY_LABELS[h.dayOfWeek] ?? `Día ${h.dayOfWeek}`;
-      if (h.isClosed) return `${day}: cerrado`;
-      if (h.opensAt && h.closesAt) return `${day}: ${h.opensAt} – ${h.closesAt}`;
-      return `${day}: ${h.notes?.trim() || "horario por confirmar"}`;
-    });
+  const sorted = hours.slice().sort((a, b) => a.dayOfWeek - b.dayOfWeek);
+  if (sorted.length === 0) return [];
+  /* Cuando los siete días son idénticos se resume en una sola línea en vez de
+     repetir siete tarjetas iguales. */
+  const values = sorted.map(hoursValue);
+  if (sorted.length === 7 && values.every((v) => v === values[0])) {
+    return [`Todos los días: ${values[0]}`];
+  }
+  return sorted.map((h, index) => {
+    const day = DAY_LABELS[h.dayOfWeek] ?? `Día ${h.dayOfWeek}`;
+    return `${day}: ${values[index]}`;
+  });
 }
 
 const ADMISSION_LABELS: Record<string, string> = {
@@ -333,7 +375,7 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     .map((m) => toSurfaceMedia(m, placeholderLabel));
 
   const galleryItems = dto.media
-    .filter((m) => m.url)
+    .filter((m) => m.url && m.approved)
     .map((m) => toSurfaceMedia(m, placeholderLabel));
 
   const facts: PlacePremiumContent["essentials"]["facts"] = [];
@@ -475,6 +517,20 @@ export function adaptPlaceToPremiumSurface(dto: PublicPlaceDTO): PlaceSurfacePro
     })),
     // Q2D-B no infiere cercanías: sin fuente gobernada, la sección se oculta.
     nearby: [],
+    /* Cercanía real por coordenadas CMS (nunca inferida por texto). */
+    nearbyBusinesses: (dto.nearbyBusinesses ?? []).map((b) => ({
+      id: b.id,
+      slug: b.slug,
+      title: b.name,
+      tagline: b.tagline,
+      categorySlug: b.categorySlug,
+      categoryLabel: b.categoryLabel,
+      href: b.href,
+      distanceKm: b.distanceKm,
+      imageUrl: b.imageUrl,
+      imageAlt: b.imageAlt,
+      groupKey: b.groupKey,
+    })),
     trip: {
       title: "Agrega este lugar a Mi Viaje",
       description: "Guárdalo en tu itinerario y Alux lo integrará a tu plan del Oriente Maya.",

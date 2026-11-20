@@ -9,6 +9,7 @@
  */
 import {
   DESTINATION_PREMIUM_G4_CONTENT,
+  DESTINATION_PREMIUM_SECTION_ORDER,
   type DestinationPremiumContent,
   type DestinationPremiumMedia,
   type DestinationPremiumSectionKey,
@@ -51,11 +52,28 @@ const galleryLayoutOf = (value: unknown): DestinationGalleryLayout =>
     ? (value as DestinationGalleryLayout)
     : "mosaico";
 
+/**
+ * Orden editable de secciones (clave `destination_section_order`).
+ * Fail-closed: sólo se aceptan claves conocidas; las faltantes se añaden en el
+ * orden aprobado, de modo que una configuración vacía o inválida conserva
+ * exactamente la plantilla aprobada.
+ */
+const sectionOrder = (value: unknown): DestinationPremiumSectionKey[] => {
+  const approved = DESTINATION_PREMIUM_SECTION_ORDER;
+  if (!Array.isArray(value)) return [...approved];
+  const valid = value.filter((key): key is DestinationPremiumSectionKey =>
+    approved.some((k) => k === key),
+  );
+  const unique = Array.from(new Set(valid));
+  return [...unique, ...approved.filter((k) => !unique.includes(k))];
+};
+
 export interface DestinationPremiumG4Resolved {
   content: DestinationPremiumContent;
   heroVariant: DestinationHeroVariant;
   galleryLayout: DestinationGalleryLayout;
   sections: Partial<Record<DestinationPremiumSectionKey, boolean>>;
+  order: DestinationPremiumSectionKey[];
 }
 
 export function resolveDestinationPremiumG4(config: Cfg = {}): DestinationPremiumG4Resolved {
@@ -142,6 +160,7 @@ export function resolveDestinationPremiumG4(config: Cfg = {}): DestinationPremiu
       map: bool(config.show_mapa, true),
       nearby: bool(config.show_cercanos, true),
     },
+    order: sectionOrder(config.destination_section_order),
   };
 }
 
@@ -201,5 +220,6 @@ export function destinationPremiumG4DefaultConfig(): Cfg {
     show_servicio_preview: true,
     show_mapa: true,
     show_cercanos: true,
+    destination_section_order: [...DESTINATION_PREMIUM_SECTION_ORDER],
   };
 }

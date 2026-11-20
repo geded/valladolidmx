@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "phase1_authenticated_insert" ON storage.objects;

@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.concierge_order_start_online_payment(uuid, text, text) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.concierge_order_start_online_payment(uuid, text, text) TO service_role;

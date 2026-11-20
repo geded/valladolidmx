@@ -5,6 +5,7 @@
  * Soporta lightbox opcional (browser-only). No emite side-effects
  * cuando `capabilities.lightbox` es `false`.
  */
+import { resolveMediaSource } from "@/lib/media/resolve-source";
 import { useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -119,11 +120,17 @@ export function ExperienceGallery({ dto, className }: ExperienceGalleryProps) {
         </ul>
       ) : (
         // mosaic
-        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-3xl auto-rows-[45vw] sm:auto-rows-auto sm:grid-cols-4 sm:grid-rows-2 sm:h-[420px] md:h-[520px]">
+        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-3xl auto-rows-[34vw] sm:auto-rows-auto sm:grid-cols-4 sm:grid-rows-2 sm:h-[420px] md:h-[520px]">
           {visible.map((it, i) => (
             <div
               key={i}
-              className={cn("relative min-w-0", i === 0 && "sm:col-span-2 sm:row-span-2")}
+              className={cn(
+                "relative min-w-0",
+                /* Móvil: la portada ocupa el ancho completo para que las
+                   miniaturas no se vean amontonadas (paridad en todas las
+                   fichas). Escritorio conserva el mosaico aprobado. */
+                i === 0 && "col-span-2 row-span-1 sm:col-span-2 sm:row-span-2",
+              )}
             >
               <Thumb
                 item={it}
@@ -226,6 +233,7 @@ function Thumb({
     <>
       <img
         src={item.url}
+        {...thumbSrcSet(item)}
         alt={item.alt}
         loading="lazy"
         className={cn(
@@ -269,4 +277,20 @@ function Thumb({
       {inner}
     </button>
   );
+}
+
+/**
+ * H3·A4 · Versiones ligeras vía `resolveMediaSource()` (fuente única). Sin
+ * variantes listas no añade nada y la miniatura queda idéntica a hoy.
+ */
+function thumbSrcSet(item: ExperienceGalleryItem): { srcSet?: string; sizes?: string } {
+  if (!item.asset) return {};
+  const resolved = resolveMediaSource(item.asset, {
+    context: "gallery",
+    fallbackUrl: item.url,
+  });
+  if (!resolved.usedPipeline) return {};
+  const webp = resolved.sources.find((s) => s.type === "image/webp") ?? resolved.sources[0];
+  if (!webp?.srcSet) return {};
+  return { srcSet: webp.srcSet, sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" };
 }

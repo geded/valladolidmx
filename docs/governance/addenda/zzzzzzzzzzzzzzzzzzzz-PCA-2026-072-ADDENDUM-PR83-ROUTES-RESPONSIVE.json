@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-072-ADDENDUM-PR83-ROUTES-RESPONSIVE",
+  "status": "Approved",
+  "parent": "PCA-2026-072",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Corrección visual Founder basada en IMG_0660 del preview Lovable.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/home-premium/HomePremiumSurface.tsx",
+    "previous_sha256": "cfd6a710dd88ecd10808a8edde39745a7c35a671ee1385194edfceeecbf22356",
+    "current_sha256": "c6dbee7dd60367387011cb28c5d77c7634a6e9237e2fc304ff32f077c7e735aa",
+    "semantic_change": "Ajusta únicamente el comportamiento responsive de la sección existente de rutas para evitar botones montados y alturas vacías.",
+    "authority": "Founder · corrección visual responsive de rutas · 2026-09-10"
+  },
+  "invariants": [
+    "Diseño, contenido, rutas y acciones existentes preservados",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

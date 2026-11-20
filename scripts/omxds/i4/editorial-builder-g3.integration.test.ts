@@ -87,9 +87,94 @@ describe("I4-D · G3 Integration & Evidence Closure", () => {
     expect(studio).toMatch(/role=["']dialog["']/);
     expect(studio).toMatch(/aria-modal=["']true["']/);
     expect(studio).toContain("flex-wrap");
-    expect(studio).toContain("md:flex");
+    // El selector de dispositivo permanece accesible en todos los anchos
+    // (antes oculto bajo 768 px con `md:flex`).
+    expect(studio).toContain("overflow-x-auto rounded-md border border-border bg-background");
     expect(studio).toContain("max-w-[92vw]");
     expect(studio).toContain("aria-label");
+    // El iframe conserva el viewport lógico Premium y una ventana acotada. El
+    // documento es la única autoridad de scroll; el zoom sólo escala el conjunto
+    // y toda la capa de edición vive fuera de la plantilla.
+    expect(studio).toContain('data-eb-canvas-scrollport="editor"');
+    expect(studio).toContain("usableWidth / logicalWidth");
+    // Vista "Real": ancho lógico = ancho disponible y escala fija al 100%,
+    // para que el lienzo reproduzca 1:1 la página publicada.
+    expect(studio).toContain('short: "Real"');
+    expect(studio).toContain('const isAutoWidth = deviceViewport === "auto"');
+    expect(studio).toContain("const scale = isAutoWidth ? 1 :");
+    expect(studio).toContain("CANVAS_MIN_SCALE = 0.2");
+    expect(studio).toContain("CANVAS_PRECISE_EDIT_SCALE = 0.45");
+    expect(studio).toContain("scrollport.scrollTo({ left: 0, top: 0 })");
+    expect(studio).toContain("scaled <= minimumScale");
+    expect(studio).toContain("Ajustar al espacio de trabajo");
+    expect(studio).toContain("new ResizeObserver(read)");
+    expect(studio).toContain("transform: `scale(${scaled})`");
+    expect(studio).toContain("origin-top-left");
+    expect(studio).toContain('srcDoc="<!doctype html><html><head></head><body></body></html>"');
+    expect(studio).toContain("onLoad={() => setIframeLoadVersion((version) => version + 1)}");
+    expect(studio).toContain("justify-start overflow-auto overscroll-contain");
+    expect(studio).toContain('doc.addEventListener("scroll", read, { passive: true, capture: true })');
+    expect(studio).toContain("setCanvasScrollTop(win.scrollY)");
+    // La sección seleccionada sólo se revela cuando está fuera de pantalla:
+    // el panel inferior se descuenta del área realmente visible y no puede
+    // dejar otra sección en pantalla mientras el inspector edita la activa.
+    expect(studio).toContain("const visibleLogicalHeight =");
+    expect(studio).toContain("const visibleOverlap =");
+    expect(studio).toContain("const requiredOverlap = Math.min(target.height, 160)");
+    expect(studio).toContain('behavior: "smooth"');
+    // El asa de arrastre acompaña la parte visible de la sección.
+    expect(studio).toContain("const controlsOffset =");
+    expect(studio).not.toContain("doc.body.scrollTop");
+    expect(studio).toContain("top: Math.max(0, Math.round(rect.top - base))");
+    expect(studio).not.toContain("rect.top - base + scrollTop");
+    expect(studio).toContain("overflow-y: visible");
+    expect(studio).not.toContain("getBoundingClientRect().top + window.scrollY");
+    expect(studio).toContain("Math.ceil(mount.scrollHeight)");
+    // Una sola geometría compartida por marco, iframe y capa de edición.
+    expect(studio).toContain("const frameWidth = Math.round(width * scaled)");
+    expect(studio).toContain("const canvasHeight = Math.max(minimumHeight, documentHeight)");
+    expect(studio).toContain("const frameHeight = Math.round(canvasHeight * scaled)");
+    expect(studio).toContain("data-eb-canvas-edit-layer");
+    expect(studio).toContain("data-eb-canvas-precision-notice");
+    // Un solo arrastrar y soltar del lienzo, válido también en táctil.
+    expect(studio).toContain("startSectionDrag");
+    expect(studio).toContain('touchAction: "none"');
+    expect(studio).toContain('window.addEventListener("pointermove", onMove, { passive: false })');
+    expect(studio).toContain("if (!visible && dragKey !== section.key) return null");
+    expect(studio).toContain("xl:static");
+    expect(studio).toContain('window.matchMedia("(max-width: 1279px)")');
+    expect(studio).toContain('setSidebarRef.current("hidden")');
+    expect(studio).toContain("data-eb-external-section-handle");
+    // Una plantilla compuesta usa selección por sección; su bloque raíz no
+    // dibuja un borde sobre la página completa ni captura el clic interno.
+    expect(studio).toContain("sectionManaged={node.id === renderedCompositeNode?.id}");
+    expect(studio).toContain("role={sectionManaged ? undefined : \"button\"}");
+    expect(studio).toContain('pageDef.page_type === "home" && tree ? resolveHomePremiumAuthorityTree(tree) : tree');
+    expect(studio).toContain("onSelect={(id) => selectUnit(id, null)}");
+    // Ya no existe el arrastre nativo HTML5 en el lienzo (competía con dnd-kit).
+    expect(studio).not.toContain("onDragStart={(event) => {");
+    expect(studio).not.toContain("dataTransfer");
+    expect(studio).not.toContain('[data-eb-section="destinos"] { overflow:clip; }');
+    expect(studio).not.toContain("isolation:isolate");
+    expect(studio).not.toContain("contain:paint");
+    // La concurrencia usa exclusivamente la huella efectiva entregada por el
+    // servidor; la huella del árbol local no puede convertirse en expected_hash.
+    expect(studio).toContain("draftHashRef.current = page?.draft_hash ?? null");
+    expect(studio).not.toContain("page?.draft_hash ?? draftHash ?? null");
+    expect(studio).toContain("page.draft_version >= draftVersionRef.current");
+    expect(studio).toContain("const restoreTask = saveChainRef.current.catch(() => undefined).then(");
+    expect(studio).toContain('expected_hash: draftHashRef.current ?? ""');
+
+    const studioFunctions = read("src/lib/experience-builder/studio.functions.ts");
+    expect(studioFunctions).toContain("const effectiveDraftHash =");
+    expect(studioFunctions).toContain("draft_hash: effectiveDraftHash");
+
+    const inspector = read("src/components/experience-builder/AutoInspector.tsx");
+    // Las filas parciales del borrador muestran los valores acreditados por
+    // índice, pero sólo se materializan cuando el editor cambia un campo.
+    expect(inspector).toContain("defaultRows[index] ?? {}");
+    expect(inspector).toContain("setRow(index, { ...displayRow, [key]: nextValue })");
+    expect(inspector).not.toContain("defaultRows[index % defaultRows.length]");
   });
 
   test("acceptance report declares every mandatory human scenario and remains the authority for final G3 PASS", () => {

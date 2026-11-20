@@ -107,6 +107,7 @@ const EDITABLE_COLUMNS: Record<EditableTable, readonly string[]> = {
     "price_currency",
     "duration_minutes",
     "capacity",
+    "location_id",
     "cover_media_id",
     "metadata",
   ],
@@ -222,14 +223,46 @@ function assertEditableTable(t: string): asserts t is EditableTable {
   }
 }
 
+/**
+ * Columnas NOT NULL con valor por defecto en la base. El formulario envía
+ * `null` cuando el editor deja el campo vacío; en esas columnas eso rompe
+ * el guardado. Se normaliza al valor neutro (arreglo vacío) o se omite la
+ * clave para que la base aplique su propio default.
+ */
+const NON_NULLABLE_DEFAULTS: Partial<
+  Record<EditableTable, Record<string, "omit" | "empty_array">>
+> = {
+  editorial_routes: {
+    duration_days: "omit",
+    region_slug: "omit",
+    destination_ids: "empty_array",
+    zone_ids: "empty_array",
+    interests: "empty_array",
+    audiences: "empty_array",
+    seasons: "empty_array",
+  },
+};
+
 function sanitizePayload(table: EditableTable, payload: Record<string, unknown>) {
   const allowed = EDITABLE_COLUMNS[table];
+  const rules = NON_NULLABLE_DEFAULTS[table] ?? {};
   const out: Record<string, unknown> = {};
   for (const k of allowed) {
-    if (k in payload) out[k] = payload[k];
+    if (!(k in payload)) continue;
+    const value = payload[k];
+    if (value === null || value === undefined) {
+      const rule = rules[k];
+      if (rule === "omit") continue;
+      if (rule === "empty_array") {
+        out[k] = [];
+        continue;
+      }
+    }
+    out[k] = value;
   }
   return out;
 }
+
 
 /* ─────────────────  Capa conceptual reservada  ─────────────────────── */
 /**
@@ -431,11 +464,26 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
       } else if (data.table === "products") {
         const { data: prod, error: prodErr } = await db
           .from("products")
-          .select("business_id")
+          .select("business_id, location_id")
           .eq("id", data.id)
           .maybeSingle();
         if (prodErr) throw prodErr;
-        businessIdToCheck = (prod?.business_id as string | null) ?? null;
+        if (prod?.location_id) {
+          const { data: productLocation, error: productLocationError } = await db
+            .from("business_locations")
+            .select("id, latitude, longitude")
+            .eq("id", prod.location_id)
+            .eq("business_id", prod.business_id)
+            .is("deleted_at", null)
+            .maybeSingle();
+          if (productLocationError) throw productLocationError;
+          if (!productLocation || productLocation.latitude == null || productLocation.longitude == null) {
+            throw new Error("Falta ubicar el punto de encuentro de la experiencia en el mapa.");
+          }
+          businessIdToCheck = null;
+        } else {
+          businessIdToCheck = (prod?.business_id as string | null) ?? null;
+        }
       }
       if (businessIdToCheck) {
         const { data: loc, error: locErr } = await db
@@ -454,12 +502,35 @@ export const transitionEntityStatus = createServerFn({ method: "POST" })
       }
     }
 
+    if (
+      data.table === "businesses" &&
+      (data.to === "in_review" || data.to === "approved" || data.to === "published")
+    ) {
+      const { data: biz, error: bizErr } = await db
+        .from("businesses")
+        .select("primary_category_id")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (bizErr) throw bizErr;
+      if (!biz?.primary_category_id) {
+        throw new Error(
+          "Falta la categoría (Hotel, Restaurante, etc.). Sin categoría la empresa no aparece en los listados ni en la búsqueda.",
+        );
+      }
+    }
+
     const patch: Record<string, unknown> = {
       status: data.to,
       updated_by: context.userId,
     };
     if (data.to === "published") {
       patch.published_at = new Date().toISOString();
+    }
+    // Aprobar/Publicar por personal editorial acredita también la revisión
+    // de origen: es la condición única de descubrimiento público
+    // (`PUBLIC_BUSINESS_ELIGIBILITY_EQ`). Devolver a borrador no la revoca.
+    if (data.table === "businesses" && (data.to === "approved" || data.to === "published")) {
+      patch.source_review_state = "approved";
     }
 
     const { error: updErr } = await db.from(data.table).update(patch).eq("id", data.id);

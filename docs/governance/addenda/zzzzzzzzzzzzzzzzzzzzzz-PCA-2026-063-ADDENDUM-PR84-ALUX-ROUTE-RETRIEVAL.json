@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-PR84-ALUX-ROUTE-RETRIEVAL",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-09-10 para que Personalizar con Alux recupere todos los territorios canónicos de la ruta elegida.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/alux/converse-retrieval.server.ts",
+    "previous_sha256": "246fca9784400af5d8e1a16bf8a4e40a69ea2f40010384302745685e8e0636c0",
+    "current_sha256": "b2074f060cce780951084e20436be19a41d64edf79bb8941f77c3955827a3580",
+    "semantic_change": "Permite ampliar el límite de destinos cercanos sólo cuando una ruta publicada acredita más territorios canónicos.",
+    "authority": "Founder · alcance territorial completo de ruta para Alux · 2026-09-10"
+  },
+  "invariants": [
+    "Límite general de dos cercanías preservado fuera de rutas seleccionadas",
+    "Sin publicación ni despliegue"
+  ],
+  "recorded_at": "2026-09-10"
+}

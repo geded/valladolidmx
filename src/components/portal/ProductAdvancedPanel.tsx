@@ -8,6 +8,7 @@
  *
  * Mobile-first: layout en columna, botones grandes, contraste alto.
  */
+import { deriveVariantsInBackground } from "@/lib/media/derive-on-upload-browser";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,6 +19,7 @@ import {
   registerPortalProductMedia,
   removePortalProductMedia,
 } from "@/lib/portal/portal-product-media.functions";
+import { prepareImageForRole } from "@/lib/cms/image-upload";
 import {
   listPortalProductFaqs,
   createPortalProductFaq,
@@ -81,10 +83,11 @@ function MediaSection({ productId }: { productId: string }) {
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  async function upload(role: "cover" | "gallery", file: File) {
+  async function upload(role: "cover" | "gallery", original: File) {
     setErr(null);
     setUploading(true);
     try {
+      const file = await prepareImageForRole(original, role);
       const { path, token, bucket } = await signFn({
         data: { productId, filename: file.name, contentType: file.type },
       });
@@ -95,7 +98,7 @@ function MediaSection({ productId }: { productId: string }) {
         upsert: false,
       });
       if (upErr) throw upErr;
-      await registerFn({
+      const registered = await registerFn({
         data: {
           productId,
           storagePath: path,
@@ -104,6 +107,7 @@ function MediaSection({ productId }: { productId: string }) {
           sizeBytes: file.size,
         },
       });
+      deriveVariantsInBackground(file, registered);
       refresh();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error al subir");

@@ -174,7 +174,7 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
     const { data: prod, error } = await supabase
       .from("products")
       .select(
-        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
+        "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, business_id, location_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level",
       )
       .eq("id", data.productId)
       .is("deleted_at", null)
@@ -227,8 +227,7 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
         .select("label, address_line1, address_line2, latitude, longitude, is_primary")
         .eq("business_id", prod.business_id)
         .is("deleted_at", null)
-        .order("is_primary", { ascending: false })
-        .limit(1),
+        .order("is_primary", { ascending: false }),
       supabase
         .from("promotions")
         .select("id, slug, title, description, discount_percent, starts_at, ends_at, status")
@@ -337,15 +336,21 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
           label: contactRows[0].label,
         }
       : null;
-    const locRow = (
+    const locationRows = (
       (locations ?? []) as Array<{
+        id?: string;
+        is_primary?: boolean;
         label: string | null;
         address_line1: string | null;
         address_line2: string | null;
         latitude: number | string | null;
         longitude: number | string | null;
       }>
-    )[0];
+    );
+    const locRow =
+      locationRows.find((row) => row.id === prod.location_id) ??
+      locationRows.find((row) => row.is_primary) ??
+      locationRows[0];
     const primaryLocation = locRow
       ? {
           label: locRow.label,
@@ -419,6 +424,7 @@ export const getPortalProductPreview = createServerFn({ method: "POST" })
         primary_contact: primaryContact,
         primary_location: primaryLocation,
       },
+      effective_location: primaryLocation,
       related,
       promotions: (promos ?? []).map((p) => ({
         id: p.id as string,

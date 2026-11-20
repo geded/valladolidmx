@@ -218,12 +218,13 @@ function PremiumRelatedCollection({ service, name }: { service: string; name: st
       config={{
         source: "destination",
         entityKind: kind,
-        variant: "grid",
-        columns: 3,
+        // Fila deslizable estilo Airbnb (variante oficial `carousel`).
+        variant: "carousel",
+        columns: 4,
         heading: `${service === "que-hacer" ? "Qué hacer" : service.charAt(0).toUpperCase() + service.slice(1)} en ${name}`,
         emptyMessage: "Aún no hay opciones publicadas en esta categoría.",
         groups: [
-          { id: service, entityKind: kind, categorySlug: service, maxItems: 6, variant: "grid" },
+          { id: service, entityKind: kind, categorySlug: service, maxItems: 10, variant: "carousel" },
         ],
         capabilities: {
           showImage: true,
@@ -233,6 +234,7 @@ function PremiumRelatedCollection({ service, name }: { service: string; name: st
           showDate: true,
           showKindBadge: true,
           dedupe: true,
+          compact: true,
         },
       }}
     />
@@ -278,6 +280,12 @@ export function DestinationSurfaceContractBoundary({
     );
     const serviceHrefByKey = Object.fromEntries(
       content.services.flatMap((service) => {
+        // Lugares y sitios de interés tiene ruta territorial propia y estable.
+        if (service.key === "lugares") {
+          return [
+            [service.key, `/oriente-maya/${encodeURIComponent(destinationSlug)}/lugares`],
+          ] as [string, string][];
+        }
         const family: ListingFamilyId | null = isListingFamilyId(service.key) ? service.key : null;
         if (!family) return [];
         const cmsSlugs = listingFamilyTaxonomy.taxonomy[family] ?? [];
@@ -324,7 +332,7 @@ export function DestinationSurfaceContractBoundary({
                   slug={destinationSlug}
                   imageUrl={content.hero.cover.url || null}
                   subtitle={premiumDestination.tagline}
-                  variant="full"
+                  variant="compact"
                   eligibilityMode="legacy"
                 />
               ) : null
@@ -390,6 +398,7 @@ export function DestinationSurface({
   const premiumHeroMedia = premiumHeroUrl
     ? {
         url: premiumHeroUrl,
+        asset: effectiveGalleryMedia.find((item) => item.url === premiumHeroUrl)?.asset ?? db?.hero_media?.asset,
         alt:
           (heroSlide?.url === premiumHeroUrl ? heroSlide?.alt : null) ||
           `Vista de ${input.name}, Oriente Maya de Yucatán`,

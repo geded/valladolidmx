@@ -95,11 +95,16 @@ export const DESTINATION_FIELDS: EditorField[] = [
   },
   {
     name: "tagline",
-    label: "Frase corta",
+    label: "Descripción corta del hero",
     type: "text",
-    helpText: "Una línea evocadora que resume el destino.",
+    helpText: "Una sola frase breve que resume el destino en la portada.",
   },
-  { name: "description", label: "Descripción", type: "textarea" },
+  {
+    name: "description",
+    label: "Descripción completa del destino",
+    type: "textarea",
+    helpText: "Texto editorial que aparece debajo de la portada junto con las fotografías.",
+  },
   {
     name: "highlights",
     label: "Highlights",
@@ -242,8 +247,8 @@ export const EVENT_FIELDS: EditorField[] = [
   { name: "external_url", label: "URL externa", type: "text" },
   {
     name: "cover_media_id",
-    label: "Portada (media id)",
-    type: "text",
-    helpText: "Identificador del medio aprobado que se usará como portada.",
+    label: "Portada",
+    type: "media",
+    helpText: "Selecciona una imagen de la Biblioteca o sube una nueva desde aquí.",
   },
 ];

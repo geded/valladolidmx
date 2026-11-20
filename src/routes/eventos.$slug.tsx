@@ -9,8 +9,13 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PublicShell } from "@/components/discovery";
 import { buildPublicHead, eventJsonLd, businessEntityId } from "@/lib/discovery/seo";
 import { SITE } from "@/config/site";
-import { getEventBySlug, type PublicEventDetail } from "@/lib/events/public-reads.functions";
+import { getEventBySlug, getEventRelated, type PublicEventDetail } from "@/lib/events/public-reads.functions";
 import { EventPremiumSurface } from "@/components/surfaces/EventPremiumSurface";
+import { getPublishedCompositionBySlug } from "@/lib/experience-builder/public-reads.functions";
+import {
+  EVENT_PREMIUM_BLOCK_TYPE,
+  resolveEventPremiumCopyFromTree,
+} from "@/lib/events/event-copy-resolution";
 import {
   ContextEngineProvider,
   defineRouteContext,
@@ -35,7 +40,27 @@ function buildEventContext(e: PublicEventDetail): RouteContextDeclaration {
     },
     inherit: ["region", "destination", "category"],
     canonical: `/eventos/${e.slug}`,
-    kindDefaults: [{ kind: "site_section", label: "Eventos", href: "/eventos" }],
+    // Paridad con hoteles/restaurantes/casas/lugares: la cadena
+    // territorial completa (Inicio → Oriente Maya → Destino → Eventos)
+    // se declara como ancestros explícitos para que "Eventos" siempre
+    // aparezca, incluso cuando el visitante llega con contexto heredado
+    // (p. ej. desde el Home con destino activo). `kindDefaults` sólo se
+    // aplica cuando no hay ancestros; al heredar el destino se perdía la
+    // miga "Eventos".
+    ancestors: [
+      { kind: "region", slug: "oriente-maya", label: "Oriente Maya", href: "/oriente-maya" },
+      ...(e.destination_slug && e.destination_name
+        ? [
+            {
+              kind: "destination" as const,
+              slug: e.destination_slug,
+              label: e.destination_name,
+              href: `/oriente-maya/${e.destination_slug}`,
+            },
+          ]
+        : []),
+      { kind: "site_section", label: "Eventos", href: "/eventos" },
+    ],
   });
 }
 
@@ -43,7 +68,24 @@ export const Route = createFileRoute("/eventos/$slug")({
   loader: async ({ params }) => {
     const event = await getEventBySlug({ data: { slug: params.slug } });
     if (!event) throw notFound();
-    return { event };
+    /* Composition-first para TEXTOS (mismo patrón que empresa y lugar):
+       primero la composición específica del evento y, en su ausencia, la
+       plantilla oficial de la familia. Nunca sustituye la autoridad visual
+       aprobada: sólo aporta encabezados editables. */
+    const [related, specific, template] = await Promise.all([
+      getEventRelated({
+        data: { eventId: event.id, destinationId: event.destination_id, limit: 4 },
+      }),
+      getPublishedCompositionBySlug({
+        data: { slug: `event-${params.slug}`, variant_key: params.slug },
+      }).catch(() => null),
+      getPublishedCompositionBySlug({ data: { slug: "__tpl_event__" } }).catch(() => null),
+    ]);
+    const copy = resolveEventPremiumCopyFromTree(
+      (specific ?? template)?.snapshot ?? null,
+      EVENT_PREMIUM_BLOCK_TYPE,
+    );
+    return { event, related, copy };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -89,6 +131,15 @@ export const Route = createFileRoute("/eventos/$slug")({
       isFree: e.is_free,
       organizerId,
       organizerName,
+      schedule: e.recurrence_frequency
+        ? {
+            repeatFrequency: e.recurrence_frequency,
+            repeatInterval: e.recurrence_interval,
+            startDate: e.starts_at,
+            endDate: e.recurrence_until,
+            times: e.schedule_times,
+          }
+        : null,
     });
     return buildPublicHead({
       title: `${e.title} · Eventos — ${SITE.name}`,
@@ -118,17 +169,17 @@ export const Route = createFileRoute("/eventos/$slug")({
       title="Evento no disponible"
       crumbs={[{ label: "Eventos", to: "/eventos" }, { label: "—" }]}
     >
-      <p className="text-sm text-muted-foreground">{String(error.message)}</p>
+      <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
     </PublicShell>
   ),
 });
 
 function EventoPage() {
-  const { event } = Route.useLoaderData();
+  const { event, related, copy } = Route.useLoaderData();
   const declaration = buildEventContext(event);
   return (
     <ContextEngineProvider declaration={declaration}>
-      <EventPremiumSurface event={event} />
+      <EventPremiumSurface event={event} related={related} copy={copy} />
     </ContextEngineProvider>
   );
 }

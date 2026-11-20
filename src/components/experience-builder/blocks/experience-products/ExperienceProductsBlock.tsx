@@ -12,11 +12,14 @@
  * construido a partir del contexto — cumple la Regla de Orquestación.
  */
 import { useContext, useMemo } from "react";
+import { Link } from "@tanstack/react-router";
 import { ExperienceProducts } from "./ExperienceProducts";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { ProductActions, type ProductActionsProduct } from "@/components/commerce/ProductActions";
 import { BusinessSurfaceContext } from "@/components/surfaces/BusinessSurface";
 import type { MarketplaceProductCard } from "@/lib/catalog/marketplace-reads.functions";
+import { isLodgingBusiness } from "@/lib/experience-builder/adapters/business-to-blocks";
+import { Button } from "@/components/ui/button";
 import {
   buildExperienceProductsPreviewDTO,
   experienceProductsConfigSchema,
@@ -24,6 +27,19 @@ import {
   type ExperienceProductsConfig,
   type ExperienceProductsDTO,
 } from "@/lib/experience-builder/blocks/experience-products/contract";
+
+const DISCOVERY_PRODUCT_TYPES = new Set([
+  "experiencia",
+  "tour",
+  "evento",
+  "transporte",
+  "servicio",
+  "artesanal",
+]);
+
+function isDiscoveryProduct(item: ExperienceProductItem): boolean {
+  return DISCOVERY_PRODUCT_TYPES.has(item.productType?.trim().toLowerCase() ?? "");
+}
 
 function safeParse(raw: unknown): ExperienceProductsConfig {
   const r = experienceProductsConfigSchema.safeParse(raw ?? {});
@@ -40,9 +56,15 @@ export function marketplaceProductToItem(p: MarketplaceProductCard): ExperienceP
     tagline: p.tagline || null,
     productType: p.product_type || null,
     entityKind: "product",
-    href: p.business_slug && p.slug ? `/marketplace/${p.business_slug}#p-${p.slug}` : null,
-    mediaUrl: null,
-    mediaAlt: null,
+    href:
+      p.slug && DISCOVERY_PRODUCT_TYPES.has(p.product_type?.trim().toLowerCase() ?? "")
+        ? `/producto/${p.slug}`
+        : p.business_slug && p.slug
+          ? `/marketplace/${p.business_slug}#p-${p.slug}`
+          : null,
+    mediaUrl: p.cover_url ?? null,
+    mediaAsset: p.cover_asset,
+    mediaAlt: p.cover_url ? p.name : null,
     priceAmount: p.price_amount != null ? Number(p.price_amount) : null,
     priceCurrency: p.price_currency || "MXN",
     priceHint: null,
@@ -119,6 +141,8 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
     if (cfg.source === "business" && business) {
       const filtered =
         cfg.filters?.businessId && cfg.filters.businessId !== business.id ? [] : business.products;
+      /* Hospedaje: la tarifa CMS se lee por noche (sin cobro en línea). */
+      const lodging = isLodgingBusiness(business);
       baseItems = filtered.map((p) => {
         interactive.set(p.id, {
           id: p.id,
@@ -127,8 +151,13 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
           secondary_action_mode: p.secondary_action_mode,
           secondary_action_label: p.secondary_action_label,
           accepts_online_payment: p.accepts_online_payment,
+          name: p.name,
+          slug: p.slug ?? null,
+          imageUrl: p.cover_url ?? null,
+          subtitle: p.tagline ?? null,
         });
-        return marketplaceProductToItem(p);
+        const item = marketplaceProductToItem(p);
+        return lodging && item.priceAmount != null ? { ...item, priceHint: "por noche" } : item;
       });
     } else {
       baseItems = cfg.items;
@@ -141,14 +170,32 @@ export function ExperienceProductsBlock({ config }: ExperienceProductsBlockProps
   return (
     <ExperienceProducts
       dto={dto}
+      renderItemMediaActions={(item) =>
+        dto.capabilities.showFavorite && isDiscoveryProduct(item) ? (
+          <FavoriteButton
+            entityKind="product"
+            entityId={item.id}
+            entityTitle={item.name}
+            entityImageUrl={item.mediaUrl ?? undefined}
+            variant="media-overlay"
+          />
+        ) : null
+      }
       renderItemActions={(item) => {
         const showFav = dto.capabilities.showFavorite;
         const interactive = interactiveMap.get(item.id);
+        if (isDiscoveryProduct(item)) {
+          return dto.capabilities.showActions && item.href ? (
+            <Button asChild className="min-h-11 w-full rounded-pill">
+              <Link to={item.href}>Ver experiencia</Link>
+            </Button>
+          ) : null;
+        }
         return (
           <>
             {showFav ? <FavoriteButton entityKind="product" entityId={item.id} /> : null}
             {dto.capabilities.showActions && interactive ? (
-              <ProductActions product={interactive} />
+              <ProductActions product={interactive} compact={dto.capabilities.compact} />
             ) : null}
           </>
         );

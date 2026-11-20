@@ -37,6 +37,23 @@ import {
   EXPERIENCE_ATTRIBUTE_FAMILY,
   EXPERIENCE_TYPE_ATTRIBUTE_KEY,
 } from "@/lib/experiences/experience-attributes";
+import { attachReadyVariants, shouldServePublicVariants, type AssetBaseForVariants } from "@/lib/media/variant-bundles.server";
+import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
+
+/**
+ * Tarjeta del listado de Experiencias: el contrato turístico compartido más
+ * los datos comerciales y territoriales reales que la tienda necesita para
+ * decidir qué puede reservarse en línea y dónde se vive la experiencia.
+ */
+export type ExperienceListingItem = TourismCardVM & {
+  readonly destinationSlug: string | null;
+  readonly conversionMode: string | null;
+  readonly acceptsOnlinePayment: boolean;
+  readonly onlineSalePriceAmount: number | null;
+  readonly onlineSalePriceCurrency: string | null;
+  readonly durationMinutes: number | null;
+  readonly coordinates: { lat: number; lng: number } | null;
+};
 
 export interface ExperienceAxisDTO {
   readonly key: string;
@@ -147,14 +164,16 @@ export function resolveExperienceTypeLabel(
 async function signCovers(
   client: SupabaseClient<Database>,
   productIds: readonly string[],
-): Promise<Map<string, { url: string; alt: string | null }>> {
-  const coverByProduct = new Map<string, { url: string; alt: string | null }>();
+): Promise<Map<string, { url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>> {
+  const coverByProduct = new Map<string, { url: string; alt: string | null; asset?: import("@/lib/media/resolve-source").MediaAssetInput }>();
+  const bases: AssetBaseForVariants[] = [];
+  const assetByProduct = new Map<string, string>();
   if (!productIds.length) return coverByProduct;
 
   const { data: links } = await client
     .from("product_media")
     .select(
-      "product_id, media_asset_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, alt_text )",
+      "product_id, media_asset_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text )",
     )
     .in("product_id", [...productIds])
     .order("sort_order", { ascending: true });
@@ -187,12 +206,21 @@ async function signCovers(
         .from(asset.storage_bucket)
         .createSignedUrl(asset.storage_path, 60 * 60);
       if (signed?.signedUrl) {
+        assetByProduct.set(productId, String(asset.id));
+        bases.push({ id: String(asset.id), file_url: signed.signedUrl, width: asset.width ?? null, height: asset.height ?? null, pipeline_status: asset.pipeline_status ?? null });
         coverByProduct.set(productId, {
           url: signed.signedUrl,
           alt: (asset.alt_text as string | null) ?? null,
         });
         break;
       }
+    }
+  }
+  if (await shouldServePublicVariants()) {
+    const bundles = await attachReadyVariants(bases);
+    for (const [id, media] of coverByProduct) {
+      const assetId = assetByProduct.get(id);
+      if (assetId && bundles[assetId]) media.asset = bundles[assetId];
     }
   }
   return coverByProduct;
@@ -213,7 +241,7 @@ export async function listExperiencesListing(
     client
       .from("products")
       .select(
-        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, is_demo_seed, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
+        "id, slug, name, tagline, price_amount, price_currency, status, filter_attributes, metadata, business_id, location_id, is_demo_seed, conversion_mode, accepts_online_payment, duration_minutes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, businesses:businesses!products_business_id_fkey ( id, slug, display_name, destination_id, destinations!businesses_destination_id_fkey ( slug, name ) )",
       )
       .eq("product_type", "experiencia")
       .in("status", statuses)
@@ -244,8 +272,63 @@ export async function listExperiencesListing(
     products.map((product) => String(product.id)),
   );
 
+  /* Ubicación real de la empresa operadora (regla Geolocation Mandatory).
+     Sólo coordenadas ya guardadas en el CMS: nunca se aproxima un punto. */
+  const businessIds = [
+    ...new Set(products.map((product) => String(product.business_id)).filter(Boolean)),
+  ];
+  const locationByBusiness = new Map<string, { lat: number; lng: number }>();
+  const locationById = new Map<string, { lat: number; lng: number }>();
+  if (businessIds.length) {
+    const { data: locations } = await client
+      .from("business_locations")
+      .select("id, business_id, latitude, longitude, is_primary")
+      .in("business_id", businessIds)
+      .is("deleted_at", null)
+      .order("is_primary", { ascending: false });
+    for (const row of (locations ?? []) as Row[]) {
+      const id = String(row.business_id);
+      if (locationByBusiness.has(id)) continue;
+      const lat = row.latitude != null ? Number(row.latitude) : null;
+      const lng = row.longitude != null ? Number(row.longitude) : null;
+      if (lat == null || lng == null || Number.isNaN(lat) || Number.isNaN(lng)) continue;
+      locationById.set(String(row.id), { lat, lng });
+      locationByBusiness.set(id, { lat, lng });
+    }
+  }
+
+  /* Peso de visibilidad del CMS (misma autoridad que el listado de empresas,
+     `listMarketplaceBusinesses`): plan efectivo del negocio operador.
+     Fail-closed: si la lectura falla, el listado conserva su orden alfabético. */
+  const boostByBusinessId = new Map<string, number>();
+  if (businessIds.length) {
+    try {
+      const { data: viz } = await client
+        .from("business_effective_visibility")
+        .select("business_id, levers, is_default")
+        .in("business_id", businessIds);
+      for (const row of (viz ?? []) as Row[]) {
+        if (row.is_default === true) continue;
+        const levers = (row.levers as Record<string, unknown> | null) ?? {};
+        const boost = Number(
+          (levers.discovery_boost as number | undefined) ??
+            (levers.search_weight as number | undefined) ??
+            0,
+        );
+        boostByBusinessId.set(String(row.business_id), Number.isFinite(boost) ? boost : 0);
+      }
+    } catch {
+      // Fail-closed: orden alfabético.
+    }
+  }
+  const boostByProductId = new Map<string, number>();
+
   const items: TourismCardVM[] = products
     .map((product) => {
+      boostByProductId.set(
+        String(product.id),
+        boostByBusinessId.get(String(product.business_id)) ?? 0,
+      );
       const business = (product.businesses as Row | null) ?? null;
       const destination = (business?.destinations as Row | null) ?? null;
       const cover = coverByProduct.get(product.id) ?? null;
@@ -268,6 +351,7 @@ export async function listExperiencesListing(
         tagline: (product.tagline as string | null) ?? null,
         businessName: (business?.display_name as string | null) ?? null,
         mediaUrl: cover?.url ?? null,
+        mediaAsset: cover?.asset,
         mediaAlt: cover?.alt ?? String(product.name),
         rating: null,
         location: destination ? { label: String(destination.name), distanceKm: null } : null,
@@ -284,9 +368,33 @@ export async function listExperiencesListing(
         secondaryAction: null,
         filterAttributes,
         destinationSlug: destination ? String(destination.slug) : null,
-      } as TourismCardVM & { destinationSlug: string | null };
+        /* Capacidad comercial real acreditada en el CMS. La tarjeta jamás
+           anuncia "Reserva en línea" sin estas dos banderas. */
+        conversionMode: (product.conversion_mode as string | null) ?? null,
+        acceptsOnlinePayment: product.accepts_online_payment === true,
+        onlineSalePriceAmount:
+          product.direct_sale_enabled === true && product.direct_sale_price_amount != null
+            ? Number(product.direct_sale_price_amount)
+            : null,
+        onlineSalePriceCurrency: (product.direct_sale_currency as string | null) ?? null,
+        durationMinutes:
+          product.duration_minutes != null ? Number(product.duration_minutes) : null,
+        coordinates:
+          (product.location_id ? locationById.get(String(product.location_id)) : null) ??
+          locationByBusiness.get(String(product.business_id)) ??
+          null,
+      } as ExperienceListingItem;
     })
-    .filter((item) => !destino || item.destinationSlug === destino);
+    .filter((item) => !destino || (item as ExperienceListingItem).destinationSlug === destino);
+
+  // Mismo criterio que los listados de empresas: peso de visibilidad DESC,
+  // luego alfabético. Sin pesos configurados el orden queda alfabético.
+  items.sort((a, b) => {
+    const scoreA = boostByProductId.get(a.id) ?? 0;
+    const scoreB = boostByProductId.get(b.id) ?? 0;
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    return a.name.localeCompare(b.name, "es");
+  });
 
   const destinationLabel = destino
     ? (destinationName ??
@@ -307,7 +415,9 @@ export async function listExperiencesListing(
     provenance: "real_reads",
     hero: {
       eyebrow: contract.hero.eyebrow,
-      title: destino ? `${contract.hero.title} en ${destinationLabel}` : contract.hero.title,
+      title: destino
+        ? `${contract.hero.title} en ${destinationLabel}`
+        : `${contract.hero.title} del ${REGION_SCOPE_LABEL}`,
       subtitle: contract.hero.subtitle,
       metaLabel: items.length ? `${items.length} experiencias publicadas` : null,
     },
@@ -349,7 +459,7 @@ export async function readExperienceReviewDetail(
   const { data: prod, error } = await client
     .from("products")
     .select(
-      "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
+      "id, slug, name, tagline, description, product_type, price_amount, price_currency, status, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, business_id, location_id, duration_minutes, capacity, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_max_quantity, direct_sale_cancellation_policy, direct_sale_terms, filter_attributes, metadata",
     )
     .eq("slug", slug)
     .eq("product_type", "experiencia")
@@ -372,11 +482,10 @@ export async function readExperienceReviewDetail(
         .maybeSingle(),
       client
         .from("business_locations")
-        .select("label, address_line1, address_line2, latitude, longitude, is_primary")
+        .select("id, label, address_line1, address_line2, latitude, longitude, is_primary")
         .eq("business_id", row.business_id)
         .is("deleted_at", null)
-        .order("is_primary", { ascending: false })
-        .limit(1),
+        .order("is_primary", { ascending: false }),
       client
         .from("business_contacts")
         .select("contact_type, value, label, is_public, sort_order")
@@ -414,7 +523,12 @@ export async function readExperienceReviewDetail(
       : null;
 
   const cover = covers.get(String(row.id)) ?? null;
-  const loc = ((locations ?? []) as Row[])[0] ?? null;
+  const locationRows = (locations ?? []) as Row[];
+  const loc =
+    locationRows.find((location) => location.id === row.location_id) ??
+    locationRows.find((location) => location.is_primary === true) ??
+    locationRows[0] ??
+    null;
   const contact = ((contacts ?? []) as Row[])[0] ?? null;
 
   return {
@@ -448,12 +562,14 @@ export async function readExperienceReviewDetail(
       terms: (row.direct_sale_terms as string | null) ?? null,
     },
     cover_url: cover?.url ?? null,
+    cover_asset: cover?.asset,
     media: cover
       ? [
           {
             id: `${row.id}-cover`,
             role: "cover",
             url: cover.url,
+            asset: cover.asset,
             alt: cover.alt,
             width: null,
             height: null,
@@ -487,6 +603,15 @@ export async function readExperienceReviewDetail(
           }
         : null,
     },
+    effective_location: loc
+      ? {
+          label: (loc.label as string | null) ?? null,
+          address_line1: (loc.address_line1 as string | null) ?? null,
+          address_line2: (loc.address_line2 as string | null) ?? null,
+          latitude: loc.latitude != null ? Number(loc.latitude) : null,
+          longitude: loc.longitude != null ? Number(loc.longitude) : null,
+        }
+      : null,
     related: [],
     promotions: [],
     reviews: [],

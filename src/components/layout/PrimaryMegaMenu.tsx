@@ -13,7 +13,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown } from "lucide-react";
+import {
+  BedDouble,
+  CalendarDays,
+  ChevronDown,
+  ChevronRight,
+  Home,
+  MapPin,
+  Search,
+  Sparkles,
+  UtensilsCrossed,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { listPublishedDestinations } from "@/lib/cms/public-reads.functions";
 
@@ -82,7 +93,7 @@ function mergeDestinos(published: DestinoLite[]): { featured: DestinoLite[]; res
 function buildSections(destinos: DestinoLite[]): MenuSection[] {
   const { featured, rest } = mergeDestinos(destinos);
   const destinosLinks: MenuLink[] = [
-    { label: `Ver los ${Math.max(destinos.length, 23)} destinos`, href: "/oriente-maya" },
+    { label: "Ver todos los destinos", href: "/oriente-maya" },
     ...featured.map((d) => ({ label: d.name, href: `/oriente-maya/${d.slug}` })),
   ];
   const otrosDestinos: MenuLink[] = rest.slice(0, 12).map((d) => ({
@@ -149,62 +160,13 @@ function buildSections(destinos: DestinoLite[]): MenuSection[] {
         { title: "Por destino", links: destFilterLinks("/experiencias") },
       ],
     },
-    {
-      id: "casas",
-      label: "Casas de vacaciones",
-      href: "/casas-de-vacaciones",
-      columns: [
-        {
-          title: "Hospedaje independiente",
-          links: [{ label: "Todas las casas", href: "/casas-de-vacaciones" }],
-        },
-        { title: "Por destino", links: destFilterLinks("/casas-de-vacaciones") },
-      ],
-    },
-    {
-      id: "que-hacer",
-      label: "¿Qué hacer?",
-      href: "/que-hacer",
-      columns: [
-        {
-          title: "Editorial",
-          links: [
-            { label: "Ver todas las actividades", href: "/que-hacer" },
-            { label: "Cultura", href: "/que-hacer?tema=cultura" },
-            { label: "Naturaleza", href: "/que-hacer?tema=naturaleza" },
-            { label: "Aventura", href: "/que-hacer?tema=aventura" },
-            { label: "Gastronomía", href: "/que-hacer?tema=gastronomia" },
-          ],
-        },
-        {
-          title: "Vida local",
-          links: [
-            { label: "Eventos", href: "/eventos" },
-            { label: "Mercados", href: "/que-hacer?tema=mercados" },
-          ],
-        },
-      ],
-    },
-    {
-      id: "mas",
-      label: "Más",
-      href: "/promociones",
-      expandOnly: true,
-      columns: [
-        {
-          links: [
-            { label: "Promociones", href: "/promociones" },
-            { label: "Mapa", href: "/mapa" },
-            { label: "Blog", href: "/blog" },
-            { label: "Contacto", href: "/contacto" },
-          ],
-        },
-      ],
-    },
+    // Casas de vacaciones, ¿Qué hacer?, Eventos y los enlaces institucionales
+    // viven ahora exclusivamente en el panel de menú (hamburguesa), también en
+    // escritorio. La barra principal conserva sólo las secciones que venden.
   ];
 }
 
-function useSections(): MenuSection[] {
+function usePublishedDestinos(): DestinoLite[] {
   const { data } = useQuery({
     queryKey: ["primary-menu", "destinations"],
     queryFn: async () => {
@@ -213,7 +175,7 @@ function useSections(): MenuSection[] {
     },
     staleTime: 5 * 60_000,
   });
-  return buildSections(data ?? []);
+  return data ?? [];
 }
 
 function activeDestinationFromPath(pathname: string): string | null {
@@ -235,7 +197,8 @@ function hrefWithActiveDestination(href: string, activeDestination: string | nul
 }
 
 export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
-  const sections = useSections();
+  const destinos = usePublishedDestinos();
+  const sections = buildSections(destinos);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [browserPathname, setBrowserPathname] = useState<string | null>(null);
   useEffect(() => {
@@ -251,13 +214,7 @@ export function PrimaryMegaMenu(props: PrimaryMegaMenuProps) {
       />
     );
   }
-  return (
-    <MobileMenu
-      sections={sections}
-      activeDestination={activeDestination}
-      onNavigate={props.onNavigate}
-    />
-  );
+  return <MobileMenu activeDestination={activeDestination} onNavigate={props.onNavigate} />;
 }
 
 /* ─────────────────────────── Desktop ─────────────────────────── */
@@ -402,81 +359,110 @@ function DesktopMenu({
 
 /* ─────────────────────────── Mobile ─────────────────────────── */
 
+interface MobileItem extends MenuLink {
+  icon: LucideIcon;
+}
+
+const MOBILE_PRIMARY: MobileItem[] = [
+  { label: "Hoteles", href: "/hoteles", hint: "Dónde dormir", icon: BedDouble },
+  { label: "Restaurantes", href: "/restaurantes", hint: "Dónde comer", icon: UtensilsCrossed },
+  {
+    label: "Casas de vacaciones",
+    href: "/casas-de-vacaciones",
+    hint: "Estancias completas",
+    icon: Home,
+  },
+  { label: "Experiencias", href: "/experiencias", hint: "Tours y actividades", icon: Sparkles },
+  { label: "¿Qué hacer?", href: "/que-hacer", hint: "Lugares y sitios de interés", icon: MapPin },
+  { label: "Eventos", href: "/eventos", hint: "Agenda del destino", icon: CalendarDays },
+];
+
+const MOBILE_SECONDARY: MenuLink[] = [
+  { label: "Promociones", href: "/promociones" },
+  { label: "Mapa", href: "/mapa" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contacto", href: "/contacto" },
+];
+
 function MobileMenu({
-  sections,
   activeDestination,
   onNavigate,
 }: {
-  sections: MenuSection[];
   activeDestination: string | null;
   onNavigate?: () => void;
 }) {
-  const [open, setOpen] = useState<string | null>(null);
   return (
-    <ul className="flex flex-col gap-0.5">
-      {sections.map((section) => {
-        const isOpen = open === section.id;
-        const cols = Array.isArray(section.columns) ? section.columns : [];
-        return (
-          <li key={section.id} className="border-b border-border/40 last:border-b-0">
-            <div className="flex items-stretch">
-              {section.expandOnly ? (
-                <button
-                  type="button"
-                  onClick={() => setOpen(isOpen ? null : section.id)}
-                  className="flex-1 rounded-lg px-3 py-2.5 text-left text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
-                >
-                  {section.label}
-                </button>
-              ) : (
+    <div className="flex flex-col gap-4 pb-1">
+      <a
+        href="/oriente-maya"
+        onClick={() => onNavigate?.()}
+        className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-colors hover:bg-foreground/[0.04]"
+      >
+        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground/[0.06] text-muted-foreground">
+          <Search className="size-4" aria-hidden />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-[0.95rem] font-medium leading-snug text-foreground">
+            ¿Donde empezamos?
+          </span>
+          <span className="block text-[0.8125rem] leading-snug text-muted-foreground">
+            Explora el Oriente Maya de Yucatán
+          </span>
+        </span>
+        <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground" aria-hidden />
+      </a>
+
+      <div>
+        <p className="mb-2 px-1 text-[0.8125rem] font-medium text-muted-foreground">Descubre</p>
+        <ul className="flex flex-col">
+          {MOBILE_PRIMARY.map((link) => {
+            const Icon = link.icon;
+            return (
+              <li key={link.href} className="border-b border-border/40 last:border-b-0">
                 <a
-                  href={hrefWithActiveDestination(section.href, activeDestination)}
+                  href={hrefWithActiveDestination(link.href, activeDestination)}
                   onClick={() => onNavigate?.()}
-                  className="flex-1 rounded-lg px-3 py-2.5 text-[0.95rem] font-medium leading-tight text-foreground hover:bg-accent hover:text-accent-foreground"
+                  className="flex items-center gap-3 rounded-xl px-1 py-3 transition-colors hover:bg-foreground/[0.04]"
                 >
-                  {section.label}
-                </a>
-              )}
-              <button
-                type="button"
-                aria-label={isOpen ? `Cerrar ${section.label}` : `Abrir ${section.label}`}
-                aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : section.id)}
-                className="inline-flex w-10 items-center justify-center text-muted-foreground hover:text-foreground"
-              >
-                <ChevronDown
-                  className={cn("size-4 transition-transform", isOpen && "rotate-180")}
-                  aria-hidden
-                />
-              </button>
-            </div>
-            {isOpen ? (
-              <div className="pb-3 pl-3">
-                {cols.map((col, idx) => (
-                  <div key={idx} className="mt-2">
-                    {col.title ? (
-                      <p className="text-caption mb-1 px-2 text-muted-foreground">{col.title}</p>
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground/[0.06] text-muted-foreground">
+                    <Icon className="size-[1.05rem]" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[1rem] font-medium leading-snug text-foreground">
+                      {link.label}
+                    </span>
+                    {link.hint ? (
+                      <span className="block truncate text-[0.8125rem] text-muted-foreground">
+                        {link.hint}
+                      </span>
                     ) : null}
-                    <ul className="flex flex-col gap-0.5">
-                      {col.links.map((link) => (
-                        <li key={link.href + link.label}>
-                          <a
-                            href={hrefWithActiveDestination(link.href, activeDestination)}
-                            onClick={() => onNavigate?.()}
-                            className="block rounded-md px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground"
-                          >
-                            {link.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </li>
-        );
-      })}
-    </ul>
+                  </span>
+                  <ChevronRight
+                    className="ml-auto size-4 shrink-0 text-muted-foreground/70"
+                    aria-hidden
+                  />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <div className="border-t border-border/50 pt-3">
+        <ul className="flex flex-wrap gap-x-5 gap-y-0.5 px-1">
+          {MOBILE_SECONDARY.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                onClick={() => onNavigate?.()}
+                className="inline-block py-2 text-[0.9375rem] font-normal text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }

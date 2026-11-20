@@ -41,13 +41,24 @@ export function WorkspaceShell({
   return (
     <WorkspaceContextProvider>
       <SheetStackProvider>
-        <div className={cn("flex h-[100dvh] w-full bg-background text-foreground", className)}>
+        {/*
+         * Altura estable: en navegadores móviles (iOS Safari) `100dvh` cambia
+         * al ocultar/mostrar la barra del navegador y el área de trabajo
+         * "salta" dejando un hueco en blanco. Usamos `100svh` (altura estable)
+         * y conservamos `100dvh` sólo en escritorio, donde no varía.
+         */}
+        <div
+          className={cn(
+            "flex h-[100svh] w-full overflow-hidden bg-background text-foreground lg:h-[100dvh]",
+            className,
+          )}
+        >
           {showSidebar ? <WorkspaceSidebar /> : null}
           <div className="flex min-w-0 flex-1 flex-col">
             <WorkspaceTopbar title={title} titleAsText={topbarTitleAsText} />
             <main
               id="main"
-              className="min-h-0 flex-1 overflow-y-auto"
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]"
               style={{
                 paddingBottom:
                   bp === "xs" || bp === "sm"

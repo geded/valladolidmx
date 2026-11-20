@@ -11,6 +11,7 @@ import { Sparkles, ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { AluxMark } from "@/components/alux/AluxMark";
 import { usePlannerPresence } from "@/lib/alux/planner-presence";
+import { useAluxBrand } from "@/lib/brand/brand-context";
 
 import {
   applyAluxPlannerDefaults,
@@ -25,6 +26,7 @@ const VARIANT_PADDING: Record<AluxPlannerDTO["variant"], string> = {
 
 export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> } = {}) {
   const dto = applyAluxPlannerDefaults(config);
+  const alux = useAluxBrand();
   // Máximo un planificador contextual por página (el dock global es aparte).
   const isOwner = usePlannerPresence();
   if (!isOwner) return null;
@@ -52,7 +54,9 @@ export function AluxPlannerBlock({ config }: { config?: Record<string, unknown> 
           <div className="relative mb-4 flex items-center gap-3">
             {/* Sistema visual canónico Alux IA — activo gobernado /brand/alux/. */}
             <AluxMark family="full" size={96} decorative={Boolean(dto.eyebrow)} loading="lazy" />
-            <p className="text-sm font-semibold text-foreground">Alux · Concierge IA</p>
+            <p className="text-sm font-semibold text-foreground">
+              {alux.name} · {alux.copy("shortDescriptor")}
+            </p>
           </div>
           <div className="relative flex min-w-0 flex-col gap-4">
             {dto.eyebrow ? (

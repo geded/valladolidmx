@@ -18,6 +18,7 @@ import {
 } from "@/components/home-premium/home-premium-config";
 import {
   mergeHomeRealContent,
+  readHomeRailLimits,
   resolveHomeSectionVisibility,
 } from "@/components/home-premium/home-premium-real";
 import { useTranslation } from "@/i18n/context";
@@ -55,7 +56,12 @@ function HomePremiumNode({
     staleTime: 60_000,
   });
 
-  const content = mergeHomeRealContent(resolved.content, data);
+  const content = mergeHomeRealContent(
+    resolved.content,
+    data,
+    localized.config as Record<string, unknown>,
+    readHomeRailLimits(localized.config),
+  );
   const sections = resolveHomeSectionVisibility(content, resolved.sections);
   const surface = (
     <HomePremiumSurface

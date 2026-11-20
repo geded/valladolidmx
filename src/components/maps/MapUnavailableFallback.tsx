@@ -56,7 +56,9 @@ export function MapUnavailableFallback({ points = [], className }: MapUnavailabl
                 key={`${point.lat},${point.lng},${index}`}
                 className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-border/70 bg-background px-3 py-2"
               >
-                <span className="min-w-0 flex-1 truncate font-medium text-foreground">{label}</span>
+                <span className="w-full min-w-0 font-medium text-foreground sm:w-auto sm:flex-1 sm:truncate">
+                  {label}
+                </span>
                 <a
                   href={googleMapsPlaceUrl(point)}
                   target="_blank"

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { formatInMerida } from "@/lib/time/merida";
 import { SITE } from "@/config/site";
 import {
   Body,
@@ -33,12 +34,13 @@ const CouponRedeemedEmail = ({
   reviewUrl = `${SITE.url}`,
 }: Props) => {
   const dateLabel = redeemedAt
-    ? new Date(redeemedAt).toLocaleString("es-MX", {
+    ? formatInMerida(redeemedAt, {
         day: "2-digit",
         month: "long",
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
+        hour12: false,
       })
     : null;
   return (

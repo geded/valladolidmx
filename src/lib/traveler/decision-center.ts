@@ -26,6 +26,7 @@
  */
 
 import type { DestinationContext, LiveDayContext, LiveDayItemInput } from "@/lib/traveler/live-day";
+import { meridaClock } from "@/lib/time/merida";
 import type { TripPhase } from "@/lib/traveler/trip-phase";
 
 /** Ranura conceptual del Centro de Decisiones. */
@@ -142,7 +143,7 @@ function humanTime(iso?: string | null): string | undefined {
   if (!iso) return undefined;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return undefined;
-  return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return meridaClock(d);
 }
 
 /**

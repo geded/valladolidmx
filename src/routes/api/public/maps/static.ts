@@ -98,7 +98,7 @@ export const Route = createFileRoute("/api/public/maps/static")({
           status: 200,
           headers: {
             "Content-Type": contentType,
-            "Cache-Control": "public, max-age=86400, s-maxage=86400",
+            "Cache-Control": "public, max-age=1800, s-maxage=1800",
           },
         });
       },

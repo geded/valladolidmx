@@ -18,13 +18,13 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PremiumPresetGallery } from "@/components/experience-builder/PremiumPresetGallery";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
 import {
   Archive,
   ArchiveRestore,
   CalendarClock,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Copy,
@@ -41,6 +41,7 @@ import {
   Search,
   Star,
   Trash2,
+  Undo2,
   X,
 } from "lucide-react";
 
@@ -55,6 +56,7 @@ import {
   unarchiveComposition,
   deleteComposition,
   markCompositionAsTemplate,
+  setCompositionWorkflowState,
   type StudioPageRow,
 } from "@/lib/experience-builder/studio.functions";
 import {
@@ -64,6 +66,12 @@ import {
   type PageKindDefinition,
 } from "@/lib/experience-builder/page-kind-registry";
 import { getKitSeed } from "@/lib/experience-builder/kit-seeds";
+import {
+  buildPresetCompositionTree,
+  defaultPresetIdForPageKind,
+  type OfficialTemplateEntry,
+} from "@/lib/experience-builder/official-template-structure";
+import { OfficialTemplateStructure } from "./OfficialTemplateStructure";
 import { useAuth } from "@/hooks/useAuth";
 
 /* -------------------------------------------------------------------- */
@@ -73,6 +81,38 @@ import { useAuth } from "@/hooks/useAuth";
 type StatusFilter = "all" | "draft" | "published" | "scheduled" | "archived";
 type WorkflowFilter = "all" | "draft" | "in_review" | "approved";
 type OwnershipFilter = "all" | "mine";
+
+/**
+ * Familias con cadena vigente Studio → guardado → preview → superficie pública.
+ * Las familias históricas o todavía desconectadas no se ofrecen como editables:
+ * permanecen intactas en el historial y pueden recuperarse cuando completen su gate.
+ */
+const ACTIVE_STUDIO_KINDS = new Set<PageKind>([
+  "home",
+  "landing",
+  "campaign",
+  "microsite",
+  "institutional",
+  "promo",
+  "place",
+  "experience",
+  "hotel",
+  "restaurant",
+  "event",
+  "business",
+  "product",
+  "alux",
+  "trip_builder",
+  "wedding",
+]);
+
+const ACTIVE_PAGE_KIND_REGISTRY = PAGE_KIND_REGISTRY.filter((definition) =>
+  ACTIVE_STUDIO_KINDS.has(definition.kind),
+);
+
+function isCurrentStudioPage(row: StudioPageRow): boolean {
+  return ACTIVE_STUDIO_KINDS.has(row.kind);
+}
 
 function slugify(v: string): string {
   return v
@@ -210,17 +250,19 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const unarchive = useServerFn(unarchiveComposition);
   const del = useServerFn(deleteComposition);
   const markTpl = useServerFn(markCompositionAsTemplate);
+  const setWorkflow = useServerFn(setCompositionWorkflowState);
 
   const [rows, setRows] = useState<StudioPageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  // La vista operativa abre sólo lo que está publicado y en uso. Los borradores
+  // y archivados siguen disponibles mediante el filtro para revisión gobernada.
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("published");
   const [kindFilter, setKindFilter] = useState<PageKind | "all">("all");
   const [workflowFilter, setWorkflowFilter] = useState<WorkflowFilter>("all");
   const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>("all");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [showCreate, setShowCreate] = useState(false);
-  const [showPremium, setShowPremium] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [inlineEdit, setInlineEdit] = useState<null | {
     mode: "rename" | "slug";
@@ -256,6 +298,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     return rows.filter((r) => {
+      if (!isCurrentStudioPage(r)) return false;
       if (statusFilter !== "all" && derivedStatus(r) !== statusFilter) return false;
       if (kindFilter !== "all" && r.kind !== kindFilter) return false;
       if (workflowFilter !== "all" && r.workflow_state !== workflowFilter) return false;
@@ -277,7 +320,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
       list.push(r);
       byKind.set(r.kind, list);
     }
-    return PAGE_KIND_REGISTRY.map((def) => ({
+    return ACTIVE_PAGE_KIND_REGISTRY.map((def) => ({
       def,
       rows: byKind.get(def.kind) ?? [],
     }));
@@ -299,6 +342,57 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
       publicPath: publicPathFromKind(def, r.slug),
       custom: true,
     });
+  };
+
+  /** Abre por dirección web una página ya existente (Estructura oficial). */
+  const handleOpenSlug = (slug: string) => {
+    const row = rows.find((r) => r.slug === slug);
+    if (!row) {
+      toast.error("Esa página todavía no existe.");
+      return;
+    }
+    handleOpen(row);
+  };
+
+  /**
+   * Crea la página de trabajo de una sección usando su plantilla
+   * aprobada. Fail-closed: sin preset declarado no se crea nada.
+   */
+  const handleCreateFromTemplate = async (entry: OfficialTemplateEntry) => {
+    if (!entry.workingSlug) return;
+    const tree = buildPresetCompositionTree(entry.id);
+    if (!tree) {
+      toast.error("Esta sección todavía no tiene plantilla aprobada declarada.");
+      return;
+    }
+    setBusyId(entry.id);
+    try {
+      const created = await create({
+        data: {
+          slug: entry.workingSlug,
+          title: entry.name,
+          description: entry.description,
+          page_type: entry.pageKind,
+        },
+      });
+      await saveDraft({ data: { id: created.id, tree } });
+      toast.success("Página creada con la plantilla de la sección.");
+      await reload();
+      onOpenPage({
+        id: created.id,
+        key: entry.workingSlug,
+        slug: entry.workingSlug,
+        title: entry.name,
+        description: entry.description,
+        page_type: entry.pageKind,
+        publicPath: entry.publicRoute.includes("{") ? `/p/${entry.workingSlug}` : entry.publicRoute,
+        custom: true,
+      });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusyId(null);
+    }
   };
 
   const doAction = async (id: string, fn: () => Promise<unknown>, ok: string) => {
@@ -336,6 +430,29 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
         }),
       r.is_template ? "Marca de plantilla retirada." : "Guardada como plantilla oficial.",
     );
+
+  /**
+   * Flujo editorial desde el listado. Respeta la máquina oficial
+   * `draft → in_review → approved`: si se aprueba desde borrador se
+   * registra primero el paso por revisión, sin saltar estados.
+   */
+  const onWorkflow = (r: StudioPageRow, next: "draft" | "in_review" | "approved") => {
+    const labels: Record<string, string> = {
+      draft: "Página regresada a borrador.",
+      in_review: "Página enviada a revisión.",
+      approved: "Página aprobada.",
+    };
+    void doAction(
+      r.id,
+      async () => {
+        if (next === "approved" && r.workflow_state === "draft") {
+          await setWorkflow({ data: { id: r.id, next_state: "in_review" } });
+        }
+        return setWorkflow({ data: { id: r.id, next_state: next } });
+      },
+      labels[next] ?? "Estado actualizado.",
+    );
+  };
 
   const submitInlineEdit = async () => {
     if (!inlineEdit) return;
@@ -385,8 +502,8 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           </p>
           <h2 className="mt-1 text-lg font-semibold sm:text-xl">Mis páginas</h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Todas las páginas del sitio, agrupadas por tipo. Selecciona una para editarla dentro del
-            Studio, sin salir del canvas.
+            Páginas y plantillas aprobadas que utiliza actualmente el sitio. Los borradores
+            históricos permanecen disponibles en el filtro de estados.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -397,14 +514,10 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           >
             Actualizar
           </button>
-          <button
-            type="button"
-            onClick={() => setShowPremium((v) => !v)}
-            aria-pressed={showPremium}
-            className="rounded-md border border-primary/40 bg-primary/5 px-3 py-1.5 text-[11px] font-semibold text-primary hover:bg-primary/10"
-          >
-            Plantillas premium
-          </button>
+          {/* R1 · Un solo lugar para trabajar plantillas: el Panel de Páginas.
+              El catálogo interno de presets premium permanece disponible en la
+              ruta interna /lovable/g8e-premium-template-catalog (no editorial). */}
+
           <button
             type="button"
             onClick={() => setShowCreate(true)}
@@ -415,12 +528,14 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
         </div>
       </header>
 
-      {showPremium ? (
-        <PremiumPresetGallery
-          pageKind={kindFilter === "all" ? undefined : kindFilter}
-          onClose={() => setShowPremium(false)}
-        />
-      ) : null}
+      {/* Estructura oficial de plantillas por sección */}
+      <OfficialTemplateStructure
+        rows={rows}
+        loading={loading}
+        busyId={busyId}
+        onOpenSlug={handleOpenSlug}
+        onCreateFromTemplate={handleCreateFromTemplate}
+      />
 
       {/* Filtros y búsqueda */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2">
@@ -455,7 +570,7 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
           aria-label="Filtrar por tipo de página"
         >
           <option value="all">Todos los tipos</option>
-          {PAGE_KIND_REGISTRY.map((k) => (
+          {ACTIVE_PAGE_KIND_REGISTRY.map((k) => (
             <option key={k.kind} value={k.kind}>
               {k.label}
             </option>
@@ -525,6 +640,14 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
                       return canDelete
                         ? onMarkTemplate(row)
                         : toast.error("Sólo administradores pueden gestionar plantillas.");
+                    case "wf_review":
+                      return onWorkflow(row, "in_review");
+                    case "wf_approve":
+                      return canDelete
+                        ? onWorkflow(row, "approved")
+                        : toast.error("Sólo administradores pueden aprobar.");
+                    case "wf_draft":
+                      return onWorkflow(row, "draft");
                     default:
                       return;
                   }
@@ -562,14 +685,24 @@ export function PagesPanel({ onOpenPage, seedPages = [] }: PagesPanelProps) {
               // usando `getKitSeed(kind).build()`. Persistimos con el
               // flujo existente (`saveCompositionDraft`) — sin tocar
               // Business / Product ni renderers.
+              // Plantilla por defecto de la sección: si el tipo tiene un
+              // preset premium aprobado, la página nueva nace con él. Si no,
+              // se conserva la semilla oficial del Surface Kit.
+              const presetId = defaultPresetIdForPageKind(form.kind);
+              const presetTree = presetId ? buildPresetCompositionTree(presetId) : null;
               const seed = getKitSeed(form.kind);
-              if (seed && created?.id) {
+              const initialTree = presetTree ?? (seed ? seed.build() : null);
+              if (initialTree && created?.id) {
                 try {
-                  await saveDraft({ data: { id: created.id, tree: seed.build() } });
-                  toast.success("Página creada con semilla del Kit.");
+                  await saveDraft({ data: { id: created.id, tree: initialTree } });
+                  toast.success(
+                    presetTree
+                      ? "Página creada con la plantilla de la sección."
+                      : "Página creada con semilla del Kit.",
+                  );
                 } catch (seedErr) {
                   // No bloqueamos la creación por un fallo de semilla.
-                  console.warn("[PagesPanel] seed inicial falló:", seedErr);
+                  console.warn("[PagesPanel] semilla inicial falló:", seedErr);
                   toast.success("Página creada (semilla vacía).");
                 }
               } else {
@@ -641,7 +774,10 @@ type RowAction =
   | "archive"
   | "unarchive"
   | "delete"
-  | "template";
+  | "template"
+  | "wf_review"
+  | "wf_approve"
+  | "wf_draft";
 
 function GroupBlock({
   def,
@@ -868,6 +1004,29 @@ function PageRow({
                 disabled={!canDelete}
               />
               <div className="my-1 border-t border-border" />
+              {row.workflow_state !== "in_review" && row.workflow_state !== "approved" ? (
+                <MenuItem
+                  icon={GitBranch}
+                  label="Enviar a revisión"
+                  onClick={() => onAction("wf_review", row)}
+                />
+              ) : null}
+              {row.workflow_state !== "approved" ? (
+                <MenuItem
+                  icon={CheckCircle2}
+                  label="Aprobar"
+                  onClick={() => onAction("wf_approve", row)}
+                  disabled={!canDelete}
+                />
+              ) : null}
+              {row.workflow_state !== "draft" ? (
+                <MenuItem
+                  icon={Undo2}
+                  label="Regresar a borrador"
+                  onClick={() => onAction("wf_draft", row)}
+                />
+              ) : null}
+              <div className="my-1 border-t border-border" />
               {archived ? (
                 <MenuItem
                   icon={ArchiveRestore}
@@ -964,7 +1123,7 @@ function CreatePageDialog({
   }) => Promise<void>;
 }) {
   const { roles } = useAuth();
-  const allowedKinds = PAGE_KIND_REGISTRY.filter((k) =>
+  const allowedKinds = ACTIVE_PAGE_KIND_REGISTRY.filter((k) =>
     k.requiredRoles.some((r) => roles.includes(r)),
   );
   const [step, setStep] = useState<1 | 2>(1);

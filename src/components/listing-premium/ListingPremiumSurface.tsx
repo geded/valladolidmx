@@ -21,7 +21,10 @@ import {
 import type { TourismCardVM } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
-import { TerritorialListingReviewSurface } from "./TerritorialListingReviewSurface";
+import {
+  TerritorialListingReviewSurface,
+  type TerritorialListingProfileOverride,
+} from "./TerritorialListingReviewSurface";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((module) => ({ default: module.InteractiveMap })),
@@ -76,6 +79,7 @@ export interface ListingPremiumSurfaceProps {
     title: string;
     subtitle: string | null;
     mediaUrl: string | null;
+    mediaAsset?: import("@/lib/media/resolve-source").MediaAssetInput;
     mediaAlt: string | null;
     metaLabel?: string | null;
   };
@@ -91,6 +95,8 @@ export interface ListingPremiumSurfaceProps {
   familyLabel?: string;
   intentPrompts?: readonly string[];
   mapSlot?: ReactNode;
+  /** Superficie pública para medición de visibilidad (aditiva). */
+  trackingSurface?: string | null;
   className?: string;
 }
 
@@ -108,6 +114,7 @@ export function ListingPremiumSurface({
   familyLabel,
   intentPrompts,
   mapSlot,
+  trackingSurface = null,
   className,
 }: ListingPremiumSurfaceProps) {
   return (
@@ -117,6 +124,7 @@ export function ListingPremiumSurface({
         title: hero.title,
         subtitle: hero.subtitle,
         mediaUrl: hero.mediaUrl,
+        mediaAsset: hero.mediaAsset,
         mediaAlt: hero.mediaAlt,
         metaLabel: hero.metaLabel ?? null,
       }}
@@ -131,6 +139,8 @@ export function ListingPremiumSurface({
       familyLabel={familyLabel}
       intentPrompts={intentPrompts}
       mapSlot={mapSlot}
+      trackingSurface={trackingSurface}
+      trackingRail="listado"
       emptyMessage={
         emptyMessage ?? "Aún no hay resultados publicados. Explora otros destinos del Oriente Maya."
       }
@@ -154,6 +164,8 @@ export interface ListingPremiumSurfaceFromDTOProps {
   nearbyItems?: readonly TourismCardVM[];
   /** Contexto territorial bloqueado del listado contextual. */
   lockedDestinationLabel?: string | null;
+  /** Copy de la categoría activa para la familia genérica de empresas. */
+  profileOverride?: TerritorialListingProfileOverride;
 }
 
 /**
@@ -172,6 +184,7 @@ export function ListingPremiumSurfaceFromDTO({
   className,
   nearbyItems,
   lockedDestinationLabel,
+  profileOverride,
 }: ListingPremiumSurfaceFromDTOProps) {
   // Perfiles visuales aprobados dentro de la única entrada canónica. Comparten
   // el mismo PublicListingDTO, mapa, Alux, Mi Viaje y expediente de concierge;
@@ -179,10 +192,12 @@ export function ListingPremiumSurfaceFromDTO({
   if (
     dto.family === "hoteles" ||
     dto.family === "restaurantes" ||
+    dto.family === "experiencias" ||
     dto.family === "casas-de-vacaciones" ||
     dto.family === "eventos" ||
     dto.family === "lugares" ||
-    dto.family === "que-hacer"
+    dto.family === "que-hacer" ||
+    dto.family === "empresas"
   ) {
     return (
       <TerritorialListingReviewSurface
@@ -190,10 +205,12 @@ export function ListingPremiumSurfaceFromDTO({
           dto.family as
             | "hoteles"
             | "restaurantes"
+            | "experiencias"
             | "casas-de-vacaciones"
             | "eventos"
             | "lugares"
             | "que-hacer"
+            | "empresas"
         }
         dto={dto}
         titleOverride={titleOverride}
@@ -201,6 +218,7 @@ export function ListingPremiumSurfaceFromDTO({
         facets={facets}
         nearbyItems={nearbyItems}
         lockedDestinationLabel={lockedDestinationLabel}
+        profileOverride={profileOverride}
       />
     );
   }
@@ -212,7 +230,7 @@ export function ListingPremiumSurfaceFromDTO({
     (item): item is TourismCardVM & { coordinates: { lat: number; lng: number } } =>
       item.coordinates?.lat != null && item.coordinates?.lng != null,
   );
-  const family = FAMILY_EXPERIENCE[dto.family];
+  const family = FAMILY_EXPERIENCE[dto.family as keyof typeof FAMILY_EXPERIENCE];
   const defaultFacets = [
     buildDestinationFacet([...dto.items]),
     buildEntityKindFacet([...dto.items]),
@@ -248,6 +266,7 @@ export function ListingPremiumSurfaceFromDTO({
         title: titleOverride?.trim() || dto.hero.title,
         subtitle: subtitleOverride?.trim() || dto.hero.subtitle,
         mediaUrl: mediaItems[0]?.mediaUrl ?? null,
+        mediaAsset: mediaItems[0]?.mediaAsset,
         mediaAlt: mediaItems[0]?.mediaAlt ?? mediaItems[0]?.name ?? null,
         metaLabel: dto.hero.metaLabel,
       }}
@@ -263,6 +282,7 @@ export function ListingPremiumSurfaceFromDTO({
       familyLabel={family.label}
       intentPrompts={family.prompts}
       mapSlot={mapSlot}
+      trackingSurface={dto.family}
       className={className}
     />
   );

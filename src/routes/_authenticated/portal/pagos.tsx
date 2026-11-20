@@ -2,6 +2,7 @@
  * /portal/pagos — vista administrativa por empresa para pagos y visibilidad.
  */
 import { useEffect, useMemo, useState } from "react";
+import { meridaDate } from "@/lib/time/merida";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -206,7 +207,7 @@ function CommercialStatusView({ data }: { data: AdminBusinessCommercialStatus })
                     </td>
                     <td className="px-5 py-3">{formatMoney(pkg.amount, pkg.currency)}</td>
                     <td className="px-5 py-3 text-muted-foreground">
-                      {pkg.paid_at ? new Date(pkg.paid_at).toLocaleDateString("es-MX") : "—"}
+                      {pkg.paid_at ? meridaDate(pkg.paid_at) : "—"}
                     </td>
                   </tr>
                 ))}

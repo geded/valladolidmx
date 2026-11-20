@@ -49,6 +49,13 @@ const DEMO_EVENT: PublicEventDetail = {
   },
   latitude: null,
   longitude: null,
+  recurrence_frequency: null,
+  recurrence_interval: 1,
+  recurrence_weekdays: [],
+  recurrence_until: null,
+  schedule_times: [],
+  exception_dates: [],
+  event_timezone: "America/Merida",
   body: [
     "Contenido de demostración para revisión visual interna.",
     "",

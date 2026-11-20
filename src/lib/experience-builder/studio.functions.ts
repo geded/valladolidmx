@@ -18,7 +18,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import type { CompositionNode, CompositionTree } from "./composition-tree";
 import { EMPTY_TREE } from "./composition-tree";
-import { translateTreeBestEffort } from "./translate.functions";
 import {
   getMarketplaceBusinessBySlug,
   type MarketplaceBusinessDetail,
@@ -91,6 +90,77 @@ export interface CompositionRevisionSummary {
   is_active: boolean;
 }
 
+/**
+ * Claves heredadas de versiones anteriores del borrador que la plantilla
+ * aprobada ya no declara. Se descartan antes de validar para que un borrador
+ * histórico no bloquee el guardado; no sustituyen ningún dato vigente.
+ */
+const LEGACY_CONFIG_KEYS: Readonly<Record<string, readonly string[]>> = {
+  "vmx.home.premium-g4": ["eventos_image", "eventos_image_alt"],
+};
+
+function dropLegacyNodeConfig(node: CompositionNode): CompositionNode {
+  const legacy = LEGACY_CONFIG_KEYS[node.type];
+  let config = node.config;
+  if (legacy && config && typeof config === "object") {
+    const next = { ...(config as Record<string, unknown>) };
+    let changed = false;
+    for (const key of legacy)
+      if (key in next) {
+        delete next[key];
+        changed = true;
+      }
+    if (changed) config = next;
+  }
+  return {
+    ...node,
+    config,
+    children: node.children?.map(dropLegacyNodeConfig),
+  };
+}
+
+/**
+ * Reordenamiento editorial puro: el árbol entrante es idéntico al guardado
+ * salvo el campo `order` de las secciones raíz. Es la capacidad declarada de
+ * reordenar una plantilla Premium aprobada y no modifica contenido, medios,
+ * enlaces ni maqueta, por lo que no re-valida autoría de bloques históricos.
+ */
+function isRootOrderOnlyDelta(next: CompositionTree, previous: CompositionTree): boolean {
+  const a = next.root?.children ?? [];
+  const b = previous.root?.children ?? [];
+  if (!b.length || a.length !== b.length) return false;
+  const dropUndefined = (value: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined));
+  const strip = (node: CompositionNode) => {
+    const { order: _order, ...rest } = (node.config ?? {}) as Record<string, unknown>;
+    return canonicalize(
+      dropUndefined({ ...(node as unknown as Record<string, unknown>), config: dropUndefined(rest) }),
+    );
+  };
+  let orderChanged = false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i].id !== b[i].id) return false;
+    if (strip(a[i]) !== strip(b[i])) return false;
+    const na = (a[i].config ?? {})["order"];
+    const nb = (b[i].config ?? {})["order"];
+    if (na !== nb) {
+      if (na !== undefined && typeof na !== "number") return false;
+      orderChanged = true;
+    }
+  }
+  return orderChanged;
+}
+
+function dropLegacyConfig(tree: CompositionTree): CompositionTree {
+  return {
+    ...tree,
+    root: {
+      ...tree.root,
+      children: (tree.root.children ?? []).map(dropLegacyNodeConfig),
+    },
+  };
+}
+
 function mergeExistingNodeI18n(
   incoming: CompositionNode,
   existingById: Map<string, CompositionNode>,
@@ -135,12 +205,17 @@ async function resolveServerEditorialActor(
   context: EditorialServerContext,
 ): Promise<EditorialActorClass> {
   const roles = ["super_admin", "admin", "editor", "business_owner"] as const;
+  const checks = await Promise.all(
+    roles.map(async (role) => {
+      const { data, error } = await context.supabase.rpc("has_role", {
+        _user_id: context.userId,
+        _role: role,
+      });
+      return { role, data, error };
+    }),
+  );
   const resolved: string[] = [];
-  for (const role of roles) {
-    const { data, error } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: role,
-    });
+  for (const { role, data, error } of checks) {
     if (error) throw new Error(`i4_role_check_failed: ${error.message}`);
     if (data) resolved.push(role);
   }
@@ -242,10 +317,12 @@ async function assertI4AuthoringTree(input: {
 }) {
   const surface: EditorialSurface | null = resolveEditorialSurface(input.pageType);
   if (!surface) throw new Error(`i4_authoring_forbidden: unknown page kind "${input.pageType}"`);
-  const actor = await resolveServerEditorialActor(input.context);
+  const [actor, registeredMediaPaths] = await Promise.all([
+    resolveServerEditorialActor(input.context),
+    loadRegisteredMediaPaths(input.context, input.tree),
+  ]);
   if (actor === "business_author" && surface !== "business")
     throw new Error("i4_authoring_forbidden: business authors require business surface");
-  const registeredMediaPaths = await loadRegisteredMediaPaths(input.context, input.tree);
   const validation = validateEditorialCompositionTree({
     tree: input.tree,
     previous_tree: input.previousTree,
@@ -283,6 +360,15 @@ export const getComposition = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!row) return null;
     const activeId = (row as { active_revision_id: string | null }).active_revision_id;
+    const currentDraft =
+      ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE;
+    // Filas creadas antes de I4-C pueden conservar `draft_hash = null`. El
+    // guardado gobernado compara contra la huella efectiva del JSON vigente,
+    // por lo que el Studio debe recibir exactamente ese mismo token y nunca
+    // enviar una cadena vacía en la primera edición.
+    const effectiveDraftHash =
+      (row as { draft_hash: string | null }).draft_hash ??
+      (await sha256Hex(canonicalize(currentDraft)));
     let published_hash: string | null = null;
     if (activeId) {
       const { data: rev } = await context.supabase
@@ -299,8 +385,8 @@ export const getComposition = createServerFn({ method: "GET" })
         CompositionDetail,
         "current_draft" | "published_hash" | "published_at"
       >),
-      current_draft:
-        ((row as { current_draft: unknown }).current_draft as CompositionTree) ?? EMPTY_TREE,
+      current_draft: currentDraft,
+      draft_hash: effectiveDraftHash,
       published_hash,
       published_at: (row as { published_at: string | null }).published_at ?? null,
       scheduled_publish_at:
@@ -359,6 +445,24 @@ async function sha256Hex(input: string): Promise<string> {
     .join("");
 }
 
+/**
+ * Fallos transitorios de infraestructura (pooler saturado, tiempo de espera,
+ * lock_timeout). No son errores de contrato ni de autorización: se reintentan.
+ */
+function isTransientDbError(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes("connection pool") ||
+    m.includes("timed out") ||
+    m.includes("timeout") ||
+    m.includes("draft_busy") ||
+    m.includes("canceling statement") ||
+    m.includes("too many clients")
+  );
+}
+
+
+
 export const createComposition = createServerFn({ method: "POST" })
   .inputValidator(
     (data: { slug: string; title: string; description?: string; page_type?: string }) => data,
@@ -396,35 +500,45 @@ export const saveCompositionDraft = createServerFn({ method: "POST" })
           "draft_conflict: El borrador cambió desde que lo abriste. Recarga antes de guardar.",
         );
       }
-      let treeToSave = mergeExistingI18n(data.tree, previousTree);
+      const treeToSave = dropLegacyConfig(mergeExistingI18n(data.tree, previousTree));
 
-      await assertI4AuthoringTree({
-        context,
-        tree: treeToSave,
-        previousTree,
-        pageType: String(existingRow.page_type),
-      });
-
-      try {
-        const translated = await translateTreeBestEffort(treeToSave, context.supabase);
-        treeToSave = translated.tree;
-      } catch {
-        // La traducción automática nunca debe romper ni bloquear el guardado.
+      if (!isRootOrderOnlyDelta(treeToSave, previousTree)) {
+        await assertI4AuthoringTree({
+          context,
+          tree: treeToSave,
+          previousTree,
+          pageType: String(existingRow.page_type),
+        });
       }
 
-      await assertI4AuthoringTree({
-        context,
-        tree: treeToSave,
-        previousTree,
-        pageType: String(existingRow.page_type),
-      });
+      /* Reintento acotado: el pooler puede agotar conexiones o exceder el
+         tiempo de espera en picos de autoguardado. Es transitorio y no debe
+         romper el editor ni alterar contratos. */
+      let result: unknown = null;
+      let lastError: string | null = null;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const rpc = await context.supabase.rpc("eb_save_composition_draft", {
+          _id: data.id,
+          _tree: treeToSave as never,
+          _expected_hash: data.expected_hash,
+        });
+        if (!rpc.error) {
+          result = rpc.data;
+          lastError = null;
+          break;
+        }
+        lastError = rpc.error.message;
+        if (!isTransientDbError(lastError) || attempt === 1) break;
+        await new Promise((resolve) => setTimeout(resolve, 600));
+      }
+      if (lastError) {
+        throw new Error(
+          isTransientDbError(lastError)
+            ? "draft_busy: El servidor está ocupado. Se reintentará el guardado."
+            : lastError,
+        );
+      }
 
-      const { data: result, error } = await context.supabase.rpc("eb_save_composition_draft", {
-        _id: data.id,
-        _tree: treeToSave as never,
-        _expected_hash: data.expected_hash,
-      });
-      if (error) throw new Error(error.message);
       const payload = (result ?? {}) as { draft_hash?: string; draft_version?: number };
       return {
         ok: true,
@@ -669,7 +783,12 @@ export const heartbeatEditLock = createServerFn({ method: "POST" })
     const { data: res, error } = await context.supabase.rpc("eb_heartbeat_edit_lock", {
       _composition_id: data.id,
     });
-    if (error) throw new Error(error.message);
+    /* El latido es best-effort: un fallo transitorio de infraestructura no
+       revoca el bloqueo ni debe romper la sesión de edición. */
+    if (error) {
+      if (isTransientDbError(error.message)) return { ok: true, lock: null };
+      throw new Error(error.message);
+    }
     const payload = (res ?? {}) as { ok?: boolean; lock?: EditingLock | null };
     return { ok: Boolean(payload.ok), lock: payload.lock ?? null };
   });

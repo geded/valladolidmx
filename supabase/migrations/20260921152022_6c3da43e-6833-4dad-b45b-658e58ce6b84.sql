@@ -1,0 +1,1 @@
+revoke all on function public.unc_notify_new_traveler() from public, anon, authenticated;

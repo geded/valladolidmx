@@ -1,20 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Suspense, lazy } from "react";
 import { queryOptions } from "@tanstack/react-query";
 import { SITE } from "@/config/site";
 import { getPublishedHomeComposition } from "@/lib/experience-builder/public-reads.functions";
 import { HomePremiumRenderer } from "@/lib/experience-builder/home-premium-renderer";
 import type { CompositionTree } from "@/lib/experience-builder/composition-tree";
 import { PublicShell } from "@/components/discovery";
-// H2·P3 — `ContinuityWelcomeSurface` sólo se muestra a viajeros con
-// estado de continuidad (visita previa detectada). Para el primer
-// visitante y para SSR renderiza null: lo diferimos para no cargarlo
-// en el entry principal. Fallback: null (sin CLS).
-const ContinuityWelcomeSurface = lazy(() =>
-  import("@/components/traveler/ContinuityWelcomeSurface").then((m) => ({
-    default: m.ContinuityWelcomeSurface,
-  })),
-);
+// Founder Decision (2026-09-13): la continuidad del viaje NO interrumpe
+// la portada. El retorno se reconoce con un aviso breve en el botón
+// flotante de Mi Viaje (`FloatingTravelPlanDock`), que se cierra solo.
 import { useSectionEditWrap } from "@/components/experience-builder/SectionEditOverlay";
 import { buildPublicHead, pickFirstMediaUrl, webPageJsonLd } from "@/lib/discovery/seo";
 import {
@@ -23,6 +16,17 @@ import {
 } from "@/components/home-premium/home-premium-config";
 import { publishedDestinationsQueryOptions } from "@/lib/destinations/destination-labels";
 import { homeFeaturedCategoriesQueryOptions } from "@/lib/cms/home-featured-categories-query";
+import { resolveHomePremiumRealContent } from "@/lib/experience-builder/smart-blocks.functions";
+
+// El contenido real de la Home (destinos, eventos, negocios acreditados) se
+// resuelve en SSR con la MISMA clave que consume `HomePremiumRenderer`, para
+// que el visitante no vea un segundo pintado al hidratar y los buscadores
+// reciban la portada completa. La página de destino ya usa este patrón.
+const homeRealContentQuery = queryOptions({
+  queryKey: ["home-premium-real-content"],
+  queryFn: () => resolveHomePremiumRealContent(),
+  staleTime: 60_000,
+});
 
 const publishedHomeQuery = queryOptions({
   queryKey: ["eb", "published-home", "default"],
@@ -80,6 +84,7 @@ export const Route = createFileRoute("/")({
       // Lote 3E — Categorías destacadas reales de CMS en SSR: el buscador del
       // Hero y la sección de categorías ya no dependen de `CATEGORIAS_MOCK`.
       context.queryClient.ensureQueryData(homeFeaturedCategoriesQueryOptions).catch(() => []),
+      context.queryClient.ensureQueryData(homeRealContentQuery).catch(() => null),
     ]);
     const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
     const stableAuthorityTree = authorityTree ?? HOME_PREMIUM_FALLBACK_TREE;
@@ -108,9 +113,6 @@ function HomePage() {
 
   return (
     <PublicShell variant="hero">
-      <Suspense fallback={null}>
-        <ContinuityWelcomeSurface />
-      </Suspense>
       <HomePremiumRenderer tree={authorityTree} wrap={editWrap} />
     </PublicShell>
   );

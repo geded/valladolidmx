@@ -9,6 +9,8 @@
  * estado editorial y no introduce fixtures.
  */
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { listMarketplaceBusinesses } from "@/lib/catalog/marketplace-reads.functions";
 import { listPublishedEvents } from "@/lib/events/public-reads.functions";
 import { listPublishedPlaces } from "@/lib/places/place-public-reads.functions";
@@ -18,6 +20,7 @@ import {
   isListingFamilyId,
   listingFamilyContract,
   type ListingFamilyId,
+  type PublicDestinationZone,
   type PublicListingDTO,
 } from "./listing-public-contract";
 import {
@@ -34,6 +37,33 @@ export interface GetPublicListingInput {
    * públicas jamás lo activan.
    */
   previewMedia?: boolean;
+}
+
+async function listPublishedZones(
+  destinationSlug: string | null,
+): Promise<PublicDestinationZone[]> {
+  if (!destinationSlug) return [];
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return [];
+  const client = createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await client
+    .from("destination_zones")
+    .select("id, slug, name, description, destinations!inner(slug)")
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .eq("destinations.slug", destinationSlug)
+    .order("name", { ascending: true });
+  if (error) throw new Error(`destination_zones_read_failed: ${error.message}`);
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description ?? null,
+    destinationSlug,
+  }));
 }
 
 export const getPublicListing = createServerFn({ method: "GET" })
@@ -82,14 +112,114 @@ export const getPublicListing = createServerFn({ method: "GET" })
       return buildPublicListing({ family: contract.id, destino: data.destino, places });
     }
 
-    const [destinations, events] = await Promise.all([
+    const [destinations, events, businesses, places, taxonomy, zones] = await Promise.all([
       listPublishedDestinations().catch(() => []),
       listPublishedEvents({ data: { upcomingOnly: true, limit: 24 } }).catch(() => []),
+      listMarketplaceBusinesses().catch(() => []),
+      listPublishedPlaces({ data: { destinationSlug: data.destino, previewMedia: false } }).catch(
+        () => [],
+      ),
+      getListingFamilyTaxonomy().catch(
+        (): ListingFamilyTaxonomyResult => ({ available: false, taxonomy: {} }),
+      ),
+      listPublishedZones(data.destino).catch(() => []),
     ]);
+    const experienceSlugs = new Set(
+      taxonomy.available
+        ? (taxonomy.taxonomy.experiencias ?? [])
+        : listingFamilyContract("experiencias").categorySlugs,
+    );
     return buildPublicListing({
       family: contract.id,
       destino: data.destino,
       destinations,
       events,
+      businesses: businesses.filter((business) => experienceSlugs.has(business.category_slug)),
+      places,
+      zones,
     });
+  });
+
+/**
+ * Listado Premium de empresas para CUALQUIER categoría publicada en CMS
+ * (cenotes, artesanías, transporte, cultura…). Usa la misma autoridad
+ * visual que hoteles/restaurantes: no existe render alternativo.
+ *
+ * - `destino` nulo ⇒ alcance regional (Oriente Maya) con filtro por destino.
+ * - `destino` presente ⇒ alcance del destino, con filtro por zonas.
+ */
+export const getPublicBusinessCategoryListing = createServerFn({ method: "GET" })
+  .inputValidator(
+    (data: { categorySlug?: unknown; categoryLabel?: unknown; destino?: unknown } | undefined) => ({
+      categorySlug:
+        typeof data?.categorySlug === "string" && data.categorySlug.trim()
+          ? data.categorySlug.trim().toLowerCase()
+          : "",
+      categoryLabel:
+        typeof data?.categoryLabel === "string" && data.categoryLabel.trim()
+          ? data.categoryLabel.trim()
+          : "",
+      destino: typeof data?.destino === "string" && data.destino.trim() ? data.destino : null,
+    }),
+  )
+  .handler(async ({ data }): Promise<PublicListingDTO> => {
+    if (!data.categorySlug) {
+      return buildPublicListing({ family: "empresas", destino: data.destino, categorySlugs: [] });
+    }
+
+    const businesses = await listMarketplaceBusinesses().catch(() => []);
+    const dto = buildPublicListing({
+      family: "empresas",
+      destino: data.destino,
+      businesses,
+      categorySlugs: [data.categorySlug],
+    });
+
+    const label = data.categoryLabel || dto.label;
+    const scope = dto.destinationLabel ?? "el Oriente Maya de Yucatán";
+
+    return {
+      ...dto,
+      label,
+      route: data.destino
+        ? `/oriente-maya/${data.destino}/${data.categorySlug}`
+        : `/oriente-maya/categoria/${data.categorySlug}`,
+      hero: {
+        ...dto.hero,
+        title: dto.destinationLabel
+          ? `${label} en ${dto.destinationLabel}`
+          : `${label} del Oriente Maya`,
+        subtitle: `Selección editorial de ${label.toLowerCase()} en ${scope}.`,
+      },
+      emptyMessage: `Aún no hay ${label.toLowerCase()} publicados en ${scope}.`,
+    };
+  });
+
+/**
+ * Resolución pública de una categoría empresarial del CMS para el listado
+ * regional `/oriente-maya/categoria/:categoria`. No inventa categorías:
+ * devuelve `null` cuando el slug no existe en `business_categories`.
+ */
+export const resolvePublicBusinessCategory = createServerFn({ method: "GET" })
+  .inputValidator((data: { categorySlug?: unknown } | undefined) => ({
+    categorySlug:
+      typeof data?.categorySlug === "string" && /^[a-z0-9][a-z0-9-]{0,199}$/.test(data.categorySlug)
+        ? data.categorySlug
+        : "",
+  }))
+  .handler(async ({ data }): Promise<{ slug: string; label: string } | null> => {
+    if (!data.categorySlug) return null;
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) return null;
+    const sb = createClient<Database>(url, key, {
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+    const { data: cat } = await sb
+      .from("business_categories")
+      .select("slug, name")
+      .ilike("slug", data.categorySlug)
+      .maybeSingle();
+    if (!cat) return null;
+    return { slug: String(cat.slug).toLowerCase(), label: cat.name as string };
   });
