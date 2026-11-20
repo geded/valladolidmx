@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-091-ADDENDUM-2026-11-20-ALUX-EVENT-DATES-SRC-LIB-ALUX-CONVERSE-RETRIEVAL-SERVER-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-091",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Autorización Founder del 2026-11-20 («autorizado, pongamos bien y fechas del pasado no tiene porque mostrar») para que Alux muestre la próxima función de cada evento y nunca fechas pasadas, y solicitud del mismo día de que Alux conozca bien Valladolid y todo el Oriente Maya, sin rediseñar el concierge, cambiar contenido CMS, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/alux/converse-retrieval.server.ts",
+    "previous_sha256": "950b3d476311cc6ef70574a8be1986d1a8af3019d67dc22f610252a921bd2d39",
+    "current_sha256": "891cab0d26a6eeb438bb2604a7b034e7d034ab3fe6144e6684799707e24b5407",
+    "semantic_change": "Delta localizado en Alux: los eventos muestran su próxima función según la recurrencia publicada y los pasados ya no se ofrecen; el tiempo de espera del proveedor sube para no cortar respuestas normales. Sin cambios de diseño, contenido CMS ni otras superficies.",
+    "authority": "Founder · Alux: próximas funciones de eventos y respuestas sin cortes · 2026-11-20"
+  },
+  "invariants": [
+    "El concierge Alux conserva su diseño, tarjetas, Mi Viaje, resumen de reseñas y navegación.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

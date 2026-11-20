@@ -537,10 +537,15 @@ async function enrichCatalog(
       family = "evento";
       planKind = "event";
       const e = eventBy.get(c.entityId);
-      const startsAt = c.startsAt ?? (e ? (e["starts_at"] as string | null) : null);
+      // `c.startsAt` ya es la PRÓXIMA función (nunca una fecha pasada).
+      const startsAt = c.startsAt ?? null;
       const when = formatWhen(startsAt);
       nightFit = nightFitFromStart(startsAt, TZ);
-      if (when) facts.push(fact(`Fecha: ${when} (hora local)`));
+      if (c.scheduleSummary) facts.push(fact(sanitizeCmsText(c.scheduleSummary, 90)));
+      if (when)
+        facts.push(
+          fact(`${c.scheduleSummary ? "Próxima función" : "Fecha"}: ${when} (hora local)`),
+        );
       else unavailable.push("fechas");
       if (e) {
         if (typeof e["venue_name"] === "string" && e["venue_name"])

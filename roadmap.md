@@ -9,6 +9,9 @@
 - [x] Alux respeta «de noche»: ya no ofrece cenotes o lugares sin evidencia nocturna (caso Suytun).
 - [x] Al responder, Alux se coloca al inicio de la respuesta, no al final de las tarjetas.
 - [x] Probar «¿Qué hacer de noche en Valladolid?»: salen video mappings, cenas y bares nocturnos.
+- [x] Eventos en Alux: muestran la próxima función y nunca fechas pasadas.
+- [x] Alux: respuestas ya no se cortan a los 9 s (aviso «conversación avanzada no disponible»).
+- [ ] Alux conoce bien todo el Oriente Maya: faltan fichas publicadas (Izamal sin lugares; Ek Balam, Las Coloradas y Río Lagartos sin lugares ni negocios; Chichén Itzá, Tizimín, El Cuyo, etc. no son destinos). Espera decisión y contenido del Founder.
 - [ ] Destinos (pueblos) no tienen resumen de reseñas en Google; se queda sin resumen.
 
 ## Revisión automática de gobernanza al día · 2026-11-20

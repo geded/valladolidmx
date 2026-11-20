@@ -49,6 +49,14 @@ import {
 import { PILOT_NON_DEMO_FILTER } from "@/lib/omxds/pilot-allowlist";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/alux/proximity";
+import {
+  nextEventOccurrence,
+  normalizeExceptionDates,
+  normalizeScheduleTimes,
+  recurrenceLabel,
+  scheduleLabel,
+  type EventRecurrenceFrequency,
+} from "@/lib/events/recurrence";
 
 export const ALUX_CANONICAL_CATALOG_VERSION = "1.3.0" as const;
 
@@ -83,8 +91,11 @@ export interface AluxCanonicalCandidate {
   readonly favoriteKind: "business" | "product" | null;
   /** Kind aceptado por `addPlanItem` (null ⇒ acción "Mi Viaje" no aplica). */
   readonly planKind: "destination" | "business" | "product" | "event" | null;
+  /** Eventos: PRÓXIMA función (nunca una fecha pasada de la serie). */
   readonly startsAt?: string | null;
   readonly endsAt?: string | null;
+  /** Eventos recurrentes: frecuencia y horarios publicados ("Todos los días · 19:00 h"). */
+  readonly scheduleSummary?: string | null;
   /**
    * G8-R1-E-R1 · DEF-R1E-002 — Coordenadas ACREDITADAS del candidato.
    * `null` cuando la entidad no tiene ubicación almacenada: en ese caso el
@@ -372,11 +383,16 @@ export async function loadAluxCanonicalCandidates(
     const nowIso = new Date().toISOString();
     let query = sb
       .from("events")
-      .select("id, slug, title, summary, starts_at, ends_at")
+      .select(
+        "id, slug, title, summary, starts_at, ends_at, recurrence_frequency, recurrence_interval, recurrence_weekdays, recurrence_until, schedule_times, exception_dates, event_timezone",
+      )
       .eq("destination_id", input.destinationId)
       .eq("status", "published")
       .is("deleted_at", null)
       .or(demoFilter)
+      // Sólo eventos vigentes: las fechas pasadas no ocupan los lugares del límite.
+      .or(`ends_at.is.null,ends_at.gte.${nowIso}`)
+      .or(`recurrence_frequency.not.is.null,starts_at.gte.${nowIso}`)
       .order("starts_at", { ascending: true });
     const selected = requiredIds("event");
     if (selected) query = query.in("id", requiredOrSentinel("event"));
@@ -401,6 +417,32 @@ export async function loadAluxCanonicalCandidates(
         rejected.push({ table: "events", slug, reason: "evento finalizado" });
         continue;
       }
+      // Próxima función real (recurrencia, horarios y fechas suspendidas):
+      // jamás se ofrece ni se muestra una fecha que ya pasó.
+      const rawStart = clean(row.starts_at);
+      const frequency = clean(row.recurrence_frequency) as EventRecurrenceFrequency | "";
+      const recurrence = {
+        starts_at: rawStart,
+        ends_at: endsAt,
+        recurrence_frequency: frequency || null,
+        recurrence_interval:
+          typeof row.recurrence_interval === "number" ? row.recurrence_interval : null,
+        recurrence_weekdays: Array.isArray(row.recurrence_weekdays)
+          ? (row.recurrence_weekdays as unknown[]).filter((d): d is number => typeof d === "number")
+          : null,
+        recurrence_until: clean(row.recurrence_until) || null,
+        schedule_times: normalizeScheduleTimes(row.schedule_times),
+        exception_dates: normalizeExceptionDates(row.exception_dates),
+        event_timezone: clean(row.event_timezone) || null,
+      };
+      const next = rawStart ? nextEventOccurrence(recurrence) : null;
+      if (!next) {
+        rejected.push({ table: "events", slug, reason: "sin próxima función" });
+        continue;
+      }
+      const every = recurrenceLabel(recurrence);
+      const times = scheduleLabel(row.schedule_times);
+      const scheduleSummary = every ? [every, times].filter(Boolean).join(" · ") : null;
       const canonicalUrl = buildCanonicalEntityUrl({ entityType: "event", slug });
       if (!canonicalUrl) {
         rejected.push({ table: "events", slug, reason: "ruta canónica no construible" });
@@ -422,8 +464,9 @@ export async function loadAluxCanonicalCandidates(
         eligibility: "publicado · vigente · ruta canónica válida",
         favoriteKind: null,
         planKind: "event",
-        startsAt: clean(row.starts_at) || null,
+        startsAt: next.startsAt,
         endsAt,
+        scheduleSummary,
       });
     }
     familyReport.event = {

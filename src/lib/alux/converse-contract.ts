@@ -43,8 +43,11 @@ export const ALUX_CONVERSE_LIMITS = {
   maxFactsPerCandidate: 5,
   /** Elementos guardados en Mi Viaje considerados. */
   maxTripItems: 40,
-  /** Timeout duro del proveedor (ms). */
-  providerTimeoutMs: 9_000,
+  /**
+   * Timeout duro del proveedor (ms). 9 s cortaba respuestas normales de 7-9 s
+   * y el viajero veía el aviso de "conversación avanzada no disponible".
+   */
+  providerTimeoutMs: 18_000,
   /** Tokens de salida máximos (incluye razonamiento del proveedor). */
   maxOutputTokens: 2_400,
   /** Longitud máxima del texto de respuesta. */
