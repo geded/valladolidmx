@@ -2,6 +2,8 @@
 
 ## CRM del concierge en dos secciones · 2026-11-21
 
+- [x] Documentación oficial: propuesta 19.48 «CRM Alux de Prospectos» registrada como mejora del seguimiento de prospectos con Alux (índice oficial y hoja de ruta), sin implementar.
+
 - [x] Correo de GitHub «Governance Integrity falló»: los documentos del plan del CRM no estaban registrados en el inventario de gobernanza; registrados y revisión PASS.
 
 - [ ] Replantear alcance: Alux como agente de ventas (web + WhatsApp), captura progresiva de datos, regreso al registro y venta directa por WhatsApp (plan en revisión).

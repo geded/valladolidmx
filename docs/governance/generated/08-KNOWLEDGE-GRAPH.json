@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "status": "Approved",
-  "generated_at": "2026-09-15T00:00:00.000Z",
+  "generated_at": "2026-11-21T00:00:00.000Z",
   "derived_from": {
     "glossary": {
       "document": "docs/governance/01-GLOSSARY.md",
@@ -11,7 +11,7 @@
     "dependency_map": {
       "document": "docs/governance/generated/07-BLUEPRINT-DEPENDENCY-MAP.json",
       "state": "Approved",
-      "source_sha256": "27490c86ccf0a51e2f25a7e6c9ad67d97e41dd371316ccf7e1229fc46a7907e8"
+      "source_sha256": "28e33cfad1e5125e95a2f02dde0fee8613d116cf7d4e4fd3612706b2dd568c80"
     },
     "domain_adr": {
       "document": "docs/decisions/ADR-GOV-0001-CANONICAL-DOCUMENT-DOMAINS.md",
@@ -17168,6 +17168,16 @@
       "path": "src/components/traveler/TripQrCode.tsx",
       "source": "src/components/traveler/TripQrCode.tsx",
       "evidence": "src/components/traveler/TripQrCode.tsx"
+    },
+    {
+      "id": "DOC:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "type": "blueprint",
+      "path": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "owner": "D09 · concierge-service",
+      "state": "Draft",
+      "version": "1.0",
+      "source": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "evidence": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md"
     }
   ],
   "edges": [
@@ -50949,6 +50959,15 @@
       "destination": "DOMAIN:D08",
       "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
       "evidence": "06 v0.86 · docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md → D08 · traveler-lifecycle"
+    },
+    {
+      "id": "AUTO:GOVERNED_BY:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "verified_at": "2026-11-21",
+      "origin": "DOC:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "relation": "governed_by",
+      "destination": "DOMAIN:D09",
+      "source": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
+      "evidence": "06 v0.87 · docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md → D09 · concierge-service"
     }
   ],
   "views": {
