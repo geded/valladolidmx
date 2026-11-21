@@ -70,6 +70,13 @@ Adaptado al Oriente Maya:
 5. Canal de WhatsApp intercambiable: el mismo servidor de Zazil ahora, o el oficial después, sin rehacer el CRM.
 6. Las ventas cerradas por un concierge se ligan a las comisiones que ya existen.
 
+## 3·WA. Conexión de WhatsApp (decidido: igual que Zazil)
+
+- **Por QR, en el mismo servidor de Railway que usa Zazil:** se crean líneas propias de Valladolid.mx (`vmx-…`) con su propio número y su propio enlace de avisos. Los datos nunca se mezclan con Zazil.
+- **Se conecta desde el panel, como en Zazil:** en Configuración → WhatsApp, un administrador crea la línea, escanea el QR con el teléfono y ve si está «Conectada», «Conectando» o «Desconectada». También puede desvincularla. Si se desconecta, te avisa.
+- El concierge sigue usando ese teléfono: lo que contesta desde ahí cuenta como respuesta humana, y ahí mismo usa los comandos `#`.
+- **Riesgo aceptado:** no es la vía oficial de Meta y el número podría bloquearse. Como el CRM no depende del canal, se puede pasar al oficial después sin rehacerlo.
+
 ## 3a. Alux en WhatsApp arma el viaje mientras platica
 
 - Contesta cualquier pregunta de **todo el Oriente Maya**, con el mismo conocimiento que en la web: destinos, lugares, hoteles, restaurantes, experiencias, eventos, rutas, distancias, horarios y resúmenes de reseñas.
@@ -129,7 +136,7 @@ Cada fase se aprueba por separado. Nada se publica sin tu visto bueno.
 - **Tablas:** `concierge_prospects` (campos de `alux_leads` + `temperature`, `destination_slug`, `linked_user_id`, `travel_plan_id`) y `concierge_prospect_sales`. El pase a asesor se agrega a las conversaciones de Alux existentes, sin tabla paralela. Avisos sobre `notifications` y el push existente. RLS para concierge, líder y admin.
 - **Reglas en base:** trigger de etapa cerrada, conciliación de venta (`partial`/`paid`, búsqueda única y diagnóstico cuando hay duda), cron de rescate (100 por minuto) y reapertura de perdidos.
 - **Alux:** se reutilizan `converse-retrieval.server.ts` y `canonical-catalog.server.ts`. Se añaden bloques de reglas por jerarquía y un registro de reglas R-xx con pruebas. La regla «no pidas datos personales» se sustituye por «contacto antes de cerrar». El modelo nunca recibe teléfono ni correo; el servidor los guarda aparte.
-- **WhatsApp:** puerto `src/lib/crm/channel/*` con dos adaptadores, Evolution (token comparado en tiempo constante) y Meta oficial. Bandeja de mensajes idempotente por id y candado de una respuesta por plática.
+- **WhatsApp:** puerto `src/lib/crm/channel/*`; adaptador activo Evolution API (Baileys/QR) en el servidor de Railway de Zazil, con instancias `vmx-*` y tablas propias `crm_whatsapp_lines` y `crm_whatsapp_line_events`. Secretos `EVOLUTION_API_URL` y `EVOLUTION_API_KEY` (los da el Founder) y `EVOLUTION_WEBHOOK_TOKEN` generado. Webhook `/api/public/whatsapp/evolution?t=` comparado en tiempo constante; administración de líneas solo para admin (crear, QR, estado, desvincular). El adaptador oficial de Meta queda preparado, no activo. Bandeja de mensajes idempotente por id y candado de una respuesta por plática.
 - **Traspaso:** el pre-expediente vive en `concierge_prospects` (`trip_brief` jsonb + `trip_items` jsonb con snapshots + `handoff_summary`). Al registrarse se reutiliza `cc_case_create_from_plan(_summary, _items, _travel_plan_id)` con un plan `shared_with_concierge`, luego `cc_case_assign` al concierge del prospecto, `concierge_case_links` (`link_type` prospect/conversation) y `cc_timeline_append`. `concierge_cases.traveler_user_id` es obligatorio, así que no hay expediente sin cuenta. Enlace firmado de un solo uso con el id del prospecto. Al confirmar la cuenta se crean `travel_plans` (`source` Alux/WhatsApp, `meta.prospect_id`) con sus `travel_plan_items` y un `concierge_cases` con `summary` = ficha de traspaso generada por Alux desde la conversación (sin inventar datos), y el concierge responsable como participante.
 - **Agregar al viaje desde WhatsApp:** herramienta de Alux `add_to_trip` que solo acepta entidades publicadas del catálogo. Sin cuenta escribe en `concierge_prospects.trip_items`; con cuenta reutiliza la misma inserción de `travel_plan_items`, con deduplicación por objetivo. Requiere un «sí» explícito en el turno anterior.
 - **Venta directa:** el enlace de pago solo se genera para `products.product_type = experiencia` con precio publicado y cobro activo; cualquier otro tipo responde con «agregar al viaje + pase a concierge». Prueba que falla si Alux cita un precio fuera de experiencias.

@@ -8,7 +8,8 @@
 - [ ] Traspaso prospecto → viajero: enlace de registro prellenado, viaje en borrador y expediente con ficha de traspaso para el mismo concierge (en plan).
 - [ ] Alux en WhatsApp contesta sobre todo el territorio y pregunta «¿Lo agrego a tu viaje?» (en plan).
 - [ ] Regla de venta: solo experiencias se venden directo con enlace de pago; lo demás pasa al concierge, que busca los mejores precios (en plan).
-- [ ] Elegir conexión de WhatsApp: Evolution/Railway como Zazil u oficial de Meta (espera decisión del Founder).
+- [x] Conexión de WhatsApp elegida: QR como Zazil (Evolution en Railway), con líneas administradas desde el panel.
+- [ ] Recibir del Founder la dirección y clave del servidor Evolution de Railway (al iniciar la Fase 2).
 
 - [ ] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (borrador en la tarjeta de plan).
 - [ ] Fase 1 · Captura consentida de WhatsApp/correo en Alux y bandeja «CRM Prospectos».
