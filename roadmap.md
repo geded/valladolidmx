@@ -6,6 +6,7 @@
 - [ ] Replicar y mejorar el CRM Alux de Zazil Tunich (etapas, tablero, pase a asesor, comandos #, avisos, cierre automático por pago) — plan en revisión.
 - [x] Revisar el CRM de Zazil Tunich en vivo (reglas, configuración, embudo) y las 9 capturas; plan ajustado.
 - [ ] Traspaso prospecto → viajero: enlace de registro prellenado, viaje en borrador y expediente con ficha de traspaso para el mismo concierge (en plan).
+- [ ] Alux en WhatsApp contesta sobre todo el territorio y pregunta «¿Lo agrego a tu viaje?» (en plan).
 - [ ] Elegir conexión de WhatsApp: Evolution/Railway como Zazil u oficial de Meta (espera decisión del Founder).
 
 - [ ] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (borrador en la tarjeta de plan).

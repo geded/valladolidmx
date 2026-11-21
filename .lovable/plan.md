@@ -67,6 +67,13 @@ Adaptado al Oriente Maya:
 5. Canal de WhatsApp intercambiable: el mismo servidor de Zazil ahora, o el oficial después, sin rehacer el CRM.
 6. Las ventas cerradas por un concierge se ligan a las comisiones que ya existen.
 
+## 3a. Alux en WhatsApp arma el viaje mientras platica
+
+- Contesta cualquier pregunta de **todo el Oriente Maya**, con el mismo conocimiento que en la web: destinos, lugares, hoteles, restaurantes, experiencias, eventos, rutas, distancias, horarios y resúmenes de reseñas.
+- Cada vez que recomienda algo concreto, pregunta **«¿Lo agrego a tu viaje?»**. Si la persona dice que sí, lo guarda en su pre-expediente. Si ya tiene cuenta, lo agrega directo a su viaje en Mi Viaje.
+- Puede decirle en cualquier momento qué lleva: «Llevas 4 lugares: Valladolid, Ek Balam…».
+- Nunca agrega algo sin que la persona diga que sí.
+
 ## 3b. Paso de prospecto a viaje armado sin volver a preguntar
 
 Cuando un prospecto quiere que le armen el viaje, el concierge (o Alux) le manda un **enlace personal para registrarse**. Ese enlace lleva todo lo que ya se platicó:
@@ -121,4 +128,5 @@ Cada fase se aprueba por separado. Nada se publica sin tu visto bueno.
 - **Alux:** se reutilizan `converse-retrieval.server.ts` y `canonical-catalog.server.ts`. Se añaden bloques de reglas por jerarquía y un registro de reglas R-xx con pruebas. La regla «no pidas datos personales» se sustituye por «contacto antes de cerrar». El modelo nunca recibe teléfono ni correo; el servidor los guarda aparte.
 - **WhatsApp:** puerto `src/lib/crm/channel/*` con dos adaptadores, Evolution (token comparado en tiempo constante) y Meta oficial. Bandeja de mensajes idempotente por id y candado de una respuesta por plática.
 - **Traspaso:** el pre-expediente vive en `concierge_prospects` (`trip_brief` jsonb + `trip_items` jsonb con snapshots + `handoff_summary`). Al registrarse se reutiliza `cc_case_create_from_plan(_summary, _items, _travel_plan_id)` con un plan `shared_with_concierge`, luego `cc_case_assign` al concierge del prospecto, `concierge_case_links` (`link_type` prospect/conversation) y `cc_timeline_append`. `concierge_cases.traveler_user_id` es obligatorio, así que no hay expediente sin cuenta. Enlace firmado de un solo uso con el id del prospecto. Al confirmar la cuenta se crean `travel_plans` (`source` Alux/WhatsApp, `meta.prospect_id`) con sus `travel_plan_items` y un `concierge_cases` con `summary` = ficha de traspaso generada por Alux desde la conversación (sin inventar datos), y el concierge responsable como participante.
+- **Agregar al viaje desde WhatsApp:** herramienta de Alux `add_to_trip` que solo acepta entidades publicadas del catálogo. Sin cuenta escribe en `concierge_prospects.trip_items`; con cuenta reutiliza la misma inserción de `travel_plan_items`, con deduplicación por objetivo. Requiere un «sí» explícito en el turno anterior.
 - **Controles:** Scope y Preservation Gate, pruebas por regla, QA 390/834/1440 e inventario de gobernanza.
