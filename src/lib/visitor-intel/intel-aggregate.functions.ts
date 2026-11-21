@@ -69,9 +69,10 @@ export const aggregateJourneyIntel = createServerFn({ method: "POST" })
     const rows = await readVisitorIntelEvents(
       {
         since,
-        mode: data.mode === "real" || data.mode === "simulation" || data.mode === "combined"
-          ? data.mode
-          : "all",
+        mode:
+          data.mode === "real" || data.mode === "simulation" || data.mode === "combined"
+            ? data.mode
+            : "all",
         ...(data.simulation_run_id ? { simulationRunId: data.simulation_run_id } : {}),
       },
       "intel-aggregate",

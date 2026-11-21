@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-099-ADDENDUM-2026-11-20-GOVERNANCE-FORMAT-SRC-LIB-NOTIFICATIONS-TRAVELER-SIGNUP-ADMIN-FUNCTIONS-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-099",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Mira la imagen, siguen llegando»: correo automático de GitHub «Governance Integrity: All jobs have failed»; autorización previa «Sí, corrígelo» para acomodar formato sin tocar fotos, textos ni funciones): acomodar sólo el formato (espacios, saltos de línea y comas finales) de cuatro archivos del monitor de visitantes y del aviso de nuevo viajero para que la revisión automática vuelva a pasar; sin cambiar lógica, contenido CMS, datos, plantillas públicas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/lib/notifications/traveler-signup-admin.functions.ts",
+    "previous_sha256": "97d93148d802954d6b216c561466c37c252d4eadd863d138c91d36da40088ff3",
+    "current_sha256": "b5aca6052e6c39d31fe5fea93fe59e7c17fec8e2fccecb695d68aab3fa5da748",
+    "semantic_change": "Sólo formato Prettier (espacios, saltos de línea y comas finales) según PCA-2026-102; lógica y comportamiento sin cambios.",
+    "authority": "Founder · formato de la revisión automática de gobernanza · 2026-11-20"
+  },
+  "invariants": [
+    "Lógica, contratos, datos y plantillas públicas sin cambios.",
+    "Sólo cambia el formato del código.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

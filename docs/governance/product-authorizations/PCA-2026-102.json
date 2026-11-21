@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-102",
+  "title": "Formato de cuatro archivos para que la revisión automática de gobernanza vuelva a pasar",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Mira la imagen, siguen llegando»: correo automático de GitHub «Governance Integrity: All jobs have failed»; autorización previa «Sí, corrígelo» para acomodar formato sin tocar fotos, textos ni funciones): acomodar sólo el formato (espacios, saltos de línea y comas finales) de cuatro archivos del monitor de visitantes y del aviso de nuevo viajero para que la revisión automática vuelva a pasar; sin cambiar lógica, contenido CMS, datos, plantillas públicas, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/notifications/traveler-signup-admin.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/event-reads.server.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/lib/notifications/traveler-signup-admin.functions.ts",
+      "sha256": "b5aca6052e6c39d31fe5fea93fe59e7c17fec8e2fccecb695d68aab3fa5da748",
+      "authority": "Founder · formato de la revisión automática de gobernanza · 2026-11-20"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/event-reads.server.ts",
+      "sha256": "b10d46e67973890658def292df0397dc76aefb361150321262f5bfdf6e01d40e",
+      "authority": "Founder · formato de la revisión automática de gobernanza · 2026-11-20"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": []
+}

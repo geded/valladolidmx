@@ -173,7 +173,8 @@ async function appendDecisionEvent(
     {
       _event: event,
       _expected_from_state: expectedFromState,
-    });
+    },
+  );
   if (error) {
     console.error("[visitor_intel.decisions] append failed", error);
     const status = ["40001", "23503", "23505", "23514"].includes(error.code ?? "") ? 409 : 500;

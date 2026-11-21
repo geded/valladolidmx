@@ -69,7 +69,10 @@ export async function readVisitorIntelEvents(
   const maxRows = filters.maxRows ?? DEFAULT_MAX_ROWS;
   const rows: VisitorIntelEventRow[] = [];
   for (let offset = 0; offset < maxRows; offset += PAGE_SIZE) {
-    const { data, error } = await db.rpc("visitor_intel_read_events", buildReadArgs(filters, offset));
+    const { data, error } = await db.rpc(
+      "visitor_intel_read_events",
+      buildReadArgs(filters, offset),
+    );
     if (error) {
       console.error(`[visitor_intel.${label}] read failed`, error);
       throw new Response("Read failed", { status: 500 });
