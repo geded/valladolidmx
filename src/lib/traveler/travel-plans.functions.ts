@@ -1110,6 +1110,9 @@ export interface SharedPlanItem {
   target_id: string | null;
   position: number;
   day_index: number | null;
+  /** Hora local planeada (HH:MM) y duración; null si no se agendó. */
+  starts_at_local: string | null;
+  duration_minutes: number | null;
   snapshot: TravelPlanItemSnapshot;
 }
 
@@ -1214,6 +1217,13 @@ export const getSharedPlan = createServerFn({ method: "POST" })
     if (!raw.plan) return null;
     return {
       plan: raw.plan,
-      items: Array.isArray(raw.items) ? raw.items : [],
+      items: (Array.isArray(raw.items) ? raw.items : []).map((it) => ({
+        ...it,
+        starts_at_local: normalizeLocalTime(it.starts_at_local),
+        duration_minutes:
+          typeof it.duration_minutes === "number" && it.duration_minutes > 0
+            ? it.duration_minutes
+            : null,
+      })),
     };
   });

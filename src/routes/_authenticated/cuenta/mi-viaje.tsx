@@ -71,6 +71,13 @@ import { AluxTravelerPanel } from "@/components/traveler/AluxTravelerPanel";
 import { AluxPlanProposalsInbox } from "@/components/traveler/AluxPlanProposalsInbox";
 import { CalendarCheck, Sparkles } from "lucide-react";
 import { getPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
+import {
+  buildItineraryModel,
+  snapshotSubtitle,
+  snapshotTitle,
+} from "@/lib/traveler/itinerary-document";
+import { useItineraryProgress } from "@/lib/traveler/itinerary-progress";
+import { TripItineraryDocument } from "@/components/traveler/TripItineraryDocument";
 import { deriveTripPhase, type TripPhase } from "@/lib/traveler/trip-phase";
 import { NowNextLaterSurface } from "@/components/traveler/NowNextLaterSurface";
 import { optimizePlanDay } from "@/lib/traveler/travel-plan-optimize.functions";
@@ -80,7 +87,16 @@ import {
   type SuggestDayScheduleResult,
 } from "@/lib/traveler/travel-plan-schedule.functions";
 import { InteractiveMap } from "@/components/maps/InteractiveMap";
-import { List, Clock, Map as MapIcon, ChevronUp, ChevronDown, Wand2 } from "lucide-react";
+import {
+  List,
+  Clock,
+  Map as MapIcon,
+  ChevronUp,
+  ChevronDown,
+  Wand2,
+  Check,
+  BookOpenText,
+} from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 import { TripBriefForm } from "@/components/traveler/TripBriefForm";
@@ -710,6 +726,11 @@ function MiViajeVistaBody({
       <div className="space-y-6">
         {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
         <ItinerarioViews data={plan} onChanged={onChanged} reservedIds={reservedIds} />
+        <BrandedItinerarySection
+          data={plan}
+          reservedIds={reservedIds}
+          folio={confirmed?.folio ?? null}
+        />
       </div>
     );
   }
@@ -1240,10 +1261,12 @@ function ItinerarioTimeline({
                     ) : null}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">
-                        {snap.title || (it.item_kind === "note" ? "Nota" : "Elemento")}
+                        {snapshotTitle(snap) || (it.item_kind === "note" ? "Nota" : "Elemento")}
                       </p>
-                      {snap.subtitle ? (
-                        <p className="truncate text-xs text-muted-foreground">{snap.subtitle}</p>
+                      {snapshotSubtitle(snap) ? (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {snapshotSubtitle(snap)}
+                        </p>
                       ) : null}
                       {it.notes ? (
                         <p className="mt-1 text-xs text-muted-foreground">{it.notes}</p>
@@ -1255,6 +1278,11 @@ function ItinerarioTimeline({
                           setItemTime.mutate({ itemId: it.id, startsAtLocal })
                         }
                       />
+                      {it.item_kind !== "note" ? (
+                        <div className="mt-1.5">
+                          <StopDoneToggle planId={data.plan.id} itemId={it.id} />
+                        </div>
+                      ) : null}
                     </div>
                     {items.length > 1 ? (
                       <div className="ml-auto flex shrink-0 flex-col gap-0.5">
@@ -1369,6 +1397,120 @@ function ItemScheduleRow({
   );
 }
 
+/**
+ * Itinerario con marca — misma autoridad que el enlace compartido y su PDF
+ * (TripItineraryDocument). Dentro de Mi Viaje añade folio y reservas del
+ * concierge; funciona con la copia sin señal porque usa el mismo plan.
+ */
+function BrandedItinerarySection({
+  data,
+  reservedIds,
+  folio,
+}: {
+  data: TravelPlanWithItems;
+  reservedIds: Set<string>;
+  folio: string | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const fetchGeo = useServerFn(getPlanItemsGeo);
+  const itemsPayload = useMemo(
+    () =>
+      data.items
+        .filter((i) => i.target_id && (i.item_kind === "business" || i.item_kind === "destination"))
+        .map((i) => ({ id: i.id, kind: i.item_kind, target_id: i.target_id })),
+    [data.items],
+  );
+  const geoQ = useQuery({
+    queryKey: ["mi-viaje", "itinerario-geo", data.plan.id, itemsPayload.length],
+    queryFn: () => fetchGeo({ data: { items: itemsPayload } }),
+    enabled: open && itemsPayload.length > 0,
+  });
+  const model = useMemo(() => {
+    const geo = new Map<string, { lat: number; lng: number }>();
+    for (const g of geoQ.data?.geo ?? []) geo.set(g.item_id, { lat: g.lat, lng: g.lng });
+    return buildItineraryModel(data.items, {
+      startDate: data.plan.start_date,
+      geo,
+      reservedTargetIds: reservedIds,
+    });
+  }, [data.items, data.plan.start_date, geoQ.data, reservedIds]);
+  const shareUrl =
+    typeof window !== "undefined" && data.plan.share_token
+      ? `${window.location.origin}/viaje-compartido/${data.plan.share_token}`
+      : null;
+
+  if (!open) {
+    return (
+      <section className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-4">
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+          <BookOpenText className="size-5" aria-hidden />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base font-medium">Itinerario con marca</h2>
+          <p className="text-xs text-muted-foreground">
+            Día por día, con horarios, cómo llegar y casillas para marcar lo que ya hiciste.
+            Guárdalo en PDF o imprímelo.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex min-h-11 items-center gap-2 rounded-pill bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-95"
+        >
+          Ver itinerario
+        </button>
+      </section>
+    );
+  }
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between gap-3 print:hidden">
+        <h2 className="text-lg font-medium">Itinerario con marca</h2>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="inline-flex min-h-11 items-center rounded-pill border px-4 text-sm hover:bg-accent"
+        >
+          Cerrar
+        </button>
+      </div>
+      <TripItineraryDocument
+        planId={data.plan.id}
+        title={data.plan.title}
+        startDate={data.plan.start_date}
+        endDate={data.plan.end_date}
+        partySize={data.plan.party_size}
+        model={model}
+        shareUrl={shareUrl}
+        folio={folio}
+        showConciergeLink
+        footerNote="Tu itinerario del Oriente Maya. Los horarios pueden ajustarse con tu concierge; las paradas marcadas como hechas se guardan sólo en este teléfono."
+      />
+    </section>
+  );
+}
+
+/** Marca «hecho» de una parada (misma memoria local que el itinerario con marca). */
+function StopDoneToggle({ planId, itemId }: { planId: string; itemId: string }) {
+  const { done, toggle } = useItineraryProgress(planId);
+  const isDone = done.has(itemId);
+  return (
+    <button
+      type="button"
+      onClick={() => toggle(itemId)}
+      aria-pressed={isDone}
+      className={`inline-flex items-center gap-1 rounded-pill border px-2 py-0.5 text-[11px] font-medium transition ${
+        isDone
+          ? "border-success bg-success text-success-foreground"
+          : "border-border bg-background text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      <Check className="size-3" aria-hidden />
+      {isDone ? "Hecho" : "Marcar hecho"}
+    </button>
+  );
+}
+
 function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
   const fetchGeo = useServerFn(getPlanItemsGeo);
   const itemsPayload = useMemo(
@@ -1395,7 +1537,7 @@ function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
     return geo.map((g) => ({
       lat: g.lat,
       lng: g.lng,
-      title: itemsById.get(g.item_id)?.snapshot?.title ?? undefined,
+      title: snapshotTitle(itemsById.get(g.item_id)?.snapshot) ?? undefined,
       href: null as string | null,
     }));
   }, [q.data, itemsById]);
@@ -2096,7 +2238,7 @@ function PlanItemRow({
   });
 
   const snap = item.snapshot ?? {};
-  const title = snap.title || (item.item_kind === "note" ? "Nota" : "Elemento");
+  const title = snapshotTitle(snap) || (item.item_kind === "note" ? "Nota" : "Elemento");
 
   return (
     <li className="flex gap-3 py-3">
@@ -2122,8 +2264,8 @@ function PlanItemRow({
             </span>
           )}
         </p>
-        {snap.subtitle ? (
-          <p className="truncate text-xs text-muted-foreground">{snap.subtitle}</p>
+        {snapshotSubtitle(snap) ? (
+          <p className="truncate text-xs text-muted-foreground">{snapshotSubtitle(snap)}</p>
         ) : null}
         {editing ? (
           <div className="mt-2 space-y-2">

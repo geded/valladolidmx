@@ -4,26 +4,18 @@
  * Reglas Founder:
  *  · Superficie pública (Discovery Layer); sin auth.
  *  · Sólo lee vía getSharedPlan (RPC SECURITY DEFINER filtra campos).
- *  · Print-to-PDF nativo (window.print) con estilos @media print embebidos.
+ *  · Itinerario con marca (TripItineraryDocument): días, horas, cómo llegar,
+ *    paradas hechas en el teléfono y PDF nativo (window.print) con logotipo.
  *  · No expone user_id, notes privadas del plan, ni acciones de edición.
  */
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import {
-  Landmark,
-  Package,
-  CalendarDays,
-  MapPin,
-  StickyNote,
-  Printer,
-  Users,
-  ArrowLeft,
-} from "lucide-react";
-import {
-  getSharedPlan,
-  type SharedPlanItem,
-  type SharedPlanView,
-} from "@/lib/traveler/travel-plans.functions";
+import { useEffect, useMemo, useState } from "react";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
+import { getSharedPlan, type SharedPlanView } from "@/lib/traveler/travel-plans.functions";
+import { getSharedPlanItemsGeo } from "@/lib/traveler/travel-plan-geo.functions";
+import { buildItineraryModel } from "@/lib/traveler/itinerary-document";
+import { TripItineraryDocument } from "@/components/traveler/TripItineraryDocument";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -44,9 +36,9 @@ export const Route = createFileRoute("/viaje-compartido/$token")({
     return context.queryClient.ensureQueryData(sharedPlanQuery(params.token));
   },
   head: ({ loaderData }) => {
-    const title = loaderData?.plan.title ?? "Expediente de viaje";
+    const title = loaderData?.plan.title ?? "Itinerario de viaje";
     const count = loaderData?.items.length ?? 0;
-    const desc = `Expediente compartido con ${count} elemento${count === 1 ? "" : "s"} para el Oriente Maya.`;
+    const desc = `Itinerario de viaje con ${count} parada${count === 1 ? "" : "s"} por el Oriente Maya de Yucatán.`;
     return {
       meta: [
         { title: `${title} · Valladolid.mx` },
@@ -55,6 +47,7 @@ export const Route = createFileRoute("/viaje-compartido/$token")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary" },
       ],
     };
   },
@@ -68,188 +61,52 @@ export const Route = createFileRoute("/viaje-compartido/$token")({
 function SharedPlanPage() {
   const { token } = Route.useParams();
   const { data } = useSuspenseQuery(sharedPlanQuery(token));
-  return <SharedPlanView data={data} />;
+  return <SharedPlanView data={data} token={token} />;
 }
 
 /* ------------------------------------------------------------------ */
-/* Render                                                             */
+/* Render · Itinerario con marca (autoridad única TripItineraryDocument) */
 /* ------------------------------------------------------------------ */
 
-const KIND_LABEL: Record<SharedPlanItem["item_kind"], string> = {
-  destination: "Destino",
-  business: "Lugar",
-  product: "Experiencia",
-  event: "Evento",
-  note: "Nota",
-  route: "Ruta",
-  place: "Lugar",
-};
-
-function KindIcon({ kind }: { kind: SharedPlanItem["item_kind"] }) {
-  const cls = "size-3.5";
-  switch (kind) {
-    case "destination":
-      return <MapPin className={cls} aria-hidden />;
-    case "business":
-      return <Landmark className={cls} aria-hidden />;
-    case "product":
-      return <Package className={cls} aria-hidden />;
-    case "event":
-      return <CalendarDays className={cls} aria-hidden />;
-    default:
-      return <StickyNote className={cls} aria-hidden />;
-  }
-}
-
-function formatDateRange(start: string | null, end: string | null) {
-  if (!start && !end) return null;
-  const fmt = (v: string) =>
-    new Date(v + "T12:00:00").toLocaleDateString("es-MX", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  if (start && end) return `${fmt(start)} — ${fmt(end)}`;
-  return fmt((start ?? end)!);
-}
-
-function SharedPlanView({ data }: { data: SharedPlanView }) {
+function SharedPlanView({ data, token }: { data: SharedPlanView; token: string }) {
   const { plan, items } = data;
-  const range = formatDateRange(plan.start_date, plan.end_date);
+  const geoQ = useQuery({
+    queryKey: ["shared-plan", token, "geo"],
+    queryFn: () => getSharedPlanItemsGeo({ data: { token } }),
+    staleTime: 5 * 60_000,
+  });
+  const model = useMemo(() => {
+    const geo = new Map<string, { lat: number; lng: number }>();
+    for (const g of geoQ.data?.geo ?? []) geo.set(g.item_id, { lat: g.lat, lng: g.lng });
+    return buildItineraryModel(items, { startDate: plan.start_date, geo });
+  }, [items, plan.start_date, geoQ.data]);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  useEffect(() => {
+    setShareUrl(`${window.location.origin}/viaje-compartido/${token}`);
+  }, [token]);
 
   return (
-    <>
-      <PrintStyles />
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
-          <Link
-            to="/arma-tu-viaje"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Arma tu viaje
-          </Link>
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95"
-          >
-            <Printer className="size-4" aria-hidden />
-            Imprimir / Guardar PDF
-          </button>
-        </div>
-
-        <header className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-10 print:border-0 print:bg-white print:p-0">
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-            Expediente de viaje · Oriente Maya
-          </p>
-          <h1 className="text-balance text-3xl font-semibold sm:text-4xl">{plan.title}</h1>
-          <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            {range ? (
-              <div className="inline-flex items-center gap-1.5">
-                <dt className="sr-only">
-                  <CalendarDays className="size-4" aria-hidden /> Fechas
-                </dt>
-                <dd>{range}</dd>
-              </div>
-            ) : null}
-            {plan.party_size ? (
-              <div className="inline-flex items-center gap-1.5">
-                <dt className="sr-only">
-                  <Users className="size-4" aria-hidden /> Personas
-                </dt>
-                <dd>
-                  {plan.party_size} persona{plan.party_size === 1 ? "" : "s"}
-                </dd>
-              </div>
-            ) : null}
-            <div className="inline-flex items-center gap-1.5">
-              <dt className="sr-only">Elementos</dt>
-              <dd>
-                {items.length} elemento{items.length === 1 ? "" : "s"} guardado
-                {items.length === 1 ? "" : "s"}
-              </dd>
-            </div>
-          </dl>
-        </header>
-
-        <section className="mt-8" aria-labelledby="items-h">
-          <h2 id="items-h" className="mb-4 text-xl font-semibold">
-            Contenido del expediente
-          </h2>
-          {items.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Este expediente aún no tiene elementos.
-            </p>
-          ) : (
-            <ol className="space-y-3">
-              {items.map((it, idx) => (
-                <SharedItem key={it.id} item={it} index={idx + 1} />
-              ))}
-            </ol>
-          )}
-        </section>
-
-        <footer className="mt-10 rounded-xl border border-border bg-card p-5 text-xs text-muted-foreground print:mt-8">
-          <p>
-            <strong className="text-foreground">Valladolid.mx</strong> · Planificador Oficial del
-            Oriente Maya. Este expediente fue compartido por su autor; los detalles pueden cambiar.
-            Para reservar o coordinar servicios, contacta a un Concierge humano desde{" "}
-            <span className="underline">valladolid.mx</span>.
-          </p>
-        </footer>
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
+      <div className="mb-4 print:hidden">
+        <Link
+          to="/arma-tu-viaje"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          Arma tu viaje
+        </Link>
       </div>
-    </>
-  );
-}
-
-function SharedItem({ item, index }: { item: SharedPlanItem; index: number }) {
-  const snap = item.snapshot ?? {};
-  const title = snap.title ?? "Elemento";
-  return (
-    <li className="flex gap-4 rounded-xl border border-border bg-card p-4 print:break-inside-avoid">
-      <div className="grid size-9 shrink-0 place-items-center rounded-full border border-border bg-muted text-xs font-semibold text-muted-foreground">
-        {index}
-      </div>
-      {snap.image_url ? (
-        <img
-          src={snap.image_url}
-          alt=""
-          loading="lazy"
-          className="size-20 shrink-0 rounded-lg object-cover"
-        />
-      ) : (
-        <div className="grid size-20 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
-          <KindIcon kind={item.item_kind} />
-        </div>
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="mb-0.5 inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-          <KindIcon kind={item.item_kind} />
-          {KIND_LABEL[item.item_kind] ?? "Elemento"}
-        </p>
-        <h3 className="text-base font-semibold text-foreground">{title}</h3>
-        {snap.subtitle ? (
-          <p className="mt-0.5 text-sm text-muted-foreground">{snap.subtitle}</p>
-        ) : null}
-      </div>
-    </li>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Print styles                                                        */
-/* ------------------------------------------------------------------ */
-
-function PrintStyles() {
-  return (
-    <style>{`
-      @media print {
-        @page { margin: 18mm; }
-        body { background: white !important; }
-        header, footer { break-inside: avoid; }
-      }
-    `}</style>
+      <TripItineraryDocument
+        planId={plan.id}
+        title={plan.title}
+        startDate={plan.start_date}
+        endDate={plan.end_date}
+        partySize={plan.party_size}
+        model={model}
+        shareUrl={shareUrl}
+        footerNote="Itinerario compartido por su autor; los horarios pueden cambiar. Para reservar o coordinar servicios, contacta a un Concierge humano desde Valladolid.mx."
+      />
+    </div>
   );
 }
 

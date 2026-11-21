@@ -473,3 +473,12 @@
 - [x] Itinerario del concierge sin señal («Copia con documentos»): itinerario, expediente, reservas y documentos en el teléfono, solo lectura, sin pagos, borrado al cerrar sesión. Probado en vista previa con la cuenta demo VMX-DEMO01 simulando sin señal y acceso vencido. Pendiente: publicar y probar en iPhone real en modo avión.
 - [x] Memoria de rutas: el mapa compartido libera mapa, pines y trazos al salir (autorizado). Vista previa: 20 cambios entre rutas 29.9→32.4 MB (antes 16→40 MB publicado).
 - [x] Las lecturas con sesión ya no se guardan en la caché compartida sin señal (solo en la copia por cuenta de Mi Viaje).
+
+## Itinerario con marca · 2026-11-21 (autorizado «Puntos 1 a 5»)
+
+- [x] Portada con logo, días con fecha y hora, cómo llegar y traslado estimado, notas y pie con QR.
+- [x] Mismo formato en el enlace compartido, su PDF y Mi Viaje (con folio y reservas del concierge).
+- [x] Casilla «hecho» por parada, guardada sólo en el teléfono (también en la línea de tiempo).
+- [x] Paradas del concierge muestran su nombre real en vez de «Elemento».
+- [ ] WhatsApp del concierge en el itinerario: no hay número oficial configurado (espera dato del Founder).
+- [ ] Fotos en paradas guardadas sin foto (solo 16 de 53 la tienen): pendiente decidir si se toman de la ficha oficial.

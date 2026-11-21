@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-BRANDED-ITINERARY-SRC-LIB-TRAVELER-TRAVEL-PLAN-GEO-FUNCTIONS-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («El formato de los itinerarios quiero que tenga el logo y un formato fácil de dar seguimiento con la imagen de la marca, veo que solo es un texto plano»; opción autorizada «Puntos 1 a 5»): portada con logotipo, itinerario día por día con hora, cómo llegar y traslado estimado, reservas del concierge en Mi Viaje, PDF limpio con logotipo y código QR, y casilla «hecho» por parada guardada sólo en el teléfono. El enlace compartido agrega la hora y duración planeadas de cada parada. Sin cambiar reservas, pagos, contenido CMS, plantillas públicas ajenas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/traveler/travel-plan-geo.functions.ts",
+    "previous_sha256": "19404b1a74f9d0513b46dd82fe65ecffeb451df411e830e20250a92e8d0187f3",
+    "current_sha256": "1ba4a9bffdb35247e107db8dfab20e0642189e6db53e572442930ae5b7b96b57",
+    "semantic_change": "Las coordenadas públicas de las paradas se resuelven con una sola función compartida; el itinerario compartido las pide con su token válido para calcular traslados. El mapa de Mi Viaje lee igual que antes.",
+    "authority": "Founder · itinerario con marca · 2026-11-21"
+  },
+  "invariants": [
+    "Las plantillas públicas, header, footer, Alux y Mi Viaje conservan estructura, orden y contenido CMS.",
+    "Pagos, reservaciones, permisos y datos de cuenta no cambian; nada se publica ni despliega.",
+    "Las marcas de «hecho» viven sólo en el teléfono del viajero."
+  ],
+  "recorded_at": "2026-11-21"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-BRANDED-ITINERARY-SRC-ROUTES-AUTHENTICATED-CUENTA-MI-VIAJE-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («El formato de los itinerarios quiero que tenga el logo y un formato fácil de dar seguimiento con la imagen de la marca, veo que solo es un texto plano»; opción autorizada «Puntos 1 a 5»): portada con logotipo, itinerario día por día con hora, cómo llegar y traslado estimado, reservas del concierge en Mi Viaje, PDF limpio con logotipo y código QR, y casilla «hecho» por parada guardada sólo en el teléfono. El enlace compartido agrega la hora y duración planeadas de cada parada. Sin cambiar reservas, pagos, contenido CMS, plantillas públicas ajenas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cuenta/mi-viaje.tsx",
+    "previous_sha256": "79ebaacd89ac7e31fc82725b3b668256f416b3c72f085ac99065e3efc7f1e8d6",
+    "current_sha256": "ff2ae5f48f7480e00ce912960b09841551b2e73d40e944d7ff2e70a3ac9cfade",
+    "semantic_change": "El Itinerario de Mi Viaje suma la tarjeta «Itinerario con marca» y la casilla «Marcar hecho» en la línea de tiempo; las paradas del concierge muestran su nombre real en vez de «Elemento». El resto de vistas y su orden no cambian.",
+    "authority": "Founder · itinerario con marca · 2026-11-21"
+  },
+  "invariants": [
+    "Las plantillas públicas, header, footer, Alux y Mi Viaje conservan estructura, orden y contenido CMS.",
+    "Pagos, reservaciones, permisos y datos de cuenta no cambian; nada se publica ni despliega.",
+    "Las marcas de «hecho» viven sólo en el teléfono del viajero."
+  ],
+  "recorded_at": "2026-11-21"
+}

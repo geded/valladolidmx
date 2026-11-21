@@ -1,0 +1,86 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-105",
+  "title": "Itinerario de viaje con la marca, día por día y paradas hechas",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («El formato de los itinerarios quiero que tenga el logo y un formato fácil de dar seguimiento con la imagen de la marca, veo que solo es un texto plano»; opción autorizada «Puntos 1 a 5»): portada con logotipo, itinerario día por día con hora, cómo llegar y traslado estimado, reservas del concierge en Mi Viaje, PDF limpio con logotipo y código QR, y casilla «hecho» por parada guardada sólo en el teléfono. El enlace compartido agrega la hora y duración planeadas de cada parada. Sin cambiar reservas, pagos, contenido CMS, plantillas públicas ajenas, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/components/traveler/TripItineraryDocument.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/itinerary-document.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/itinerary-progress.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/travel-plan-geo.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/travel-plans.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/viaje-compartido.$token.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/mi-viaje.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/components/traveler/TripItineraryDocument.tsx",
+      "sha256": "2123172d8f99c9a54ac267f4cad7c84f92b940d15852d62c71819bc0458080f1",
+      "authority": "Founder · itinerario con marca · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/itinerary-document.ts",
+      "sha256": "adc7f8bb97c892a76fd750586c1a7e87ab0d74c3ddd6ecee46a9595e2f389240",
+      "authority": "Founder · itinerario con marca · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/itinerary-progress.ts",
+      "sha256": "5227a7b92cda07d0e09951e5a59f0d5b811cb38be9696f9243a86d9790469a0a",
+      "authority": "Founder · itinerario con marca · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/travel-plan-geo.functions.ts",
+      "sha256": "1ba4a9bffdb35247e107db8dfab20e0642189e6db53e572442930ae5b7b96b57",
+      "authority": "Founder · itinerario con marca · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/travel-plans.functions.ts",
+      "sha256": "8b0eedf2fe260d2db48f70e2ef72867f4d1f6a93d4239f7f3de8354e452d6c1b",
+      "authority": "Founder · itinerario con marca · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/viaje-compartido.$token.tsx",
+      "sha256": "b8eeb48dcd1f81a7fd0c93b6cda45617350ae5dbb35e72dcdee0ef2041d68fe9",
+      "authority": "Founder · itinerario con marca · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/mi-viaje.tsx",
+      "sha256": "ff2ae5f48f7480e00ce912960b09841551b2e73d40e944d7ff2e70a3ac9cfade",
+      "authority": "Founder · itinerario con marca · 2026-11-21"
+    }
+  ],
+  "public_routes": ["/viaje-compartido/$token", "/cuenta/mi-viaje"],
+  "required_feature_flags": [],
+  "required_tests": []
+}
