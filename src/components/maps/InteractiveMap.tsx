@@ -364,10 +364,21 @@ export function InteractiveMap({
       return;
     }
     let cancelled = false;
+    /* Al salir de la página el mapa, sus pines y sus trazos se sueltan
+       para que la memoria del teléfono no crezca con cada ruta visitada. */
+    const overlays: unknown[] = [];
+    let mapInstance: unknown = null;
+    let releaseListeners: ((instance: unknown) => void) | null = null;
 
     loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
+        const mapsEvent = (
+          google.maps as unknown as {
+            event?: { clearInstanceListeners?: (instance: unknown) => void };
+          }
+        ).event;
+        releaseListeners = (instance) => mapsEvent?.clearInstanceListeners?.(instance);
         const { markers, routeStops, fitPoints, restriction } = latestRef.current;
         /* En mapas pequeños (celular) el margen fijo dejaba el recorrido
            diminuto o fuera de cuadro: se limita a una fracción del lado corto. */
@@ -399,6 +410,7 @@ export function InteractiveMap({
             : {}),
           ...(typeof minZoom === "number" ? { minZoom } : {}),
         });
+        mapInstance = map;
         const list: InteractiveMapMarker[] =
           markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
         const bounds = new google.maps.LatLngBounds();
@@ -440,6 +452,7 @@ export function InteractiveMap({
               anchor: new google.maps.Point(pinW / 2, pinH - 2),
             },
           });
+          overlays.push(marker);
           if (m.key) {
             marker.addListener("click", () => markerSelectRef.current?.(m.key as string));
           }
@@ -457,6 +470,7 @@ export function InteractiveMap({
                 anchor: new google.maps.Point(chip.width / 2, -4),
               },
             });
+            overlays.push(nameMarker);
             if (m.key) {
               nameMarker.addListener("click", () => markerSelectRef.current?.(m.key as string));
             }
@@ -479,20 +493,22 @@ export function InteractiveMap({
           const isProminentRoute = routeEmphasis === "prominent";
           if (isProminentRoute && roadRoute?.encodedPolyline) {
             const roadPath = decodePolyline(roadRoute.encodedPolyline);
-            new google.maps.Polyline({
-              map,
-              path: roadPath,
-              strokeColor: themeColor("--selva", "#234933"),
-              strokeOpacity: 0.88,
-              strokeWeight: 10,
-            });
-            new google.maps.Polyline({
-              map,
-              path: roadPath,
-              strokeColor: themeColor("--primary", "#eaa840"),
-              strokeOpacity: 1,
-              strokeWeight: 6,
-            });
+            overlays.push(
+              new google.maps.Polyline({
+                map,
+                path: roadPath,
+                strokeColor: themeColor("--selva", "#234933"),
+                strokeOpacity: 0.88,
+                strokeWeight: 10,
+              }),
+              new google.maps.Polyline({
+                map,
+                path: roadPath,
+                strokeColor: themeColor("--primary", "#eaa840"),
+                strokeOpacity: 1,
+                strokeWeight: 6,
+              }),
+            );
             map.fitBounds(bounds, pad);
             routeStatusRef.current?.({
               mode: "directions",
@@ -525,6 +541,8 @@ export function InteractiveMap({
               strokeWeight: isProminentRoute ? 6 : 5,
             },
           });
+          if (routeUnderlay) overlays.push(routeUnderlay);
+          overlays.push(renderer);
           directions.route(
             {
               origin: { lat: stops[0].lat, lng: stops[0].lng },
@@ -568,7 +586,7 @@ export function InteractiveMap({
                 routeStatusRef.current?.({ mode: "none", providerStatus: status });
               } else {
                 const approximatePath = stops.map((s) => ({ lat: s.lat, lng: s.lng }));
-                new google.maps.Polyline({
+                const approximateLine = new google.maps.Polyline({
                   map,
                   path: approximatePath,
                   strokeColor: themeColor("--primary", "#eaa840"),
@@ -581,6 +599,7 @@ export function InteractiveMap({
                     },
                   ],
                 });
+                overlays.push(approximateLine);
               }
               map.fitBounds(bounds, pad);
               if (!isProminentRoute) {
@@ -598,6 +617,12 @@ export function InteractiveMap({
       });
     return () => {
       cancelled = true;
+      for (const overlay of overlays.splice(0)) {
+        releaseListeners?.(overlay);
+        (overlay as { setMap?: (map: null) => void }).setMap?.(null);
+      }
+      if (mapInstance) releaseListeners?.(mapInstance);
+      mapInstance = null;
     };
   }, [
     shouldMount,

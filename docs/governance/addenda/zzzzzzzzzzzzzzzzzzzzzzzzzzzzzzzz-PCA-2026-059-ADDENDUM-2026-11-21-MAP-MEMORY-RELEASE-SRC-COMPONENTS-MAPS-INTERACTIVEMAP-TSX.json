@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-MAP-MEMORY-RELEASE-SRC-COMPONENTS-MAPS-INTERACTIVEMAP-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Usa mucha memoria la aplicación para funcionar?»; autorización «Sí, corrígelo»: que el mapa libere su memoria al salir de cada ruta, sin cambiar nada de cómo se ve). Sin cambiar estructura, orden, contenido CMS, rutas, pines, trazos, diseño, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/maps/InteractiveMap.tsx",
+    "previous_sha256": "9862e9d601cb177de1bbcfc965f88badd768bd332694ca0f13910a610a26745e",
+    "current_sha256": "57379120dcd5faec7d8f123dedd6a7b6e3f5dc116f4b4517ffcd512ccc66779b",
+    "semantic_change": "Liberación de memoria del mapa compartido: al desmontarse o redibujarse, el mapa suelta sus pines, etiquetas, trazos y renderizadores de ruta y limpia sus escuchas. La memoria ya no crece al pasar de una ruta a otra. Sin cambios visuales, de datos, proveedor, encuadre ni otras secciones.",
+    "authority": "Founder · liberar memoria del mapa al salir de cada ruta · 2026-11-21"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Los mapas conservan proveedor, controles, pines, trazos, encuadre, enlaces «Cómo llegar» y datos; sólo se liberan al salir.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-21"
+}

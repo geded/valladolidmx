@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Monitor de visitantes y registro de viajeros · 2026-11-20
+
 - [x] Estadísticas del monitor visibles: la pantalla Inteligencia del visitante fallaba para todos (lectura de un esquema no expuesto) y se topaba en 1,000 registros; ahora lee todo por páginas. Verificado como administrador: 1,084 visitantes y 1,739 visitas en 30 días.
 - [x] Entrada «Inteligencia del visitante» en el menú del CMS (sólo administradores).
 - [x] Correo «Nuevo viajero registrado» al administrador; probado con un viajero de prueba: enviado a geded@valladolid.com.mx.
@@ -10,6 +11,7 @@
 - [ ] Herramienta de simulación del monitor sigue usando la lectura antigua (sólo pruebas internas, no afecta cifras reales).
 
 ## Alux · resumen de reseñas de Google · 2026-11-20
+
 - [x] Alux muestra solo, al abrirse desde una ficha, «Este es un resumen basado en las reseñas de [Nombre]» con el resumen oficial de Google (Gemini) sin modificar, encabezado, divulgación y enlaces exigidos.
 - [x] Dos momentos: planeando («Estás explorando…») y en sitio con ubicación («Estás a 150 m de…»).
 - [x] Negocios, lugares, experiencias (reseñas del negocio) y eventos (negocio o sede); en recomendaciones del chat se despliega a petición.
@@ -24,12 +26,14 @@
 - [ ] Destinos (pueblos) no tienen resumen de reseñas en Google; se queda sin resumen.
 
 ## Revisión automática de gobernanza al día · 2026-11-20
+
 - [x] Paso 0 · Formato: 217 archivos acomodados solo en espacios/saltos; 7 archivos con versión exacta aprobada o texto fijado por pruebas se dejaron intactos. Mismas pruebas que antes.
 - [x] Paso 1 · Avisos de código: 34 grupos resueltos (marcas de deuda conocida en módulos de correo/servidor, 4 correcciones de hooks sin cambio de comportamiento, BusinessSurface fijado por su prueba). Lint gate PASS; 1,046 pruebas con los mismos 7 fallos previos; Qué hacer, Experiencias y Mi Concierge verificados en 390 px.
 - [x] Paso 2 · Registros de gobernanza: inventario de artefactos sin registrar y conteo de brechas.
 - [x] Paso 3 · Huellas de versiones aprobadas (PCA) y controles I3/I4 desactualizados por meses de trabajo.
 
 ## Compactación de fichas existentes · 2026-10-23
+
 - [x] Alcance inmediato: hoteles, restaurantes, casas de vacaciones, lugares/sitios de interés y eventos; sólo espacios y presentación, sin cambiar plantillas, contenido, orden ni funciones.
 - [x] Preflight autenticado de las cinco familias: negocios abren bloques individuales demo; eventos abre Kit genérico; lugar no muestra ficha en el lienzo observado. Informe: docs/governance/audit/2026-10-23-COMPACT-FICHES-PREFLIGHT.md. Scope de lectura PASS; Preservation de implementación BLOQUEADO.
 - [x] Founder autoriza revisar y corregir la conexión constructor/público sin modificar forma ni estructura, sustituir datos CMS ni publicar.
@@ -42,31 +46,38 @@
 - [ ] Negocios/eventos: bloqueo de preservación pendiente de definición del ownership entre nodos granulares editables y secciones públicas; no se sustituye el árbol ni se compactan superficies divergentes. Controles globales Route Inventory/Governance siguen fallando por deuda previa; aceptación visual humana y prueba 360 pendientes.
 
 ## Armonía visual de todas las plantillas públicas · 2026-10-23
+
 - [x] Alcance confirmado: Inicio, región, destinos, listados y fichas; sólo presentación, conservando partes y funciones establecidas.
 - [x] Inventario de autoridades y preflight de primera ficha: Sutuk público recorrido en 1440/834/430/390; recomendaciones ya compactas 240px/16:9. Informe: docs/governance/audit/2026-10-23-PUBLIC-TEMPLATE-HARMONY-PREFLIGHT.md.
-- [ ] BLOQUEADO: «Hotel Premium» abre __tpl_business__ con bloques individuales, sin recomendaciones de la ficha pública. Revalidación: hotel-sutuk SÍ reemplaza los datos demo al esperar la carga; persiste la diferencia de composición. Conexión autorizada sin cambiar estructura; reconciliación debe preservar controles editoriales y datos. Sin cambios visuales, CMS ni publicación.
+- [ ] BLOQUEADO: «Hotel Premium» abre **tpl_business** con bloques individuales, sin recomendaciones de la ficha pública. Revalidación: hotel-sutuk SÍ reemplaza los datos demo al esperar la carga; persiste la diferencia de composición. Conexión autorizada sin cambiar estructura; reconciliación debe preservar controles editoriales y datos. Sin cambios visuales, CMS ni publicación.
 - [ ] Comparación visual y aceptación de primera muestra antes de extender a otros lotes; depende de resolver la divergencia. Scope Gate de investigación PASS; Preservation Gate de implementación BLOQUEADO.
 
 ## Armonía de acciones en tarjetas del destino · 2026-10-23
+
 - [x] Retirado únicamente «Ver ruta» de las tarjetas de Rutas y Sigue explorando en DestinationPremiumSurface; conservados enlace de toda la tarjeta, señal Alux, contenido CMS, fuentes de imágenes, duración y paradas. Comparativa de nueve secciones en 1440/834/430/390: sólo cambia la acción retirada y altura de esas tarjetas, demás contenido y dimensiones intactos; cero errores/desbordes. Navegación real a /rutas/pueblos-coloniales PASS en cuatro tamaños, cuatro contratos PASS, build automático OK. Capturas móvil/tableta inspeccionadas; fotos diferidas no cargaron en esas capturas, disponibilidad no certificada. Sin publicación ni cambios CMS; constructor y aceptación humana pendientes.
 
 ## Enlaces compactos del destino en celular · 2026-10-23
+
 - [x] Reducidos sólo texto, separación e iconos de Explorar servicios, Compartir y Agregar a Mi Viaje en DestinationPremiumSurface por debajo de tableta; áreas táctiles de 44px. Valladolid completo comparado en 1440/834/430/390: nueve secciones, contenido/enlaces/fuentes de medios intactos y geometría de las demás secciones idéntica; cero errores de página/desbordes, cuatro contratos PASS y build automático OK. Captura 390 inspeccionada: tres acciones en una fila. Sin CMS ni publicación.
 - [ ] Verificación de apertura de Compartir no completada: el clic no mostró la hoja en la automatización; lógica compartida intacta, pendiente comprobar interactividad del entorno antes de certificarla. Constructor autenticado y aceptación humana pendientes.
 
 ## Tarjetas compactas inferiores del destino · 2026-10-23
+
 - [x] Compactadas únicamente Rutas, Sigue explorando y Cerca del destino: tarjetas de 240px, imágenes 16:9 (238×134 interiores como hoteles), filas deslizables y títulos locales compactos. Catálogo regional conserva su rama sin cambios. Comparativa pública Valladolid 1440/834/430/390: nueve secciones, textos/enlaces/fuentes de medios intactos, geometría de las demás secciones idéntica, cero errores/desbordes. En 390 desplazamiento rutas/cercanos y enlace /rutas/pueblos-coloniales PASS; capturas móviles inspeccionadas. Cuatro contratos PASS, build automático OK. Algunas fotos no cargaron en las capturas: disponibilidad completa de medios no certificada. Sin publicación ni cambios CMS; constructor autenticado y aceptación humana pendientes.
 
 ## Acciones del destino en una sola fila · 2026-10-23
+
 - [x] Corregido sólo el ancho del grupo Explorar servicios / Compartir / Agregar a Mi Viaje en DestinationPremiumSurface: sin límite de 22rem y sin salto desde tableta. Capturas 1024/834 inspeccionadas: tres acciones en una fila. Comparativa 1440/1024/834/430/390: nueve secciones, textos/enlaces/fuentes de imágenes intactos y dimensiones de secciones restantes idénticas; Compartir PASS, cero errores/desbordes, textos largos PASS. Cuatro pruebas de contrato del destino PASS y build automático OK; contrato G5 de presentación falla por marca corta existente, ajena a esta clase CSS. Sin cambios CMS ni publicación; constructor autenticado y aceptación humana siguen pendientes.
 
 ## Equilibrio de presentación y descripción del destino · 2026-10-23
+
 - [x] Etiquetas centradas al pie de la galería; título a la izquierda y acciones distribuidas en desktop/tableta, agrupadas a la izquierda en móvil. Sólo DestinationPremiumSurface; navegación y contenido intactos.
 - [x] Descubre: foto horizontal sobre el texto hasta 1023 px; desde 1024 px, dos columnas con proporción fija y foto que acompaña el desplazamiento, sin estirar ni truncar descripción.
 - [x] Valladolid comparado en 1440/834/430/390: nueve secciones, mismas fuentes de fotos, textos y enlaces; sólo cambia geometría de presentación y Descubre. Compartir abre, cero errores de página y desbordes; descripción cuatro veces más larga comprobada sin escrituras CMS. 59 pruebas PASS, build automático OK, diff-check limpio. Capturas en /tmp/browser/destination-balance. Disponibilidad completa de fotos no certificada por cargas diferidas variables.
 - [ ] Aceptación visual del Founder y comprobación autenticada en el constructor pendientes; controles globales conservan deuda previa fuera del alcance. Sin publicación.
 
 ## Etiquetas navegables y acciones de viaje · 2026-10-23
+
 - [x] Preferencia sustituida por la corrección del Founder: sólo etiquetas centradas; título y acciones equilibrados según dispositivo (ver sección anterior).
 - [x] Plan aprobado e implementado: Arma tu viaje junto a las etiquetas institucionales, sin botón grande duplicado; Agregar a Mi Viaje conserva su función. Enlaces internos de los distintivos reutilizan el renderer compartido y no abren pestañas nuevas.
 - [x] Región conserva origen validado contra destinos publicados y muestra Volver al destino; Pueblo Mágico llega al ancla de su sección existente. Arma tu viaje conserva destination/destinationLabel y breadcrumb de regreso también con composición publicada.
@@ -74,19 +85,23 @@
 - [ ] Pendiente aceptación visual humana y constructor autenticado; controles globales Route Inventory/Governance conservan deuda previa documentada. Sin publicación.
 
 ## Franja de presentación del destino · 2026-10-23
+
 - [x] Ajuste autorizado: título y acciones distribuidos en escritorio/tableta, una columna compacta en móvil y menor separación antes de Descubre. Sólo DestinationPremiumSurface; sin nuevos contenidos, cambios CMS, fotos, mapa, Alux, tarjetas, navegación o publicación.
 - [x] Valladolid antes/después en 1440/834/430/390: cero errores/desbordes; Compartir abre en los cuatro anchos; contenido, enlaces, imágenes y dimensiones de las secciones ajenas al delta idénticos. Capturas de la franja inspeccionadas. Cinematográfico mantiene su disposición anterior al no habilitar distributed/compactTop. 20 pruebas PASS; build automático OK y diff-check limpio.
- - [ ] Cierre global pendiente: Route Inventory reporta rutas previas sin registrar y Governance conserva artefactos ausentes/gap obsoleto (607 avisos). No se alteran registros ni rutas fuera de alcance; constructor autenticado y aceptación visual humana pendientes, sin publicación.
+- [ ] Cierre global pendiente: Route Inventory reporta rutas previas sin registrar y Governance conserva artefactos ausentes/gap obsoleto (607 avisos). No se alteran registros ni rutas fuera de alcance; constructor autenticado y aceptación visual humana pendientes, sin publicación.
 
 ## Portada y Descubre del destino armonizados · 2026-10-23
+
 - [x] Ajuste autorizado en DestinationPremiumSurface: en celular la portada pasa de altura fija 288 px a proporción 4:3 (igual que la foto de "El destino"), el título "Descubre" baja de text-3xl/4xl a text-2xl/3xl (igual que "Galería") y el texto descriptivo pierde el aumento sm:text-lg. Sólo clases de presentación; sin cambios de estructura, contenido, medios, funciones ni CMS.
 - [x] Verificación móvil 430/390/360: portada llena el ancho y manda visualmente sobre la foto de descripción, título a 24 px, cero errores de página; build automático OK. El contrato G5 sigue en deuda previa documentada (marca corta), ajena a esta clase CSS. Capturas en /tmp/browser/dest-hero-fix. Aceptación visual humana pendiente; sin publicación.
 
 ## Validación de subidas, IA y ampliación · 2026-10-22
+
 - [x] Auditoría de código de subidas CMS/Portal/selector compartido, búsqueda/generación IA y ampliación: derivación tras registro conectada; 15 contratos PASS y codificación WebP en navegador comprobada sin persistencia. No certificación de subida autenticada ni IA real: no se subieron fotos ni consumió generación.
 - Hallazgos para corrección autorizada: AluxMediaSourceButtons sólo entrega File y pierde metadatos de autor/fuente/licencia/IA; ampliación IA no valida dimensiones devueltas; galería permite omitir evaluación de tamaño. Derivación en segundo plano no garantiza copias si falla/cierra navegador; <400 px, GIF/SVG y formatos sin soporte pueden conservar original. Fotos personales/documentos no quedan certificados por el flujo de medios CMS. No se declara cobertura universal ni blindaje completo.
 
 ## Optimización integral de imágenes · 2026-10-22
+
 - [x] Conectar variantes existentes a consumidores públicos compartidos de listados, destinos, rutas, experiencias, eventos, productos relacionados y logotipos; originales, editor y datos editoriales sin cambios. Zonas conservan la subida compartida; no se inventó una superficie pública inexistente.
 - [x] Verificar contratos (65 tests PASS), 36 recorridos públicos en 1440/834/430/390 (0 errores, 0 overflow, 0 peticiones originales detectadas en la muestra) y eventos/experiencias/Sutuk (0 imágenes rotas); documentar alcance y limitaciones en docs/media-optimization-2026-10-22.md. No publicación ni cambios de fichas.
 
@@ -407,6 +422,7 @@
 - [x] Avisos · Correo CANCELADO por el Founder (21-sep): se retiró el despachador, la plantilla `unc-notification` y el job `unc-email-dispatch-5min`; no quedó ningún envío programado.
 
 ## Imágenes de empresas
+
 - [x] Encuadre manual (mover, zoom, pellizco) para logo, portada y galería; logo completo sin cortar letras.
 - [x] Luz y color (luz, sombras, contraste, color, calidez) + "Mejorar con Alux" y comparación con original.
 - [x] Galería por lote: cada foto se acomoda en secuencia, con opción de subir el resto sin ajustar.
@@ -414,6 +430,7 @@
 - [ ] Prueba visual con sesión editor en 1440/834/430/390 y aceptación del Founder.
 
 ## Fotos ligeras (H3·A4)
+
 - [x] Tamaño real guardado en las 624 fotos y en cada subida nueva de empresa.
 - [x] Versiones ligeras creadas para 622 de 624 fotos (2 con fallo parcial siguen con su original).
 - [x] Ficha de empresa lee versiones ligeras (piloto Hotel Sutuk en vista previa) + comparación 1440/834/430/390.
@@ -422,14 +439,16 @@
 - [ ] Respaldo periódico automático para fotos que no se optimizaron al subir — requiere decidir un servidor externo para el proceso por lotes.
 
 ## Correcciones Alux/listados autorizadas · 2026-10-22 (Founder: "Autorizado todo")
-- [x] 1) Corregir la búsqueda de cercanía del chat público de Alux (campo inexistente `display_name` → `name` en la consulta de categorías). Verificado end-to-end: Alux respondió con Casa Colonial Sisal a 0.1 km con ubicación de visitante real.
-- [x] 2) Conectar el peso de visibilidad en el listado de Experiencias (misma autoridad `business_effective_visibility` que hoteles/restaurantes; peso DESC + alfabético; fail-closed).
-- [x] 3) Blindar coordenadas vacías/inválidas: guardia `== null` antes de `Number()` en travel-plan-geo/optimize/schedule (Number(null) era 0 → punto (0,0)).
-- [x] 4) Fichas de las 60 esperadas: NO faltaban — error de la auditoría anterior (filtraba mal). Base real: 30 hoteles + 32 restaurantes publicados y aprobados; verificado en navegador (30 tarjetas en /hoteles, 32 en /restaurantes).
+
+- [x] 1. Corregir la búsqueda de cercanía del chat público de Alux (campo inexistente `display_name` → `name` en la consulta de categorías). Verificado end-to-end: Alux respondió con Casa Colonial Sisal a 0.1 km con ubicación de visitante real.
+- [x] 2. Conectar el peso de visibilidad en el listado de Experiencias (misma autoridad `business_effective_visibility` que hoteles/restaurantes; peso DESC + alfabético; fail-closed).
+- [x] 3. Blindar coordenadas vacías/inválidas: guardia `== null` antes de `Number()` en travel-plan-geo/optimize/schedule (Number(null) era 0 → punto (0,0)).
+- [x] 4. Fichas de las 60 esperadas: NO faltaban — error de la auditoría anterior (filtraba mal). Base real: 30 hoteles + 32 restaurantes publicados y aprobados; verificado en navegador (30 tarjetas en /hoteles, 32 en /restaurantes).
 - [x] Tests de contrato: scripts/alux/alux-nearby-visibility-geo.contract.test.ts (4 PASS) + suite de experiencias (13 PASS).
 - [ ] Pendiente: que el Founder asigne pesos de visibilidad reales a los operadores de experiencias (los 6 pesos actuales son de otros negocios), sin eso el orden de Experiencias sigue alfabético.
 
 ## Fotos del destino Valladolid no visibles en público · 2026-10-22 (Founder reporta en vivo)
+
 - [x] Diagnosticado: las 12 fotos subidas hoy estaban publicadas pero sin acreditar (review_state=unreviewed, sin crédito/licencia/huella); la política pública fail-closed G8 las ocultaba por diseño.
 - [x] Acreditación aplicada con autorización del Founder (fotos suyas o con permiso): huella sha256 de cada original, crédito/licencia Valladolid.mx, revisión aprobada. Verificado en navegador: hero y galería visibles en /oriente-maya/valladolid, 0 errores de página.
 - [x] Mejora autorizada implementada en destinos: declaración compartida de propiedad/permiso y atribución; validación editorial, SHA del archivo almacenado y auditoría al acreditar fotos reales completas sin espera administrativa. Protecciones IA, encuadre y compresión conservadas; 38 pruebas PASS y formulario comprobado con sesión en 1440/834/430/390.
@@ -437,6 +456,7 @@
 - [ ] Hallazgo: la tarjeta de la ruta "Uayma y Espita en dos días" muestra imagen rota porque su asset es conceptual IA en borrador (proxy lo bloquea por diseño). Requiere decisión del Founder (foto real o retirar tarjeta); contenido demo protegido por Demo Pack Policy.
 
 ## Fotos de destino estilo Airbnb · 2026-10-23
+
 - [x] Portada en mosaico (escritorio/tableta) y deslizable con contador (móvil) en la plantilla única de destinos
 - [x] Galería única en "Ver todas las fotos"; Descubre con una sola foto
 - [x] Acomodar foto (punto de enfoque) al subir y en fotos ya subidas
@@ -444,10 +464,12 @@
 - [ ] Probar "Acomodar fotos" guardando como editor real (pendiente de validación del usuario)
 
 ## App sin señal · 2026-11-20 (Founder reporta: la app no abre sin señal)
+
 - [x] Causa: sin señal, si una pieza flotante (Alux, Tu viaje, aviso de sesión) no estaba guardada, toda la página se reemplazaba por «Sin conexión». Corregido: la pieza se omite y la página se ve. Pendiente publicar y probar en iPhone real.
 
 ## Memoria de la app al seguir rutas · 2026-11-21
+
 - [ ] Medir cuánta memoria usa la app (y espacio en el teléfono) con una ruta abierta y Mi Viaje; revisar qué pasa con rutas guardadas sin señal. Solo diagnóstico.
-- [ ] Requisito Founder: el viajero debe ver su itinerario una vez que el concierge le armó el viaje (también sin señal). Hoy Mi Viaje con cuenta no abre sin señal.
-- [ ] Hallazgo: la memoria crece ~1 MB por cada cambio entre fichas de rutas (16→40 MB en 20 cambios) porque el mapa compartido no se libera al salir. Propuesta: liberar mapa, pines y trazos al salir. Espera autorización.
+- [ ] Requisito Founder: el viajero debe ver su itinerario una vez que el concierge le armó el viaje (también sin señal). Autorizado «Copia con documentos»: itinerario + reservas + documentos del viaje en el teléfono, solo lectura, se borra al cerrar sesión; sin pagos.
+- [x] Memoria de rutas: el mapa compartido libera mapa, pines y trazos al salir (autorizado). Vista previa: 20 cambios entre rutas 29.9→32.4 MB (antes 16→40 MB publicado).
 - [ ] Hallazgo: la app guarda en el teléfono respuestas de datos con sesión (lecturas GET) en la memoria sin señal, aunque la regla dice no guardar nada de la cuenta. Revisar junto con el itinerario sin señal.
