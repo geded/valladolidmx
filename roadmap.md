@@ -9,6 +9,7 @@
 - [ ] Alux en WhatsApp contesta sobre todo el territorio y pregunta «¿Lo agrego a tu viaje?» (en plan).
 - [ ] Regla de venta: solo experiencias se venden directo con enlace de pago; lo demás pasa al concierge, que busca los mejores precios (en plan).
 - [x] Conexión de WhatsApp elegida: QR como Zazil (Evolution en Railway), con líneas administradas desde el panel.
+- [ ] Organización: CRM Prospectos (Hoy, Pláticas, Prospectos, Estadísticas) en el panel del concierge; configuración, reglas, entrenamiento y canales de Alux en las pantallas de Alux del CMS que ya existen, con acceso directo (en plan).
 - [ ] Recibir del Founder la dirección y clave del servidor Evolution de Railway (al iniciar la Fase 2).
 
 - [ ] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (borrador en la tarjeta de plan).

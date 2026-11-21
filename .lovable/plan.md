@@ -32,6 +32,16 @@ Adaptado al Oriente Maya:
 
 ## 2. Panel del concierge (como tus capturas)
 
+**Dónde vive cada cosa (sin duplicar pantallas que ya existen)**
+- **CRM Prospectos**, en el panel del concierge, junto a CRM Arma tu viaje. Tiene cuatro pestañas, como el «Chat Centro de Ayuda» de Zazil:
+  - Hoy: acciones y urgentes;
+  - Pláticas: todas las conversaciones de web y WhatsApp;
+  - Prospectos: lista, tablero y fichas;
+  - Estadísticas: embudo y rentabilidad por canal.
+- **Configuración, reglas y entrenamiento de Alux:** ya existen en el CMS (Alux, Conocimiento, Calidad, Comentarios). Ahí se agregan **Reglas de venta** (jerarquía y bitácora R-xx) y **Canales** (botón web y líneas de WhatsApp con QR). Desde CRM Prospectos hay un acceso directo, solo para administradores.
+- **Concierges:** ven Hoy, Pláticas, Prospectos y Estadísticas. **Administradores:** además ven configuración, reglas, entrenamiento y canales.
+
+
 **Acciones de hoy**
 - Propuestas por vencer.
 - Pidieron concierge: responder en menos de 15 min.
