@@ -11,13 +11,12 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getAluxFeedbackStats } from "@/lib/alux/feedback.functions";
-import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, ThumbsDown, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cms/alux/feedback")({
   head: () => ({
     meta: [
-      { title: "Feedback de Alux · CMS Studio" },
+      { title: "Opiniones sobre Alux · CMS Studio" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -62,12 +61,12 @@ function AluxFeedbackPage() {
         </Link>
         <p className="text-xs uppercase tracking-wider text-muted-foreground">CMS · Inteligencia</p>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-serif">Feedback y calidad de Alux</h1>
-          <Badge variant="secondary">Ola A4</Badge>
+          <h1 className="text-2xl font-serif">Opiniones de los viajeros sobre Alux</h1>
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Cada 👍/👎 del viajero se registra aquí. Úsalo para iterar el prompt, curar la Base de
-          Conocimiento (Ola A2) y detectar capacidades con baja calidad.
+          Cada vez que un viajero marca 👍 o 👎 en una respuesta de Alux queda registrado aquí.
+          Sirve para ajustar la personalidad de Alux, corregir la base de conocimiento y ver en qué
+          tipo de ayuda responde peor.
         </p>
 
         <div className="pt-2 flex flex-wrap gap-2">
@@ -98,24 +97,24 @@ function AluxFeedbackPage() {
           {/* KPIs globales */}
           <section className="grid gap-4 sm:grid-cols-4">
             <KpiCard
-              label="CSAT"
+              label="Satisfacción"
               value={data.totals.total > 0 ? pct(data.totals.csat) : "—"}
-              hint={`${data.totals.total} respuestas`}
+              hint={`👍 sobre ${data.totals.total} opiniones`}
             />
             <KpiCard label="👍 Útiles" value={String(data.totals.up)} tone="success" />
             <KpiCard label="👎 Poco útiles" value={String(data.totals.down)} tone="destructive" />
             <KpiCard
-              label="Volumen total"
+              label="Opiniones recibidas"
               value={String(data.totals.total)}
-              hint={`ventana ${days}d`}
+              hint={`últimos ${days} días`}
             />
           </section>
 
           {/* Por capacidad */}
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="font-serif text-lg mb-4">CSAT por capacidad</h2>
+            <h2 className="font-serif text-lg mb-4">Satisfacción por tipo de ayuda</h2>
             {data.perCapability.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aún sin feedback en esta ventana.</p>
+              <p className="text-sm text-muted-foreground">Aún no hay opiniones en este periodo.</p>
             ) : (
               <div className="space-y-3">
                 {data.perCapability.map((c) => (
@@ -144,7 +143,7 @@ function AluxFeedbackPage() {
 
           {/* Volumen por día */}
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="font-serif text-lg mb-4">Volumen diario</h2>
+            <h2 className="font-serif text-lg mb-4">Opiniones por día</h2>
             {data.perDay.length === 0 ? (
               <p className="text-sm text-muted-foreground">Sin datos.</p>
             ) : (
@@ -174,11 +173,12 @@ function AluxFeedbackPage() {
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
             <h2 className="font-serif text-lg mb-1">Entradas de conocimiento a revisar</h2>
             <p className="mb-4 text-xs text-muted-foreground">
-              Base de Conocimiento (Ola A2) citada en respuestas con 👎. Revísalas o mejóralas.
+              Datos de la base de conocimiento que Alux usó en respuestas marcadas con 👎. Conviene
+              revisarlos o mejorarlos.
             </p>
             {data.knowledgeDownHits.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Ninguna entrada asociada a feedback negativo. 🎉
+                Ningún dato aparece en respuestas con 👎. 🎉
               </p>
             ) : (
               <ul className="space-y-1.5">
@@ -200,14 +200,14 @@ function AluxFeedbackPage() {
                 to="/cms/alux/conocimiento"
                 className="text-xs underline underline-offset-4 hover:text-primary"
               >
-                Abrir Base de Conocimiento →
+                Abrir base de conocimiento →
               </Link>
             </div>
           </section>
 
           {/* Feedback reciente */}
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="font-serif text-lg mb-4">Feedback reciente</h2>
+            <h2 className="font-serif text-lg mb-4">Opiniones recientes</h2>
             {data.recent.length === 0 ? (
               <p className="text-sm text-muted-foreground">Sin registros.</p>
             ) : (

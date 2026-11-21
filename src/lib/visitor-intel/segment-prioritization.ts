@@ -13,6 +13,7 @@
  */
 import type { JourneySegmentSnapshot, SegmentBucket, SegmentDimension } from "./segments.functions";
 import type { RecommendationValidationSnapshot } from "./recommendations.functions";
+import { factorLabel, reliabilityLabel, segmentValueLabel } from "./plain-language";
 
 export const SEGMENT_PRIORITIZATION_CONTRACT_VERSION = "1.0.0" as const;
 
@@ -88,10 +89,18 @@ export interface SegmentPrioritizationResult {
   };
 }
 
+const TYPE_LABEL: Record<SegmentFindingType, string> = {
+  commercial_opportunity: "Oportunidad comercial",
+  experience_opportunity: "Oportunidad de experiencia",
+  inclusion_opportunity: "Oportunidad de inclusión",
+  abandonment_risk: "Riesgo de abandono",
+  insufficient_data: "Pocos datos",
+};
+
 const DIMENSION_LABEL: Record<SegmentDimension, string> = {
   locale: "Idioma",
   destination: "Destino",
-  capability: "Capability",
+  capability: "Sección del sitio",
   country: "País",
   channel: "Canal",
   device: "Dispositivo",
@@ -215,33 +224,33 @@ function alternativeExplanationsFor(t: SegmentFindingType, dim: SegmentDimension
 function recommendedActionFor(t: SegmentFindingType, dim: SegmentDimension, label: string): string {
   switch (t) {
     case "commercial_opportunity":
-      return `Amplificar oferta y visibilidad para ${DIMENSION_LABEL[dim].toLowerCase()} "${label}" sin degradar la experiencia de otros grupos.`;
+      return `Dar más visibilidad a la oferta para ${DIMENSION_LABEL[dim].toLowerCase()} «${label}», sin descuidar a los demás grupos.`;
     case "experience_opportunity":
-      return `Reducir fricción de progresión (información, precio, disponibilidad, atención) para ${DIMENSION_LABEL[dim].toLowerCase()} "${label}".`;
+      return `Quitar obstáculos para avanzar (información, precio, disponibilidad, atención) en ${DIMENSION_LABEL[dim].toLowerCase()} «${label}».`;
     case "inclusion_opportunity":
-      return `Auditar barreras (idioma, accesibilidad, confianza, canal, atención) antes de asumir menor interés en ${DIMENSION_LABEL[dim].toLowerCase()} "${label}".`;
+      return `Revisar barreras (idioma, accesibilidad, confianza, canal, atención) antes de suponer que a ${DIMENSION_LABEL[dim].toLowerCase()} «${label}» le interesa menos.`;
     case "abandonment_risk":
-      return `Intervenir de inmediato en ${DIMENSION_LABEL[dim].toLowerCase()} "${label}": diagnóstico de causa raíz y plan de recuperación.`;
+      return `Revisar cuanto antes ${DIMENSION_LABEL[dim].toLowerCase()} «${label}»: encontrar por qué se detienen y cómo recuperarlos.`;
     default:
-      return `Recolectar más evidencia antes de decidir sobre ${DIMENSION_LABEL[dim].toLowerCase()} "${label}".`;
+      return `Esperar a tener más datos antes de decidir sobre ${DIMENSION_LABEL[dim].toLowerCase()} «${label}».`;
   }
 }
 
 function expectedImpactFor(t: SegmentFindingType, delta: number, sample: number): string {
   const pct = Math.abs(delta) * 100;
   if (t === "commercial_opportunity") {
-    return `Si el efecto se sostiene, este segmento aporta ~${pct.toFixed(0)}% más avance vs baseline sobre n=${sample}.`;
+    return `Si se mantiene, este grupo avanza ~${pct.toFixed(0)}% más que el promedio (${sample} personas).`;
   }
   if (t === "abandonment_risk") {
-    return `Sin intervención, se pierden hasta ~${pct.toFixed(0)}% de avance vs baseline sobre n=${sample}.`;
+    return `Si no se atiende, este grupo avanza hasta ~${pct.toFixed(0)}% menos que el promedio (${sample} personas).`;
   }
   if (t === "inclusion_opportunity") {
-    return `Cerrar la brecha recuperaría ~${pct.toFixed(0)}% de progresión sobre n=${sample} viajeros.`;
+    return `Cerrar la diferencia recuperaría ~${pct.toFixed(0)}% de avance en ${sample} viajeros.`;
   }
   if (t === "experience_opportunity") {
-    return `Reducir fricción convertiría intención observada en avance para n=${sample}.`;
+    return `Quitar obstáculos convertiría el interés de ${sample} personas en avance real.`;
   }
-  return "Impacto no determinable — evidencia insuficiente.";
+  return "Todavía no se puede saber: hay pocos datos.";
 }
 
 export function prioritizeSegments(input: SegmentPrioritizationInput): SegmentPrioritizationResult {
@@ -278,7 +287,7 @@ export function prioritizeSegments(input: SegmentPrioritizationInput): SegmentPr
           weight: SEGMENT_PRIORITIZATION_WEIGHTS.impact,
           value: impact,
           contribution: Number((SEGMENT_PRIORITIZATION_WEIGHTS.impact * impact).toFixed(4)),
-          explanation: `Δ JPR ${(delta * 100).toFixed(1)}% vs baseline (saturación en 50%).`,
+          explanation: `Avanza ${(delta * 100).toFixed(1)} puntos frente al promedio (una diferencia de 50 o más cuenta como máximo).`,
         },
         {
           key: "confidence",
@@ -289,22 +298,22 @@ export function prioritizeSegments(input: SegmentPrioritizationInput): SegmentPr
           ),
           explanation:
             confAvg.reliability === "unknown"
-              ? "Sin validación previa suficiente — se usa 0.5 por defecto (CV8.6)."
-              : `Confianza aprendida promedio ${(confAvg.value * 100).toFixed(0)}% (${confAvg.reliability}) desde CV8.6.`,
+              ? "Aún no hay recomendaciones anteriores comprobadas; se asume 50%."
+              : `Las recomendaciones anteriores acertaron en promedio ${(confAvg.value * 100).toFixed(0)}% (${reliabilityLabel(confAvg.reliability)}).`,
         },
         {
           key: "urgency",
           weight: SEGMENT_PRIORITIZATION_WEIGHTS.urgency,
           value: urgency,
           contribution: Number((SEGMENT_PRIORITIZATION_WEIGHTS.urgency * urgency).toFixed(4)),
-          explanation: `Tipo "${type}" define urgencia; se pondera magnitud del delta.`,
+          explanation: `El tipo de hallazgo («${TYPE_LABEL[type]}») y el tamaño de la diferencia definen la urgencia.`,
         },
         {
           key: "reach",
           weight: SEGMENT_PRIORITIZATION_WEIGHTS.reach,
           value: reach,
           contribution: Number((SEGMENT_PRIORITIZATION_WEIGHTS.reach * reach).toFixed(4)),
-          explanation: `n=${b.active_subjects} sobre máximo observado n=${maxSample}.`,
+          explanation: `${b.active_subjects} personas en este grupo (el más grande tiene ${maxSample}).`,
         },
         {
           key: "friction",
@@ -313,8 +322,8 @@ export function prioritizeSegments(input: SegmentPrioritizationInput): SegmentPr
           contribution: Number((SEGMENT_PRIORITIZATION_WEIGHTS.friction * friction).toFixed(4)),
           explanation:
             friction === 0
-              ? "Sin fricción detectada (delta no negativo)."
-              : `Fricción detectada por delta negativo ${(delta * 100).toFixed(1)}%.`,
+              ? "No se detectan obstáculos: avanza igual o mejor que el promedio."
+              : `Hay obstáculos: avanza ${(Math.abs(delta) * 100).toFixed(1)} puntos menos que el promedio.`,
         },
         {
           key: "traveler_benefit",
@@ -347,19 +356,20 @@ export function prioritizeSegments(input: SegmentPrioritizationInput): SegmentPr
       const topFactors = [...factors]
         .sort((x, y) => y.contribution - x.contribution)
         .slice(0, 2)
-        .map((f) => f.key)
-        .join(" + ");
+        .map((f) => factorLabel(f.key).toLowerCase())
+        .join(" y ");
 
       const rationale =
         type === "insufficient_data"
-          ? `Muestra insuficiente (n=${b.active_subjects} < ${minPop}) — se reporta pero no se prioriza.`
-          : `Score ${(score * 100).toFixed(0)}/100 — impulsado por ${topFactors}. Tipo: ${type.replace(/_/g, " ")}.`;
+          ? `Grupo pequeño (${b.active_subjects} personas; se necesitan ${minPop}): se muestra, pero no se prioriza.`
+          : `Prioridad ${(score * 100).toFixed(0)} de 100, sobre todo por ${topFactors}. Tipo: ${TYPE_LABEL[type].toLowerCase()}.`;
+      const plainLabel = segmentValueLabel(snap.dimension, b.key, b.label);
 
       findings.push({
         rank: 0,
         dimension: snap.dimension,
         segment_key: b.key,
-        segment_label: b.label,
+        segment_label: plainLabel,
         type,
         score,
         sample_size: b.active_subjects,
@@ -370,7 +380,7 @@ export function prioritizeSegments(input: SegmentPrioritizationInput): SegmentPr
         expected_impact: expectedImpactFor(type, delta, b.active_subjects),
         bias_risk: bias,
         alternative_explanations: alternativeExplanationsFor(type, snap.dimension),
-        recommended_action: recommendedActionFor(type, snap.dimension, b.label),
+        recommended_action: recommendedActionFor(type, snap.dimension, plainLabel),
         rationale,
         factors,
       });

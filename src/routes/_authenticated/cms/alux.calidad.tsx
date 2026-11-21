@@ -72,12 +72,11 @@ function AluxQualityPage() {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">CMS · Inteligencia</p>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-serif">Calidad de respuestas de Alux</h1>
-          <Badge variant="secondary">Ola A20</Badge>
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Instrumentación heurística (no censura): riesgo de alucinación, low-context, latencia y
-          coincidencias con la base de conocimiento por capacidad. Complementa el 👍/👎 explícito
-          del viajero.
+          Revisión automática de cada respuesta de Alux: si pudo haber inventado algo, si tenía poca
+          información para responder, cuánto tardó y cuántos datos de la base de conocimiento usó.
+          Es una estimación, no bloquea respuestas, y complementa el 👍/👎 que dan los viajeros.
         </p>
 
         <div className="pt-2 flex flex-wrap gap-2">
@@ -113,27 +112,27 @@ function AluxQualityPage() {
             />
             <KpiCard
               icon={<AlertTriangle className="size-4" />}
-              label="Riesgo alucinación (prom.)"
+              label="Riesgo de inventar datos (promedio)"
               value={pct(data.overall.avg_hallucination_risk)}
               tone={riskTone(data.overall.avg_hallucination_risk)}
-              hint={`Alto (>50%): ${pct(data.overall.high_hallucination_rate)}`}
+              hint={`Respuestas con riesgo alto (más de 50%): ${pct(data.overall.high_hallucination_rate)}`}
             />
             <KpiCard
               icon={<BookOpen className="size-4" />}
-              label="Base de conocimiento"
+              label="Datos usados por respuesta"
               value={data.overall.avg_kb_matches.toFixed(1)}
-              hint={`Low-context: ${pct(data.overall.low_context_rate)}`}
+              hint={`Con poca información para responder: ${pct(data.overall.low_context_rate)}`}
             />
             <KpiCard
               icon={<Clock className="size-4" />}
-              label="Latencia"
+              label="Tiempo de respuesta (promedio)"
               value={ms(data.overall.avg_latency_ms)}
-              hint={`p95: ${ms(data.overall.p95_latency_ms)}`}
+              hint={`Las más lentas (5%) tardan más de ${ms(data.overall.p95_latency_ms)}`}
             />
           </section>
 
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="font-serif text-lg mb-4">Por capacidad</h2>
+            <h2 className="font-serif text-lg mb-4">Por tipo de ayuda</h2>
             {data.per_capability.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Sin respuestas registradas en el rango.
@@ -143,14 +142,14 @@ function AluxQualityPage() {
                 <table className="w-full text-sm">
                   <thead className="text-xs uppercase text-muted-foreground">
                     <tr className="border-b">
-                      <th className="text-left py-2 pr-3">Capacidad</th>
-                      <th className="text-right py-2 px-3">Total</th>
-                      <th className="text-right py-2 px-3">Riesgo prom.</th>
-                      <th className="text-right py-2 px-3">% alto</th>
-                      <th className="text-right py-2 px-3">Low-ctx</th>
-                      <th className="text-right py-2 px-3">KB prom.</th>
-                      <th className="text-right py-2 px-3">Sin sources</th>
-                      <th className="text-right py-2 pl-3">p95 latencia</th>
+                      <th className="text-left py-2 pr-3">Tipo de ayuda</th>
+                      <th className="text-right py-2 px-3">Respuestas</th>
+                      <th className="text-right py-2 px-3">Riesgo promedio</th>
+                      <th className="text-right py-2 px-3">Riesgo alto</th>
+                      <th className="text-right py-2 px-3">Poca información</th>
+                      <th className="text-right py-2 px-3">Datos usados</th>
+                      <th className="text-right py-2 px-3">Sin fuentes</th>
+                      <th className="text-right py-2 pl-3">Las más lentas</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -198,10 +197,12 @@ function AluxQualityPage() {
           </section>
 
           <section className="rounded-2xl border bg-card p-6 shadow-soft">
-            <h2 className="font-serif text-lg mb-4">Respuestas de alto riesgo (últimas 15)</h2>
+            <h2 className="font-serif text-lg mb-4">
+              Respuestas que pudieron inventar algo (últimas 15)
+            </h2>
             {data.recent_high_risk.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Ninguna respuesta reciente superó el umbral heurístico (riesgo &gt; 50%).
+                Ninguna respuesta reciente tuvo riesgo alto (más de 50%).
               </p>
             ) : (
               <ul className="space-y-3">
@@ -229,7 +230,9 @@ function AluxQualityPage() {
                     </div>
                     {r.unknown_mentions.length > 0 && (
                       <p className="text-sm">
-                        <span className="text-muted-foreground">Menciones no verificables: </span>
+                        <span className="text-muted-foreground">
+                          Nombres que no encontramos en Valladolid.mx:{" "}
+                        </span>
                         {r.unknown_mentions.map((m, i) => (
                           <span
                             key={i}
@@ -300,7 +303,7 @@ function DailySparkline({
             <div
               key={p.day}
               className="flex flex-col items-center gap-1"
-              title={`${p.day} — ${p.total} resp · riesgo ${pct(risk)} · low-ctx ${pct(p.low_context_rate)} · ${ms(p.avg_latency_ms)}`}
+              title={`${p.day} — ${p.total} respuestas · riesgo ${pct(risk)} · poca información ${pct(p.low_context_rate)} · ${ms(p.avg_latency_ms)}`}
             >
               <div className={`w-4 rounded-t ${bg}`} style={{ height: `${h}px` }} />
               <span className="text-[9px] text-muted-foreground rotate-45 origin-top-left translate-y-2">
@@ -311,8 +314,8 @@ function DailySparkline({
         })}
       </div>
       <p className="mt-6 text-[11px] text-muted-foreground">
-        Altura = volumen diario · color = riesgo promedio (verde &lt; 15%, ámbar 15–35%, rojo ≥
-        35%).
+        Altura = respuestas del día · color = riesgo de inventar (verde menos de 15%, ámbar 15–35%,
+        rojo ≥ 35%).
       </p>
     </div>
   );

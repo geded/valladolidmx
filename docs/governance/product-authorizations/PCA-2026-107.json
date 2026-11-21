@@ -1,0 +1,179 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-107",
+  "title": "Inteligencia de Alux y estadísticas en lenguaje de usuario",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero que revises toda la parte de Inteligencia de alux y estadísticas que ya está haciendo la plataforma y lo pongas en un lenguaje más de usuario, veo muchas secciones con términos técnicos y en inglés, debemos hacerlos más entendibles y saber qué significa cada sección que esté acumulando estadísticas y datos»): sólo textos de presentación en el monitor de visitantes, decisiones del equipo, Consola de Alux y sus subpantallas, salud del sitio, actividad y panel de inteligencia; las tres subpantallas de Alux vuelven a abrirse. Sin cambiar cálculos, cifras, identificadores, permisos, plantillas públicas, Alux para viajeros, pagos, reservaciones ni datos.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/notifications/ActivityFeedView.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/visitor-intel/PagePerformancePanel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/visitor-intel/VisitorIntelModuleNav.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/decision-workspace.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/visitor-intel/plain-language.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/prioritization.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/segment-prioritization.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/admin/ia.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/actividad.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.calidad.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.conocimiento.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.feedback.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/observabilidad.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/visitor-intel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/visitor-intel_.decisions.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/notifications/ActivityFeedView.tsx",
+      "sha256": "f001c298ddf9c843295fd6c15a6d81f369989ba4310ac4131689776e6ff94515",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/visitor-intel/PagePerformancePanel.tsx",
+      "sha256": "3a9ab5603629cb484e57a3deb4f2bb25104fc53683e0d49d1445294097ebc6c2",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/visitor-intel/VisitorIntelModuleNav.tsx",
+      "sha256": "b4f5051a4dac659b4928570b53c5d0b60e7a81dbba770ff5fdf97c434fb5d3b0",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/decision-workspace.ts",
+      "sha256": "404cab5307cffa9e0ac34e3c2b2f7c8d2c9b66179d01d46dc5f36a08b049b864",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/visitor-intel/plain-language.ts",
+      "sha256": "71ea476843ea49599ac5532f0017867a86343c73d53f70eb9006bd84aa879e9a",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/prioritization.ts",
+      "sha256": "4fbde338f941695aa8a6db0d7c8608da41826a75099add2d2a952bbb86c97dac",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/segment-prioritization.ts",
+      "sha256": "aa2a2eef48f12ad2b82b56a4b3b43e1565a2e4dd6d107fb83de5cf1fae769646",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/admin/ia.tsx",
+      "sha256": "6ca687e64ac04251c868bc2afac0ab2dacc29445d3947ec229c0bc744272b6f1",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/actividad.tsx",
+      "sha256": "23fae6ebbbb49971a5fc81ce8b5da55aa5742172825f822079d0bdd710f75cfd",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.calidad.tsx",
+      "sha256": "d8c8e271254a2be249e6c614d3101d3993129d5155631efbfed24ffe03b30909",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.conocimiento.tsx",
+      "sha256": "30ee28251b787ff53d8ceec99be3caf358b1e89053de2d5aca6853c9ccc0f0f1",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.feedback.tsx",
+      "sha256": "4d777f1f2fbceeab138cd4223192c6a7848200d7c218fc578a7942441b62d419",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.tsx",
+      "sha256": "7416a87bd2a5a111fe3c07194aac1c7b905066f44033c0f74752217dff8fd904",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/observabilidad.tsx",
+      "sha256": "ac688c882cdb5de59363ff5bf1c84c23481eacbf7a89e14a92bea95f2a057dd4",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/visitor-intel.tsx",
+      "sha256": "cee6bc57039da2c723c29403b825edc3aea65bf2758d7b0e7c10f73e2cab3b39",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/visitor-intel_.decisions.tsx",
+      "sha256": "d6342a103a20ca2a3606b8adb1e476c1fd0d46f394df64268881555f551e8dcf",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "scripts/visitor-intel-decisions.test.ts",
+    "scripts/visitor-intel-decision-operations.test.ts"
+  ]
+}

@@ -72,11 +72,11 @@ const InputSchema = z.object({
 
 const CONTRACT_PENDING: Record<string, string> = {
   country:
-    "El contrato de evento v1.0.0 aún no incluye país. Se activará cuando la ingesta CV8.1 registre `context.country` (evolución aditiva prevista).",
+    "Todavía no registramos el país del visitante en este cálculo. Se activará cuando las señales lo incluyan.",
   channel:
-    "El contrato v1.0.0 aún no distingue canal de adquisición. Se activará cuando la ingesta registre `context.channel` (referral/paid/organic/direct).",
+    "Todavía no registramos por dónde llegó cada visitante (buscador, campaña, enlace o directo) en este cálculo. Se activará cuando las señales lo incluyan.",
   device:
-    "El contrato v1.0.0 aún no captura dispositivo. Se activará cuando la ingesta registre `context.device` (mobile/tablet/desktop).",
+    "Todavía no registramos el dispositivo (celular, tableta o computadora) en este cálculo. Se activará cuando las señales lo incluyan.",
 };
 
 function bucketKeyFor(dim: SegmentDimension, evt: VisitorEvent): string | null {
@@ -239,12 +239,25 @@ export const aggregateJourneySegments = createServerFn({ method: "POST" })
 
     buckets.sort((a, b) => b.active_subjects - a.active_subjects);
 
+    // Nombre legible del destino en lugar de su identificador interno.
+    if (data.dimension === "destination" && buckets.length > 0) {
+      const { data: names } = await context.supabase
+        .from("destinations")
+        .select("id, name")
+        .in(
+          "id",
+          buckets.map((bucket) => bucket.key),
+        );
+      const byId = new Map((names ?? []).map((row) => [row.id, row.name]));
+      for (const bucket of buckets) bucket.label = byId.get(bucket.key) ?? bucket.label;
+    }
+
     const others: SegmentBucket | null =
       othersCount === 0
         ? null
         : {
             key: "__others__",
-            label: `Otros (${othersCount} segmentos < ${MIN_SEGMENT_POPULATION})`,
+            label: `Otros grupos pequeños (${othersCount}, con menos de ${MIN_SEGMENT_POPULATION} personas cada uno)`,
             active_subjects: othersActive.size,
             progressed_subjects: othersProgressed.size,
             jpr:

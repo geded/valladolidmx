@@ -3,7 +3,7 @@
  * Editor único (singleton) de persona, guardrails, modelo, temperatura,
  * max_tokens y banderas de las capas de memoria M1..M4.
  */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useChildMatches } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,7 +20,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/lib/toast";
 
 export const Route = createFileRoute("/_authenticated/cms/alux")({
@@ -30,51 +29,58 @@ export const Route = createFileRoute("/_authenticated/cms/alux")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: AluxConsolePage,
+  component: AluxConsoleRoute,
 });
 
+/** Las subpáginas (conocimiento, opiniones, calidad) se muestran en lugar de la consola. */
+function AluxConsoleRoute() {
+  const childMatches = useChildMatches();
+  if (childMatches.length > 0) return <Outlet />;
+  return <AluxConsolePage />;
+}
+
 const MODEL_OPTIONS = [
-  { value: "google/gemini-3-flash-preview", label: "Gemini 3 Flash (rápido, recomendado)" },
-  { value: "google/gemini-3.5-flash", label: "Gemini 3.5 Flash (calidad + agentes)" },
-  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro (razonamiento profundo)" },
-  { value: "google/gemini-3.1-flash-lite", label: "Gemini 3.1 Flash Lite (económico)" },
+  { value: "google/gemini-3-flash-preview", label: "Gemini 3 Flash · rápido (recomendado)" },
+  { value: "google/gemini-3.5-flash", label: "Gemini 3.5 Flash · mejores respuestas" },
+  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro · piensa más, tarda más" },
+  { value: "google/gemini-3.1-flash-lite", label: "Gemini 3.1 Flash Lite · más económico" },
 ];
 
 const FLAG_META: Array<{ key: keyof AluxFlags; title: string; description: string }> = [
   {
     key: "m1_identity",
-    title: "M1 · Memoria de identidad del viajero",
-    description: "Consumir perfil (nombre, idioma, país, intereses, presupuesto, restricciones).",
+    title: "Recordar quién es el viajero",
+    description: "Usa su perfil: nombre, idioma, país, intereses, presupuesto y restricciones.",
   },
   {
     key: "m2_travel_plan",
-    title: "M2 · Memoria del viaje activo",
-    description: "Consumir plan actual, ítems, huecos y expediente al concierge.",
+    title: "Recordar su viaje actual",
+    description: "Usa lo que lleva en Mi Viaje, los huecos del plan y su caso con el concierge.",
   },
   {
     key: "m3_episodic",
-    title: "M3 · Memoria episódica",
-    description: "Consumir historial de sugerencias, canjes, reseñas y feedback previo.",
+    title: "Recordar lo que ya pasó",
+    description: "Usa sugerencias anteriores, cupones canjeados, reseñas y opiniones que dio.",
   },
   {
     key: "m4_knowledge",
-    title: "M4 · Conocimiento del territorio",
-    description: "Consumir catálogo, promociones activas y base de conocimiento curada.",
+    title: "Conocer el territorio",
+    description: "Usa los lugares publicados, las promociones vigentes y la base de conocimiento.",
   },
   {
     key: "proactive_suggestions",
     title: "Sugerencias proactivas",
-    description: "Permitir que Alux abra tarjetas sin que el viajero pregunte primero.",
+    description: "Alux puede mostrar sugerencias sin que el viajero pregunte primero.",
   },
   {
     key: "cite_sources",
     title: "Citar fuentes siempre",
-    description: "Forzar que cada respuesta importante liste sus fuentes (Explainable by Default).",
+    description: "Cada respuesta importante dice de dónde sacó la información.",
   },
   {
     key: "prioritize_visibility",
-    title: "Priorizar visibilidad pagada",
-    description: "Aplicar alux_weight / alux_proactive del plan de visibilidad al ranking.",
+    title: "Dar preferencia a planes de visibilidad",
+    description: "Las empresas con plan de visibilidad pagado aparecen antes en las sugerencias.",
   },
 ];
 
@@ -133,12 +139,11 @@ function AluxConsolePage() {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">CMS · Inteligencia</p>
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-2xl font-serif">Consola de Alux</h1>
-          <Badge variant="secondary">Ola A1</Badge>
         </div>
         <p className="text-sm text-muted-foreground max-w-2xl">
-          Ajusta la personalidad, los guardrails y las capas de memoria que Alux consume en tiempo
-          real. Los cambios se aplican sin redeploy y se auditan por usuario. Alux es copiloto y
-          concierge IA — no chatbot.
+          Aquí decides cómo es Alux: su personalidad, las reglas que nunca rompe y qué recuerda de
+          cada viajero. Los cambios se aplican al momento, sin publicar, y queda registrado quién
+          los hizo. Alux es copiloto y concierge, no un simple chat.
         </p>
         {data?.updated_at && (
           <p className="text-xs text-muted-foreground">
@@ -150,30 +155,30 @@ function AluxConsolePage() {
             to="/cms/alux/conocimiento"
             className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
           >
-            📚 Gestionar Base de Conocimiento (Ola A2)
+            📚 Base de conocimiento
           </Link>
           <span className="mx-3 text-muted-foreground">·</span>
           <Link
             to="/cms/alux/feedback"
             className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
           >
-            📊 Feedback y calidad (Ola A4)
+            📊 Opiniones de los viajeros
           </Link>
           <span className="mx-3 text-muted-foreground">·</span>
           <Link
             to="/cms/alux/calidad"
             className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
           >
-            🎯 Calidad heurística (Ola A20)
+            🎯 Calidad de las respuestas
           </Link>
         </div>
       </header>
 
       <section className="rounded-2xl border bg-card p-6 space-y-4 shadow-soft">
         <div>
-          <h2 className="font-serif text-lg">Persona (system prompt)</h2>
+          <h2 className="font-serif text-lg">Personalidad</h2>
           <p className="text-xs text-muted-foreground">
-            Quién es Alux, cómo habla, qué tono usa. Se antepone a cada capacidad.
+            Quién es Alux, cómo habla y qué tono usa. Alux lo lee antes de cada respuesta.
           </p>
         </div>
         <Textarea
@@ -185,10 +190,10 @@ function AluxConsolePage() {
 
       <section className="rounded-2xl border bg-card p-6 space-y-4 shadow-soft">
         <div>
-          <h2 className="font-serif text-lg">Guardrails</h2>
+          <h2 className="font-serif text-lg">Reglas que Alux nunca rompe</h2>
           <p className="text-xs text-muted-foreground">
-            Reglas obligatorias que se anexan al final de cada prompt. No inventar, no sustituir al
-            concierge, priorizar al viajero, Explainable by Default.
+            Se aplican en cada respuesta: no inventar, no reemplazar al concierge, poner primero al
+            viajero y explicar siempre por qué recomienda algo.
           </p>
         </div>
         <Textarea
@@ -200,14 +205,14 @@ function AluxConsolePage() {
 
       <section className="rounded-2xl border bg-card p-6 space-y-6 shadow-soft">
         <div>
-          <h2 className="font-serif text-lg">Modelo y generación</h2>
+          <h2 className="font-serif text-lg">Inteligencia artificial que usa</h2>
           <p className="text-xs text-muted-foreground">
-            Modelo del Lovable AI Gateway y parámetros por defecto.
+            Qué modelo de inteligencia artificial responde y cómo escribe.
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label>Modelo por defecto</Label>
+          <Label>Modelo</Label>
           <select
             className="w-full rounded-md border bg-background px-3 py-2 text-sm"
             value={form.default_model}
@@ -224,7 +229,7 @@ function AluxConsolePage() {
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>Temperatura</Label>
+              <Label>Creatividad</Label>
               <span className="text-xs text-muted-foreground">{form.temperature.toFixed(2)}</span>
             </div>
             <Slider
@@ -235,11 +240,11 @@ function AluxConsolePage() {
               onValueChange={([v]) => setForm({ ...form, temperature: v })}
             />
             <p className="text-[11px] text-muted-foreground">
-              Bajo = más literal y consistente. Alto = más creativo.
+              Baja = respuestas más precisas y parecidas entre sí. Alta = más variadas y creativas.
             </p>
           </div>
           <div className="space-y-2">
-            <Label>Tokens máximos</Label>
+            <Label>Largo máximo de cada respuesta</Label>
             <Input
               type="number"
               min={64}
@@ -247,15 +252,18 @@ function AluxConsolePage() {
               value={form.max_tokens}
               onChange={(e) => setForm({ ...form, max_tokens: Number(e.target.value) || 1200 })}
             />
+            <p className="text-[11px] text-muted-foreground">
+              En fragmentos de texto: 1,200 equivale a unas 900 palabras.
+            </p>
           </div>
         </div>
       </section>
 
       <section className="rounded-2xl border bg-card p-6 space-y-4 shadow-soft">
         <div>
-          <h2 className="font-serif text-lg">Capas de memoria y comportamiento</h2>
+          <h2 className="font-serif text-lg">Qué recuerda y cómo sugiere</h2>
           <p className="text-xs text-muted-foreground">
-            Activa o desactiva qué recuerda Alux y cómo se comporta al sugerir.
+            Activa o desactiva lo que Alux recuerda de cada viajero y cómo se comporta al sugerir.
           </p>
         </div>
         <div className="grid gap-3">

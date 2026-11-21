@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-PLAIN-LANGUAGE-SRC-ROUTES-AUTHENTICATED-CMS-OBSERVABILIDAD-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero que revises toda la parte de Inteligencia de alux y estadísticas que ya está haciendo la plataforma y lo pongas en un lenguaje más de usuario, veo muchas secciones con términos técnicos y en inglés, debemos hacerlos más entendibles y saber qué significa cada sección que esté acumulando estadísticas y datos»): sólo textos de presentación en el monitor de visitantes, decisiones del equipo, Consola de Alux y sus subpantallas, salud del sitio, actividad y panel de inteligencia; las tres subpantallas de Alux vuelven a abrirse. Sin cambiar cálculos, cifras, identificadores, permisos, plantillas públicas, Alux para viajeros, pagos, reservaciones ni datos.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cms/observabilidad.tsx",
+    "previous_sha256": "67b68ba888c8b3d85b533626dc66053d2e39f1fc2fd595171b4312a1bdfb37e8",
+    "current_sha256": "ac688c882cdb5de59363ff5bf1c84c23481eacbf7a89e14a92bea95f2a057dd4",
+    "semantic_change": "Sólo textos en lenguaje de usuario (y, en la Consola de Alux, mostrar sus subpantallas); cálculos, cifras e identificadores no cambian.",
+    "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+  },
+  "invariants": [
+    "Cálculos, cifras, identificadores técnicos, permisos y datos no cambian.",
+    "Plantillas públicas, header, footer, Alux para viajeros y Mi Viaje no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

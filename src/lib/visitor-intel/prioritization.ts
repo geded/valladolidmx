@@ -19,6 +19,14 @@ import type {
 } from "./recommendations.functions";
 import { JOURNEY_TRANSITIONS, type JourneyTransitionId } from "./journey";
 import { KPI_CATALOG } from "./kpis";
+import { factorLabel, reliabilityLabel, transitionLabel } from "./plain-language";
+
+const SEVERITY_LABEL: Record<Opportunity["severity"], string> = {
+  critical: "crítica",
+  attention: "requiere atención",
+  opportunity: "oportunidad",
+  informative: "informativa",
+};
 
 export const PRIORITIZATION_CONTRACT_VERSION = "1.0.0" as const;
 
@@ -69,24 +77,23 @@ function severityUrgency(s: Opportunity["severity"]): number {
 
 /** Etapas tempranas amplifican aguas abajo → boost prescriptivo. */
 function journeyWeight(t: Opportunity["transition"]): { value: number; label: string } {
-  if (t === "aggregate") return { value: 0.9, label: "North Star (agregado)" };
+  if (t === "aggregate") return { value: 0.9, label: "avance general del recorrido" };
   const idx = (Object.keys(JOURNEY_TRANSITIONS) as JourneyTransitionId[]).indexOf(t);
-  if (idx < 0) return { value: 0.5, label: "transición desconocida" };
+  if (idx < 0) return { value: 0.5, label: "paso desconocido" };
   // T1..T9 → boost decreciente 1.0 → 0.55
   const value = Number((1.0 - (idx / 8) * 0.45).toFixed(3));
-  const canonical = JOURNEY_TRANSITIONS[t];
   return {
     value,
-    label: `${t.slice(0, 2)} · ${canonical.from} → ${canonical.to}`,
+    label: transitionLabel(t),
   };
 }
 
 function ecosystemBenefit(o: Opportunity): { value: number; label: string } {
   const kpi = KPI_CATALOG.find((k) => k.id === o.metric_id);
-  if (!kpi) return { value: 0.5, label: "KPI fuera de catálogo (peso neutro)" };
-  if (kpi.tier === "north_star") return { value: 1.0, label: "North Star" };
-  if (kpi.tier === "secondary") return { value: 0.75, label: "KPI secundario" };
-  return { value: 0.4, label: "contrapeso" };
+  if (!kpi) return { value: 0.5, label: "indicador no catalogado (peso neutro)" };
+  if (kpi.tier === "north_star") return { value: 1.0, label: "indicador principal" };
+  if (kpi.tier === "secondary") return { value: 0.75, label: "indicador de un paso" };
+  return { value: 0.4, label: "indicador de control" };
 }
 
 /** Normaliza magnitud del delta relativo a [0,1] con saturación en 50%. */
@@ -150,45 +157,45 @@ export function prioritizeOpportunities(input: PrioritizationInput): Prioritizat
         contribution: Number((PRIORITIZATION_WEIGHTS.confidence * learned).toFixed(4)),
         explanation:
           reliability === "unknown"
-            ? "Sin evidencia histórica para esta familia — se usa 0.5 por defecto."
+            ? "Aún no hay recomendaciones anteriores de este tipo; se asume 50%."
             : reliability === "insufficient_data"
-              ? `Muestra insuficiente (n=${fam?.sample_size}) — confianza tentativa.`
-              : `Confianza aprendida ${(learned * 100).toFixed(0)}% sobre n=${fam?.sample_size} (${reliability}).`,
+              ? `Pocas recomendaciones anteriores (${fam?.sample_size}); confianza provisional.`
+              : `Las recomendaciones anteriores de este tipo acertaron ${(learned * 100).toFixed(0)}% de ${fam?.sample_size} veces (${reliabilityLabel(reliability)}).`,
       },
       {
         key: "impact",
         weight: PRIORITIZATION_WEIGHTS.impact,
         value: impact,
         contribution: Number((PRIORITIZATION_WEIGHTS.impact * impact).toFixed(4)),
-        explanation: `Δ relativo ${(o.evidence.delta_relative * 100).toFixed(1)}% — normalizado a saturación en 50%.`,
+        explanation: `Cambió ${(o.evidence.delta_relative * 100).toFixed(1)}% frente al periodo anterior (un cambio de 50% o más cuenta como máximo).`,
       },
       {
         key: "urgency",
         weight: PRIORITIZATION_WEIGHTS.urgency,
         value: urgency,
         contribution: Number((PRIORITIZATION_WEIGHTS.urgency * urgency).toFixed(4)),
-        explanation: `Severidad ${o.severity}.`,
+        explanation: `Gravedad: ${SEVERITY_LABEL[o.severity]}.`,
       },
       {
         key: "reach",
         weight: PRIORITIZATION_WEIGHTS.reach,
         value: reach,
         contribution: Number((PRIORITIZATION_WEIGHTS.reach * reach).toFixed(4)),
-        explanation: `Población observada n=${o.evidence.sample_size} sobre máximo n=${maxSample}.`,
+        explanation: `${o.evidence.sample_size} personas involucradas (el hallazgo más grande tiene ${maxSample}).`,
       },
       {
         key: "journey",
         weight: PRIORITIZATION_WEIGHTS.journey,
         value: jw.value,
         contribution: Number((PRIORITIZATION_WEIGHTS.journey * jw.value).toFixed(4)),
-        explanation: `Etapa Journey: ${jw.label} — amplifica aguas abajo.`,
+        explanation: `Etapa: ${jw.label}. Los primeros pasos pesan más porque afectan a todos los siguientes.`,
       },
       {
         key: "ecosystem",
         weight: PRIORITIZATION_WEIGHTS.ecosystem,
         value: eco.value,
         contribution: Number((PRIORITIZATION_WEIGHTS.ecosystem * eco.value).toFixed(4)),
-        explanation: `Beneficio ecosistema: ${eco.label}.`,
+        explanation: `Beneficio para el destino: ${eco.label}.`,
       },
     ];
 
@@ -197,20 +204,20 @@ export function prioritizeOpportunities(input: PrioritizationInput): Prioritizat
     const topFactors = [...factors]
       .sort((a, b) => b.contribution - a.contribution)
       .slice(0, 2)
-      .map((f) => f.key)
-      .join(" + ");
+      .map((f) => factorLabel(f.key).toLowerCase())
+      .join(" y ");
 
-    const rationale = `Score ${(score * 100).toFixed(0)}/100 — impulsado por ${topFactors}. ${o.what_happens}`;
+    const rationale = `Prioridad ${(score * 100).toFixed(0)} de 100, sobre todo por ${topFactors}. ${o.what_happens}`;
 
     const expected_effect =
       o.expected_kpi +
       (reliability === "reliable"
-        ? ` · Confianza aprendida: ${(learned * 100).toFixed(0)}%.`
+        ? ` · Recomendaciones parecidas acertaron ${(learned * 100).toFixed(0)}% de las veces.`
         : reliability === "learning"
-          ? ` · Aprendizaje en curso (${(learned * 100).toFixed(0)}%).`
+          ? ` · Todavía aprendiendo de recomendaciones parecidas (${(learned * 100).toFixed(0)}%).`
           : reliability === "insufficient_data"
-            ? " · Muestra insuficiente para asegurar confianza."
-            : " · Sin evidencia previa — primera intervención de esta familia.");
+            ? " · Aún hay pocas recomendaciones parecidas para asegurarlo."
+            : " · Es la primera recomendación de este tipo.");
 
     return {
       rank: 0,

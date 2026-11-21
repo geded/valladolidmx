@@ -28,8 +28,8 @@ export const DECISION_STATE_LABELS: Readonly<Record<DecisionState, string>> = {
 };
 
 export const DECISION_ORIGIN_LABELS = {
-  cv87_priority: "CV8.7 · Prioridad",
-  cv88_segment: "CV8.8 · Segmento",
+  cv87_priority: "Prioridad de hoy",
+  cv88_segment: "Prioridad por grupo",
   manual: "Manual",
 } as const;
 

@@ -45,14 +45,27 @@ import type { DecisionActorAccess } from "@/lib/visitor-intel/decision-operation
 import { projectDecisionWorkflowMetrics } from "@/lib/visitor-intel/decision-metrics";
 import { JOURNEY_TRANSITIONS } from "@/lib/visitor-intel/journey";
 import { KPI_CATALOG } from "@/lib/visitor-intel/kpis";
+import {
+  DIMENSION_LABEL,
+  metricLabel,
+  segmentValueLabel,
+  transitionLabel,
+} from "@/lib/visitor-intel/plain-language";
+
+const ACTOR_ROLE_LABEL: Record<string, string> = {
+  founder: "Fundador",
+  admin: "Administrador",
+  concierge_lead: "Líder de concierge",
+  editor: "Editor",
+};
 
 export const Route = createFileRoute("/_authenticated/cms/visitor-intel_/decisions")({
   head: () => ({
     meta: [
-      { title: "Cola de decisiones · Visitor Intelligence · Valladolid.mx" },
+      { title: "Decisiones del equipo · Inteligencia del visitante · Valladolid.mx" },
       {
         name: "description",
-        content: "Backlog humano y auditable de decisiones de Visitor Intelligence.",
+        content: "Decisiones del equipo tomadas a partir de la Inteligencia del visitante.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -188,18 +201,19 @@ function DecisionWorkspace() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-              CV8.9.3 · Action Queue
+              Inteligencia del visitante
             </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Cola de decisiones</h1>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Decisiones del equipo</h1>
             <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-              Convierte inteligencia en compromisos humanos trazables. Nada aquí ejecuta
-              automáticamente cambios sobre campañas, contenido, Alux o Concierge.
+              Aquí las recomendaciones del monitor se vuelven tareas con responsable, meta y fecha,
+              y después se comprueba si funcionaron. Nada de esto cambia por sí solo campañas,
+              contenido, Alux ni el concierge.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline">
               <Link to="/cms/visitor-intel" search={{}}>
-                ← Centro de Inteligencia
+                ← Inteligencia del visitante
               </Link>
             </Button>
             {access.data?.manage_all ? (
@@ -248,12 +262,12 @@ function DecisionWorkspace() {
 
           <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4">
             <label className="min-w-56 flex-1 text-xs font-medium text-muted-foreground">
-              Buscar decisión, KPI, owner o acción
+              Buscar decisión, indicador, responsable o acción
               <Input
                 className="mt-1"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Ej. JPR_30D o nombre de acción"
+                placeholder="Ej. Avance del recorrido o nombre de la acción"
               />
             </label>
             <label className="w-full text-xs font-medium text-muted-foreground sm:w-52">
@@ -331,15 +345,18 @@ function WorkflowMetrics({
   metrics: ReturnType<typeof projectDecisionWorkflowMetrics>;
 }) {
   const values = [
-    ["Aceptación 7d", formatRate(metrics.acceptance_rate_7d)],
-    ["Aceptación 30d", formatRate(metrics.acceptance_rate_30d)],
-    ["Tiempo a aceptar p50", formatHours(metrics.time_to_accept_p50_hours)],
-    ["Tiempo a implementar p50", formatHours(metrics.time_to_implement_p50_hours)],
-    ["Validación", formatRate(metrics.validation_rate)],
-    ["SLA vencido", formatRate(metrics.sla_breach_rate)],
+    ["Aceptadas (7 días)", formatRate(metrics.acceptance_rate_7d)],
+    ["Aceptadas (30 días)", formatRate(metrics.acceptance_rate_30d)],
+    ["Tiempo normal para aceptar", formatHours(metrics.time_to_accept_p50_hours)],
+    ["Tiempo normal para hacerla", formatHours(metrics.time_to_implement_p50_hours)],
+    ["Comprobadas", formatRate(metrics.validation_rate)],
+    ["Fuera de plazo", formatRate(metrics.sla_breach_rate)],
   ];
   return (
-    <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-6" aria-label="Métricas CV8.9">
+    <section
+      className="grid gap-2 sm:grid-cols-2 lg:grid-cols-6"
+      aria-label="Cifras de las decisiones"
+    >
       {values.map(([label, value]) => (
         <div key={label} className="rounded-xl border border-border bg-card p-3">
           <p className="text-lg font-semibold">{value}</p>
@@ -355,9 +372,7 @@ function WorkflowMetrics({
 function AccessBanner({ access }: { access: DecisionActorAccess }) {
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-      <Badge variant="outline">
-        {access.actor_role === "founder" ? "Founder" : access.actor_role}
-      </Badge>
+      <Badge variant="outline">{ACTOR_ROLE_LABEL[access.actor_role] ?? access.actor_role}</Badge>
       <span>
         {access.manage_all
           ? "Puedes proponer, asignar, decidir y validar."
@@ -390,7 +405,7 @@ function QueueSummary({
   ];
   return (
     <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
-      <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Buckets de decisiones">
+      <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Grupos de decisiones">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -410,7 +425,9 @@ function QueueSummary({
       </nav>
       <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 text-sm">
         <strong>{feedback}</strong>
-        <span className="ml-2 text-xs text-muted-foreground">señales listas para CV8.6</span>
+        <span className="ml-2 text-xs text-muted-foreground">
+          resultados listos para el seguimiento de recomendaciones
+        </span>
       </div>
     </div>
   );
@@ -454,13 +471,23 @@ function DecisionCard({
             <Badge variant="outline">{DECISION_STATE_LABELS[decision.current_state]}</Badge>
             {decision.source.segment ? (
               <Badge variant="outline">
-                {decision.source.segment.dimension}: {decision.source.segment.value}
+                {DIMENSION_LABEL[decision.source.segment.dimension] ??
+                  decision.source.segment.dimension}
+                :{" "}
+                {segmentValueLabel(
+                  decision.source.segment.dimension,
+                  decision.source.segment.value,
+                  decision.source.segment.value,
+                )}
               </Badge>
             ) : null}
-            {feedsLearning ? <Badge className="bg-emerald-600 text-white">→ CV8.6</Badge> : null}
+            {feedsLearning ? (
+              <Badge className="bg-emerald-600 text-white">→ Seguimiento</Badge>
+            ) : null}
           </div>
           <h2 className="mt-3 text-lg font-semibold">
-            {decision.agreement?.action ?? `Evaluar oportunidad ${decision.source.metric_id}`}
+            {decision.agreement?.action ??
+              `Evaluar oportunidad: ${metricLabel(decision.source.metric_id)}`}
           </h2>
           <p className="mt-1 font-mono text-[11px] text-muted-foreground">{decision.decision_id}</p>
         </div>
@@ -473,11 +500,11 @@ function DecisionCard({
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Datum label="KPI origen" value={decision.source.metric_id} />
-        <Datum label="Transición" value={decision.source.transition} />
+        <Datum label="Indicador de origen" value={metricLabel(decision.source.metric_id)} />
+        <Datum label="Paso del recorrido" value={transitionLabel(decision.source.transition)} />
         <Datum label="Prioridad" value={formatPercent(decision.source.priority_score)} />
         <Datum
-          label="Confianza aprendida"
+          label="Qué tan seguros estamos"
           value={formatPercent(decision.source.learned_confidence)}
         />
       </div>
@@ -489,14 +516,17 @@ function DecisionCard({
             value={owner?.display_name ?? shortId(decision.agreement.owner_user_id)}
             mono={!owner?.display_name}
           />
-          <Datum label="KPI esperado" value={decision.agreement.expected_kpi_id} />
+          <Datum
+            label="Indicador a mover"
+            value={metricLabel(decision.agreement.expected_kpi_id)}
+          />
           <Datum
             label="Movimiento esperado"
             value={`${decision.agreement.expected_direction === "up" ? "↑" : "↓"} ${formatPercent(decision.agreement.expected_delta_relative)}`}
           />
           <Datum
-            label="Ventana / fecha objetivo"
-            value={`${decision.agreement.evaluation_window_days}d · ${decision.agreement.due_at ? formatDate(decision.agreement.due_at) : "sin fecha"}`}
+            label="Periodo / fecha meta"
+            value={`${decision.agreement.evaluation_window_days} días · ${decision.agreement.due_at ? formatDate(decision.agreement.due_at) : "sin fecha"}`}
           />
         </div>
       ) : null}
@@ -657,41 +687,42 @@ function ProposalForm({
     <form onSubmit={submit} className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
       <h2 className="text-lg font-semibold">Proponer una decisión manual</h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        Esto crea sólo una propuesta auditable. La acción y el responsable se acuerdan al aceptarla.
+        Esto sólo crea una propuesta que queda registrada. La acción y el responsable se acuerdan al
+        aceptarla.
       </p>
       <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        <SelectField label="Métrica observada" value={metric} onChange={setMetric}>
+        <SelectField label="Indicador" value={metric} onChange={setMetric}>
           {KPI_CATALOG.map((kpi) => (
             <option key={kpi.id} value={kpi.id}>
-              {kpi.id}
+              {metricLabel(kpi.id)}
             </option>
           ))}
         </SelectField>
-        <SelectField label="Transición del Journey" value={transition} onChange={setTransition}>
-          <option value="aggregate">aggregate</option>
+        <SelectField label="Paso del recorrido" value={transition} onChange={setTransition}>
+          <option value="aggregate">{transitionLabel("aggregate")}</option>
           {Object.keys(JOURNEY_TRANSITIONS).map((id) => (
             <option key={id} value={id}>
-              {id}
+              {transitionLabel(id)}
             </option>
           ))}
         </SelectField>
         <TextField
-          label="ID de oportunidad (opcional)"
+          label="Código de la oportunidad (opcional)"
           value={opportunity}
           onChange={setOpportunity}
         />
         <SelectField
-          label="Segmento (opcional)"
+          label="Grupo de visitantes (opcional)"
           value={segmentDimension}
           onChange={setSegmentDimension}
         >
-          <option value="">Sin segmento</option>
+          <option value="">Sin grupo</option>
           <option value="locale">Idioma</option>
           <option value="destination">Destino</option>
-          <option value="capability">Capability</option>
+          <option value="capability">Sección del sitio</option>
         </SelectField>
         <TextField
-          label="Valor del segmento"
+          label="Valor del grupo (ej. es, page)"
           value={segmentValue}
           onChange={setSegmentValue}
           disabled={!segmentDimension}
@@ -786,12 +817,12 @@ function AgreementForm({
             ))}
           </SelectField>
         ) : (
-          <TextField label="UUID del responsable" value={owner} onChange={setOwner} required />
+          <TextField label="Código del responsable" value={owner} onChange={setOwner} required />
         )}
-        <SelectField label="KPI esperado" value={kpi} onChange={setKpi}>
+        <SelectField label="Indicador a mover" value={kpi} onChange={setKpi}>
           {KPI_CATALOG.map((item) => (
             <option key={item.id} value={item.id}>
-              {item.id}
+              {metricLabel(item.id)}
             </option>
           ))}
         </SelectField>
@@ -922,10 +953,10 @@ function EvidenceForm({
           <option value="validated">Validada</option>
           <option value="rejected">Rechazada</option>
         </SelectField>
-        <SelectField label="KPI observado" value={metric} onChange={setMetric}>
+        <SelectField label="Indicador observado" value={metric} onChange={setMetric}>
           {KPI_CATALOG.map((item) => (
             <option key={item.id} value={item.id}>
-              {item.id}
+              {metricLabel(item.id)}
             </option>
           ))}
         </SelectField>
@@ -977,10 +1008,7 @@ function DecisionDetail({ decision }: { decision: ProjectedDecision }) {
     <div className="mt-4 grid gap-4 border-t border-border pt-4 lg:grid-cols-2">
       <div className="space-y-3 text-sm">
         <h3 className="font-semibold">Explicación</h3>
-        <Datum
-          label="Rationale"
-          value={decision.agreement?.rationale ?? "Pendiente de aceptación"}
-        />
+        <Datum label="Razón" value={decision.agreement?.rationale ?? "Pendiente de aceptación"} />
         <Datum label="Motivo del último estado" value={decision.reason ?? "—"} />
         {decision.evidence ? (
           <div className="rounded-lg border border-border p-3">
@@ -1019,8 +1047,8 @@ function DecisionDetail({ decision }: { decision: ProjectedDecision }) {
                 {!entry.applied ? " · no aplicada" : ""}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {entry.event.actor_role} · {shortId(entry.event.actor_user_id)} ·{" "}
-                {formatDateTime(entry.event.occurred_at)}
+                {ACTOR_ROLE_LABEL[entry.event.actor_role] ?? entry.event.actor_role} ·{" "}
+                {shortId(entry.event.actor_user_id)} · {formatDateTime(entry.event.occurred_at)}
               </p>
             </li>
           ))}
@@ -1134,8 +1162,8 @@ function EmptyQueue({
         {filtered
           ? "Quita el filtro o cambia el estado para ampliar la búsqueda."
           : bucket === "today"
-            ? "La cola de hoy está limpia. Founder/Admin puede registrar una propuesta cuando exista una oportunidad accionable."
-            : "Este bucket no contiene decisiones actualmente."}
+            ? "No hay decisiones pendientes hoy. El fundador o un administrador puede registrar una propuesta cuando el monitor muestre una oportunidad."
+            : "Este grupo no tiene decisiones por ahora."}
       </p>
     </div>
   );
@@ -1146,7 +1174,8 @@ function ErrorPanel({ onRetry }: { onRetry: () => void }) {
     <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
       <p className="font-medium">No fue posible cargar la cola de decisiones.</p>
       <p className="mt-1 text-xs">
-        Verifica la sesión y que tu rol sea Founder, Admin, Concierge Lead o Editor.
+        Revisa que tu sesión siga abierta y que seas fundador, administrador, líder de concierge o
+        editor.
       </p>
       <Button className="mt-3" size="sm" variant="outline" onClick={onRetry}>
         Reintentar
@@ -1198,7 +1227,7 @@ function slaLabel(flag: string): string {
     (
       {
         no_owner: "Sin responsable",
-        no_kpi: "Sin KPI",
+        no_kpi: "Sin indicador",
         overdue_due_at: "Fecha objetivo vencida",
         validation_window_expired: "Validación vencida",
       } as Record<string, string>

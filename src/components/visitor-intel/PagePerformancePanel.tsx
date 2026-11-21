@@ -12,11 +12,12 @@ import {
   aggregatePagePerformance,
   type PagePerformanceSnapshot,
 } from "@/lib/visitor-intel/page-performance.functions";
+import { localeLabel } from "@/lib/visitor-intel/plain-language";
 import { PAGE_TYPES, type PageType } from "@/lib/visitor-intel/page-signals";
 
 const PAGE_TYPE_LABEL: Record<PageType, string> = {
   home: "Inicio",
-  landing_seo: "Landings SEO",
+  landing_seo: "Páginas para buscadores",
   business: "Perfiles de empresa",
   product: "Fichas de producto",
   destination: "Destinos",
@@ -79,8 +80,8 @@ export function PagePerformancePanel() {
         <div>
           <h2 className="text-base font-semibold">Rendimiento de páginas</h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Visitas reales de las páginas públicas, su origen y hasta dónde llegan las personas. Sin
-            datos personales: sólo señales seudónimas del recorrido.
+            Cuántas personas visitan cada página, de dónde llegan y cuántas la leen a fondo. Sirve
+            para saber qué contenido atrae y cuál conviene mejorar. No guarda nombres ni correos.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -130,16 +131,17 @@ export function PagePerformancePanel() {
 
           <div className="mt-4 rounded-xl border border-border bg-card p-3">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Avance de personas (visitantes anónimos)
+              Avance de los visitantes sin cuenta
             </h3>
             <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
-              <Stat label="Sesiones nuevas" value={snapshot.journey.new_sessions} />
-              <Stat label="Exploradores" value={snapshot.journey.deep_explorers} />
-              <Stat label="Primera intención" value={snapshot.journey.anonymous_intents} />
+              <Stat label="Visitas nuevas" value={snapshot.journey.new_sessions} />
+              <Stat label="Exploraron a fondo" value={snapshot.journey.deep_explorers} />
+              <Stat label="Primer interés" value={snapshot.journey.anonymous_intents} />
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Hitos del recorrido, no clics: llegada, exploración profunda (varias páginas o
-              permanencia) y primera señal de interés sin cuenta.
+              Cuenta momentos, no clics: cuando alguien llega, cuando explora a fondo (ve varias
+              páginas o se queda un buen rato) y la primera vez que muestra interés sin tener
+              cuenta.
             </p>
           </div>
 
@@ -170,7 +172,7 @@ export function PagePerformancePanel() {
                 ))}
                 {Object.entries(snapshot.by_locale).map(([locale, count]) => (
                   <li key={locale} className="flex justify-between gap-3 text-muted-foreground">
-                    <span>Idioma {locale}</span>
+                    <span>Idioma: {localeLabel(locale)}</span>
                     <span>{count}</span>
                   </li>
                 ))}
@@ -186,7 +188,12 @@ export function PagePerformancePanel() {
                   <th className="px-3 py-2">Tipo</th>
                   <th className="px-3 py-2 text-right">Visitas</th>
                   <th className="px-3 py-2 text-right">Visitantes</th>
-                  <th className="px-3 py-2 text-right">Lectura</th>
+                  <th
+                    className="px-3 py-2 text-right"
+                    title="Visitas que leyeron más de la mitad de la página"
+                  >
+                    Leída a fondo
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -216,7 +223,7 @@ export function PagePerformancePanel() {
 
           <div className="mt-4 rounded-xl border border-border bg-card p-3">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Embudo turístico del periodo
+              Del clic a la reserva en el periodo
             </h3>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
               <Stat label="Visitas" value={snapshot.funnel.views} />
@@ -226,8 +233,9 @@ export function PagePerformancePanel() {
               <Stat label="Reservas pagadas" value={snapshot.funnel.orders_paid} />
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Confianza declarada: las visitas y señales son observadas; los viajes y reservas del
-              periodo no están atribuidos página por página.
+              «Lectura profunda» = leyeron más de la mitad de la página. Las visitas y señales se
+              cuentan página por página; los viajes y reservas son del periodo completo, sin saber
+              qué página los originó.
             </p>
           </div>
         </>

@@ -18,6 +18,7 @@ import { VisitorEventSchema, type VisitorEvent } from "./events";
 import { readVisitorIntelEvents } from "./event-reads.server";
 import { JOURNEY_TRANSITIONS, type JourneyTransitionId } from "./journey";
 import { KPI_CATALOG } from "./kpis";
+import { influencersLabel, metricAction, STAGE_LABEL, TRANSITION_LABEL } from "./plain-language";
 
 export const OPPORTUNITY_SNAPSHOT_CONTRACT_VERSION = "1.0.0" as const;
 
@@ -180,24 +181,25 @@ export const detectJourneyOpportunities = createServerFn({ method: "POST" })
         transition: "aggregate",
         metric_id: "JPR_30D",
         segment: "global",
-        headline: `JPR ${(jprCurrent * 100).toFixed(1)}% vs ${(jprPrevious * 100).toFixed(1)}% del periodo previo`,
+        headline: `Avance del recorrido: ${(jprCurrent * 100).toFixed(1)}% ahora vs ${(jprPrevious * 100).toFixed(1)}% el periodo anterior`,
         what_happens:
           sev === "opportunity"
-            ? "El Journey Progression Rate mejoró de forma significativa."
+            ? "Más visitantes que antes dieron al menos un paso en su recorrido."
             : sev === "critical" || sev === "attention"
-              ? "El Journey Progression Rate cayó frente al periodo previo."
-              : "El Journey Progression Rate se mantiene estable.",
+              ? "Menos visitantes que antes dieron al menos un paso en su recorrido."
+              : "La proporción de visitantes que avanza se mantiene casi igual.",
         why_it_happens:
-          "Cambio agregado en la proporción de sujetos que avanzan ≥1 etapa dentro de la ventana.",
+          "Compara qué parte de los visitantes avanzó al menos un paso en este periodo contra el anterior.",
         impact:
-          "Afecta el North Star. Un punto porcentual sostenido impacta reservas confirmadas y advocacy.",
-        recommended_action:
-          kpi?.actionable_decision ??
-          "Diagnosticar por transición cuál está arrastrando el indicador.",
+          "Es el indicador principal: si sube o baja de forma sostenida, se nota en reservas y recomendaciones.",
+        recommended_action: metricAction(
+          "JPR_30D",
+          kpi?.actionable_decision ?? "Revisar paso por paso cuál está frenando el avance.",
+        ),
         expected_kpi:
           sev === "opportunity"
-            ? "Sostener o incrementar JPR ≥ nivel actual en la próxima ventana."
-            : "Recuperar JPR al nivel del periodo previo en la próxima ventana.",
+            ? "Mantener o superar este nivel en el siguiente periodo."
+            : "Volver al nivel del periodo anterior en el siguiente periodo.",
         evidence: {
           reference: "previous_period",
           current_value: Number(jprCurrent.toFixed(4)),
@@ -232,25 +234,27 @@ export const detectJourneyOpportunities = createServerFn({ method: "POST" })
         transition: id,
         metric_id: kpiId,
         segment: "global",
-        headline: `${id.slice(0, 2)} · ${canonical.from} → ${canonical.to}: ${curSubjects} vs ${prevSubjects}`,
+        headline: `Paso ${id.slice(1, 2)} · ${TRANSITION_LABEL[id]}: ${curSubjects} personas ahora vs ${prevSubjects} antes`,
         what_happens:
           sev === "opportunity"
-            ? `La transición ${id.slice(0, 2)} creció ${(deltaRel * 100).toFixed(0)}% vs periodo previo.`
-            : `La transición ${id.slice(0, 2)} cayó ${(Math.abs(deltaRel) * 100).toFixed(0)}% vs periodo previo.`,
-        why_it_happens: `Cambio en la conversión ${canonical.from} → ${canonical.to}. Influenciada por: ${canonical.known_influencers.join(", ")}.`,
+            ? `Este paso creció ${(deltaRel * 100).toFixed(0)}% frente al periodo anterior.`
+            : `Este paso bajó ${(Math.abs(deltaRel) * 100).toFixed(0)}% frente al periodo anterior.`,
+        why_it_happens: `Cuenta a las personas que pasaron de «${STAGE_LABEL[canonical.from]}» a «${STAGE_LABEL[canonical.to]}». Influyen: ${influencersLabel(canonical.known_influencers)}.`,
         impact:
           sev === "critical"
-            ? "Bloquea el avance del Journey aguas abajo; comprime revenue y advocacy."
+            ? "Frena a todos los pasos siguientes: menos reservas y recomendaciones."
             : sev === "attention"
-              ? "Degrada el pipeline; sin intervención se propaga a las siguientes transiciones."
-              : "Expande el pipeline; capitalizar amplificaría avance de las siguientes transiciones.",
-        recommended_action:
+              ? "Si no se atiende, la baja se pasa a los pasos siguientes."
+              : "Llegan más personas a los siguientes pasos; conviene aprovecharlo.",
+        recommended_action: metricAction(
+          kpiId,
           kpi?.actionable_decision ??
-          `Auditar las capacidades influyentes (${canonical.known_influencers.join(", ")}).`,
+            `Revisar lo que influye en este paso (${influencersLabel(canonical.known_influencers)}).`,
+        ),
         expected_kpi:
           sev === "opportunity"
-            ? `Consolidar conteo ≥ ${curSubjects} sujetos en la próxima ventana.`
-            : `Recuperar conteo al nivel previo (${prevSubjects}) en la próxima ventana.`,
+            ? `Mantener al menos ${curSubjects} personas en este paso el siguiente periodo.`
+            : `Volver a ${prevSubjects} personas en este paso el siguiente periodo.`,
         evidence: {
           reference: "previous_period",
           current_value: curSubjects,
@@ -284,7 +288,7 @@ export const detectJourneyOpportunities = createServerFn({ method: "POST" })
       status,
       reason:
         status === "insufficient_data"
-          ? `Muestra insuficiente: se requieren ≥ ${MIN_SAMPLE_FOR_OPPORTUNITY} sujetos activos en la ventana.`
+          ? `Todavía hay pocos datos: se necesitan al menos ${MIN_SAMPLE_FOR_OPPORTUNITY} visitantes en el periodo.`
           : undefined,
       baseline: {
         active_subjects_current: current.active_subjects.size,

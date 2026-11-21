@@ -38,6 +38,27 @@ const eventLabel: Record<string, string> = {
   "Concierge.Message.Received": "Mensaje nuevo en la conversación",
 };
 
+/** Nombre legible del tipo de evento (sólo presentación; el tipo técnico no cambia). */
+const eventTypeName: Record<string, string> = {
+  ...eventLabel,
+  "Concierge.Case.Created": "Nuevo caso para el concierge",
+  "Concierge.Proposal.Sent": "Propuesta enviada al viajero",
+  "Concierge.Proposal.Viewed": "El viajero vio la propuesta",
+  "Concierge.Proposal.Accepted": "El viajero aceptó la propuesta",
+  "Concierge.Quote.Expired": "Cotización vencida",
+  "Traveler.SignedUp": "Nuevo viajero registrado",
+};
+
+const subjectTypeName: Record<string, string> = {
+  notification: "Aviso",
+  system_alert: "Alerta del sistema",
+  payment: "Pago",
+  order: "Reservación",
+  booking: "Reservación",
+  case: "Caso del concierge",
+  traveler: "Viajero",
+};
+
 const readableSummary = (eventType: string, summary: string, payload: unknown): string => {
   const label = eventLabel[eventType];
   if (!label) return summary;
@@ -172,7 +193,7 @@ function GroupSection({ items }: { items: SubjectGroup[] }) {
   return (
     <section>
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        Agrupación por entidad
+        Agrupado por reservación, pago o caso
       </h2>
       <ul className="mt-3 divide-y divide-border rounded-lg border border-border bg-card">
         {items.map((g) => (
@@ -182,9 +203,12 @@ function GroupSection({ items }: { items: SubjectGroup[] }) {
               aria-hidden
             />
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium truncate">{g.last_summary ?? g.subject_type}</p>
+              <p className="text-sm font-medium truncate">
+                {g.last_summary ?? subjectTypeName[g.subject_type] ?? g.subject_type}
+              </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {g.subject_type} · {g.subject_id.slice(0, 8)} · {g.event_count} eventos
+                {subjectTypeName[g.subject_type] ?? g.subject_type} · {g.subject_id.slice(0, 8)} ·{" "}
+                {g.event_count} eventos
               </p>
             </div>
             <span className="text-[11px] text-muted-foreground">
@@ -201,7 +225,7 @@ function FeedSection({ items }: { items: AluxFeedItem[] }) {
   return (
     <section>
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        Feed estructurado
+        Últimos eventos
       </h2>
       {!items.length ? (
         <p className="mt-3 text-sm text-muted-foreground">Sin actividad reciente.</p>
@@ -218,7 +242,8 @@ function FeedSection({ items }: { items: AluxFeedItem[] }) {
                   {readableSummary(it.event_type, it.summary, it.payload)}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {it.event_type} · {categoryLabel[it.category] ?? it.category} ·{" "}
+                  {eventTypeName[it.event_type] ?? it.event_type} ·{" "}
+                  {categoryLabel[it.category] ?? it.category} ·{" "}
                   {new Date(it.occurred_at).toLocaleString()}
                 </p>
               </div>

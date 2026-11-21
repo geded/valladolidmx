@@ -18,9 +18,9 @@ export interface IntelModuleEntry {
 
 export const INTEL_MODULES: readonly IntelModuleEntry[] = [
   { id: "funnel", label: "Embudo del viaje", anchor: "mod-embudo" },
-  { id: "anonymous", label: "Visitantes anónimos", anchor: "mod-embudo" },
-  { id: "conversion", label: "Conversión del journey", anchor: "mod-conversion" },
-  { id: "plans", label: "Travel Plans", anchor: "mod-conversion" },
+  { id: "anonymous", label: "Visitantes sin cuenta", anchor: "mod-embudo" },
+  { id: "conversion", label: "Avance del recorrido", anchor: "mod-conversion" },
+  { id: "plans", label: "Viajes armados", anchor: "mod-conversion" },
   { id: "alux", label: "Alux", anchor: "mod-conversion" },
   { id: "concierge", label: "Concierge", anchor: "mod-conversion" },
   { id: "businesses", label: "Empresas", anchor: "mod-embudo" },
@@ -40,17 +40,17 @@ export const INTEL_MODULES: readonly IntelModuleEntry[] = [
     label: "Embajadores",
     pending: "Se activará cuando se registren señales de recomendación post-viaje.",
   },
-  { id: "alerts", label: "Alertas de conversión", anchor: "mod-conversion" },
+  { id: "alerts", label: "Alertas de caídas", anchor: "mod-conversion" },
 ];
 
 export function VisitorIntelModuleNav() {
   return (
     <nav
-      aria-label="Módulos del Centro de Inteligencia"
+      aria-label="Secciones de Inteligencia del visitante"
       className="rounded-2xl border border-border bg-surface p-3 sm:p-4"
     >
       <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        Módulos
+        Ir a una sección
       </p>
       <ul className="mt-2 flex flex-wrap gap-2">
         {INTEL_MODULES.map((module) =>

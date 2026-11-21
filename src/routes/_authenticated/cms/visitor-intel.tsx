@@ -47,13 +47,23 @@ import {
   type SegmentFinding,
   type SegmentFindingType,
 } from "@/lib/visitor-intel/segment-prioritization";
-import { KPI_CATALOG, JOURNEY_TRANSITIONS, type JourneyTransitionId } from "@/lib/visitor-intel";
+import { KPI_CATALOG, type JourneyTransitionId } from "@/lib/visitor-intel";
 import {
   decisionSourceFromPrioritizedOpportunity,
   decisionSourceFromSegmentFinding,
   type DecisionSource,
 } from "@/lib/visitor-intel/decisions";
 import { getDecisionActorAccess, proposeDecision } from "@/lib/visitor-intel/decisions.functions";
+import {
+  DIMENSION_LABEL,
+  factorLabel,
+  levelLabel,
+  metricAction,
+  metricLabel,
+  reliabilityLabel,
+  segmentValueLabel,
+  transitionLabel,
+} from "@/lib/visitor-intel/plain-language";
 import { PagePerformancePanel } from "@/components/visitor-intel/PagePerformancePanel";
 import { VisitorIntelModuleNav } from "@/components/visitor-intel/VisitorIntelModuleNav";
 
@@ -64,11 +74,11 @@ export const Route = createFileRoute("/_authenticated/cms/visitor-intel")({
   }),
   head: () => ({
     meta: [
-      { title: "Visitor Intelligence Center · CMS · Valladolid.mx" },
+      { title: "Inteligencia del visitante · CMS · Valladolid.mx" },
       {
         name: "description",
         content:
-          "Centro de Inteligencia del Visitante — cada módulo responde una pregunta de negocio y declara la decisión que permite tomar.",
+          "Inteligencia del visitante: cómo descubren, planean y reservan los visitantes, y qué hacer con cada cifra.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -104,11 +114,11 @@ function VisitorIntelCenter() {
         >
           <span>
             {mode === "simulation" ? "🧪 MODO SIMULACIÓN" : "🔀 MODO COMBINADO (real + simulación)"}
-            {runId ? ` · run ${runId.slice(0, 8)}…` : ""}
+            {runId ? ` · prueba ${runId.slice(0, 8)}…` : ""}
             {" · "}
             <span className="font-normal opacity-80">
-              Los KPIs principales aplican filtro. Oportunidades / segmentos / validación aún
-              combinan fuentes.
+              Las tarjetas principales usan sólo esta simulación. Cambios, grupos y seguimiento aún
+              mezclan datos reales y simulados.
             </span>
           </span>
           <Link
@@ -122,14 +132,15 @@ function VisitorIntelCenter() {
       )}
       <header className="border-b border-border pb-5">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          CV8.3 · Centro de Inteligencia
+          Monitor de visitantes
         </p>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Visitor Intelligence Center</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Inteligencia del visitante</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Cada módulo responde una pregunta de negocio y declara la decisión que permite tomar.
-              No es un dashboard — es un Centro de Decisiones. Ventana: <strong>{win} días</strong>.
+              Cada tarjeta responde una pregunta sobre cómo los visitantes descubren, planean y
+              reservan, y te dice qué puedes hacer con esa cifra. Periodo:{" "}
+              <strong>{win} días</strong>.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -137,7 +148,7 @@ function VisitorIntelCenter() {
               to="/cms/visitor-intel/decisions"
               className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
             >
-              Abrir cola de decisiones
+              Ver decisiones del equipo
             </Link>
             <div className="flex gap-1 rounded-full border border-border p-1 text-xs">
               {[7, 30, 90].map((n) => (
@@ -152,17 +163,18 @@ function VisitorIntelCenter() {
                       : "text-muted-foreground hover:text-foreground")
                   }
                 >
-                  {n}d
+                  {n} días
                 </button>
               ))}
             </div>
           </div>
         </div>
+        <ReadingGuide />
       </header>
 
       {q.error ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-          No fue posible cargar la inteligencia. Verifica tu rol admin/super_admin.
+          No fue posible cargar el monitor. Necesitas ser administrador para verlo.
         </p>
       ) : null}
 
@@ -187,12 +199,12 @@ function VisitorIntelCenter() {
 /* --------------------------------------------------------------------- */
 
 const DIMENSIONS: Array<{ id: SegmentDimension; label: string; hint: string }> = [
-  { id: "locale", label: "Idioma", hint: "subject.locale" },
-  { id: "destination", label: "Destino", hint: "context.destination_id" },
-  { id: "capability", label: "Capability", hint: "context.surface (prefijo)" },
-  { id: "country", label: "País", hint: "requiere ampliar contrato" },
-  { id: "channel", label: "Canal", hint: "requiere ampliar contrato" },
-  { id: "device", label: "Dispositivo", hint: "requiere ampliar contrato" },
+  { id: "locale", label: "Idioma", hint: "Idioma del navegador del visitante" },
+  { id: "destination", label: "Destino", hint: "Destino que estaba viendo" },
+  { id: "capability", label: "Sección del sitio", hint: "Parte del sitio donde ocurrió la señal" },
+  { id: "country", label: "País", hint: "Aún no disponible" },
+  { id: "channel", label: "Canal", hint: "Aún no disponible" },
+  { id: "device", label: "Dispositivo", hint: "Aún no disponible" },
 ];
 
 function SegmentationSection({ window: win }: { window: 7 | 30 | 90 }) {
@@ -209,15 +221,15 @@ function SegmentationSection({ window: win }: { window: 7 | 30 | 90 }) {
       <header className="flex flex-wrap items-end justify-between gap-3 border-b border-border/60 pb-4">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            CV8.4 · Segmentación
+            Grupos de visitantes
           </p>
           <h2 className="mt-1 text-xl font-semibold tracking-tight">
-            ¿Cómo recorre el Journey cada grupo?
+            ¿Cómo avanza cada grupo de visitantes?
           </h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Segmentación ética: sólo datos mínimos, agregados, con umbral mínimo de{" "}
-            <strong>{MIN_SEGMENT_POPULATION}</strong> sujetos. Segmentos menores se agrupan como{" "}
-            <em>Otros</em>. Cero identidades individuales.
+            Compara grupos por idioma, destino o sección del sitio. Sólo se muestran grupos de al
+            menos <strong>{MIN_SEGMENT_POPULATION}</strong> personas; los más pequeños se juntan en{" "}
+            <em>Otros</em> para cuidar la privacidad. Nunca se identifica a nadie.
           </p>
         </div>
         <div className="flex flex-wrap gap-1 rounded-full border border-border p-1 text-xs">
@@ -257,7 +269,7 @@ function SegmentationBody({
   if (error) {
     return (
       <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-        No fue posible cargar la segmentación.
+        No fue posible cargar los grupos de visitantes.
       </p>
     );
   }
@@ -268,7 +280,7 @@ function SegmentationBody({
   if (snapshot.status === "contract_pending") {
     return (
       <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-        <p className="font-medium text-foreground">Segmentación pendiente de contrato</p>
+        <p className="font-medium text-foreground">Este grupo aún no está disponible</p>
         <p className="mt-1">{snapshot.pending_reason}</p>
       </div>
     );
@@ -278,12 +290,12 @@ function SegmentationBody({
     return (
       <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
         <p className="font-medium text-foreground">
-          Sin muestra suficiente en la ventana seleccionada
+          Todavía no hay suficientes visitantes en este periodo
         </p>
         <p className="mt-1">
-          Baseline: <strong>{snapshot.baseline.active_subjects}</strong> sujetos · JPR{" "}
-          {(snapshot.baseline.jpr * 100).toFixed(1)}%. Se activará cuando existan segmentos con ≥{" "}
-          {snapshot.min_population} sujetos activos.
+          Promedio general: <strong>{snapshot.baseline.active_subjects}</strong> personas · avance{" "}
+          {(snapshot.baseline.jpr * 100).toFixed(1)}%. Se activará cuando haya grupos de al menos{" "}
+          {snapshot.min_population} personas.
         </p>
       </div>
     );
@@ -292,52 +304,60 @@ function SegmentationBody({
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        Baseline global · <strong>{snapshot.baseline.active_subjects}</strong> sujetos · JPR{" "}
-        <strong>{(snapshot.baseline.jpr * 100).toFixed(1)}%</strong>. Delta = JPR del segmento −
-        baseline.
+        Promedio general: <strong>{snapshot.baseline.active_subjects}</strong> personas · avance{" "}
+        <strong>{(snapshot.baseline.jpr * 100).toFixed(1)}%</strong>. «Diferencia» = avance del
+        grupo menos el promedio, en puntos.
       </p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
-              <th className="py-2">Segmento</th>
-              <th>Activos</th>
+              <th className="py-2">Grupo</th>
+              <th>Personas</th>
               <th>Avanzaron</th>
-              <th>JPR</th>
-              <th>Δ vs baseline</th>
-              <th>Intención</th>
-              <th>T2</th>
-              <th>T5</th>
-              <th>T7</th>
+              <th>Avance</th>
+              <th>Diferencia</th>
+              <th>Señales de interés</th>
+              <th>Crearon cuenta</th>
+              <th>Armaron viaje</th>
+              <th>Reservaron</th>
             </tr>
           </thead>
           <tbody>
             {snapshot.buckets.map((b) => (
-              <SegmentRow key={b.key} b={b} />
+              <SegmentRow key={b.key} b={b} dimension={snapshot.dimension} />
             ))}
-            {snapshot.others ? <SegmentRow b={snapshot.others} /> : null}
+            {snapshot.others ? (
+              <SegmentRow b={snapshot.others} dimension={snapshot.dimension} />
+            ) : null}
           </tbody>
         </table>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Contrato v{snapshot.contract_version} · dimensión <code>{snapshot.dimension}</code> ·
-        recomputado sin persistencia.
+        Agrupado por {(DIMENSION_LABEL[snapshot.dimension] ?? snapshot.dimension).toLowerCase()}. Se
+        calcula al momento con los datos del periodo; no se guarda ninguna copia.
       </p>
     </div>
   );
 }
 
-function SegmentRow({ b }: { b: JourneySegmentSnapshot["buckets"][number] }) {
+function SegmentRow({
+  b,
+  dimension,
+}: {
+  b: JourneySegmentSnapshot["buckets"][number];
+  dimension: SegmentDimension;
+}) {
   const delta = b.jpr_delta_vs_baseline;
   const deltaColor =
     delta > 0.02 ? "text-success" : delta < -0.02 ? "text-destructive" : "text-muted-foreground";
   return (
     <tr className="border-t border-border/60">
       <td className="py-2 font-medium">
-        {b.label}
+        {segmentValueLabel(dimension, b.key, b.label)}
         {b.suppressed ? (
           <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-            agregado
+            agrupado
           </span>
         ) : null}
       </td>
@@ -346,7 +366,7 @@ function SegmentRow({ b }: { b: JourneySegmentSnapshot["buckets"][number] }) {
       <td className="font-mono">{(b.jpr * 100).toFixed(1)}%</td>
       <td className={"font-mono " + deltaColor}>
         {delta > 0 ? "+" : ""}
-        {(delta * 100).toFixed(1)} pp
+        {(delta * 100).toFixed(1)} puntos
       </td>
       <td className="font-mono">{b.intent_signals}</td>
       <td className="font-mono">{b.transitions.T2_anonymous_to_identified}</td>
@@ -372,13 +392,13 @@ function IntelModules({
   return (
     <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <DecisionCard
-        title="Journey Funnel"
-        question="¿Dónde se está fugando el viajero en el Journey?"
-        why="Compara conteos de cada transición canónica T1..T9."
-        decision={kpi["JPR_30D"]?.actionable_decision ?? ""}
+        title="Recorrido del viajero, paso a paso"
+        question="¿En qué paso se detienen los visitantes?"
+        why="Cuenta cuántas personas dieron cada uno de los 9 pasos, desde llegar al sitio hasta recomendarlo."
+        decision={metricAction("JPR_30D", kpi["JPR_30D"]?.actionable_decision)}
         value={
           snapshot
-            ? `${snapshot.progressed_subjects} / ${snapshot.active_subjects} avanzaron`
+            ? `${snapshot.progressed_subjects} de ${snapshot.active_subjects} avanzaron`
             : undefined
         }
         detail={
@@ -389,141 +409,138 @@ function IntelModules({
                   key={row.id}
                   className="flex items-center justify-between border-b border-border/60 py-1"
                 >
-                  <span className="text-muted-foreground">
-                    {row.id.replace(/^T(\d).*/, "T$1")} · {JOURNEY_TRANSITIONS[row.id].from} →{" "}
-                    {JOURNEY_TRANSITIONS[row.id].to}
-                  </span>
+                  <span className="text-muted-foreground">{transitionLabel(row.id)}</span>
                   <span className="font-mono">{row.distinct_subjects}</span>
                 </li>
               ))}
             </ul>
           ) : null
         }
-        activatesWhen="lleguen eventos journey.transition (CV8.1)."
+        activatesWhen="lleguen las primeras señales de avance de los visitantes."
         loading={loading}
       />
 
       <DecisionCard
-        title="Conversión del Journey (JPR)"
-        question="¿Qué % avanza ≥1 etapa en la ventana?"
-        why="Journey Progression Rate — North Star."
-        decision={kpi["JPR_30D"]?.actionable_decision ?? ""}
+        title="Avance del recorrido"
+        question="¿Qué parte de los visitantes dio al menos un paso?"
+        why="Es el indicador principal: personas que avanzaron entre personas que visitaron en el periodo."
+        decision={metricAction("JPR_30D", kpi["JPR_30D"]?.actionable_decision)}
         value={snapshot ? `${(snapshot.jpr * 100).toFixed(1)} %` : undefined}
-        activatesWhen="haya ≥1 subject activo con eventos."
+        activatesWhen="haya al menos un visitante con actividad."
         loading={loading}
       />
 
       <DecisionCard
-        title="Visitantes Anónimos → Identificados"
-        question="¿Cuántos anónimos se registran?"
-        why="Transición T2 · momentos de valor (AC1.4)."
-        decision={kpi["T2_conversion"]?.actionable_decision ?? ""}
+        title="Visitantes que crearon su cuenta"
+        question="¿Cuántos visitantes sin cuenta se registraron?"
+        why="Paso 2 · Creó su cuenta. Depende de los momentos en que invitamos a registrarse."
+        decision={metricAction("T2_conversion", kpi["T2_conversion"]?.actionable_decision)}
         value={
           snapshot
             ? `${t("T2_anonymous_to_identified")?.distinct_subjects ?? 0} personas`
             : undefined
         }
-        activatesWhen="lleguen transiciones T2."
+        activatesWhen="alguien cree su cuenta después de visitar."
         loading={loading}
       />
 
       <DecisionCard
-        title="Travel Plans creados"
-        question="¿Cuántos planes reales se están creando?"
-        why="Transición T5 · Bridge Alux↔Plan."
-        decision={kpi["T5_conversion"]?.actionable_decision ?? ""}
+        title="Viajes armados en Mi Viaje"
+        question="¿Cuántas personas armaron un viaje con al menos un lugar real?"
+        why="Paso 5 · Armó su viaje. Depende de qué tan fácil es pasar de lo que sugiere Alux a Mi Viaje."
+        decision={metricAction("T5_conversion", kpi["T5_conversion"]?.actionable_decision)}
         value={
           snapshot
             ? `${t("T5_interested_to_travel_plan")?.distinct_subjects ?? 0} viajeros`
             : undefined
         }
-        activatesWhen="Travel Plan emita journey.transition T5."
+        activatesWhen="alguien arme su primer viaje."
         loading={loading}
       />
 
       <DecisionCard
-        title="Alux · Intención capturada"
-        question="¿Qué volumen de señales de intención genera Alux/Discovery?"
-        why="Suma de intent.signal en la ventana."
-        decision="Repriorizar surfaces/recomendaciones con menor generación de intención."
+        title="Alux · Señales de interés"
+        question="¿Cuánto interés despiertan Alux y las páginas para descubrir?"
+        why="Suma cada vez que alguien guarda, compara, agrega a su viaje o le pide algo a Alux."
+        decision={metricAction("T4_conversion")}
         value={snapshot ? `${snapshot.intent_signals_total} señales` : undefined}
-        activatesWhen="las superficies emitan intent.signal."
+        activatesWhen="los visitantes empiecen a guardar o pedir sugerencias."
         loading={loading}
       />
 
       <DecisionCard
-        title="Concierge · Promoción a caso"
-        question="¿Cuántos planes se promueven a Concierge?"
-        why="Transición T6 · propuesta Alux."
-        decision={kpi["T6_conversion"]?.actionable_decision ?? ""}
+        title="Viajes enviados al concierge"
+        question="¿Cuántos viajes se enviaron al concierge para que los atienda?"
+        why="Paso 6 · Pidió ayuda al concierge. Depende de qué tan clara es la invitación de Alux."
+        decision={metricAction("T6_conversion", kpi["T6_conversion"]?.actionable_decision)}
         value={
           snapshot ? `${t("T6_travel_plan_to_concierge")?.distinct_subjects ?? 0} casos` : undefined
         }
-        activatesWhen="lleguen transiciones T6."
+        activatesWhen="alguien envíe su viaje al concierge."
         loading={loading}
       />
 
       <DecisionCard
-        title="Revenue · Concierge → Reserva"
-        question="¿Cuánto está convirtiendo el Concierge en reservas?"
-        why="Transición T7 · checkout narrativo."
-        decision={kpi["T7_conversion"]?.actionable_decision ?? ""}
+        title="Reservas logradas por el concierge"
+        question="¿Cuántos casos del concierge terminaron en reserva?"
+        why="Paso 7 · Reservó. Depende de las propuestas del concierge y del proceso de pago."
+        decision={metricAction("T7_conversion", kpi["T7_conversion"]?.actionable_decision)}
         value={
           snapshot
             ? `${t("T7_concierge_to_reservation")?.distinct_subjects ?? 0} reservas`
             : undefined
         }
-        activatesWhen="Concierge emita transición T7."
+        activatesWhen="un caso del concierge termine en reserva."
         loading={loading}
       />
 
       <DecisionCard
-        title="Empresas · Intención por capacidad"
-        question="¿Qué empresas generan más intención?"
-        why="Requiere segmentación por capability (CV8.4)."
-        decision="Priorizar publicación / spotlight en empresas de alta intención y baja conversión."
-        activatesWhen="CV8.4 habilite segmentación por capability."
+        title="Empresas que más interés generan"
+        question="¿Qué empresas despiertan más interés?"
+        why="Necesita separar las señales de interés por empresa."
+        decision="Dar más visibilidad a empresas con mucho interés y pocas reservas."
+        activatesWhen="las señales se puedan separar por empresa."
         loading={loading}
       />
 
       <DecisionCard
-        title="Destinos · Avance de Journey"
-        question="¿Qué destinos generan más avance del Journey?"
-        why="Requiere segmentación por destination_id (CV8.4)."
-        decision="Reasignar recursos editoriales hacia destinos con mejor progresión."
-        activatesWhen="CV8.4 habilite segmentación por destino."
+        title="Destinos que más hacen avanzar"
+        question="¿Qué destinos hacen que más visitantes avancen en su viaje?"
+        why="Necesita separar el avance de los visitantes por destino."
+        decision="Dedicar más contenido a los destinos que mejor hacen avanzar al viajero."
+        activatesWhen="el avance se pueda separar por destino."
         loading={loading}
       />
 
       <DecisionCard
-        title="Permanencia · Continuity Rate"
-        question="¿Los viajeros regresan y reconocen su viaje?"
-        why="Contrapeso oficial CONTINUITY_RATE."
-        decision={kpi["CONTINUITY_RATE"]?.actionable_decision ?? ""}
-        activatesWhen="lleguen señales continuity.recognized (post CV8.3)."
+        title="Regresos que encuentran su viaje"
+        question="¿Los viajeros que regresan encuentran su viaje donde lo dejaron?"
+        why="Indicador de control: cuida que la experiencia no empeore aunque suban las demás cifras."
+        decision={metricAction("CONTINUITY_RATE", kpi["CONTINUITY_RATE"]?.actionable_decision)}
+        activatesWhen="se registren los primeros regresos de visitantes."
         loading={loading}
       />
 
       <DecisionCard
         title="Embajadores"
-        question="¿Cuántos viajeros regresan como advocates?"
-        why="Transición T9 · post-trip loops."
-        decision={kpi["T9_conversion"]?.actionable_decision ?? ""}
+        question="¿Cuántos viajeros recomendaron Valladolid.mx después de su viaje?"
+        why="Paso 9 · Recomendó a otros."
+        decision={metricAction("T9_conversion", kpi["T9_conversion"]?.actionable_decision)}
         value={
           snapshot
             ? `${t("T9_traveler_to_ambassador")?.distinct_subjects ?? 0} embajadores`
             : undefined
         }
-        activatesWhen="lleguen transiciones T9."
+        activatesWhen="un viajero recomiende Valladolid.mx después de su viaje."
         loading={loading}
       />
 
       <DecisionCard
-        title="Alertas de conversión"
-        question="¿Hay transiciones cayendo bajo benchmark?"
-        why="Requiere motor de umbrales (CV8.5)."
-        decision="Intervención inmediata en la transición degradada."
-        activatesWhen="CV8.5 defina benchmarks y umbrales."
+        title="Alertas de caídas"
+        question="¿Hay algún paso cayendo por debajo de lo normal?"
+        why="Necesita definir qué cifra es «normal» para cada paso."
+        decision="Atender de inmediato el paso que está cayendo."
+        activatesWhen="se defina la cifra de referencia de cada paso."
         loading={loading}
       />
     </section>
@@ -562,12 +579,12 @@ function DecisionCard({
             (hasData ? "bg-success/15 text-success" : "bg-muted text-muted-foreground")
           }
         >
-          {hasData ? "Accionable" : "Pendiente"}
+          {hasData ? "Con datos" : "Sin datos aún"}
         </span>
       </header>
 
       <p className="mt-2 text-xs text-muted-foreground">
-        <strong className="text-foreground">Pregunta:</strong> {question}
+        <strong className="text-foreground">Qué responde:</strong> {question}
       </p>
 
       {loading ? (
@@ -584,10 +601,11 @@ function DecisionCard({
 
       <div className="mt-4 space-y-1 border-t border-border/60 pt-3 text-xs">
         <p>
-          <strong>Por qué:</strong> <span className="text-muted-foreground">{why}</span>
+          <strong>Cómo se mide:</strong> <span className="text-muted-foreground">{why}</span>
         </p>
         <p>
-          <strong>Decisión:</strong> <span className="text-muted-foreground">{decision}</span>
+          <strong>Para qué te sirve:</strong>{" "}
+          <span className="text-muted-foreground">{decision}</span>
         </p>
       </div>
     </article>
@@ -633,15 +651,15 @@ function OpportunitySection({ window: win }: { window: 7 | 30 | 90 }) {
     <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
       <header className="border-b border-border/60 pb-4">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          CV8.5 · Benchmarks & Oportunidades
+          Cambios importantes
         </p>
         <h2 className="mt-1 text-xl font-semibold tracking-tight">
-          ¿Qué acción concreta recomendamos ahora?
+          ¿Qué cambió frente al periodo anterior?
         </h2>
         <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-          Detección automática de oportunidades: cada hallazgo compara la ventana actual contra el
-          periodo anterior y declara evidencia, confianza y acción sugerida. Muestra mínima:{" "}
-          <strong>{MIN_SAMPLE_FOR_OPPORTUNITY}</strong> sujetos.
+          Compara este periodo con el anterior y avisa cuando un paso sube o baja más de 10%. Cada
+          hallazgo explica qué pasó, por qué importa y qué hacer. Necesita al menos{" "}
+          <strong>{MIN_SAMPLE_FOR_OPPORTUNITY}</strong> visitantes.
         </p>
       </header>
       <OpportunityBody snapshot={q.data} loading={q.isLoading} error={!!q.error} />
@@ -661,7 +679,7 @@ function OpportunityBody({
   if (error) {
     return (
       <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-        No fue posible cargar oportunidades.
+        No fue posible cargar los cambios importantes.
       </p>
     );
   }
@@ -676,19 +694,19 @@ function OpportunityBody({
     <div className="space-y-4">
       <div className="grid gap-3 rounded-xl border border-border/60 bg-surface-raised p-4 text-xs md:grid-cols-3">
         <div>
-          <p className="text-muted-foreground">Sujetos activos (actual · previo)</p>
+          <p className="text-muted-foreground">Visitantes (ahora · antes)</p>
           <p className="mt-1 font-mono text-sm">
             {b.active_subjects_current} · {b.active_subjects_previous}
           </p>
         </div>
         <div>
-          <p className="text-muted-foreground">JPR actual vs previo</p>
+          <p className="text-muted-foreground">Avance del recorrido (ahora · antes)</p>
           <p className="mt-1 font-mono text-sm">
             {(b.jpr_current * 100).toFixed(1)}% · {(b.jpr_previous * 100).toFixed(1)}%
           </p>
         </div>
         <div>
-          <p className="text-muted-foreground">Δ JPR</p>
+          <p className="text-muted-foreground">Diferencia</p>
           <p
             className={
               "mt-1 font-mono text-sm " +
@@ -700,22 +718,22 @@ function OpportunityBody({
             }
           >
             {jprDelta > 0 ? "+" : ""}
-            {(jprDelta * 100).toFixed(1)} pp
+            {(jprDelta * 100).toFixed(1)} puntos
           </p>
         </div>
       </div>
 
       {snapshot.status === "insufficient_data" ? (
         <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">Muestra insuficiente</p>
+          <p className="font-medium text-foreground">Todavía hay pocos datos</p>
           <p className="mt-1">{snapshot.reason}</p>
         </div>
       ) : snapshot.opportunities.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">Sin hallazgos significativos</p>
+          <p className="font-medium text-foreground">Sin cambios importantes</p>
           <p className="mt-1">
-            Ninguna transición se movió más de ±10% frente al periodo previo con muestra ≥{" "}
-            {MIN_SAMPLE_FOR_OPPORTUNITY}. El Journey se mantiene estable.
+            Ningún paso subió ni bajó más de 10% frente al periodo anterior (con al menos{" "}
+            {MIN_SAMPLE_FOR_OPPORTUNITY} visitantes). El recorrido se mantiene estable.
           </p>
         </div>
       ) : (
@@ -727,8 +745,8 @@ function OpportunityBody({
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        Contrato v{snapshot.contract_version} · referencia: <code>previous_period</code> ·
-        recomputado sin persistencia.
+        Se compara con el periodo anterior de la misma duración. Se calcula al momento; no se guarda
+        ninguna copia.
       </p>
     </div>
   );
@@ -752,46 +770,94 @@ function OpportunityCard({ o }: { o: Opportunity }) {
           <h3 className="mt-2 text-sm font-semibold leading-snug">{o.headline}</h3>
         </div>
         <div className="text-right text-[11px] text-muted-foreground">
+          <p>{transitionLabel(o.transition)}</p>
+          <p>Indicador: {metricLabel(o.metric_id)}</p>
           <p>
-            Transición: <code>{o.transition}</code>
-          </p>
-          <p>
-            Métrica: <code>{o.metric_id}</code>
-          </p>
-          <p>
-            Confianza: <strong>{ev.confidence}</strong> · n={ev.sample_size}
+            Confianza: <strong>{levelLabel(ev.confidence)}</strong> · {ev.sample_size} personas
           </p>
         </div>
       </header>
 
       <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
         <div>
-          <dt className="font-semibold">¿Qué ocurre?</dt>
+          <dt className="font-semibold">¿Qué pasó?</dt>
           <dd className="text-muted-foreground">{o.what_happens}</dd>
         </div>
         <div>
-          <dt className="font-semibold">¿Por qué ocurre?</dt>
+          <dt className="font-semibold">¿Cómo se mide?</dt>
           <dd className="text-muted-foreground">{o.why_it_happens}</dd>
         </div>
         <div>
-          <dt className="font-semibold">Impacto</dt>
+          <dt className="font-semibold">¿Por qué importa?</dt>
           <dd className="text-muted-foreground">{o.impact}</dd>
         </div>
         <div>
-          <dt className="font-semibold">Acción recomendada</dt>
+          <dt className="font-semibold">Qué hacer</dt>
           <dd className="text-muted-foreground">{o.recommended_action}</dd>
         </div>
         <div className="md:col-span-2">
-          <dt className="font-semibold">KPI esperado</dt>
+          <dt className="font-semibold">Meta para el siguiente periodo</dt>
           <dd className="text-muted-foreground">{o.expected_kpi}</dd>
         </div>
       </dl>
 
-      <p className="mt-3 rounded-lg bg-surface-raised p-2 text-[11px] font-mono text-muted-foreground">
-        Evidencia · actual={ev.current_value} · previo={ev.reference_value} · Δ abs=
-        {ev.delta_absolute} · Δ rel={(ev.delta_relative * 100).toFixed(1)}% · vs {ev.reference}
+      <p className="mt-3 rounded-lg bg-surface-raised p-2 text-[11px] text-muted-foreground">
+        {evidenceText(o)}
       </p>
     </li>
+  );
+}
+
+/** Cifras del hallazgo en palabras: porcentajes para el avance general. */
+function evidenceText(o: Opportunity): string {
+  const ev = o.evidence;
+  const rel = `${ev.delta_relative > 0 ? "+" : ""}${(ev.delta_relative * 100).toFixed(1)}%`;
+  if (o.transition === "aggregate") {
+    return `Cifras · ahora ${(ev.current_value * 100).toFixed(1)}% · antes ${(ev.reference_value * 100).toFixed(1)}% · cambio ${rel}`;
+  }
+  return `Cifras · ahora ${ev.current_value} personas · antes ${ev.reference_value} · cambio ${ev.delta_absolute > 0 ? "+" : ""}${ev.delta_absolute} (${rel})`;
+}
+
+/** Guía breve para leer el monitor sin términos técnicos. */
+function ReadingGuide() {
+  return (
+    <details className="mt-4 rounded-xl border border-border bg-surface-raised p-3 text-xs text-muted-foreground">
+      <summary className="cursor-pointer font-semibold text-foreground">
+        ¿Cómo leer esta pantalla?
+      </summary>
+      <ul className="mt-2 list-disc space-y-1 pl-5">
+        <li>
+          <strong className="text-foreground">Recorrido del viajero:</strong> los 9 pasos que da una
+          persona, desde llegar al sitio, crear su cuenta, explorar, mostrar interés, armar su viaje
+          y pedir ayuda al concierge, hasta reservar, viajar y recomendarnos.
+        </li>
+        <li>
+          <strong className="text-foreground">Avance del recorrido:</strong> qué parte de los
+          visitantes dio al menos un paso en el periodo. Es el indicador principal.
+        </li>
+        <li>
+          <strong className="text-foreground">Señales de interés:</strong> cada vez que alguien
+          guarda, compara, agrega a su viaje o le pide algo a Alux.
+        </li>
+        <li>
+          <strong className="text-foreground">Grupos:</strong> visitantes agrupados por idioma,
+          destino o sección del sitio. Nunca se identifica a nadie.
+        </li>
+        <li>
+          <strong className="text-foreground">Puntos:</strong> diferencia entre dos porcentajes. Si
+          un grupo avanza 40% y el promedio 50%, está 10 puntos abajo.
+        </li>
+        <li>
+          <strong className="text-foreground">Prioridad (de 100):</strong> qué tan urgente es
+          atender un hallazgo. Abre «Ver por qué» para conocer cada razón.
+        </li>
+        <li>
+          <strong className="text-foreground">Decisiones del equipo:</strong> cuando una
+          recomendación te convence, pásala a decisiones para asignarla y darle seguimiento. Nada
+          cambia en el sitio por sí solo.
+        </li>
+      </ul>
+    </details>
   );
 }
 
@@ -829,14 +895,14 @@ function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
     <section className="space-y-4 rounded-2xl border-2 border-primary/40 bg-surface p-5">
       <header className="border-b border-border/60 pb-4">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          CV8.7 · Prescriptive Decision Prioritization
+          Prioridades de hoy
         </p>
         <h2 className="mt-1 text-xl font-semibold tracking-tight">¿Qué deberíamos hacer hoy?</h2>
         <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
-          Ranking prescriptivo derivado — cero persistencia. Combina{" "}
-          <strong>confianza aprendida (CV8.6)</strong>, impacto, urgencia, alcance, etapa del
-          Journey y beneficio para el ecosistema. Cada posición se justifica con factores
-          auditables.
+          Ordena los cambios importantes de más a menos urgente. Toma en cuenta qué tan seguros
+          estamos (según recomendaciones anteriores), el tamaño del cambio, la urgencia, cuántas
+          personas alcanza, la etapa del recorrido y el beneficio para el destino. Cada prioridad
+          muestra por qué quedó en ese lugar.
         </p>
         <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-mono text-muted-foreground">
           {Object.entries(PRIORITIZATION_WEIGHTS).map(([k, v]) => (
@@ -844,7 +910,7 @@ function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
               key={k}
               className="rounded-full border border-border bg-surface-raised px-2 py-0.5"
             >
-              {k}: {(v * 100).toFixed(0)}%
+              {factorLabel(k)}: {(v * 100).toFixed(0)}%
             </span>
           ))}
         </div>
@@ -852,7 +918,7 @@ function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
 
       {oppsQ.error ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-          No fue posible cargar oportunidades para priorización.
+          No fue posible cargar las prioridades.
         </p>
       ) : null}
 
@@ -860,12 +926,10 @@ function PrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) {
         <p className="h-6 w-40 animate-pulse rounded bg-muted" />
       ) : ranked.ranked.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">
-            Sin oportunidades priorizables en la ventana actual
-          </p>
+          <p className="font-medium text-foreground">Sin prioridades por ahora</p>
           <p className="mt-1">
-            Cuando existan hallazgos con muestra suficiente, el motor los ordenará por impacto
-            esperado.
+            Cuando haya cambios importantes con suficientes datos, aparecerán aquí ordenados por
+            urgencia.
           </p>
         </div>
       ) : (
@@ -898,21 +962,22 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
           <div>
             <h3 className="text-sm font-semibold leading-snug">{p.opportunity.headline}</h3>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              <code>{p.opportunity.transition}</code> · <code>{p.opportunity.metric_id}</code>
+              {transitionLabel(p.opportunity.transition)} · {metricLabel(p.opportunity.metric_id)}
             </p>
           </div>
         </div>
         <div className="text-right">
           <p className="text-2xl font-bold tracking-tight">{(p.score * 100).toFixed(0)}</p>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">score / 100</p>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            prioridad / 100
+          </p>
           <span
             className={
               "mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " +
               reliabilityBadge
             }
           >
-            confianza:{" "}
-            {p.confidence_reliability === "insufficient_data" ? "n.d." : p.confidence_reliability}
+            confianza: {reliabilityLabel(p.confidence_reliability)}
           </span>
         </div>
       </header>
@@ -921,7 +986,7 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
 
       <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
         <div>
-          <dt className="font-semibold">Acción recomendada</dt>
+          <dt className="font-semibold">Qué hacer</dt>
           <dd className="text-muted-foreground">{p.opportunity.recommended_action}</dd>
         </div>
         <div>
@@ -932,7 +997,7 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
 
       <details className="mt-3">
         <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
-          Ver factores del score
+          Ver por qué tiene esta prioridad
         </summary>
         <ul className="mt-2 space-y-1 text-[11px]">
           {p.factors.map((f) => (
@@ -941,14 +1006,14 @@ function PrioritizedCard({ p }: { p: PrioritizedOpportunity }) {
               className="flex items-start justify-between gap-2 rounded-md bg-surface p-2"
             >
               <div className="flex-1">
-                <p className="font-mono font-semibold">
-                  {f.key} · peso {(f.weight * 100).toFixed(0)}% · valor {(f.value * 100).toFixed(0)}
-                  %
+                <p className="font-semibold">
+                  {factorLabel(f.key)} · pesa {(f.weight * 100).toFixed(0)}% · obtuvo{" "}
+                  {(f.value * 100).toFixed(0)}%
                 </p>
                 <p className="text-muted-foreground">{f.explanation}</p>
               </div>
               <span className="font-mono font-semibold text-primary">
-                +{(f.contribution * 100).toFixed(1)}
+                +{(f.contribution * 100).toFixed(1)} pts
               </span>
             </li>
           ))}
@@ -979,27 +1044,27 @@ const FINDING_TYPE_META: Record<
   commercial_opportunity: {
     label: "Oportunidad comercial",
     badge: "bg-success/15 text-success",
-    short: "Amplificar",
+    short: "Dar visibilidad",
   },
   experience_opportunity: {
     label: "Oportunidad de experiencia",
     badge: "bg-info/15 text-info",
-    short: "Reducir fricción",
+    short: "Quitar obstáculos",
   },
   inclusion_opportunity: {
     label: "Oportunidad de inclusión",
     badge: "bg-primary/15 text-primary",
-    short: "Auditar barreras",
+    short: "Revisar barreras",
   },
   abandonment_risk: {
     label: "Riesgo de abandono",
     badge: "bg-destructive/15 text-destructive",
-    short: "Intervenir",
+    short: "Atender ya",
   },
   insufficient_data: {
-    label: "Evidencia insuficiente",
+    label: "Pocos datos",
     badge: "bg-muted text-muted-foreground",
-    short: "Recolectar",
+    short: "Esperar datos",
   },
 };
 
@@ -1051,18 +1116,17 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
     <section className="space-y-4 rounded-2xl border-2 border-primary/40 bg-surface p-5">
       <header className="border-b border-border/60 pb-4">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          CV8.8 · Priorización por Segmento
+          Prioridades por grupo
         </p>
         <h2 className="mt-1 text-xl font-semibold tracking-tight">
-          ¿Dónde actuar por segmento — con equidad?
+          ¿Qué grupo de visitantes necesita atención?
         </h2>
         <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
-          Cruza segmentos oficiales de <strong>CV8.4</strong> con la confianza aprendida de{" "}
-          <strong>CV8.6</strong>. Distingue oportunidad comercial, de experiencia, de inclusión,
-          riesgo de abandono y evidencia insuficiente. Cada fila declara muestra, delta vs baseline,
-          confianza, impacto esperado, riesgo de sesgo y explicación alternativa. Cero snapshots
-          persistidos. Cero identidades individuales. Sujeto a{" "}
-          <code>MIN_SEGMENT_POPULATION = {MIN_SEGMENT_POPULATION}</code>.
+          Revisa cada grupo (por idioma, destino y sección del sitio) y lo clasifica: oportunidad
+          comercial, de experiencia o de inclusión, riesgo de abandono o pocos datos. Cada uno
+          muestra cuántas personas son, cómo avanzan frente al promedio, qué tan seguro es el dato,
+          el riesgo de sacar una conclusión equivocada y otras posibles explicaciones. Sólo grupos
+          de al menos {MIN_SEGMENT_POPULATION} personas; nunca se identifica a nadie.
         </p>
         <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-mono text-muted-foreground">
           {Object.entries(SEGMENT_PRIORITIZATION_WEIGHTS).map(([k, v]) => (
@@ -1070,7 +1134,7 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
               key={k}
               className="rounded-full border border-border bg-surface-raised px-2 py-0.5"
             >
-              {k}: {(v * 100).toFixed(0)}%
+              {factorLabel(k)}: {(v * 100).toFixed(0)}%
             </span>
           ))}
         </div>
@@ -1078,14 +1142,15 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
 
       {anyError ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-          No fue posible cargar la priorización por segmento.
+          No fue posible cargar las prioridades por grupo.
         </p>
       ) : null}
 
       {pendingDims.length > 0 ? (
         <p className="rounded-xl border border-border bg-surface-raised p-3 text-[11px] text-muted-foreground">
-          Dimensiones en <code>contract_pending</code>: {pendingDims.join(", ")}. Se activarán
-          cuando el contrato de evento las incluya.
+          Aún no disponibles:{" "}
+          {pendingDims.map((d) => (DIMENSION_LABEL[d] ?? d).toLowerCase()).join(", ")}. Se activarán
+          cuando las señales los incluyan.
         </p>
       ) : null}
 
@@ -1093,9 +1158,9 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
         <p className="h-6 w-48 animate-pulse rounded bg-muted" />
       ) : result.findings.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">Sin segmentos priorizables aún</p>
+          <p className="font-medium text-foreground">Todavía no hay grupos para priorizar</p>
           <p className="mt-1">
-            Aparecerán aquí cuando existan buckets con población ≥ {result.min_population}.
+            Aparecerán aquí cuando haya grupos de al menos {result.min_population} personas.
           </p>
         </div>
       ) : (
@@ -1125,6 +1190,8 @@ function SegmentPrioritizationSection({ window: win }: { window: 7 | 30 | 90 }) 
   );
 }
 
+const BIAS_LABEL: Record<string, string> = { low: "bajo", medium: "medio", high: "alto" };
+
 function SegmentFindingCard({ f }: { f: SegmentFinding }) {
   const meta = FINDING_TYPE_META[f.type];
   const biasBadge =
@@ -1143,10 +1210,11 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
           <div>
             <h3 className="text-sm font-semibold leading-snug">{f.segment_label}</h3>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              <code>{f.dimension}</code> · n={f.sample_size} · JPR {(f.jpr * 100).toFixed(1)}% vs
-              baseline {(f.baseline_jpr * 100).toFixed(1)}% ·{" "}
+              {DIMENSION_LABEL[f.dimension] ?? f.dimension} · {f.sample_size} personas · avance{" "}
+              {(f.jpr * 100).toFixed(1)}% vs promedio {(f.baseline_jpr * 100).toFixed(1)}% ·{" "}
               <strong className={f.delta_vs_baseline >= 0 ? "text-success" : "text-destructive"}>
-                Δ {(f.delta_vs_baseline * 100).toFixed(1)}%
+                {f.delta_vs_baseline > 0 ? "+" : ""}
+                {(f.delta_vs_baseline * 100).toFixed(1)} puntos
               </strong>
             </p>
           </div>
@@ -1155,7 +1223,7 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
           {f.type !== "insufficient_data" ? (
             <p className="text-2xl font-bold tracking-tight">{(f.score * 100).toFixed(0)}</p>
           ) : (
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">n.d.</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">sin dato</p>
           )}
           <span
             className={
@@ -1171,7 +1239,7 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
               biasBadge
             }
           >
-            sesgo: {f.bias_risk}
+            riesgo de error: {BIAS_LABEL[f.bias_risk] ?? f.bias_risk}
           </span>
         </div>
       </header>
@@ -1180,7 +1248,7 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
 
       <dl className="mt-3 grid gap-2 text-xs md:grid-cols-2">
         <div>
-          <dt className="font-semibold">Acción recomendada</dt>
+          <dt className="font-semibold">Qué hacer</dt>
           <dd className="text-muted-foreground">{f.recommended_action}</dd>
         </div>
         <div>
@@ -1191,7 +1259,7 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
 
       <details className="mt-3">
         <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
-          Explicaciones alternativas (revisar antes de concluir)
+          Otras posibles explicaciones (revísalas antes de decidir)
         </summary>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-[11px] text-muted-foreground">
           {f.alternative_explanations.map((e, i) => (
@@ -1204,7 +1272,7 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
         <>
           <details className="mt-2">
             <summary className="cursor-pointer text-[11px] font-semibold text-primary hover:underline">
-              Ver factores del score
+              Ver por qué tiene esta prioridad
             </summary>
             <ul className="mt-2 space-y-1 text-[11px]">
               {f.factors.map((fac) => (
@@ -1213,14 +1281,14 @@ function SegmentFindingCard({ f }: { f: SegmentFinding }) {
                   className="flex items-start justify-between gap-2 rounded-md bg-surface p-2"
                 >
                   <div className="flex-1">
-                    <p className="font-mono font-semibold">
-                      {fac.key} · peso {(fac.weight * 100).toFixed(0)}% · valor{" "}
+                    <p className="font-semibold">
+                      {factorLabel(fac.key)} · pesa {(fac.weight * 100).toFixed(0)}% · obtuvo{" "}
                       {(fac.value * 100).toFixed(0)}%
                     </p>
                     <p className="text-muted-foreground">{fac.explanation}</p>
                   </div>
                   <span className="font-mono font-semibold text-primary">
-                    +{(fac.contribution * 100).toFixed(1)}
+                    +{(fac.contribution * 100).toFixed(1)} pts
                   </span>
                 </li>
               ))}
@@ -1256,7 +1324,7 @@ function DecisionProposalButton({ source }: { source: DecisionSource | null }) {
       await queryClient.invalidateQueries({
         queryKey: ["cms", "visitor-intel", "decisions"],
       });
-      toast.success("Propuesta añadida a la cola de decisiones.");
+      toast.success("Propuesta añadida a las decisiones del equipo.");
     },
     onError: () => toast.error("No fue posible registrar la propuesta."),
   });
@@ -1270,10 +1338,10 @@ function DecisionProposalButton({ source }: { source: DecisionSource | null }) {
         onClick={() => proposal.mutate()}
         className="rounded-full bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
       >
-        {proposal.isPending ? "Registrando…" : "Convertir en decisión"}
+        {proposal.isPending ? "Registrando…" : "Pasar a decisiones del equipo"}
       </button>
       <span className="ml-2 text-[10px] text-muted-foreground">
-        Crea una propuesta; no ejecuta la acción.
+        Sólo crea una propuesta; no cambia nada del sitio.
       </span>
     </div>
   );
@@ -1293,16 +1361,15 @@ function ValidationLoopSection() {
       <header className="flex flex-wrap items-end justify-between gap-3 border-b border-border/60 pb-4">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-            CV8.6 · Recommendation Validation Loop
+            Seguimiento de recomendaciones
           </p>
           <h2 className="mt-1 text-xl font-semibold tracking-tight">
-            ¿Nuestras recomendaciones mejoraron el Journey?
+            ¿Nuestras recomendaciones funcionaron?
           </h2>
           <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-            Ciclo de vida completo de cada recomendación: detectada → aceptada → implementada →
-            observada → validada / descartada. Confianza aprendida desde resultados observados (n ≥{" "}
-            <strong>{MIN_FAMILY_SIGNAL}</strong>
-            por familia). Sin reglas manuales ocultas.
+            Sigue cada recomendación: detectada → aceptada → implementada → observada → validada o
+            descartada. Con al menos <strong>{MIN_FAMILY_SIGNAL}</strong> resultados de un mismo
+            tipo, aprende qué tan seguido acierta ese tipo de recomendación.
           </p>
         </div>
         <div className="flex gap-1 rounded-full border border-border p-1 text-xs">
@@ -1318,7 +1385,7 @@ function ValidationLoopSection() {
                   : "text-muted-foreground hover:text-foreground")
               }
             >
-              {n}d
+              {n} días
             </button>
           ))}
         </div>
@@ -1341,11 +1408,18 @@ function ValidationLoopBody({
   if (error) {
     return (
       <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-        No fue posible cargar el ciclo de validación.
+        No fue posible cargar el seguimiento de recomendaciones.
       </p>
     );
   }
   if (loading || !snapshot) return <p className="h-6 w-32 animate-pulse rounded bg-muted" />;
+  if (!Array.isArray(snapshot.active) || !Array.isArray(snapshot.closed)) {
+    return (
+      <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+        No fue posible cargar el seguimiento de recomendaciones.
+      </p>
+    );
+  }
 
   const total = snapshot.active.length + snapshot.closed.length;
 
@@ -1376,7 +1450,7 @@ function ValidationLoopBody({
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div>
-          <h3 className="mb-2 text-sm font-semibold">Ciclo activo</h3>
+          <h3 className="mb-2 text-sm font-semibold">En curso</h3>
           {snapshot.active.length === 0 ? (
             <p className="text-xs text-muted-foreground">Ninguna en curso.</p>
           ) : (
@@ -1388,7 +1462,7 @@ function ValidationLoopBody({
           )}
         </div>
         <div>
-          <h3 className="mb-2 text-sm font-semibold">Cerradas (aprendizaje)</h3>
+          <h3 className="mb-2 text-sm font-semibold">Cerradas (lo que aprendimos)</h3>
           {snapshot.closed.length === 0 ? (
             <p className="text-xs text-muted-foreground">
               Aún no hay recomendaciones validadas o descartadas.
@@ -1404,23 +1478,25 @@ function ValidationLoopBody({
       </div>
 
       <div>
-        <h3 className="mb-2 text-sm font-semibold">Confianza aprendida por familia de KPI</h3>
+        <h3 className="mb-2 text-sm font-semibold">
+          Qué tan seguido acierta cada tipo de recomendación
+        </h3>
         {snapshot.family_confidence.length === 0 ? (
           <p className="text-xs text-muted-foreground">
-            Aún no hay resultados observados. La confianza se aprenderá al cerrar recomendaciones
-            con evidencia.
+            Aún no hay resultados. Se aprenderá al cerrar recomendaciones con cifras de antes y
+            después.
           </p>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-xs">
               <thead className="bg-surface-raised text-left text-[10px] uppercase tracking-wide text-muted-foreground">
                 <tr>
-                  <th className="p-2">Métrica</th>
-                  <th className="p-2">Muestra</th>
+                  <th className="p-2">Indicador</th>
+                  <th className="p-2">Casos</th>
                   <th className="p-2">Validadas</th>
                   <th className="p-2">Descartadas</th>
-                  <th className="p-2">Confianza aprendida</th>
-                  <th className="p-2">Fiabilidad</th>
+                  <th className="p-2">Aciertos</th>
+                  <th className="p-2">Qué tan confiable</th>
                 </tr>
               </thead>
               <tbody>
@@ -1434,8 +1510,7 @@ function ValidationLoopBody({
       </div>
 
       <p className="text-[11px] text-muted-foreground">
-        Contrato v{snapshot.contract_version} · Estado actualizado a partir del historial de cambios
-        del recorrido del visitante.
+        Se actualiza con el historial de cada recomendación.
       </p>
     </div>
   );
@@ -1449,7 +1524,7 @@ function RecommendationLifecycleCard({ r }: { r: RecommendationRecord }) {
         <div className="min-w-0">
           <p className="truncate text-xs font-semibold">{r.recommendation_id}</p>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
-            <code>{r.metric_id}</code> · <code>{r.transition}</code>
+            {metricLabel(r.metric_id)} · {transitionLabel(r.transition)}
           </p>
         </div>
         <span
@@ -1477,10 +1552,10 @@ function RecommendationLifecycleCard({ r }: { r: RecommendationRecord }) {
       </ol>
       {r.latest_outcome ? (
         <p className="mt-2 text-[11px] text-muted-foreground">
-          Evidencia: {r.latest_outcome.kpi_before.toFixed(3)} →{" "}
+          Antes {r.latest_outcome.kpi_before.toFixed(3)} → después{" "}
           {r.latest_outcome.kpi_after.toFixed(3)} (
           {(r.latest_outcome.delta_relative * 100).toFixed(1)}%){" "}
-          {r.latest_outcome.transition_advanced ? "· transición avanzada" : ""}
+          {r.latest_outcome.transition_advanced ? "· el paso mejoró" : ""}
         </p>
       ) : null}
     </li>
@@ -1496,7 +1571,7 @@ function FamilyRow({ f }: { f: FamilyLearningSignal }) {
         : "bg-muted text-muted-foreground";
   return (
     <tr className="border-t border-border">
-      <td className="p-2 font-mono text-[11px]">{f.metric_id}</td>
+      <td className="p-2 text-[11px]">{metricLabel(f.metric_id)}</td>
       <td className="p-2">{f.sample_size}</td>
       <td className="p-2 text-success">{f.validated}</td>
       <td className="p-2 text-destructive">{f.discarded}</td>
@@ -1507,7 +1582,7 @@ function FamilyRow({ f }: { f: FamilyLearningSignal }) {
             "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide " + badge
           }
         >
-          {f.reliability === "insufficient_data" ? "muestra insuficiente" : f.reliability}
+          {reliabilityLabel(f.reliability)}
         </span>
       </td>
     </tr>

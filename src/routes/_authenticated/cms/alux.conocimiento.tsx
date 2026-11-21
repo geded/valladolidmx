@@ -211,18 +211,19 @@ function AluxKnowledgePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Alux · Ola A2</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Alux</p>
         <h1 className="text-3xl font-serif">Base de conocimiento</h1>
         <p className="text-muted-foreground max-w-2xl">
-          Entradas curadas del Oriente Maya que Alux usa para responder con contexto real (cultura,
-          clima, transporte, gastronomía, FAQs). Publicar genera automáticamente el embedding.
+          Información revisada del Oriente Maya que Alux usa para responder con datos reales
+          (cultura, clima, transporte, gastronomía, preguntas frecuentes). Al publicar una entrada,
+          Alux la aprende automáticamente.
         </p>
         <div className="flex gap-2 pt-2 flex-wrap">
           <Badge variant="secondary">{stats.total} entradas</Badge>
           <Badge>{stats.published} publicadas</Badge>
-          <Badge variant="outline">{stats.embedded} con embedding</Badge>
+          <Badge variant="outline">{stats.embedded} ya aprendidas por Alux</Badge>
           <Badge variant="outline">
-            {stats.translated}/{stats.expected} traducciones IA
+            {stats.translated}/{stats.expected} traducciones automáticas
           </Badge>
         </div>
       </header>
@@ -281,7 +282,7 @@ function AluxKnowledgePage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="draft">Borrador</SelectItem>
-                    <SelectItem value="published">Publicada (genera embedding)</SelectItem>
+                    <SelectItem value="published">Publicada (Alux la aprende)</SelectItem>
                     <SelectItem value="archived">Archivada</SelectItem>
                   </SelectContent>
                 </Select>
@@ -294,12 +295,12 @@ function AluxKnowledgePage() {
                 value={draft.summary}
                 rows={2}
                 onChange={(e) => setDraft({ ...draft, summary: e.target.value })}
-                placeholder="Resumen breve; si existe, se usa como snippet inyectado al prompt."
+                placeholder="Resumen breve; si existe, Alux lee esto primero al responder."
               />
             </div>
 
             <div>
-              <Label>Cuerpo (Markdown)</Label>
+              <Label>Texto completo</Label>
               <Textarea
                 value={draft.body}
                 rows={12}
@@ -310,7 +311,7 @@ function AluxKnowledgePage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Etiquetas (coma-separadas)</Label>
+                <Label>Etiquetas (separadas por comas)</Label>
                 <Input
                   value={draft.tags}
                   onChange={(e) => setDraft({ ...draft, tags: e.target.value })}
@@ -377,11 +378,11 @@ function AluxKnowledgePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                    Traducciones (RAG multilingüe)
+                    Traducciones
                   </Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    ES es la fuente canónica. Los otros idiomas se generan con IA y quedan como
-                    borrador editorial hasta que las revises.
+                    El español es el texto original. Los otros idiomas se traducen con IA y quedan
+                    como borrador hasta que los revises.
                   </p>
                 </div>
                 <Button
@@ -438,7 +439,7 @@ function AluxKnowledgePage() {
                         )}
                         {state === "no-emb" && (
                           <Badge variant="outline" className="text-[10px]">
-                            sin embedding
+                            Alux aún no la aprende
                           </Badge>
                         )}
                       </div>
@@ -486,7 +487,7 @@ function AluxKnowledgePage() {
         <div className="space-y-4">
           <div className="rounded-2xl border bg-card p-4 space-y-2">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-              Probar retrieval
+              Probar qué encuentra Alux
             </Label>
             <div className="flex gap-2">
               <Input

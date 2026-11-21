@@ -15,7 +15,7 @@ function AdminActivityPage() {
       scope="admin"
       eyebrow="Centro de actividad inteligente"
       title="Actividad administrativa"
-      description="Feed unificado de eventos transaccionales, operativos, de seguridad y alertas del sistema, priorizado por severidad."
+      description="Todo lo que pasa en la plataforma en un solo lugar: reservaciones, pagos, mensajes, casos del concierge, seguridad y alertas, con lo más urgente primero."
     />
   );
 }

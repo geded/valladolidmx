@@ -75,14 +75,15 @@ function ObservabilityPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           Observabilidad
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Observabilidad y Hardening</h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Salud del sitio y ventas</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Paneles técnicos y de negocio de la plataforma. Toda la información se presenta de forma
-          agrupada y requiere acceso de administrador verificado.
+          Cuántas personas buscan, arman su viaje, pagan y reservan; qué productos atraen más y si
+          el buscador encuentra lo que la gente pide. Son totales del periodo, sin datos de
+          personas, y sólo los ven administradores.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
           <label className="flex items-center gap-2">
-            <span className="text-muted-foreground">Ventana (días):</span>
+            <span className="text-muted-foreground">Periodo (días):</span>
             <select
               value={days}
               onChange={(e) => setDays(Number(e.target.value))}
@@ -102,15 +103,15 @@ function ObservabilityPage() {
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Embudo de negocio
+          Del interés a la reserva
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-          <Card label="Catálogo (búsquedas)" value={funnel?.searches} />
-          <Card label="Arma tu Viaje" value={funnel?.favorites} />
-          <Card label="Carrito" value={funnel?.carts} />
+          <Card label="Búsquedas" value={funnel?.searches} />
+          <Card label="Agregados a Arma tu Viaje" value={funnel?.favorites} />
+          <Card label="En carrito" value={funnel?.carts} />
           <Card label="Pago iniciado" value={funnel?.payments} />
           <Card label="Reserva confirmada" value={funnel?.confirmed} highlight />
-          <Card label="Leads generados" value={funnel?.leads} muted />
+          <Card label="Contactos recibidos" value={funnel?.leads} muted />
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground">
           Conteos absolutos en la ventana. Conversión = etapa siguiente / anterior.
@@ -120,7 +121,7 @@ function ObservabilityPage() {
       <section>
         <div className="flex items-end justify-between gap-3">
           <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Catálogo · Top productos
+            Productos más populares
           </h2>
           <div className="flex gap-1 text-xs">
             {(Object.keys(KIND_LABELS) as TopProductKind[]).map((k) => (
@@ -146,7 +147,7 @@ function ObservabilityPage() {
               <tr>
                 <th className="px-3 py-2">Producto</th>
                 <th className="px-3 py-2">Empresa</th>
-                <th className="px-3 py-2 text-right">Métrica</th>
+                <th className="px-3 py-2 text-right">Veces</th>
               </tr>
             </thead>
             <tbody>
@@ -171,21 +172,21 @@ function ObservabilityPage() {
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Búsqueda · Salud técnica
+          ¿El buscador encuentra lo que piden?
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card label="Total búsquedas" value={search?.total} />
-          <Card label="Zero results" value={search?.zero_results} />
-          <Card label="Tasa zero (%)" value={search?.zero_results_rate} />
+          <Card label="Búsquedas sin resultados" value={search?.zero_results} />
+          <Card label="% sin resultados" value={search?.zero_results_rate} />
           <Card
-            label="p50 / p95 (ms)"
+            label="Tiempo normal / más lento (ms)"
             value={search ? `${search.p50_ms} / ${search.p95_ms}` : undefined}
           />
         </div>
         {search && search.top_zero_terms.length > 0 && (
           <div className="mt-4 rounded-xl border border-border p-3 text-xs">
             <p className="font-semibold uppercase tracking-wide text-muted-foreground">
-              Top términos sin resultados
+              Lo más buscado que no encontró nada
             </p>
             <ul className="mt-2 flex flex-wrap gap-2">
               {search.top_zero_terms.map((t) => (

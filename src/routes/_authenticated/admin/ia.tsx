@@ -19,31 +19,36 @@ export const Route = createFileRoute("/_authenticated/admin/ia")({
 function AdminIaHub() {
   return (
     <AdminHub
-      eyebrow="Panel Fundador · 15.10.4R"
+      eyebrow="Panel del fundador"
       title="Inteligencia (Alux)"
-      description="Acceso operativo a las capacidades de Alux Intelligence ya disponibles. Esta superficie solo orquesta; las funciones de IA viven en sus módulos."
-      domains={["Alux Intelligence", "UNC", "Experience Builder"]}
+      description="Accesos rápidos a Alux y al registro de actividad. Desde aquí sólo se llega a cada sección; cada una tiene sus propios ajustes."
+      domains={["Alux", "Avisos y actividad", "Constructor de páginas"]}
       sections={[
         {
           title: "Conversación con Alux",
-          links: [{ to: "/alux", label: "Alux Concierge", description: "Asistente IA público." }],
+          links: [
+            {
+              to: "/alux",
+              label: "Alux Concierge",
+              description: "El concierge que ven los viajeros.",
+            },
+          ],
         },
         {
-          title: "Feed inteligente",
+          title: "Registro de actividad",
           description:
-            "Feed estructurado que consume Alux para razonar sobre la actividad del sistema.",
+            "Lo que pasa en la plataforma (reservas, pagos, mensajes, alertas). Alux también lo lee para entender qué está ocurriendo.",
           links: [
-            { to: "/cms/actividad", label: "Activity Center (admin)" },
-            { to: "/portal/actividad", label: "Activity Center (empresa)" },
-            { to: "/cuenta/actividad", label: "Activity Center (viajero)" },
+            { to: "/cms/actividad", label: "Actividad (administración)" },
+            { to: "/portal/actividad", label: "Actividad (empresa)" },
+            { to: "/cuenta/actividad", label: "Actividad (viajero)" },
           ],
         },
       ]}
       footer={
         <p className="text-[11px] text-muted-foreground">
-          Capacidades diferidas a olas posteriores (Embeddings Queue, AI Prompts panel, AI Usage
-          Log) están documentadas como deuda en la Matriz de Trazabilidad 15.10.4R y no forman parte
-          del alcance de esta superficie.
+          Más adelante se sumarán aquí otras herramientas de inteligencia artificial (por ejemplo,
+          el consumo de IA). Ya están anotadas como pendientes.
         </p>
       }
     />
