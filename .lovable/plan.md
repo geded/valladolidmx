@@ -30,6 +30,20 @@ Adaptado al Oriente Maya:
   - **Todo lo demás** (hoteles, restaurantes, transporte, tours, paquetes y viajes completos) no tiene precio. Alux nunca da ni inventa precios: lo agrega al viaje y lo pasa al concierge, que busca los mejores precios y arma la propuesta.
 - **Bitácora de casos (R-xx):** cada error real que corrijas se convierte en una regla con fecha y con su prueba, como en Zazil.
 
+## 1b. Que platique como persona (reglas de Zazil que se heredan)
+
+Se copian las reglas de conversación que Zazil ya corrigió con casos reales. Solo se dejan fuera las que son propias de su negocio (menús, bodas, vocabulario del cenote).
+
+- **Idioma fijo:** contesta en el idioma en que le escriben y no lo cambia a mitad de la plática, aunque el catálogo esté en español (casos Miguel Segura y Jolanda, R-23 y R-88). El concierge ve la plática con «Ver en español».
+- **No olvida nombres ni datos:** guarda nombre, fechas, personas, con quién viaja y lo que eligió. Nunca vuelve a preguntar algo que ya le dijeron; si la respuesta fue parcial, pregunta solo lo que falta (R-57, R-75, «No pierdas el hilo»).
+- **Usa el nombre con naturalidad:** no lo repite en mensajes seguidos y nunca comenta ni bromea sobre él (R-64).
+- **Memoria entre canales:** si la persona pasa de la web a WhatsApp, o regresa días después, Alux retoma donde se quedaron, sin empezar de cero.
+- **Saludo que varía:** el primer mensaje suena humano y cambia cada vez sin perder la identidad de Alux; si llegan varios mensajes seguidos, los contesta juntos (R-28 y R-76).
+- **Nunca «no te entendí»** cuando el mensaje es claro (R-102).
+- **Tono:** sobrio, cálido y breve. Sin euforia («¡qué maravilla!»), máximo un signo de admiración, casi sin emojis, sin negritas ni viñetas en la plática, como se escribe por WhatsApp. Una pregunta por mensaje y no repite explicaciones.
+- **Mensajes ya configurados en Zazil:** se toman como punto de partida para los saludos, la petición de nombre y WhatsApp, el pase al concierge y los recordatorios, adaptados al Oriente Maya. Se editan desde Reglas de venta.
+- Cada una de estas reglas lleva su prueba automática, para que no se pierda al hacer cambios.
+
 ## 2. Panel del concierge (como tus capturas)
 
 **Dónde vive cada cosa (sin duplicar pantallas que ya existen)**
@@ -152,6 +166,7 @@ Cada fase se aprueba por separado. Nada se publica sin tu visto bueno.
 
 - **Tablas:** `concierge_prospects` (campos de `alux_leads` + `temperature`, `destination_slug`, `linked_user_id`, `travel_plan_id`) y `concierge_prospect_sales`. El pase a asesor se agrega a las conversaciones de Alux existentes, sin tabla paralela. Avisos sobre `notifications` y el push existente. RLS para concierge, líder y admin.
 - **Reglas en base:** trigger de etapa cerrada, conciliación de venta (`partial`/`paid`, búsqueda única y diagnóstico cuando hay duda), cron de rescate (100 por minuto) y reapertura de perdidos.
+- **Conversación:** el idioma detectado y los datos dados (nombre, fechas, personas, acompañantes) se guardan en el prospecto y se inyectan en cada turno; se migran como bloques R-xx los casos R-23, R-28, R-57, R-64, R-75, R-76, R-88 y R-102 de Zazil con su prueba.
 - **Alux:** se reutilizan `converse-retrieval.server.ts` y `canonical-catalog.server.ts`. Se añaden bloques de reglas por jerarquía y un registro de reglas R-xx con pruebas. La regla «no pidas datos personales» se sustituye por «contacto antes de cerrar». El modelo nunca recibe teléfono ni correo; el servidor los guarda aparte.
 - **WhatsApp:** puerto `src/lib/crm/channel/*`; adaptador activo Evolution API (Baileys/QR) en el servidor de Railway de Zazil, con instancias `vmx-*` y tablas propias `crm_whatsapp_lines` y `crm_whatsapp_line_events`. Secretos `EVOLUTION_API_URL` y `EVOLUTION_API_KEY` (los da el Founder) y `EVOLUTION_WEBHOOK_TOKEN` generado. Webhook `/api/public/whatsapp/evolution?t=` comparado en tiempo constante; administración de líneas solo para admin (crear, QR, estado, desvincular). El adaptador oficial de Meta queda preparado, no activo. Bandeja de mensajes idempotente por id y candado de una respuesta por plática.
 - **Traspaso:** el pre-expediente vive en `concierge_prospects` (`trip_brief` jsonb + `trip_items` jsonb con snapshots + `handoff_summary`). Al registrarse se reutiliza `cc_case_create_from_plan(_summary, _items, _travel_plan_id)` con un plan `shared_with_concierge`, luego `cc_case_assign` al concierge del prospecto, `concierge_case_links` (`link_type` prospect/conversation) y `cc_timeline_append`. `concierge_cases.traveler_user_id` es obligatorio, así que no hay expediente sin cuenta. Enlace firmado de un solo uso con el id del prospecto. Al confirmar la cuenta se crean `travel_plans` (`source` Alux/WhatsApp, `meta.prospect_id`) con sus `travel_plan_items` y un `concierge_cases` con `summary` = ficha de traspaso generada por Alux desde la conversación (sin inventar datos), y el concierge responsable como participante.
