@@ -50,6 +50,13 @@
       "when": 1795271913488,
       "tag": "0006_visitor_intel_simulation_rpcs",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795289208953,
+      "tag": "0007_crm_prospects_phase1",
+      "breakpoints": true
     }
   ]
 }

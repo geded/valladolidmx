@@ -58,6 +58,7 @@ import {
 import { useAnonymousTrip, type AnonymousItemKind } from "@/lib/traveler/anonymous-draft";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { AluxMark } from "@/components/alux/AluxMark";
+import { AluxProspectContactCard } from "@/components/alux/AluxProspectContactCard";
 import {
   AluxReviewSummaryCard,
   AluxReviewSummaryToggle,
@@ -120,6 +121,20 @@ function clearThread(): void {
   }
 }
 
+/** CRM Prospectos: la persona ya dejó sus datos en este equipo (sólo su nombre). */
+const PROSPECT_CONTACT_KEY = "alux_prospect_contact:v1";
+
+function loadSavedContactName(): string | null {
+  try {
+    const raw = window.localStorage.getItem(PROSPECT_CONTACT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { firstName?: unknown };
+    return typeof parsed.firstName === "string" ? parsed.firstName : null;
+  } catch {
+    return null;
+  }
+}
+
 function newId(): string {
   return typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
     ? crypto.randomUUID()
@@ -175,12 +190,15 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
   const [status, setStatus] = useState<"idle" | "thinking" | "error">("idle");
   const [hydrated, setHydrated] = useState(false);
   const [liveNote, setLiveNote] = useState("");
+  const [contactName, setContactName] = useState<string | null>(null);
+  const [dismissedOffer, setDismissedOffer] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
 
   // Carga del hilo y de la clave de sesión sólo en el navegador.
   useEffect(() => {
     setSessionKey(ensureAluxSessionKey());
+    setContactName(loadSavedContactName());
     const stored = loadThread();
     if (stored) {
       setMessages(stored.messages);
@@ -447,6 +465,17 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
   });
 
   const starters = props.starters ?? defaultStarters(props.destination?.label ?? null);
+  // Tarjeta de contacto: sólo en la última respuesta que la ofreció.
+  const offerMessageId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg?.role === "assistant" && msg.response?.contactOffer) {
+        return msg.id === dismissedOffer ? null : msg.id;
+      }
+    }
+    return null;
+  }, [messages, dismissedOffer]);
+
   const thinking = status === "thinking";
   const planBlocked = isAuthed && (isPlanPending || isPlanError);
   const titleById = useMemo(
@@ -553,6 +582,40 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
                 applyingOrder={reorderMutation.isPending}
                 coords={props.coords}
               />
+              {m.id === offerMessageId && !isAuthed && !contactName && sessionKey ? (
+                <div className="mt-2">
+                  <AluxProspectContactCard
+                    sessionKey={sessionKey}
+                    reason={m.response!.contactOffer!.reason}
+                    {...(props.locale ? { locale: props.locale } : {})}
+                    destinationSlug={props.destination?.slug ?? null}
+                    trip={{
+                      items: tripItems.map((it) => ({
+                        kind: it.kind,
+                        targetId: it.targetId ?? null,
+                        title: it.title ?? null,
+                      })),
+                      partySize: tripMeta?.partySize ?? null,
+                      startDate: tripMeta?.startDate ?? null,
+                      endDate: tripMeta?.endDate ?? null,
+                      durationDays: tripMeta?.durationDays ?? null,
+                      interests: tripMeta?.interests ?? [],
+                    }}
+                    onSaved={(firstName) => {
+                      try {
+                        window.localStorage.setItem(
+                          PROSPECT_CONTACT_KEY,
+                          JSON.stringify({ firstName, at: new Date().toISOString() }),
+                        );
+                      } catch {
+                        /* sin almacenamiento: la plática ya quedó ligada en el servidor */
+                      }
+                      window.setTimeout(() => setContactName(firstName), 6000);
+                    }}
+                    onDismiss={() => setDismissedOffer(m.id)}
+                  />
+                </div>
+              ) : null}
             </div>
           ),
         )}

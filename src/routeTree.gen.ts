@@ -220,6 +220,7 @@ import { Route as AuthenticatedCmsVisitorIntelDecisionsRouteImport } from './rou
 import { Route as AuthenticatedCmsZonasIndexRouteImport } from './routes/_authenticated/cms/zonas.index'
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
+import { Route as AuthenticatedConciergeProspectosIndexRouteImport } from './routes/_authenticated/concierge/prospectos.index'
 import { Route as AuthenticatedConciergeReservacionesOrderIdRouteImport } from './routes/_authenticated/concierge/reservaciones.$orderId'
 import { Route as AuthenticatedCuentaCheckoutOrderIdRouteImport } from './routes/_authenticated/cuenta/checkout.$orderId'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
@@ -1469,6 +1470,12 @@ const AuthenticatedConciergeExpedientesCaseIdRoute =
     path: '/expedientes/$caseId',
     getParentRoute: () => AuthenticatedConciergeRouteRoute,
   } as any)
+const AuthenticatedConciergeProspectosIndexRoute =
+  AuthenticatedConciergeProspectosIndexRouteImport.update({
+    id: '/prospectos/',
+    path: '/prospectos/',
+    getParentRoute: () => AuthenticatedConciergeRouteRoute,
+  } as any)
 const AuthenticatedConciergeReservacionesOrderIdRoute =
   AuthenticatedConciergeReservacionesOrderIdRouteImport.update({
     id: '/$orderId',
@@ -2021,6 +2028,7 @@ export interface FileRoutesByFullPath {
   '/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/cms/rutas/': typeof AuthenticatedCmsRutasIndexRoute
   '/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
+  '/concierge/prospectos/': typeof AuthenticatedConciergeProspectosIndexRoute
   '/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/portal/resenas/': typeof AuthenticatedPortalResenasIndexRoute
@@ -2274,6 +2282,7 @@ export interface FileRoutesByTo {
   '/cms/reviews': typeof AuthenticatedCmsReviewsIndexRoute
   '/cms/rutas': typeof AuthenticatedCmsRutasIndexRoute
   '/cms/zonas': typeof AuthenticatedCmsZonasIndexRoute
+  '/concierge/prospectos': typeof AuthenticatedConciergeProspectosIndexRoute
   '/portal/empresas': typeof AuthenticatedPortalEmpresasIndexRoute
   '/portal/invitaciones': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/portal/resenas': typeof AuthenticatedPortalResenasIndexRoute
@@ -2541,6 +2550,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/reviews/': typeof AuthenticatedCmsReviewsIndexRoute
   '/_authenticated/cms/rutas/': typeof AuthenticatedCmsRutasIndexRoute
   '/_authenticated/cms/zonas/': typeof AuthenticatedCmsZonasIndexRoute
+  '/_authenticated/concierge/prospectos/': typeof AuthenticatedConciergeProspectosIndexRoute
   '/_authenticated/portal/empresas/': typeof AuthenticatedPortalEmpresasIndexRoute
   '/_authenticated/portal/invitaciones/': typeof AuthenticatedPortalInvitacionesIndexRoute
   '/_authenticated/portal/resenas/': typeof AuthenticatedPortalResenasIndexRoute
@@ -2808,6 +2818,7 @@ export interface FileRouteTypes {
     | '/cms/reviews/'
     | '/cms/rutas/'
     | '/cms/zonas/'
+    | '/concierge/prospectos/'
     | '/portal/empresas/'
     | '/portal/invitaciones/'
     | '/portal/resenas/'
@@ -3061,6 +3072,7 @@ export interface FileRouteTypes {
     | '/cms/reviews'
     | '/cms/rutas'
     | '/cms/zonas'
+    | '/concierge/prospectos'
     | '/portal/empresas'
     | '/portal/invitaciones'
     | '/portal/resenas'
@@ -3327,6 +3339,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/reviews/'
     | '/_authenticated/cms/rutas/'
     | '/_authenticated/cms/zonas/'
+    | '/_authenticated/concierge/prospectos/'
     | '/_authenticated/portal/empresas/'
     | '/_authenticated/portal/invitaciones/'
     | '/_authenticated/portal/resenas/'
@@ -4955,6 +4968,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteImport
       parentRoute: typeof AuthenticatedConciergeRouteRoute
     }
+    '/_authenticated/concierge/prospectos/': {
+      id: '/_authenticated/concierge/prospectos/'
+      path: '/prospectos'
+      fullPath: '/concierge/prospectos/'
+      preLoaderRoute: typeof AuthenticatedConciergeProspectosIndexRouteImport
+      parentRoute: typeof AuthenticatedConciergeRouteRoute
+    }
     '/_authenticated/concierge/reservaciones/$orderId': {
       id: '/_authenticated/concierge/reservaciones/$orderId'
       path: '/$orderId'
@@ -5414,6 +5434,7 @@ interface AuthenticatedConciergeRouteRouteChildren {
   AuthenticatedConciergeReservacionesRoute: typeof AuthenticatedConciergeReservacionesRouteWithChildren
   AuthenticatedConciergeIndexRoute: typeof AuthenticatedConciergeIndexRoute
   AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
+  AuthenticatedConciergeProspectosIndexRoute: typeof AuthenticatedConciergeProspectosIndexRoute
 }
 
 const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRouteChildren =
@@ -5428,6 +5449,8 @@ const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRoute
     AuthenticatedConciergeIndexRoute: AuthenticatedConciergeIndexRoute,
     AuthenticatedConciergeExpedientesCaseIdRoute:
       AuthenticatedConciergeExpedientesCaseIdRouteWithChildren,
+    AuthenticatedConciergeProspectosIndexRoute:
+      AuthenticatedConciergeProspectosIndexRoute,
   }
 
 const AuthenticatedConciergeRouteRouteWithChildren =

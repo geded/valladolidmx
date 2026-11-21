@@ -401,6 +401,9 @@ export type Database = {
       }
       alux_public_sessions: {
         Row: {
+          contact_capture_count: number
+          contact_offer_count: number
+          contact_offer_last_message_count: number | null
           created_at: string
           destination_visit_count: number
           first_seen_at: string
@@ -414,6 +417,7 @@ export type Database = {
           last_signals: Json | null
           last_spatial_state: string | null
           message_count: number
+          prospect_id: string | null
           session_key: string
           summary: string | null
           summary_message_count: number
@@ -424,6 +428,9 @@ export type Database = {
           visited_destinations: Json
         }
         Insert: {
+          contact_capture_count?: number
+          contact_offer_count?: number
+          contact_offer_last_message_count?: number | null
           created_at?: string
           destination_visit_count?: number
           first_seen_at?: string
@@ -437,6 +444,7 @@ export type Database = {
           last_signals?: Json | null
           last_spatial_state?: string | null
           message_count?: number
+          prospect_id?: string | null
           session_key: string
           summary?: string | null
           summary_message_count?: number
@@ -447,6 +455,9 @@ export type Database = {
           visited_destinations?: Json
         }
         Update: {
+          contact_capture_count?: number
+          contact_offer_count?: number
+          contact_offer_last_message_count?: number | null
           created_at?: string
           destination_visit_count?: number
           first_seen_at?: string
@@ -460,6 +471,7 @@ export type Database = {
           last_signals?: Json | null
           last_spatial_state?: string | null
           message_count?: number
+          prospect_id?: string | null
           session_key?: string
           summary?: string | null
           summary_message_count?: number
@@ -469,7 +481,15 @@ export type Database = {
           visited_categories?: Json
           visited_destinations?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "alux_public_sessions_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       alux_settings: {
         Row: {
@@ -2938,6 +2958,131 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      concierge_prospect_events: {
+        Row: {
+          actor_user_id: string | null
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          meta: Json
+          prospect_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          meta?: Json
+          prospect_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          meta?: Json
+          prospect_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_prospect_events_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concierge_prospects: {
+        Row: {
+          assigned_concierge_user_id: string | null
+          capture_reason: string | null
+          consent_at: string
+          consent_contact: boolean
+          consent_text: string
+          created_at: string
+          destination_slug: string | null
+          email: string | null
+          first_name: string
+          handoff_summary: string | null
+          id: string
+          language: string
+          last_activity_at: string
+          linked_user_id: string | null
+          lost_reason: string | null
+          next_followup_at: string | null
+          phone_e164: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string
+          stage: string
+          temperature: string
+          travel_plan_id: string | null
+          trip_brief: Json
+          trip_items: Json
+          updated_at: string
+        }
+        Insert: {
+          assigned_concierge_user_id?: string | null
+          capture_reason?: string | null
+          consent_at?: string
+          consent_contact: boolean
+          consent_text: string
+          created_at?: string
+          destination_slug?: string | null
+          email?: string | null
+          first_name: string
+          handoff_summary?: string | null
+          id?: string
+          language?: string
+          last_activity_at?: string
+          linked_user_id?: string | null
+          lost_reason?: string | null
+          next_followup_at?: string | null
+          phone_e164: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          stage?: string
+          temperature?: string
+          travel_plan_id?: string | null
+          trip_brief?: Json
+          trip_items?: Json
+          updated_at?: string
+        }
+        Update: {
+          assigned_concierge_user_id?: string | null
+          capture_reason?: string | null
+          consent_at?: string
+          consent_contact?: boolean
+          consent_text?: string
+          created_at?: string
+          destination_slug?: string | null
+          email?: string | null
+          first_name?: string
+          handoff_summary?: string | null
+          id?: string
+          language?: string
+          last_activity_at?: string
+          linked_user_id?: string | null
+          lost_reason?: string | null
+          next_followup_at?: string | null
+          phone_e164?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          stage?: string
+          temperature?: string
+          travel_plan_id?: string | null
+          trip_brief?: Json
+          trip_items?: Json
+          updated_at?: string
+        }
+        Relationships: []
       }
       concierge_quotes: {
         Row: {
@@ -9012,6 +9157,25 @@ export type Database = {
             }
             Returns: string
           }
+      crm_capture_prospect: {
+        Args: {
+          _consent_text: string
+          _destination_slug: string
+          _first_name: string
+          _language: string
+          _phone_e164: string
+          _reason: string
+          _session_key: string
+          _trip_brief: Json
+          _trip_items: Json
+        }
+        Returns: {
+          is_new: boolean
+          prospect_id: string
+          reopened: boolean
+        }[]
+      }
+      crm_is_prospect_staff: { Args: { _user_id: string }; Returns: boolean }
       cron_hooks_bootstrap_secret: { Args: { _value: string }; Returns: Json }
       cron_hooks_get_secret: { Args: never; Returns: string }
       cron_hooks_invoke: {

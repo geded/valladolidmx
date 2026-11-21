@@ -19,6 +19,7 @@
  *  · Las acciones son PROPUESTAS: guardar/quitar exige interacción explícita.
  */
 import { z } from "zod";
+import type { ContactOfferReason } from "@/lib/crm/prospect-rules";
 import type { TravelItemKind } from "@/lib/traveler/travel-plans.functions";
 
 export const ALUX_CONVERSE_CONTRACT_VERSION = "1.0.0" as const;
@@ -295,6 +296,11 @@ export interface AluxConverseResponse {
   readonly latencyMs: number;
   readonly rateLimited: boolean;
   readonly audit: AluxConverseAudit;
+  /**
+   * CRM Prospectos (Fase 1): cuándo la interfaz ofrece dejar nombre y
+   * WhatsApp. Opcional y aditivo: nunca bloquea la respuesta.
+   */
+  readonly contactOffer?: { readonly reason: ContactOfferReason } | null;
 }
 
 /* ─────────────────────────── Salida del modelo (validada en servidor) ─────────────────────────── */
