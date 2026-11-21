@@ -469,7 +469,7 @@
 
 ## Memoria de la app al seguir rutas · 2026-11-21
 
-- [ ] Medir cuánta memoria usa la app (y espacio en el teléfono) con una ruta abierta y Mi Viaje; revisar qué pasa con rutas guardadas sin señal. Solo diagnóstico.
-- [ ] Requisito Founder: el viajero debe ver su itinerario una vez que el concierge le armó el viaje (también sin señal). Autorizado «Copia con documentos»: itinerario + reservas + documentos del viaje en el teléfono, solo lectura, se borra al cerrar sesión; sin pagos.
+- [x] Medido: 9–18 MB por página, ~32 MB guardados en el teléfono; rutas ya abiertas se ven sin señal.
+- [x] Itinerario del concierge sin señal («Copia con documentos»): itinerario, expediente, reservas y documentos en el teléfono, solo lectura, sin pagos, borrado al cerrar sesión. Probado en vista previa con la cuenta demo VMX-DEMO01 simulando sin señal y acceso vencido. Pendiente: publicar y probar en iPhone real en modo avión.
 - [x] Memoria de rutas: el mapa compartido libera mapa, pines y trazos al salir (autorizado). Vista previa: 20 cambios entre rutas 29.9→32.4 MB (antes 16→40 MB publicado).
-- [ ] Hallazgo: la app guarda en el teléfono respuestas de datos con sesión (lecturas GET) en la memoria sin señal, aunque la regla dice no guardar nada de la cuenta. Revisar junto con el itinerario sin señal.
+- [x] Las lecturas con sesión ya no se guardan en la caché compartida sin señal (solo en la copia por cuenta de Mi Viaje).

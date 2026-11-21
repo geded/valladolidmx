@@ -172,6 +172,24 @@ export function clearOfflineDocuments(orderId: string) {
   }
 }
 
+/** Borra todas las copias de documentos del teléfono (al cerrar sesión). */
+export function clearAllOfflineDocuments() {
+  const store = storage();
+  if (!store) return;
+  const keys: string[] = [];
+  for (let i = 0; i < store.length; i += 1) {
+    const key = store.key(i);
+    if (key && key.startsWith(PREFIX)) keys.push(key);
+  }
+  for (const key of keys) {
+    try {
+      store.removeItem(key);
+    } catch {
+      /* ignorado */
+    }
+  }
+}
+
 /** Texto del código QR del voucher: identifica el folio, sin datos personales. */
 export function tripQrPayload(folio: string): string {
   return `VMX:${folio}`;

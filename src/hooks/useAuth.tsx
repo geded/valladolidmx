@@ -14,8 +14,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Session, User } from "@supabase/supabase-js";
+import { isAuthRetryableFetchError, type Session, type User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { readStoredSessionWhileOffline } from "@/lib/traveler/offline-session";
+import { clearOfflineTripCopy } from "@/lib/traveler/offline-trip-copy";
+import { clearAllOfflineDocuments } from "@/lib/traveler/offline-documents";
 import { ROLE_PRIORITY, type AppRole, type AuthUserShape } from "@/types/auth";
 
 interface ProfileRow {
@@ -79,16 +82,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    /* Sin señal la sesión vencida no puede renovarse: se reconoce la cuenta
+       guardada en el teléfono para que el viajero vea su copia de Mi Viaje. */
+    const isOffline = () => typeof navigator !== "undefined" && navigator.onLine === false;
+    const resolveSession = async (): Promise<{ session: Session | null; offlineCopy: boolean }> => {
+      const pending = supabase.auth.getSession();
+      // Sin señal no se espera la renovación del acceso (reintenta hasta 30 s).
+      const result = isOffline()
+        ? await Promise.race([
+            pending,
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
+          ])
+        : await pending;
+      if (result?.data.session) return { session: result.data.session, offlineCopy: false };
+      const noSignal = isOffline() || !result || isAuthRetryableFetchError(result.error);
+      const stored = noSignal ? readStoredSessionWhileOffline() : null;
+      return { session: stored, offlineCopy: Boolean(stored) };
+    };
     (async () => {
-      const { data } = await supabase.auth.getSession();
+      const { session: s, offlineCopy } = await resolveSession();
       if (!active) return;
-      setSession(data.session);
-      await loadIdentity(data.session?.user.id ?? null);
+      setSession(s);
+      // Sin señal no se piden perfil ni roles: esperarían la renovación.
+      await loadIdentity(offlineCopy ? null : (s?.user.id ?? null));
       setLoading(false);
     })();
+    /* Al volver la señal, la sesión real reemplaza a la guardada. */
+    const onOnline = () => {
+      void resolveSession().then(({ session: s, offlineCopy }) => {
+        if (!active || offlineCopy) return;
+        setSession(s);
+        void loadIdentity(s?.user.id ?? null);
+      });
+    };
+    if (typeof window !== "undefined") window.addEventListener("online", onOnline);
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      if (event === "SIGNED_OUT") {
+        // La copia de Mi Viaje sin señal nunca sobrevive al cierre de sesión.
+        clearOfflineTripCopy();
+        clearAllOfflineDocuments();
+      }
       setSession(s);
       // Marca identidad en vuelo de inmediato: los consumidores no deben
       // decidir rol/destino con los roles del estado anterior.
@@ -101,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
       sub.subscription.unsubscribe();
+      if (typeof window !== "undefined") window.removeEventListener("online", onOnline);
     };
   }, [loadIdentity]);
 

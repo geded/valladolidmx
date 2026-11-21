@@ -62,6 +62,31 @@ export default defineConfig({
           runtimeCaching: [
             // Rutas sensibles / autenticadas: NUNCA cachear.
             // Se resuelve siempre contra red; sin fallback offline.
+            // 2026-11-21 · Mi Viaje sin señal (Founder: «Copia con documentos»).
+            // El marco de Mi Viaje y de los documentos del viaje no trae datos
+            // de la cuenta (el servidor sólo envía «Verificando sesión…»);
+            // los datos viven en la copia del propio teléfono. Se guarda 45
+            // días, como los documentos sin señal.
+            {
+              urlPattern: ({ request, url, sameOrigin }) =>
+                sameOrigin &&
+                request.mode === "navigate" &&
+                /^\/cuenta\/(?:mi-viaje|documentos\/[^/]+)\/?$/.test(url.pathname),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "traveler-trip-shell-v1",
+                networkTimeoutSeconds: 20,
+                expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 45 },
+                cacheableResponse: { statuses: [200] },
+                plugins: [
+                  {
+                    handlerDidError: async () =>
+                      (await caches.match("/offline.html", { ignoreSearch: true })) ??
+                      Response.error(),
+                  },
+                ],
+              },
+            },
             {
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin &&
@@ -127,8 +152,14 @@ export default defineConfig({
             // pantalla "Sin conexión". Sólo GET de lectura pública; las rutas
             // sensibles siguen en NetworkOnly y nada autenticado se almacena.
             {
+              // 2026-11-21 · Las lecturas con sesión iniciada nunca se guardan
+              // aquí (caché compartida por todas las cuentas del teléfono):
+              // Mi Viaje usa su propia copia por cuenta, borrada al salir.
               urlPattern: ({ url, sameOrigin, request }) =>
-                sameOrigin && request.method === "GET" && url.pathname.startsWith("/_serverFn/"),
+                sameOrigin &&
+                request.method === "GET" &&
+                url.pathname.startsWith("/_serverFn/") &&
+                !request.headers.has("authorization"),
               handler: "NetworkFirst",
               options: {
                 cacheName: "server-data-v1",
@@ -147,7 +178,9 @@ export default defineConfig({
               handler: "CacheFirst",
               options: {
                 cacheName: "built-assets-v1",
-                expiration: { maxEntries: 160, maxAgeSeconds: 60 * 60 * 24 * 30 },
+                // 2026-11-21 · 160 se llenaba con tres páginas y borraba las
+                // piezas de Mi Viaje; los archivos son pequeños y versionados.
+                expiration: { maxEntries: 400, maxAgeSeconds: 60 * 60 * 24 * 30 },
                 cacheableResponse: { statuses: [200] },
               },
             },

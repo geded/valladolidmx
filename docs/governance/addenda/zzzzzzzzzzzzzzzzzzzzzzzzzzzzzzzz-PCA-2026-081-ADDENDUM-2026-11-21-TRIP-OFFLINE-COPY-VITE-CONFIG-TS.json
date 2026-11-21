@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-081-ADDENDUM-2026-11-21-TRIP-OFFLINE-COPY-VITE-CONFIG-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-081",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Me refiero a la memoria que usa la aplicación para funcionar y si un cliente la está usando para seguir su ruta o las rutas guardadas»; «El viajero debe ver su itinerario ya una vez que se le armó su viaje por un concierge»; opción autorizada «Copia con documentos»): Mi Viaje del viajero registrado se ve sin señal con su itinerario, expediente del concierge, reservas y documentos guardados sólo en su teléfono, sólo lectura, sin datos de pago, borrados al cerrar sesión o al entrar otra cuenta y caducados a los 45 días. Las lecturas con sesión ya no se guardan en la caché compartida del sitio. Sin cambiar plantillas, diseño, orden, contenido CMS, datos, pagos, reservaciones, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "vite.config.ts",
+    "previous_sha256": "1d377cd7e35d3d8de15ab630590849932e4e96994077ac88c4a4654942357aca",
+    "current_sha256": "2a833bcd53164d8e6055b5b7c32ffcb22f4eb79aea0a64d947cefbdd7d56fefc",
+    "semantic_change": "El marco de Mi Viaje y de los documentos del viaje (sin datos de la cuenta) se guarda 45 días para abrir sin señal; las lecturas con sesión iniciada ya no se guardan en la caché compartida; el espacio para piezas de la app sube de 160 a 400 para que no se borren las de Mi Viaje.",
+    "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Con señal Mi Viaje lee y se ve igual que antes.",
+    "Pagos, reservaciones, permisos y datos no cambian; nada se publica ni despliega."
+  ],
+  "recorded_at": "2026-11-21"
+}

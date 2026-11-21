@@ -7,10 +7,11 @@
  * sheets se consumen exclusivamente desde el Workspace Engine y los
  * registries oficiales. Sin cambios funcionales (paridad 1:1).
  */
+import { useEffect, useState } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
@@ -19,12 +20,18 @@ import { getProfileModeState } from "@/lib/profile-mode/mode.functions";
 import { WelcomeOnboardingModal } from "@/components/traveler/WelcomeOnboardingModal";
 import { PendingReviewsBanner } from "@/components/traveler/PendingReviewsBanner";
 import { JourneyBackLink } from "@/components/navigation/JourneyBackLink";
+import {
+  connectOfflineTripCopy,
+  isDeviceOffline,
+  seedOfflineTripCopy,
+} from "@/lib/traveler/offline-trip-copy";
 
 export const Route = createFileRoute("/_authenticated/cuenta")({
   component: CuentaWorkspaceRoute,
 });
 
 function CuentaWorkspaceRoute() {
+  useOfflineTripCopy();
   return (
     <WorkspaceProvider initialWorkspaceId="cuenta">
       <WorkspaceShell
@@ -39,6 +46,21 @@ function CuentaWorkspaceRoute() {
       </WorkspaceShell>
     </WorkspaceProvider>
   );
+}
+
+/**
+ * Mi Viaje sin señal: entrega la última copia del viaje guardada en el
+ * teléfono antes de que Mi Viaje lea, y la mantiene al día con señal.
+ */
+function useOfflineTripCopy() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+  useState(() => (userId && isDeviceOffline() ? seedOfflineTripCopy(qc, userId) : 0));
+  useEffect(() => {
+    if (!userId) return;
+    return connectOfflineTripCopy(qc, userId);
+  }, [qc, userId]);
 }
 
 function TravelerOnboardingMount() {

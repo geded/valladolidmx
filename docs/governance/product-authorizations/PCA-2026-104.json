@@ -1,0 +1,78 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-104",
+  "title": "El viajero ve su itinerario, reservas y documentos del concierge sin señal",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Me refiero a la memoria que usa la aplicación para funcionar y si un cliente la está usando para seguir su ruta o las rutas guardadas»; «El viajero debe ver su itinerario ya una vez que se le armó su viaje por un concierge»; opción autorizada «Copia con documentos»): Mi Viaje del viajero registrado se ve sin señal con su itinerario, expediente del concierge, reservas y documentos guardados sólo en su teléfono, sólo lectura, sin datos de pago, borrados al cerrar sesión o al entrar otra cuenta y caducados a los 45 días. Las lecturas con sesión ya no se guardan en la caché compartida del sitio. Sin cambiar plantillas, diseño, orden, contenido CMS, datos, pagos, reservaciones, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/offline-trip-copy.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/offline-session.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/offline-documents.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/hooks/useAuth.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/route.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "vite.config.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/offline-trip-copy.ts",
+      "sha256": "27081b167b01eac8b172a96f7bd5cf8c9b1416460445201af8c6430e96bf31ee",
+      "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/traveler/offline-session.ts",
+      "sha256": "c270a166b09f196ec8c15ee3d07146a8ff9327b1a29f119913d4d9cbbd2963d0",
+      "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/traveler/offline-documents.ts",
+      "sha256": "2215132a69307ab900d8392e696a0170bcfce79dae51df10097ac3830fe659cf",
+      "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/hooks/useAuth.tsx",
+      "sha256": "ad97b656c7759bc7dd508f4b8d5c723c8d30227fb9260101a77cf08452e996a0",
+      "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/route.tsx",
+      "sha256": "29b7ab916ceafab320530c142cfb24a3d8d42e135d724d81eae64851df416859",
+      "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "vite.config.ts",
+      "sha256": "2a833bcd53164d8e6055b5b7c32ffcb22f4eb79aea0a64d947cefbdd7d56fefc",
+      "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+    }
+  ],
+  "public_routes": [
+    "/cuenta/mi-viaje"
+  ],
+  "required_feature_flags": [],
+  "required_tests": []
+}

@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-TRIP-OFFLINE-COPY-SRC-ROUTES-AUTHENTICATED-CUENTA-ROUTE-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Me refiero a la memoria que usa la aplicación para funcionar y si un cliente la está usando para seguir su ruta o las rutas guardadas»; «El viajero debe ver su itinerario ya una vez que se le armó su viaje por un concierge»; opción autorizada «Copia con documentos»): Mi Viaje del viajero registrado se ve sin señal con su itinerario, expediente del concierge, reservas y documentos guardados sólo en su teléfono, sólo lectura, sin datos de pago, borrados al cerrar sesión o al entrar otra cuenta y caducados a los 45 días. Las lecturas con sesión ya no se guardan en la caché compartida del sitio. Sin cambiar plantillas, diseño, orden, contenido CMS, datos, pagos, reservaciones, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cuenta/route.tsx",
+    "previous_sha256": "57069280a2033dd868e479de9d746544c6e1e6f083c65c4b8523ddff86cd48b4",
+    "current_sha256": "29b7ab916ceafab320530c142cfb24a3d8d42e135d724d81eae64851df416859",
+    "semantic_change": "La cuenta entrega a Mi Viaje la copia del viaje guardada en el teléfono cuando falta señal y la mantiene al día con cada lectura real. Sin cambios de diseño, orden ni navegación.",
+    "authority": "Founder · itinerario del concierge sin señal · 2026-11-21"
+  },
+  "invariants": [
+    "Las plantillas conservan estructura, orden, contenido CMS, Mi Viaje, Alux, header y footer.",
+    "Con señal Mi Viaje lee y se ve igual que antes.",
+    "Pagos, reservaciones, permisos y datos no cambian; nada se publica ni despliega."
+  ],
+  "recorded_at": "2026-11-21"
+}
