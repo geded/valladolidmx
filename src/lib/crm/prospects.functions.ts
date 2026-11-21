@@ -82,7 +82,7 @@ export const submitAluxProspectContact = createServerFn({ method: "POST" })
       _phone_e164: phone,
       _language: data.locale ?? "es",
       _reason: data.reason ?? "followup",
-      _destination_slug: data.destinationSlug ?? (trip.destinations?.[0] ?? null),
+      _destination_slug: data.destinationSlug ?? trip.destinations?.[0] ?? "",
       _trip_brief: brief as never,
       _trip_items: items as never,
       _consent_text: PROSPECT_CONSENT_TEXT,
@@ -135,7 +135,7 @@ export type ProspectRow = {
   temperature: (typeof PROSPECT_TEMPERATURES)[number];
   capture_reason: (typeof CONTACT_OFFER_REASONS)[number] | null;
   destination_slug: string | null;
-  trip_brief: Record<string, unknown>;
+  trip_brief: { [key: string]: string | number | boolean | string[] | null };
   trip_items: Array<{ kind: string; targetId: string | null; title: string | null }>;
   handoff_summary: string | null;
   assigned_concierge_user_id: string | null;
@@ -218,7 +218,7 @@ export type ProspectEventRow = {
   kind: string;
   actor_user_id: string | null;
   body: string | null;
-  meta: Record<string, unknown>;
+  meta: { [key: string]: string | number | boolean | null };
   created_at: string;
 };
 
@@ -287,6 +287,8 @@ const UpdateProspectSchema = z.object({
   firstName: z.string().min(1).max(80).optional(),
   email: z.string().email().max(254).nullable().optional(),
 });
+
+export type UpdateProspectPatch = Omit<z.infer<typeof UpdateProspectSchema>, "id">;
 
 export const updateProspect = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

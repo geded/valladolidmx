@@ -555,6 +555,8 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/concierge/itinerarios.tsx",
   "src/routes/_authenticated/concierge/preguntas.tsx",
   "src/routes/_authenticated/concierge/propuestas.tsx",
+  "src/routes/_authenticated/concierge/prospectos.$prospectId.tsx",
+  "src/routes/_authenticated/concierge/prospectos.index.tsx",
   "src/routes/_authenticated/concierge/reservaciones.$orderId.tsx",
   "src/routes/_authenticated/concierge/reservaciones.tsx",
   "src/routes/_authenticated/concierge/route.tsx",

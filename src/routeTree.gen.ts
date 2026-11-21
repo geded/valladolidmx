@@ -221,6 +221,7 @@ import { Route as AuthenticatedCmsZonasIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authenticated/cms/zonas.nueva'
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedConciergeProspectosIndexRouteImport } from './routes/_authenticated/concierge/prospectos.index'
+import { Route as AuthenticatedConciergeProspectosProspectIdRouteImport } from './routes/_authenticated/concierge/prospectos.$prospectId'
 import { Route as AuthenticatedConciergeReservacionesOrderIdRouteImport } from './routes/_authenticated/concierge/reservaciones.$orderId'
 import { Route as AuthenticatedCuentaCheckoutOrderIdRouteImport } from './routes/_authenticated/cuenta/checkout.$orderId'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
@@ -1476,6 +1477,12 @@ const AuthenticatedConciergeProspectosIndexRoute =
     path: '/prospectos/',
     getParentRoute: () => AuthenticatedConciergeRouteRoute,
   } as any)
+const AuthenticatedConciergeProspectosProspectIdRoute =
+  AuthenticatedConciergeProspectosProspectIdRouteImport.update({
+    id: '/prospectos/$prospectId',
+    path: '/prospectos/$prospectId',
+    getParentRoute: () => AuthenticatedConciergeRouteRoute,
+  } as any)
 const AuthenticatedConciergeReservacionesOrderIdRoute =
   AuthenticatedConciergeReservacionesOrderIdRouteImport.update({
     id: '/$orderId',
@@ -1987,6 +1994,7 @@ export interface FileRoutesByFullPath {
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
+  '/concierge/prospectos/$prospectId': typeof AuthenticatedConciergeProspectosProspectIdRoute
   '/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -2242,6 +2250,7 @@ export interface FileRoutesByTo {
   '/cms/visibilidad/rendimiento': typeof AuthenticatedCmsVisibilidadRendimientoRoute
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
+  '/concierge/prospectos/$prospectId': typeof AuthenticatedConciergeProspectosProspectIdRoute
   '/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -2509,6 +2518,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/visitor-intel_/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
+  '/_authenticated/concierge/prospectos/$prospectId': typeof AuthenticatedConciergeProspectosProspectIdRoute
   '/_authenticated/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/_authenticated/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -2777,6 +2787,7 @@ export interface FileRouteTypes {
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
+    | '/concierge/prospectos/$prospectId'
     | '/concierge/reservaciones/$orderId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
@@ -3032,6 +3043,7 @@ export interface FileRouteTypes {
     | '/cms/visibilidad/rendimiento'
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
+    | '/concierge/prospectos/$prospectId'
     | '/concierge/reservaciones/$orderId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
@@ -3298,6 +3310,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/visitor-intel_/decisions'
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
+    | '/_authenticated/concierge/prospectos/$prospectId'
     | '/_authenticated/concierge/reservaciones/$orderId'
     | '/_authenticated/cuenta/checkout/$orderId'
     | '/_authenticated/cuenta/concierge/$caseId'
@@ -4975,6 +4988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConciergeProspectosIndexRouteImport
       parentRoute: typeof AuthenticatedConciergeRouteRoute
     }
+    '/_authenticated/concierge/prospectos/$prospectId': {
+      id: '/_authenticated/concierge/prospectos/$prospectId'
+      path: '/prospectos/$prospectId'
+      fullPath: '/concierge/prospectos/$prospectId'
+      preLoaderRoute: typeof AuthenticatedConciergeProspectosProspectIdRouteImport
+      parentRoute: typeof AuthenticatedConciergeRouteRoute
+    }
     '/_authenticated/concierge/reservaciones/$orderId': {
       id: '/_authenticated/concierge/reservaciones/$orderId'
       path: '/$orderId'
@@ -5434,6 +5454,7 @@ interface AuthenticatedConciergeRouteRouteChildren {
   AuthenticatedConciergeReservacionesRoute: typeof AuthenticatedConciergeReservacionesRouteWithChildren
   AuthenticatedConciergeIndexRoute: typeof AuthenticatedConciergeIndexRoute
   AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
+  AuthenticatedConciergeProspectosProspectIdRoute: typeof AuthenticatedConciergeProspectosProspectIdRoute
   AuthenticatedConciergeProspectosIndexRoute: typeof AuthenticatedConciergeProspectosIndexRoute
 }
 
@@ -5449,6 +5470,8 @@ const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRoute
     AuthenticatedConciergeIndexRoute: AuthenticatedConciergeIndexRoute,
     AuthenticatedConciergeExpedientesCaseIdRoute:
       AuthenticatedConciergeExpedientesCaseIdRouteWithChildren,
+    AuthenticatedConciergeProspectosProspectIdRoute:
+      AuthenticatedConciergeProspectosProspectIdRoute,
     AuthenticatedConciergeProspectosIndexRoute:
       AuthenticatedConciergeProspectosIndexRoute,
   }

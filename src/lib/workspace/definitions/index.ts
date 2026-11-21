@@ -43,6 +43,7 @@ import {
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
 import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
 import { ShoppingBag, CalendarDays } from "lucide-react";
+import { UserPlus } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -578,13 +579,23 @@ const concierge: WorkspaceDefinition = {
     {
       id: "concierge.inbox",
       workspaceId: "concierge",
-      label: "Bandeja",
+      label: "CRM Arma tu viaje",
       icon: Inbox,
       to: "/concierge",
       group: "trabajo",
       order: 1,
       surfaces: ["sidebar", "bottom", "palette"],
       primary: true,
+    },
+    {
+      id: "concierge.prospects",
+      workspaceId: "concierge",
+      label: "CRM Prospectos",
+      icon: UserPlus,
+      to: "/concierge/prospectos",
+      group: "trabajo",
+      order: 1.5,
+      surfaces: ["sidebar", "palette"],
     },
     {
       id: "concierge.reservations",
