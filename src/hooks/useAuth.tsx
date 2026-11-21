@@ -11,6 +11,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -56,14 +57,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // `roles = []` justo después de SIGNED_IN (founder caía en /mi-viaje).
   const [identityLoading, setIdentityLoading] = useState(false);
 
+  /** Cuenta cuya identidad (perfil + roles) ya está cargada. */
+  const identityUidRef = useRef<string | null>(null);
+
   const loadIdentity = useCallback(async (uid: string | null) => {
     if (!uid) {
+      identityUidRef.current = null;
       setProfile(null);
       setRoles([]);
       setIdentityLoading(false);
       return;
     }
-    setIdentityLoading(true);
+    /* Releer la identidad de la MISMA cuenta (volver a la app, regresar la
+       señal, renovar el acceso) es silencioso: no vuelve a mostrar
+       «Verificando sesión…», que desmontaba el CMS y vaciaba los formularios
+       a medio llenar. Sólo una cuenta distinta marca identidad en vuelo. */
+    const sameAccount = identityUidRef.current === uid;
+    if (!sameAccount) setIdentityLoading(true);
     try {
       const [{ data: prof }, { data: r }] = await Promise.all([
         supabase
@@ -75,8 +85,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
       setProfile((prof as ProfileRow | null) ?? null);
       setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+      identityUidRef.current = uid;
     } finally {
-      setIdentityLoading(false);
+      if (!sameAccount) setIdentityLoading(false);
     }
   }, []);
 
@@ -127,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(s);
       // Marca identidad en vuelo de inmediato: los consumidores no deben
       // decidir rol/destino con los roles del estado anterior.
-      if (s?.user) setIdentityLoading(true);
+      if (s?.user && s.user.id !== identityUidRef.current) setIdentityLoading(true);
       // No await: defer to microtask to avoid deadlocks
       setTimeout(() => {
         void loadIdentity(s?.user.id ?? null);

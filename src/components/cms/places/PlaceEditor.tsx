@@ -15,6 +15,17 @@ import { toast } from "@/lib/toast";
 import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
 import { QuickCreateZoneDialog } from "@/components/cms/QuickCreateZoneDialog";
 import { StatusBadge } from "@/components/cms/EntityListView";
+import { localDraftKey, sameDraftValues } from "@/lib/cms/local-draft";
+import { useLocalFormDraft } from "@/lib/cms/use-local-form-draft";
+import { meridaDateTime } from "@/lib/time/merida";
+import {
+  EMPTY_NEW_PLACE,
+  placeToForm,
+  sanitizeNewPlaceDraft,
+  sanitizePlaceFormDraft,
+  type NewPlaceState,
+  type PlaceFormState,
+} from "@/components/cms/places/place-form-draft";
 import {
   checkPlaceDuplicates,
   createPlaceCms,
@@ -88,21 +99,7 @@ function describePlaceError(error: unknown, fallback: string): string {
   return message || fallback;
 }
 
-const TEXT_FIELDS = [
-  "official_name",
-  "short_description",
-  "description",
-  "directions",
-  "address_line",
-  "google_place_id",
-  "best_time_to_visit",
-  "entry_fee_notes",
-  "contact_phone",
-  "contact_whatsapp",
-  "contact_email",
-  "contact_website",
-  "price_currency",
-] as const;
+/* Campos de texto: `PLACE_TEXT_FIELDS` en `place-form-draft.ts`. */
 
 /** Campos que Alux puede proponer al completar la ficha. */
 const AUTOFILL_FIELDS = [
@@ -166,14 +163,7 @@ export function PlaceEditor({ placeId }: Props) {
   };
 
   /* ── Alta ─────────────────────────────────────────────────────────── */
-  const [newPlace, setNewPlace] = useState({
-    name: "",
-    slug: "",
-    destination_id: "",
-    destination_zone_id: "",
-    place_type_id: "",
-    description: "",
-  });
+  const [newPlace, setNewPlace] = useState<NewPlaceState>(EMPTY_NEW_PLACE);
 
   const [zoneDialogOpen, setZoneDialogOpen] = useState(false);
   /** Addendum Q2B: zonas activas del destino elegido en el alta. */
@@ -222,6 +212,7 @@ export function PlaceEditor({ placeId }: Props) {
       }),
     onSuccess: (res) => {
       toast.success("Lugar creado como borrador. No se publica automáticamente.");
+      newDraft.clear();
       navigate({ to: `/cms/lugares/${res.id}/editar` as never });
     },
     onError: (e) => toast.error(describePlaceError(e, "No se pudo crear el lugar.")),
@@ -288,6 +279,86 @@ export function PlaceEditor({ placeId }: Props) {
     );
   };
 
+  /* ── Respaldo local (si el editor sale a copiar un dato y vuelve) ── */
+  const editSnapshot = useMemo<PlaceFormState>(
+    () => ({
+      values,
+      zoneId,
+      admission,
+      attractionFamily,
+      priceFrom,
+      priceTo,
+      duration,
+      highlights,
+      amenities,
+      accessibility,
+      latitude,
+      longitude,
+      categoryIds,
+    }),
+    [
+      values,
+      zoneId,
+      admission,
+      attractionFamily,
+      priceFrom,
+      priceTo,
+      duration,
+      highlights,
+      amenities,
+      accessibility,
+      latitude,
+      longitude,
+      categoryIds,
+    ],
+  );
+  const savedForm = useMemo(
+    () => (place ? placeToForm(place, det.categoryIds) : null),
+    [place, det.categoryIds],
+  );
+  const editDraft = useLocalFormDraft<PlaceFormState>({
+    key: isEdit ? localDraftKey("places", placeId) : null,
+    value: editSnapshot,
+    isDirty: (v) => (savedForm ? !sameDraftValues(v, savedForm) : false),
+    sanitize: sanitizePlaceFormDraft,
+  });
+  const newDraft = useLocalFormDraft<NewPlaceState>({
+    key: isEdit ? null : localDraftKey("places", null),
+    value: newPlace,
+    isDirty: (v) => !sameDraftValues(v, EMPTY_NEW_PLACE),
+    sanitize: sanitizeNewPlaceDraft,
+  });
+  const takeNewDraft = newDraft.take;
+  useEffect(() => {
+    if (isEdit) return;
+    const draft = takeNewDraft(EMPTY_NEW_PLACE);
+    if (draft) setNewPlace(draft);
+  }, [isEdit, takeNewDraft]);
+
+  const applyForm = (form: PlaceFormState) => {
+    setValues(form.values);
+    setZoneId(form.zoneId);
+    setAdmission(form.admission);
+    setAttractionFamily(form.attractionFamily);
+    setPriceFrom(form.priceFrom);
+    setPriceTo(form.priceTo);
+    setDuration(form.duration);
+    setHighlights(form.highlights);
+    setAmenities(form.amenities);
+    setAccessibility(form.accessibility);
+    setLatitude(form.latitude);
+    setLongitude(form.longitude);
+    setCategoryIds(form.categoryIds);
+  };
+  const discardEditDraft = () => {
+    editDraft.clear();
+    if (savedForm) applyForm(savedForm);
+  };
+  const discardNewDraft = () => {
+    newDraft.clear();
+    setNewPlace(EMPTY_NEW_PLACE);
+  };
+
   /** Última versión del lugar ya volcada al formulario. */
   const hydratedRef = useRef<string | null>(null);
   const [autofillOpen, setAutofillOpen] = useState(false);
@@ -301,42 +372,9 @@ export function PlaceEditor({ placeId }: Props) {
     const stamp = `${String(place.id ?? "")}:${String(place.updated_at ?? "")}`;
     if (hydratedRef.current === stamp) return;
     hydratedRef.current = stamp;
-    const next: Values = {};
-    for (const key of TEXT_FIELDS) next[key] = (place[key] as string | null) ?? "";
-    setValues(next);
-    setZoneId((place.destination_zone_id as string | null) ?? "");
-    setAdmission((place.admission_kind as string | null) ?? "");
-    setAttractionFamily((place.attraction_family as string | null) ?? "");
-    setPriceFrom(
-      place.price_from === null || place.price_from === undefined ? "" : String(place.price_from),
-    );
-    setPriceTo(
-      place.price_to === null || place.price_to === undefined ? "" : String(place.price_to),
-    );
-    setDuration(
-      place.visit_duration_minutes === null || place.visit_duration_minutes === undefined
-        ? ""
-        : String(place.visit_duration_minutes),
-    );
-    setHighlights(Array.isArray(place.highlights) ? (place.highlights as string[]).join("\n") : "");
-    setAmenities(Array.isArray(place.amenities) ? (place.amenities as string[]).join("\n") : "");
-    /* Accesibilidad real capturada como lista de rasgos declarados. */
-    const acc = place.accessibility as Record<string, unknown> | null;
-    setAccessibility(
-      acc && typeof acc === "object"
-        ? Object.entries(acc)
-            .filter(([, v]) => v === true || (typeof v === "string" && v.trim().length > 0))
-            .map(([k, v]) => (typeof v === "string" ? `${k}: ${v}` : k))
-            .join("\n")
-        : "",
-    );
-    setLatitude(
-      place.latitude === null || place.latitude === undefined ? "" : String(place.latitude),
-    );
-    setLongitude(
-      place.longitude === null || place.longitude === undefined ? "" : String(place.longitude),
-    );
-    setCategoryIds(det.categoryIds ?? []);
+    const saved = placeToForm(place, det.categoryIds);
+    /* Lo escrito en este equipo y aún sin guardar tiene prioridad. */
+    applyForm(editDraft.take(saved) ?? saved);
   }, [place, det.categoryIds]);
 
   /**
@@ -441,6 +479,7 @@ export function PlaceEditor({ placeId }: Props) {
     onSuccess: async () => {
       setFieldError(null);
       toast.success("Cambios guardados.");
+      editDraft.clear();
       await detail.refetch();
     },
     onError: (e) => {
@@ -512,6 +551,10 @@ export function PlaceEditor({ placeId }: Props) {
             silenciosa: el tipo de lugar es obligatorio y explícito.
           </p>
         </header>
+
+        {newDraft.recoveredAt !== null && (
+          <RecoveredDraftNotice at={newDraft.recoveredAt} onDiscard={discardNewDraft} />
+        )}
 
         {duplicates.length > 0 && (
           <div
@@ -746,6 +789,10 @@ export function PlaceEditor({ placeId }: Props) {
           <StatusBadge value={status} />
         </div>
       </header>
+
+      {editDraft.recoveredAt !== null && (
+        <RecoveredDraftNotice at={editDraft.recoveredAt} onDiscard={discardEditDraft} />
+      )}
 
       <AluxAutofillDialog
         open={autofillOpen}
@@ -1265,5 +1312,27 @@ export function PlaceEditor({ placeId }: Props) {
         </div>
       </PlaceSection>
     </section>
+  );
+}
+
+/** Aviso discreto: lo escrito en este equipo volvió al formulario. */
+function RecoveredDraftNotice({ at, onDiscard }: { at: number; onDiscard: () => void }) {
+  return (
+    <div
+      role="status"
+      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm"
+    >
+      <span>
+        Recuperamos lo que estabas escribiendo en este equipo (
+        {meridaDateTime(new Date(at).toISOString())}). Guarda para conservarlo.
+      </span>
+      <button
+        type="button"
+        onClick={onDiscard}
+        className="rounded-pill border border-border bg-surface px-3 py-1 text-xs font-medium hover:bg-muted"
+      >
+        Descartar y volver a lo guardado
+      </button>
+    </div>
   );
 }

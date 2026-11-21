@@ -1,0 +1,88 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-109",
+  "title": "CMS: no perder lo escrito ni el punto de la pantalla al salir a copiar datos",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21: «En todo el CMS, cuando estamos agregando información, si salimos para copiar datos para complementar empresas, destinos, zonas, lugares y sitios de interés, al regresar se pierde dónde estábamos y lo que habíamos puesto… hay que hacer que todo el CMS sea fácil de usar para los editores». Corrección mínima: respaldo local de lo escrito y del punto de la pantalla, sin recarga automática con cambios pendientes y sin desmontar el CMS al releer la sesión. Sin cambiar plantillas públicas, datos, permisos, pagos, reservaciones ni publicación. El ajuste de sesión en src/hooks/useAuth.tsx queda bajo PCA-2026-104 con su anexo.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/cms/EntityEditor.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/places/PlaceEditor.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/pwa/register-sw.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/places/place-form-draft.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/local-draft.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/use-local-form-draft.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/pwa/unsaved-work.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/cms/EntityEditor.tsx",
+      "sha256": "cd750e79a407f86c1fb8f6bb8762ee44aa11e20ff004f5e2c94be4d1ba7ed4e9",
+      "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/cms/places/PlaceEditor.tsx",
+      "sha256": "60a8b04609749877c0675eb8eabb03da5697d62a6a335ed6a1b889d4ade3a770",
+      "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/pwa/register-sw.ts",
+      "sha256": "a0ac3240bdbd8b966741d5a0259faf26c44d970361df123e7f9ae2fc1df0e800",
+      "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/cms/places/place-form-draft.ts",
+      "sha256": "2cc2e5a7a81d8ae433856f48db59a68d51f380aab21ed53457daa0b8c1aade2b",
+      "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/local-draft.ts",
+      "sha256": "36aa824a335906772388820f56cb449c64202978d4a26fa28932e09e4e9b8e68",
+      "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cms/use-local-form-draft.ts",
+      "sha256": "8cfcbbdf5277e2e5a605f78a07e5079675ad8291732075e1dcbf65473aad703a",
+      "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/pwa/unsaved-work.ts",
+      "sha256": "27392c134eb59ecf752fb1d2740a6fe7e089ab349d8c81604cec16abb70439bf",
+      "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "scripts/cms-local-draft.test.ts"
+  ]
+}

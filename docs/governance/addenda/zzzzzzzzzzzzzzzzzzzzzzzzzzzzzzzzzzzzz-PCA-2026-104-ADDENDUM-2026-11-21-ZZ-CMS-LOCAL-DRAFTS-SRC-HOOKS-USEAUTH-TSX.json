@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-104-ADDENDUM-2026-11-21-ZZ-CMS-LOCAL-DRAFTS-SRC-HOOKS-USEAUTH-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-104",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21: «En todo el CMS, cuando estamos agregando información, si salimos para copiar datos para complementar empresas, destinos, zonas, lugares y sitios de interés, al regresar se pierde dónde estábamos y lo que habíamos puesto… hay que hacer que todo el CMS sea fácil de usar para los editores». Corrección mínima: respaldo local de lo escrito y del punto de la pantalla, sin recarga automática con cambios pendientes y sin desmontar el CMS al releer la sesión. Sin cambiar plantillas públicas, datos, permisos, pagos, reservaciones ni publicación.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/hooks/useAuth.tsx",
+    "previous_sha256": "ad97b656c7759bc7dd508f4b8d5c723c8d30227fb9260101a77cf08452e996a0",
+    "current_sha256": "cfc54b3ee93c0f9b53d43933ce9fc4cc5a46738ba9f85b63e5434ff46fce53d0",
+    "semantic_change": "Respaldo local de lo escrito y del punto de la pantalla (PCA-2026-109); comportamiento autorizado previo intacto.",
+    "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+  },
+  "invariants": [
+    "Plantillas públicas, datos, permisos, pagos y reservaciones no cambian.",
+    "Lo escrito sólo se guarda en el equipo del editor; nunca se publica solo."
+  ],
+  "recorded_at": "2026-11-21"
+}

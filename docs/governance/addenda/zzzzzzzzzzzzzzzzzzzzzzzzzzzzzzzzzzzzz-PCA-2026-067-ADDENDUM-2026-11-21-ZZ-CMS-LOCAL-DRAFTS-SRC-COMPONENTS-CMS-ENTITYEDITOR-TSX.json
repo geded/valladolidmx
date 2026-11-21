@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-067-ADDENDUM-2026-11-21-ZZ-CMS-LOCAL-DRAFTS-SRC-COMPONENTS-CMS-ENTITYEDITOR-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-067",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21: «En todo el CMS, cuando estamos agregando información, si salimos para copiar datos para complementar empresas, destinos, zonas, lugares y sitios de interés, al regresar se pierde dónde estábamos y lo que habíamos puesto… hay que hacer que todo el CMS sea fácil de usar para los editores». Corrección mínima: respaldo local de lo escrito y del punto de la pantalla, sin recarga automática con cambios pendientes y sin desmontar el CMS al releer la sesión. Sin cambiar plantillas públicas, datos, permisos, pagos, reservaciones ni publicación.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/components/cms/EntityEditor.tsx",
+    "previous_sha256": "e6e6edc3853bf8059296619435301085d1f94db5e8df5bd5f3bba21e510e7229",
+    "current_sha256": "cd750e79a407f86c1fb8f6bb8762ee44aa11e20ff004f5e2c94be4d1ba7ed4e9",
+    "semantic_change": "Respaldo local de lo escrito y del punto de la pantalla (PCA-2026-109); comportamiento autorizado previo intacto.",
+    "authority": "Founder · CMS sin pérdida de lo escrito al salir a copiar datos · 2026-11-21"
+  },
+  "invariants": [
+    "Plantillas públicas, datos, permisos, pagos y reservaciones no cambian.",
+    "Lo escrito sólo se guarda en el equipo del editor; nunca se publica solo."
+  ],
+  "recorded_at": "2026-11-21"
+}

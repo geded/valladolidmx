@@ -18,6 +18,8 @@
  *  - Observability First: cada paso emite un `pwa:*` CustomEvent.
  */
 
+import { hasUnsavedWork, requestDraftFlush, UNSAVED_WORK_EVENT } from "@/pwa/unsaved-work";
+
 export const SW_PATH = "/sw.js" as const;
 
 type PwaEvent =
@@ -30,6 +32,7 @@ type PwaEvent =
   | "error"
   | "update-available"
   | "update-applied"
+  | "update-deferred"
   | "unregistered";
 
 function emit(event: PwaEvent, detail?: Record<string, unknown>): void {
@@ -114,6 +117,36 @@ function setWaiting(worker: ServiceWorker | null): void {
   if (worker) emit("update-available", { state: worker.state });
 }
 
+/**
+ * Activación automática de una versión nueva. Activarla recarga la página;
+ * si un editor tiene cambios sin guardar en el CMS, se pospone: el aviso
+ * «Nueva versión disponible» queda visible y la versión se aplica sola en
+ * cuanto ya no haya cambios pendientes y la app pase a segundo plano.
+ */
+let deferredWorker: ServiceWorker | null = null;
+let deferListenersArmed = false;
+
+function tryApplyDeferred(): void {
+  if (!deferredWorker || hasUnsavedWork()) return;
+  if (typeof document !== "undefined" && document.visibilityState !== "hidden") return;
+  const worker = deferredWorker;
+  deferredWorker = null;
+  activateWorker(worker);
+}
+
+function autoActivateWorker(worker: ServiceWorker): void {
+  if (!hasUnsavedWork()) {
+    activateWorker(worker);
+    return;
+  }
+  deferredWorker = worker;
+  emit("update-deferred", { reason: "unsaved-work" });
+  if (deferListenersArmed || typeof window === "undefined") return;
+  deferListenersArmed = true;
+  document.addEventListener("visibilitychange", tryApplyDeferred);
+  window.addEventListener(UNSAVED_WORK_EVENT, tryApplyDeferred);
+}
+
 function activateWorker(worker: ServiceWorker): void {
   updateApplying = true;
   try {
@@ -141,7 +174,7 @@ export function registerServiceWorker(): Promise<void> {
       if (reg.installing) trackInstalling(reg.installing);
       if (reg.waiting && navigator.serviceWorker.controller) {
         setWaiting(reg.waiting);
-        activateWorker(reg.waiting);
+        autoActivateWorker(reg.waiting);
       }
       reg.addEventListener("updatefound", () => {
         if (reg.installing) trackInstalling(reg.installing);
@@ -169,7 +202,7 @@ function trackInstalling(worker: ServiceWorker): void {
       if (navigator.serviceWorker.controller) {
         emit("updated");
         setWaiting(worker);
-        activateWorker(worker);
+        autoActivateWorker(worker);
       } else {
         emit("installed");
       }
@@ -198,6 +231,9 @@ export async function applyPendingUpdate(): Promise<boolean> {
   const reg = currentRegistration ?? (await navigator.serviceWorker.getRegistration());
   const target = waitingWorker ?? reg?.waiting ?? null;
   if (!target) return false;
+  // Lo que el editor esté escribiendo queda respaldado antes de recargar.
+  requestDraftFlush();
+  deferredWorker = null;
   updateApplying = true;
   activateWorker(target);
   return updateApplying;

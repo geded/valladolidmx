@@ -25,6 +25,8 @@ import { meridaDateTime } from "@/lib/time/merida";
 import { Sparkles } from "lucide-react";
 import { AluxWorkspaceChat } from "@/components/workspace/AluxWorkspaceChat";
 import { AluxAutofillDialog } from "@/components/cms/AluxAutofillDialog";
+import { localDraftKey, sanitizeStringRecord } from "@/lib/cms/local-draft";
+import { useLocalFormDraft } from "@/lib/cms/use-local-form-draft";
 
 export type FieldType =
   | "text"
@@ -89,45 +91,9 @@ const NEXT_ACTIONS: Record<ContentStatus, { to: ContentStatus; label: string }[]
   archived: [{ to: "draft", label: "Restaurar a borrador" }],
 };
 
-/**
- * Respaldo local de lo que el editor está tecleando.
- *
- * El sistema operativo puede descartar la pestaña cuando el editor cambia de
- * aplicación o contesta un mensaje; al volver, el formulario se vuelve a montar
- * vacío. Guardamos lo escrito en este dispositivo (nunca en el servidor, nunca
- * como contenido publicado) y lo ofrecemos de vuelta al regresar. Se borra al
- * guardar la ficha o cuando el editor lo descarta.
- */
-const LOCAL_DRAFT_PREFIX = "vmx.cms.local-draft.v1";
-const LOCAL_DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
-
-interface LocalDraft {
-  savedAt: number;
-  values: Record<string, string>;
-}
-
-function readLocalDraft(key: string): LocalDraft | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<LocalDraft>;
-    if (!parsed || typeof parsed.savedAt !== "number" || typeof parsed.values !== "object") {
-      return null;
-    }
-    if (Date.now() - parsed.savedAt > LOCAL_DRAFT_MAX_AGE_MS) {
-      window.localStorage.removeItem(key);
-      return null;
-    }
-    const values: Record<string, string> = {};
-    for (const [k, v] of Object.entries(parsed.values ?? {})) {
-      if (typeof v === "string") values[k] = v;
-    }
-    return Object.keys(values).length ? { savedAt: parsed.savedAt, values } : null;
-  } catch {
-    return null;
-  }
-}
+/* Respaldo local de lo tecleado: autoridad compartida en
+   `@/lib/cms/local-draft` + `useLocalFormDraft` (misma llave y formato de
+   siempre, así que los respaldos ya guardados en los equipos se conservan). */
 
 export function EntityEditor(props: Props) {
   const { table, id, title, description, backTo, listQueryKey, fields } = props;
@@ -168,72 +134,36 @@ export function EntityEditor(props: Props) {
   const [autofillOpen, setAutofillOpen] = useState(false);
 
   /* ---- Respaldo local de lo tecleado (ver nota arriba) ---- */
-  const draftKey = `${LOCAL_DRAFT_PREFIX}:${table}:${id ?? "nuevo"}`;
-  const [recovered, setRecovered] = useState<number | null>(null);
-  const valuesRef = useRef(values);
-  valuesRef.current = values;
+  const draftKey = localDraftKey(table, id);
   /** Mientras haya respaldo recuperado, la ficha guardada no lo pisa. */
   const recoveredRef = useRef(false);
   const dirtyRef = useRef(false);
+  const isDraftDirty = useCallback(() => dirtyRef.current, []);
+  const localDraft = useLocalFormDraft<Record<string, string>>({
+    key: draftKey,
+    value: values,
+    isDirty: isDraftDirty,
+    sanitize: sanitizeStringRecord,
+  });
+  const recovered = localDraft.recoveredAt;
+  const takeLocalDraft = localDraft.take;
+  const clearStoredDraft = localDraft.clear;
 
   const clearLocalDraft = useCallback(() => {
     dirtyRef.current = false;
     recoveredRef.current = false;
-    setRecovered(null);
-    if (typeof window !== "undefined") {
-      try {
-        window.localStorage.removeItem(draftKey);
-      } catch {
-        /* almacenamiento no disponible: el formulario sigue funcionando */
-      }
-    }
-  }, [draftKey]);
+    clearStoredDraft();
+  }, [clearStoredDraft]);
 
-  const writeLocalDraft = useCallback(() => {
-    if (!dirtyRef.current || typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(
-        draftKey,
-        JSON.stringify({ savedAt: Date.now(), values: valuesRef.current }),
-      );
-    } catch {
-      /* sin espacio o modo privado: no interrumpimos la edición */
-    }
-  }, [draftKey]);
-
-  /* Al abrir el formulario, recuperamos lo que quedó escrito en este equipo. */
+  /* Al abrir el formulario, recuperamos lo que quedó escrito en este equipo
+     y regresamos al punto de la pantalla donde iba el editor. */
   useEffect(() => {
-    const draft = readLocalDraft(draftKey);
+    const draft = takeLocalDraft();
     if (!draft) return;
     recoveredRef.current = true;
     dirtyRef.current = true;
-    setRecovered(draft.savedAt);
-    setValues((current) => ({ ...current, ...draft.values }));
-  }, [draftKey]);
-
-  /* Guardado continuo mientras se escribe, y en el momento exacto en que la
-     aplicación pasa a segundo plano (que es cuando el sistema la descarta). */
-  useEffect(() => {
-    if (!dirtyRef.current) return;
-    const timer = setTimeout(writeLocalDraft, 500);
-    return () => clearTimeout(timer);
-  }, [values, writeLocalDraft]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const flush = () => writeLocalDraft();
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") flush();
-    };
-    window.addEventListener("pagehide", flush);
-    window.addEventListener("blur", flush);
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      window.removeEventListener("pagehide", flush);
-      window.removeEventListener("blur", flush);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [writeLocalDraft]);
+    setValues((current) => ({ ...current, ...draft }));
+  }, [draftKey, takeLocalDraft]);
 
   const updateValue = useCallback((name: string, value: string) => {
     dirtyRef.current = true;

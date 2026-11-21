@@ -1,5 +1,11 @@
 # Roadmap
 
+## CMS fácil de usar: no perder lo escrito al salir a copiar datos · 2026-11-21
+
+- [x] Al volver a la app, el CMS ya no se vacía mientras se confirma la sesión.
+- [x] La app no se actualiza sola mientras un editor tiene cambios sin guardar (se aplica al guardar y salir, o con «Actualizar ahora»).
+- [x] Respaldo de lo escrito y del punto de la pantalla en empresas, destinos, zonas, regiones, rutas, eventos, productos, categorías y ahora también Lugares y sitios de interés.
+
 ## CRM del concierge en dos secciones · 2026-11-21
 
 - [x] Plan del CRM: comparación continua con el Alux de Zazil en cada fase (reglas, mismas preguntas de prueba, informe igual/mejorado/falta), adaptada a varios destinos y empresas; sin implementar.
