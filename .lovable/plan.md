@@ -67,6 +67,23 @@ Adaptado al Oriente Maya:
 5. Canal de WhatsApp intercambiable: el mismo servidor de Zazil ahora, o el oficial después, sin rehacer el CRM.
 6. Las ventas cerradas por un concierge se ligan a las comisiones que ya existen.
 
+## 3b. Paso de prospecto a viaje armado sin volver a preguntar
+
+Cuando un prospecto quiere que le armen el viaje, el concierge (o Alux) le manda un **enlace personal para registrarse**. Ese enlace lleva todo lo que ya se platicó:
+
+1. **Registro corto:** nombre, WhatsApp y correo ya vienen escritos. La persona solo confirma y crea su contraseña, o entra con Google.
+2. **Su viaje ya armado en borrador:** se crea solo en Mi Viaje con las fechas, el número de personas, los destinos y los lugares, hoteles o experiencias que vio con Alux.
+3. **Expediente abierto en CRM Arma tu viaje**, asignado al mismo concierge que lo atendía, con una **ficha de traspaso** arriba:
+   - quién es, idioma, de dónde llega y por qué medio;
+   - fechas, personas, presupuesto y tipo de viaje;
+   - qué le interesa y qué descartó;
+   - lo que ya se le cotizó o envió (propuestas, enlaces, pagos);
+   - lo pendiente y la siguiente acción sugerida;
+   - el enlace a la conversación completa de WhatsApp y de Alux.
+4. **Sin duplicados:** la ficha de Prospectos queda ligada a su cuenta y pasa a «Convertido a viajero», con todo su historial.
+
+El concierge abre el expediente y ya tiene el contexto completo. Solo arma la propuesta.
+
 ## 4. Etapas y reglas automáticas (iguales a Zazil)
 
 Nuevo → Contactado → Propuesta enviada → Reservó → Por viajar → Viajó → Posventa; No interesado y Perdido aparte. Se pueden cambiar a mano.
@@ -97,4 +114,5 @@ Cada fase se aprueba por separado. Nada se publica sin tu visto bueno.
 - **Reglas en base:** trigger de etapa cerrada, conciliación de venta (`partial`/`paid`, búsqueda única y diagnóstico cuando hay duda), cron de rescate (100 por minuto) y reapertura de perdidos.
 - **Alux:** se reutilizan `converse-retrieval.server.ts` y `canonical-catalog.server.ts`. Se añaden bloques de reglas por jerarquía y un registro de reglas R-xx con pruebas. La regla «no pidas datos personales» se sustituye por «contacto antes de cerrar». El modelo nunca recibe teléfono ni correo; el servidor los guarda aparte.
 - **WhatsApp:** puerto `src/lib/crm/channel/*` con dos adaptadores, Evolution (token comparado en tiempo constante) y Meta oficial. Bandeja de mensajes idempotente por id y candado de una respuesta por plática.
+- **Traspaso:** enlace firmado de un solo uso con el id del prospecto. Al confirmar la cuenta se crean `travel_plans` (`source` Alux/WhatsApp, `meta.prospect_id`) con sus `travel_plan_items` y un `concierge_cases` con `summary` = ficha de traspaso generada por Alux desde la conversación (sin inventar datos), y el concierge responsable como participante.
 - **Controles:** Scope y Preservation Gate, pruebas por regla, QA 390/834/1440 e inventario de gobernanza.
