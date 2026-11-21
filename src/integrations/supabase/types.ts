@@ -7796,6 +7796,117 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_agent_alux_notices: {
+        Row: {
+          created_at: string
+          destination_slug: string | null
+          id: string
+          registered: boolean
+          sent_at: string | null
+          session_id: string
+          skipped_reason: string | null
+          started_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          destination_slug?: string | null
+          id?: string
+          registered?: boolean
+          sent_at?: string | null
+          session_id: string
+          skipped_reason?: string | null
+          started_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          destination_slug?: string | null
+          id?: string
+          registered?: boolean
+          sent_at?: string | null
+          session_id?: string
+          skipped_reason?: string | null
+          started_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      whatsapp_agent_inbound: {
+        Row: {
+          attempts: number
+          body: string | null
+          last_error: string | null
+          message_id: string
+          message_type: string
+          processed_at: string | null
+          received_at: string
+          reply_message_id: string | null
+          reply_status: string
+          sender: string
+          sent_at: string
+        }
+        Insert: {
+          attempts?: number
+          body?: string | null
+          last_error?: string | null
+          message_id: string
+          message_type: string
+          processed_at?: string | null
+          received_at?: string
+          reply_message_id?: string | null
+          reply_status?: string
+          sender: string
+          sent_at: string
+        }
+        Update: {
+          attempts?: number
+          body?: string | null
+          last_error?: string | null
+          message_id?: string
+          message_type?: string
+          processed_at?: string | null
+          received_at?: string
+          reply_message_id?: string | null
+          reply_status?: string
+          sender?: string
+          sent_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_agent_state: {
+        Row: {
+          id: number
+          last_error: string | null
+          last_poll_at: string | null
+          lease_until: string | null
+          next_offset: number | null
+          recipient_id: string | null
+          setup_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          last_error?: string | null
+          last_poll_at?: string | null
+          lease_until?: string | null
+          next_offset?: number | null
+          recipient_id?: string | null
+          setup_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          last_error?: string | null
+          last_poll_at?: string | null
+          lease_until?: string | null
+          next_offset?: number | null
+          recipient_id?: string | null
+          setup_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       active_founder_spotlights: {
@@ -8905,6 +9016,10 @@ export type Database = {
       cron_hooks_get_secret: { Args: never; Returns: string }
       cron_hooks_invoke: {
         Args: { _include_legacy_apikey?: boolean; _path: string }
+        Returns: number
+      }
+      cron_hooks_invoke_long: {
+        Args: { _path: string; _timeout_ms?: number }
         Returns: number
       }
       dearmor: { Args: { "": string }; Returns: string }

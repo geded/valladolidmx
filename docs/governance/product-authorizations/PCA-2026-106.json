@@ -1,0 +1,96 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-106",
+  "title": "Agente de WhatsApp del administrador conectado con Alux: avisos y preguntas",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero conectar el Alux concierge con mi agente de whatsapp para que me avises cada vez que alguien inicia interacción con Alux concierge y también que pueda preguntar de información de todo el ecosistema o plataforma ValladolidMX»; opción autorizada «Avisos y preguntas»): el agente personal de WhatsApp del administrador recibe un aviso agrupado por cada conversación nueva con Alux (hora, destino y si tenía cuenta, sin datos personales ni texto) y responde sus preguntas con el contenido publicado y cifras agregadas de Alux. Sin cambiar plantillas públicas, Alux para viajeros, contenido CMS, pagos, reservaciones ni datos existentes.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/whatsapp-agent/digest.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/whatsapp-agent/client.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/whatsapp-agent/answer.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/whatsapp-agent.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/hooks/whatsapp-agent.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/measurement-gate.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/lib/whatsapp-agent/digest.ts",
+      "sha256": "1382955723d353ab82d5cd12e338bb4a7e89556e8cc731a2f8652f1a9328e229",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/whatsapp-agent/client.server.ts",
+      "sha256": "3474bb1f8bd40eeddb994d119bbef748a95fc80e4895d912cdcc38d39fd55575",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/whatsapp-agent/answer.server.ts",
+      "sha256": "be1cef1d3e28e3748b784eaf3e6adb18bbe1c4b212bb5a279275bd782ffe60cd",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/whatsapp-agent.server.ts",
+      "sha256": "98b2d124e2df411e927d13045e9fd1d3399573b297440d859e79b5c9b81feb16",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/hooks/whatsapp-agent.ts",
+      "sha256": "51570c76d9912b8cb873f80efe83eb5ad91c32117b4e195093e3dbbcffda6f9a",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/measurement-gate.ts",
+      "sha256": "cd7634f7f553c32e94ffabee756be521734851b69c58b685655f94d863b477ed",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "c1aeed31edb60c32fbd6522b73c0c7627d4af83f3d797c37d39233277e59fee6",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts",
+      "sha256": "2e76082e4582d8abce431ceb7e21f1a337dee4b45bae9cee0ebba3cb3820f9a1",
+      "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": ["scripts/whatsapp-agent.test.ts"]
+}

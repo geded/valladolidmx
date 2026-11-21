@@ -618,6 +618,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/api/public/hooks/proposal-payment-reminders.ts",
   "src/routes/api/public/hooks/trip-journey-emails.ts",
   "src/routes/api/public/hooks/visibility-notifications.ts",
+  "src/routes/api/public/hooks/whatsapp-agent.ts",
   "src/routes/api/public/maps/static.ts",
   "src/routes/api/public/alux/chat.ts",
   "src/routes/api/public/payments/$provider/webhook.ts",

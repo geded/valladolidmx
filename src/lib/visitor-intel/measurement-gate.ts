@@ -38,12 +38,18 @@ export interface MeasurementInput {
   readonly webdriver: boolean;
 }
 
+/** `true` cuando la identificación del navegador falta o se declara robot. */
+export function isDeclaredBotUserAgent(userAgent: string | null | undefined): boolean {
+  const value = (userAgent ?? "").trim();
+  return !value || BOT_USER_AGENT.test(value);
+}
+
 /** Núcleo puro: ¿esta visita cuenta para el monitor? */
 export function classifyMeasurement(input: MeasurementInput): MeasurementVerdict {
   const host = input.hostname.trim().toLowerCase();
   if (!MEASURED_HOSTS.includes(host)) return "non_production_host";
   if (input.webdriver) return "automated_browser";
-  if (!input.userAgent.trim() || BOT_USER_AGENT.test(input.userAgent)) return "declared_bot";
+  if (isDeclaredBotUserAgent(input.userAgent)) return "declared_bot";
   return "measured";
 }
 

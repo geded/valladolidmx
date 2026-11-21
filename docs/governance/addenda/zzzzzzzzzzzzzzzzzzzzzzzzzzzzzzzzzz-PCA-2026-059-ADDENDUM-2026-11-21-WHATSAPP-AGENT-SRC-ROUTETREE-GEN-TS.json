@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-WHATSAPP-AGENT-SRC-ROUTETREE-GEN-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero conectar el Alux concierge con mi agente de whatsapp para que me avises cada vez que alguien inicia interacción con Alux concierge y también que pueda preguntar de información de todo el ecosistema o plataforma ValladolidMX»; opción autorizada «Avisos y preguntas»): el agente personal de WhatsApp del administrador recibe un aviso agrupado por cada conversación nueva con Alux (hora, destino y si tenía cuenta, sin datos personales ni texto) y responde sus preguntas con el contenido publicado y cifras agregadas de Alux. Sin cambiar plantillas públicas, Alux para viajeros, contenido CMS, pagos, reservaciones ni datos existentes.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routeTree.gen.ts",
+    "previous_sha256": "ab0ce01d3b519f314aeb8ecee7a802dcdcf69b255dc7559d07e34c24ae96d513",
+    "current_sha256": "2e76082e4582d8abce431ceb7e21f1a337dee4b45bae9cee0ebba3cb3820f9a1",
+    "semantic_change": "Árbol de rutas regenerado con la ronda programada del agente de WhatsApp.",
+    "authority": "Founder · agente de WhatsApp con Alux (avisos y preguntas) · 2026-11-21"
+  },
+  "invariants": [
+    "Las plantillas públicas, header, footer, Alux para viajeros y Mi Viaje conservan estructura, orden y contenido CMS.",
+    "Pagos, reservaciones, permisos y datos de cuenta no cambian.",
+    "Los avisos no incluyen nombres, correos ni texto de las conversaciones."
+  ],
+  "recorded_at": "2026-11-21"
+}

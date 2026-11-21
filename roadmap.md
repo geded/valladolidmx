@@ -489,3 +489,11 @@
 - [x] Sección Itinerario de Mi Viaje: nueva pestaña «Días» (por defecto) con el itinerario con marca (logo, folio, días con hora, cómo llegar, casillas «hecho», «Guardar PDF / Imprimir»). Lista, Timeline y Mapa se conservan; se retiró la tarjeta duplicada al pie.
 - [x] Verificado con la cuenta demo VMX-DEMO01 a 390 px: las 4 vistas funcionan, sin errores; el PDF es el mismo documento con marca (hoja por día, logo y QR).
 - [x] Gobernanza: anexos PCA-2026-059/PCA-2026-105, inventario regenerado, controles PASS. No publicado.
+
+## Agente de WhatsApp con Alux · 2026-11-21 (autorizado «Avisos y preguntas»)
+
+- [x] Clave del agente guardada de forma segura (conector «WhatsApp Agent»); chat del Founder detectado.
+- [x] Aviso agrupado cada minuto cuando alguien inicia conversación con Alux (hora, destino, con/sin cuenta; sin datos personales; robots excluidos). Probado: llegó el aviso de una conversación de prueba.
+- [x] Preguntas por WhatsApp contestadas con el contenido publicado y cifras de Alux (probado localmente: respuesta en ~7 s).
+- [x] Revisión programada cada minuto; pruebas 50 PASS, gobernanza PCA-2026-106 + anexos.
+- [ ] Funciona solo tras publicar (la revisión programada llama al sitio publicado).

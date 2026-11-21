@@ -28,6 +28,7 @@ import {
 import { Route as TripRoute } from "../../src/routes/api/public/hooks/trip-journey-emails";
 import { Route as VisibilityRoute } from "../../src/routes/api/public/hooks/visibility-notifications";
 import { Route as CouponRoute } from "../../src/routes/api/public/hooks/coupon-review-reminders";
+import { Route as WhatsAppAgentRoute } from "../../src/routes/api/public/hooks/whatsapp-agent";
 
 const TEST_SECRET = "test-cron-secret-not-real-".padEnd(64, "x");
 const WRONG_SECRET = "test-cron-secret-not-real-".padEnd(64, "y");
@@ -61,6 +62,12 @@ const ROUTES: Array<{ name: string; path: string; handler: Handler; file: string
     path: "/api/public/hooks/coupon-review-reminders",
     handler: postHandler(CouponRoute),
     file: "src/routes/api/public/hooks/coupon-review-reminders.ts",
+  },
+  {
+    name: "whatsapp-agent",
+    path: "/api/public/hooks/whatsapp-agent",
+    handler: postHandler(WhatsAppAgentRoute),
+    file: "src/routes/api/public/hooks/whatsapp-agent.ts",
   },
 ];
 

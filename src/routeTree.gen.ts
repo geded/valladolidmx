@@ -242,6 +242,7 @@ import { Route as ApiPublicHooksMediaSignatureRenewRouteImport } from './routes/
 import { Route as ApiPublicHooksProposalPaymentRemindersRouteImport } from './routes/api/public/hooks/proposal-payment-reminders'
 import { Route as ApiPublicHooksTripJourneyEmailsRouteImport } from './routes/api/public/hooks/trip-journey-emails'
 import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './routes/api/public/hooks/visibility-notifications'
+import { Route as ApiPublicHooksWhatsappAgentRouteImport } from './routes/api/public/hooks/whatsapp-agent'
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicMediaDerivedSplatRouteImport } from './routes/api/public/media-derived.$'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
@@ -1597,6 +1598,12 @@ const ApiPublicHooksVisibilityNotificationsRoute =
     path: '/api/public/hooks/visibility-notifications',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksWhatsappAgentRoute =
+  ApiPublicHooksWhatsappAgentRouteImport.update({
+    id: '/api/public/hooks/whatsapp-agent',
+    path: '/api/public/hooks/whatsapp-agent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicMapsStaticRoute = ApiPublicMapsStaticRouteImport.update({
   id: '/api/public/maps/static',
   path: '/api/public/maps/static',
@@ -1992,6 +1999,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
+  '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -2245,6 +2253,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
+  '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -2510,6 +2519,7 @@ export interface FileRoutesById {
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
+  '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
@@ -2776,6 +2786,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/proposal-payment-reminders'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
+    | '/api/public/hooks/whatsapp-agent'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
@@ -3029,6 +3040,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/proposal-payment-reminders'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
+    | '/api/public/hooks/whatsapp-agent'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
@@ -3293,6 +3305,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/proposal-payment-reminders'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
+    | '/api/public/hooks/whatsapp-agent'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
@@ -3453,6 +3466,7 @@ export interface RootRouteChildren {
   ApiPublicHooksProposalPaymentRemindersRoute: typeof ApiPublicHooksProposalPaymentRemindersRoute
   ApiPublicHooksTripJourneyEmailsRoute: typeof ApiPublicHooksTripJourneyEmailsRoute
   ApiPublicHooksVisibilityNotificationsRoute: typeof ApiPublicHooksVisibilityNotificationsRoute
+  ApiPublicHooksWhatsappAgentRoute: typeof ApiPublicHooksWhatsappAgentRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicMediaDerivedSplatRoute: typeof ApiPublicMediaDerivedSplatRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
@@ -5095,6 +5109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksVisibilityNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/whatsapp-agent': {
+      id: '/api/public/hooks/whatsapp-agent'
+      path: '/api/public/hooks/whatsapp-agent'
+      fullPath: '/api/public/hooks/whatsapp-agent'
+      preLoaderRoute: typeof ApiPublicHooksWhatsappAgentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/maps/static': {
       id: '/api/public/maps/static'
       path: '/api/public/maps/static'
@@ -6028,6 +6049,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksTripJourneyEmailsRoute: ApiPublicHooksTripJourneyEmailsRoute,
   ApiPublicHooksVisibilityNotificationsRoute:
     ApiPublicHooksVisibilityNotificationsRoute,
+  ApiPublicHooksWhatsappAgentRoute: ApiPublicHooksWhatsappAgentRoute,
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
   ApiPublicMediaDerivedSplatRoute: ApiPublicMediaDerivedSplatRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
