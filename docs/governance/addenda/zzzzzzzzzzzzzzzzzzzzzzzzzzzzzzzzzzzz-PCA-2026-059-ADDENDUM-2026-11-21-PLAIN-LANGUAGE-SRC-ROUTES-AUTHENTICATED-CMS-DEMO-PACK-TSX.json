@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-PLAIN-LANGUAGE-SRC-ROUTES-AUTHENTICATED-CMS-DEMO-PACK-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero que revises toda la parte de Inteligencia de alux y estadísticas que ya está haciendo la plataforma y lo pongas en un lenguaje más de usuario, veo muchas secciones con términos técnicos y en inglés, debemos hacerlos más entendibles y saber qué significa cada sección que esté acumulando estadísticas y datos»): sólo textos de presentación en el monitor de visitantes, decisiones del equipo, Consola de Alux y sus subpantallas, salud del sitio, actividad y panel de inteligencia; las tres subpantallas de Alux vuelven a abrirse. Sin cambiar cálculos, cifras, identificadores, permisos, plantillas públicas, Alux para viajeros, pagos, reservaciones ni datos. Seguimiento del Founder («Mira la imagen estas opciones quedaron claras?»): las tarjetas de la pantalla «Hoy» del CMS que llevan a estas secciones. Seguimiento del Founder («Autorizado»): pantallas internas de pruebas con visitantes simulados y de datos de demostración.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cms/demo-pack.tsx",
+    "previous_sha256": "b5e44c7d258dc50d3268aadb63c8772778b31b3c6cf2cc30a506323ebd1b0d5d",
+    "current_sha256": "b442fcf3fea8efe13c726096a87fdb02994b94512c4ae54ac980858e6666805b",
+    "semantic_change": "Sólo textos en lenguaje de usuario: título, descripción, recorrido, prueba de respuestas de Alux e idioma visible; datos, enlaces y acciones no cambian.",
+    "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+  },
+  "invariants": [
+    "Orden, diseño, enlaces, acciones y permisos no cambian.",
+    "Cálculos, cifras, identificadores y datos no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

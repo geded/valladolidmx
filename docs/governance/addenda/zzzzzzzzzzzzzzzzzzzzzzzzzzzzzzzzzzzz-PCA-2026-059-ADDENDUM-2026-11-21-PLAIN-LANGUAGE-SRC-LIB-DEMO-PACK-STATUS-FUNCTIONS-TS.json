@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-PLAIN-LANGUAGE-SRC-LIB-DEMO-PACK-STATUS-FUNCTIONS-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero que revises toda la parte de Inteligencia de alux y estadísticas que ya está haciendo la plataforma y lo pongas en un lenguaje más de usuario, veo muchas secciones con términos técnicos y en inglés, debemos hacerlos más entendibles y saber qué significa cada sección que esté acumulando estadísticas y datos»): sólo textos de presentación en el monitor de visitantes, decisiones del equipo, Consola de Alux y sus subpantallas, salud del sitio, actividad y panel de inteligencia; las tres subpantallas de Alux vuelven a abrirse. Sin cambiar cálculos, cifras, identificadores, permisos, plantillas públicas, Alux para viajeros, pagos, reservaciones ni datos. Seguimiento del Founder («Mira la imagen estas opciones quedaron claras?»): las tarjetas de la pantalla «Hoy» del CMS que llevan a estas secciones. Seguimiento del Founder («Autorizado»): pantallas internas de pruebas con visitantes simulados y de datos de demostración.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/demo-pack/status.functions.ts",
+    "previous_sha256": "21d80768382f9f688b5b41a13615b88e07d4b9b1a641db129db2d4f82e50ae8f",
+    "current_sha256": "8c3f437761ce3fbef4d3533e61fb6a67811f35a64f93a773992638ce479739e8",
+    "semantic_change": "Sólo seis etiquetas visibles de las secciones de datos de demostración; claves, conteos y metas no cambian.",
+    "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+  },
+  "invariants": [
+    "Orden, diseño, enlaces, acciones y permisos no cambian.",
+    "Cálculos, cifras, identificadores y datos no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

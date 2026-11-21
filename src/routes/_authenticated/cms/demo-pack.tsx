@@ -21,7 +21,7 @@ import { toast } from "@/lib/toast";
 export const Route = createFileRoute("/_authenticated/cms/demo-pack")({
   head: () => ({
     meta: [
-      { title: "Demo Pack v1 · CMS · Valladolid.mx" },
+      { title: "Datos de demostración · CMS · Valladolid.mx" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -46,29 +46,30 @@ function DemoPackPanel() {
     mutationFn: (id?: string) => runFn({ data: id ? { id } : {} }),
     onSuccess: (r) => {
       const okCount = r.results.filter((x) => x.ok).length;
-      toast.success(`Golden Set ejecutado: ${okCount}/${r.ran} aprobadas`);
+      toast.success(`Prueba terminada: ${okCount} de ${r.ran} respuestas correctas`);
       qc.invalidateQueries({ queryKey: ["cms", "demo-pack", "goldenset"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Falló la ejecución"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo hacer la prueba"),
   });
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
       <header className="border-b border-border pb-6">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          Demo World · Oriente Maya
+          Datos de demostración · Oriente Maya
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Demo Pack v1</h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Datos de demostración</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Estado del ecosistema navegable oficial del Oriente Maya. Cada elemento debe ser
-          descubrible, recomendable por Alux y vendible.
+          Revisa que estén completos los lugares, la información para Alux, las reseñas y la reserva
+          de ejemplo que usamos para mostrar la plataforma. Cada elemento debe poder encontrarse,
+          Alux debe poder recomendarlo y debe poder venderse.
         </p>
       </header>
 
       {q.isLoading ? (
-        <p className="text-sm text-muted-foreground">Cargando cobertura…</p>
+        <p className="text-sm text-muted-foreground">Revisando qué está completo…</p>
       ) : q.error ? (
-        <p className="text-sm text-destructive">No se pudo cargar el estado del Demo Pack.</p>
+        <p className="text-sm text-destructive">No se pudieron cargar los datos de demostración.</p>
       ) : q.data ? (
         <>
           <section
@@ -88,11 +89,11 @@ function DemoPackPanel() {
               <div>
                 <p className="text-sm font-semibold">
                   {q.data.overallOk
-                    ? "Demo Pack completo y listo para demostrar el recorrido."
-                    : "Faltan piezas para completar el Demo Pack."}
+                    ? "Los datos de demostración están completos y listos para mostrar el recorrido."
+                    : "Faltan algunos datos para completar la demostración."}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Generado {new Date(q.data.generatedAt).toLocaleString("es-MX")}
+                  Revisado el {new Date(q.data.generatedAt).toLocaleString("es-MX")}
                 </p>
               </div>
             </div>
@@ -107,7 +108,7 @@ function DemoPackPanel() {
                 <div>
                   <p className="text-sm font-medium">{s.label}</p>
                   <p className="text-xs text-muted-foreground">
-                    {s.count} / meta {s.target}
+                    {s.count} · se necesitan {s.target}
                   </p>
                 </div>
                 {s.ok ? (
@@ -121,22 +122,22 @@ function DemoPackPanel() {
 
           <section className="rounded-2xl border border-border bg-card p-5">
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Recorrido demo end-to-end
+              Recorrido completo de demostración
             </p>
             <h2 className="mt-2 text-lg font-semibold">
-              Viajero: Armando G. · Orden {q.data.demoOrderFolio}
+              Viajero: Armando G. · Reserva {q.data.demoOrderFolio}
             </h2>
             <ul className="mt-4 space-y-2 text-sm">
-              <DemoLink to="/oriente-maya" label="Descubrimiento · Oriente Maya" />
-              <DemoLink to="/hoteles" label="Hoteles demo (Suite Selva Maya)" />
-              <DemoLink to="/casas-de-vacaciones" label="Casas de vacaciones demo" />
-              <DemoLink to="/experiencias" label="Experiencias demo (Manglar al amanecer)" />
-              <DemoLink to="/cms/travel-plans" label="Panel Concierge · Travel Plans" />
+              <DemoLink to="/oriente-maya" label="Descubrir · Oriente Maya" />
+              <DemoLink to="/hoteles" label="Hoteles de ejemplo (Suite Selva Maya)" />
+              <DemoLink to="/casas-de-vacaciones" label="Casas de vacaciones de ejemplo" />
+              <DemoLink to="/experiencias" label="Experiencias de ejemplo (Manglar al amanecer)" />
+              <DemoLink to="/cms/travel-plans" label="Panel del concierge · Viajes" />
               <DemoLink to="/cms/ventas-en-linea" label="Comisiones · Ventas en línea" />
-              <DemoLink to="/cms/alux/calidad" label="Alux · Calidad heurística" />
+              <DemoLink to="/cms/alux/calidad" label="Alux · Calidad de respuestas" />
             </ul>
             <p className="mt-4 text-xs text-muted-foreground">
-              Login demo:{" "}
+              Cuenta para entrar a la demostración:{" "}
               <code className="rounded bg-muted px-1.5 py-0.5">geded@valladolid.com.mx</code>
             </p>
           </section>
@@ -145,12 +146,14 @@ function DemoPackPanel() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Validación · Golden Set
+                  Prueba de respuestas de Alux
                 </p>
-                <h2 className="mt-2 text-lg font-semibold">Alux recall del recorrido demo</h2>
+                <h2 className="mt-2 text-lg font-semibold">
+                  ¿Alux recuerda el recorrido de demostración?
+                </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Preguntas modelo del viajero: cada elemento debe ser descubrible, recomendable por
-                  Alux y sin alucinaciones.
+                  Preguntas típicas de un viajero. En cada respuesta Alux debe encontrar y
+                  recomendar los lugares correctos sin inventar datos.
                 </p>
               </div>
               <Button onClick={() => run.mutate(undefined)} disabled={run.isPending} size="sm">
@@ -159,7 +162,7 @@ function DemoPackPanel() {
                 ) : (
                   <PlayCircle className="mr-2 h-4 w-4" />
                 )}
-                Ejecutar todo
+                Probar todas
               </Button>
             </div>
 
@@ -183,6 +186,15 @@ function DemoPackPanel() {
   );
 }
 
+const LOCALE_NAMES: Record<string, string> = {
+  es: "Español",
+  en: "Inglés",
+  fr: "Francés",
+  de: "Alemán",
+  it: "Italiano",
+  pt: "Portugués",
+};
+
 function GoldenRow({
   ev,
   running,
@@ -201,7 +213,7 @@ function GoldenRow({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {ev.locale}
+              {LOCALE_NAMES[ev.locale] ?? ev.locale}
             </span>
             {ev.last_ok === true ? (
               <CheckCircle2 className="h-4 w-4 text-success" />
@@ -212,11 +224,11 @@ function GoldenRow({
           <p className="mt-1 text-sm font-medium">{ev.question}</p>
           {ev.last_run_at ? (
             <p className="mt-1 text-xs text-muted-foreground">
-              Score {scorePct}% · Riesgo alucinación {riskPct}% · {ev.last_latency_ms}ms ·{" "}
-              {new Date(ev.last_run_at).toLocaleString("es-MX")}
+              Acierto {scorePct}% · Riesgo de inventar datos {riskPct}% · tardó {ev.last_latency_ms}{" "}
+              ms · {new Date(ev.last_run_at).toLocaleString("es-MX")}
             </p>
           ) : (
-            <p className="mt-1 text-xs text-muted-foreground">Sin ejecutar</p>
+            <p className="mt-1 text-xs text-muted-foreground">Todavía no se prueba</p>
           )}
           {ev.last_missing_entities.length ? (
             <p className="mt-1 text-xs text-warning">
@@ -232,7 +244,14 @@ function GoldenRow({
             </details>
           ) : null}
         </div>
-        <Button variant="ghost" size="sm" onClick={onRun} disabled={running} className="shrink-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onRun}
+          disabled={running}
+          className="shrink-0"
+          aria-label="Probar esta pregunta"
+        >
           <PlayCircle className="h-4 w-4" />
         </Button>
       </div>

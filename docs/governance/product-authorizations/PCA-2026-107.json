@@ -74,6 +74,18 @@
     {
       "operation": "modify",
       "path": "src/routes/_authenticated/cms/index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/simulation.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/demo-pack.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/demo-pack/status.functions.ts"
     }
   ],
   "acknowledged_revisions": [
@@ -177,6 +189,24 @@
       "operation": "modify",
       "path": "src/routes/_authenticated/cms/index.tsx",
       "sha256": "85011b24c1f3ad101d60d587f141bb25eaa6504f341f6db83d90c07c3cfbbbbb",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/simulation.tsx",
+      "sha256": "ab18ce0f535c15602d28f30add057c448cd8dcc48a485f65b67686338d60851d",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/demo-pack.tsx",
+      "sha256": "b442fcf3fea8efe13c726096a87fdb02994b94512c4ae54ac980858e6666805b",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/demo-pack/status.functions.ts",
+      "sha256": "8c3f437761ce3fbef4d3533e61fb6a67811f35a64f93a773992638ce479739e8",
       "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
     }
   ],

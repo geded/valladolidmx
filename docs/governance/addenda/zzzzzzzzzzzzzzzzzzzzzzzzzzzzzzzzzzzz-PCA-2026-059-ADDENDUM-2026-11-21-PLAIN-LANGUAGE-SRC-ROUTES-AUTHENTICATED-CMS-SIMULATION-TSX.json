@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-PLAIN-LANGUAGE-SRC-ROUTES-AUTHENTICATED-CMS-SIMULATION-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero que revises toda la parte de Inteligencia de alux y estadísticas que ya está haciendo la plataforma y lo pongas en un lenguaje más de usuario, veo muchas secciones con términos técnicos y en inglés, debemos hacerlos más entendibles y saber qué significa cada sección que esté acumulando estadísticas y datos»): sólo textos de presentación en el monitor de visitantes, decisiones del equipo, Consola de Alux y sus subpantallas, salud del sitio, actividad y panel de inteligencia; las tres subpantallas de Alux vuelven a abrirse. Sin cambiar cálculos, cifras, identificadores, permisos, plantillas públicas, Alux para viajeros, pagos, reservaciones ni datos. Seguimiento del Founder («Mira la imagen estas opciones quedaron claras?»): las tarjetas de la pantalla «Hoy» del CMS que llevan a estas secciones. Seguimiento del Founder («Autorizado»): pantallas internas de pruebas con visitantes simulados y de datos de demostración.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cms/simulation.tsx",
+    "previous_sha256": "3faaea08448e7959d7aaf3318d796fb09c67664efdf97f3c517b738294c10577",
+    "current_sha256": "ab18ce0f535c15602d28f30add057c448cd8dcc48a485f65b67686338d60851d",
+    "semantic_change": "Sólo textos en lenguaje de usuario: título, descripción, tamaños de prueba, estados, encabezados y confirmación de borrado; valores, frase de confirmación, enlaces y cálculos no cambian.",
+    "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+  },
+  "invariants": [
+    "Orden, diseño, enlaces, acciones y permisos no cambian.",
+    "Cálculos, cifras, identificadores y datos no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

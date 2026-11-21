@@ -28,11 +28,11 @@ import type { SimulationScale } from "@/lib/visitor-intel/simulation/scenario";
 export const Route = createFileRoute("/_authenticated/cms/simulation")({
   head: () => ({
     meta: [
-      { title: "Simulation Console · CV8.S.4 · Valladolid.mx" },
+      { title: "Pruebas con visitantes simulados · Valladolid.mx" },
       {
         name: "description",
         content:
-          "Consola oficial para ejecutar, auditar y eliminar simulaciones del Visitor Intelligence.",
+          "Crea, revisa y borra visitantes de práctica para probar el monitor sin tocar las cifras reales.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -41,10 +41,40 @@ export const Route = createFileRoute("/_authenticated/cms/simulation")({
 });
 
 const SCALES: Array<{ id: SimulationScale; label: string; desc: string }> = [
-  { id: "light", label: "Ligera (1k)", desc: "~15k eventos · demo rápida" },
-  { id: "medium", label: "Media (10k)", desc: "~150k eventos · validación completa" },
-  { id: "full", label: "Plena (100k)", desc: "~1.5M eventos · requiere doble confirmación" },
+  {
+    id: "light",
+    label: "Pequeña (1,000 visitantes)",
+    desc: "Unos 15,000 movimientos · prueba rápida",
+  },
+  {
+    id: "medium",
+    label: "Mediana (10,000 visitantes)",
+    desc: "Unos 150,000 movimientos · prueba completa",
+  },
+  {
+    id: "full",
+    label: "Grande (100,000 visitantes)",
+    desc: "Unos 1.5 millones de movimientos · pide doble confirmación",
+  },
 ];
+
+const SCALE_NAMES: Record<string, string> = {
+  light: "Pequeña",
+  medium: "Mediana",
+  full: "Grande",
+};
+
+const STATUS_NAMES: Record<string, string> = {
+  pending: "Pendiente",
+  running: "En curso",
+  completed: "Lista",
+  failed: "Falló",
+  wiped: "Borrada",
+};
+
+const SCENARIO_NAMES: Record<string, string> = {
+  "oriente-maya-90d": "Oriente Maya · 90 días de visitas",
+};
 
 function fmt(n: number): string {
   return new Intl.NumberFormat("es-MX").format(n);
@@ -116,36 +146,38 @@ function SimulationConsole() {
     <div className="mx-auto w-full max-w-7xl space-y-6">
       <header className="border-b border-border pb-5">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          CV8.S.4 · Simulation Console
+          Pruebas con visitantes simulados
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          Motor de simulación del Destination OS
+          Practica con visitantes de prueba
         </h1>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-          Ensaya operación, capacitación y validación del Oriente Maya sin afectar datos reales.
-          Cada corrida es explícita, identificable, reversible y auditable.
+          Crea visitantes de práctica para probar el monitor, capacitar al equipo y revisar
+          decisiones sin tocar las cifras reales. Cada prueba queda identificada y se puede borrar.
         </p>
       </header>
 
       <div className="rounded-lg border-2 border-amber-500 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
-        <strong>🧪 Modo simulación.</strong> Los eventos generados aquí llevan{" "}
-        <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/40">is_simulation = true</code>{" "}
-        y viven aislados en <code>visitor_intel.events</code> por <code>simulation_run_id</code>. El
-        Wipe sólo elimina un run; los registros administrativos se preservan como evidencia.
+        <strong>🧪 Modo de prueba.</strong> Todo lo que se crea aquí queda marcado como prueba y
+        separado de las visitas reales. Borrar una prueba sólo elimina sus visitantes simulados; el
+        registro de que existió se conserva.
       </div>
 
       {/* ── Configurador ─────────────────────────────────────────────── */}
       <section className="rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold">Configurar corrida</h2>
+        <h2 className="text-lg font-semibold">Preparar una prueba</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Escenario: <strong>{info.data?.scenario_id ?? "oriente-maya-90d"}</strong> v
-          {info.data?.scenario_version ?? "1.0.0"}
+          Situación simulada:{" "}
+          <strong>
+            {SCENARIO_NAMES[info.data?.scenario_id ?? "oriente-maya-90d"] ?? info.data?.scenario_id}
+          </strong>{" "}
+          (versión {info.data?.scenario_version ?? "1.0.0"})
         </p>
 
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Escala
+              Tamaño
             </label>
             <div className="mt-2 space-y-2">
               {SCALES.map((s) => (
@@ -180,7 +212,7 @@ function SimulationConsole() {
           <div className="space-y-4">
             <div>
               <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Seed (determinística)
+                Código de la prueba
               </label>
               <input
                 type="text"
@@ -190,25 +222,25 @@ function SimulationConsole() {
                 placeholder="p.ej. VMX-DEMO-01"
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Misma seed + mismo escenario ⇒ misma corrida byte-a-byte.
+                Con el mismo código y la misma situación, la prueba sale idéntica cada vez.
               </p>
             </div>
 
             {preview.data && (
               <div className="rounded-md border border-border bg-muted/30 p-3 text-xs">
-                <div className="font-semibold text-foreground">Estimación previa</div>
+                <div className="font-semibold text-foreground">Lo que va a crear</div>
                 <ul className="mt-1 space-y-0.5 text-muted-foreground">
                   <li>Visitantes: {fmt(preview.data.volume.visitors)}</li>
                   <li>
-                    Eventos: ≈ {fmt(preview.data.volume.events_low)} –{" "}
-                    {fmt(preview.data.volume.events_high)}
+                    Movimientos (visitas, clics, búsquedas): ≈ {fmt(preview.data.volume.events_low)}{" "}
+                    – {fmt(preview.data.volume.events_high)}
                   </li>
                   <li>
-                    Almacenamiento: ≈ {preview.data.volume.storage_mb_low}–
+                    Espacio que ocupará: ≈ {preview.data.volume.storage_mb_low}–
                     {preview.data.volume.storage_mb_high} MB
                   </li>
                   <li>
-                    Ventana:{" "}
+                    Fechas simuladas:{" "}
                     {new Date(preview.data.calendar.start_date).toLocaleDateString("es-MX")} →{" "}
                     {new Date(preview.data.calendar.end_date).toLocaleDateString("es-MX")}
                   </li>
@@ -220,12 +252,12 @@ function SimulationConsole() {
 
         {scale === "full" && (
           <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">
-            <strong className="text-destructive">Confirmación reforzada.</strong>
+            <strong className="text-destructive">Confirmación adicional.</strong>
             <p className="mt-1 text-xs text-muted-foreground">
-              La escala plena (100,000 visitantes) puede generar ~1.5M eventos.
+              La prueba grande (100,000 visitantes) puede crear unos 1.5 millones de movimientos.
               {allowFull
-                ? " Marca la casilla para autorizar."
-                : " Bloqueada en este entorno (configure SIMULATION_ALLOW_FULL=true)."}
+                ? " Marca la casilla para autorizarla."
+                : " No está habilitada en este entorno; pídela al equipo técnico."}
             </p>
             <label className="mt-2 flex items-center gap-2 text-sm">
               <input
@@ -234,7 +266,7 @@ function SimulationConsole() {
                 disabled={!allowFull}
                 onChange={(e) => setConfirmFull(e.target.checked)}
               />
-              Entiendo el volumen y el costo. Autorizo ejecutar en full.
+              Entiendo el tamaño y el costo. Autorizo crear la prueba grande.
             </label>
           </div>
         )}
@@ -246,16 +278,16 @@ function SimulationConsole() {
             disabled={disabled}
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
-            {execute.isPending ? "Ejecutando…" : "Ejecutar simulación"}
+            {execute.isPending ? "Creando prueba…" : "Crear prueba"}
           </button>
           {execute.isError && (
             <span className="text-xs text-destructive">
-              {(execute.error as Error)?.message ?? "Falló la ejecución"}
+              {(execute.error as Error)?.message ?? "No se pudo crear la prueba"}
             </span>
           )}
           {execute.isSuccess && (
             <span className="text-xs text-emerald-600">
-              Corrida completada · run {execute.data.run_id.slice(0, 8)}…
+              Prueba lista ({execute.data.run_id.slice(0, 8)}…)
             </span>
           )}
         </div>
@@ -265,13 +297,14 @@ function SimulationConsole() {
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="flex items-end justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Historial de corridas</h2>
+            <h2 className="text-lg font-semibold">Pruebas realizadas</h2>
             <p className="text-xs text-muted-foreground">
-              Todas las corridas quedan como evidencia — incluso tras Wipe.
+              Cada prueba queda registrada, incluso después de borrarla.
             </p>
           </div>
           <div className="text-xs text-muted-foreground">
-            {activeRuns.length} activas · {(runs.data?.runs.length ?? 0) - activeRuns.length} wiped
+            {activeRuns.length} activas · {(runs.data?.runs.length ?? 0) - activeRuns.length}{" "}
+            borradas
           </div>
         </div>
 
@@ -279,12 +312,12 @@ function SimulationConsole() {
           <table className="min-w-full text-sm">
             <thead className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
-                <th className="py-2 text-left">Run</th>
-                <th className="py-2 text-left">Escala</th>
-                <th className="py-2 text-left">Seed</th>
+                <th className="py-2 text-left">Prueba</th>
+                <th className="py-2 text-left">Tamaño</th>
+                <th className="py-2 text-left">Código</th>
                 <th className="py-2 text-left">Estado</th>
-                <th className="py-2 text-left">Eventos</th>
-                <th className="py-2 text-left">Iniciada</th>
+                <th className="py-2 text-left">Movimientos</th>
+                <th className="py-2 text-left">Inicio</th>
                 <th className="py-2 text-right">Acciones</th>
               </tr>
             </thead>
@@ -294,7 +327,7 @@ function SimulationConsole() {
                 return (
                   <tr key={r.run_id} className="border-b border-border/50">
                     <td className="py-2 font-mono text-xs">{r.run_id.slice(0, 8)}…</td>
-                    <td className="py-2">{r.scale}</td>
+                    <td className="py-2">{SCALE_NAMES[r.scale] ?? r.scale}</td>
                     <td className="py-2 font-mono text-xs">{r.seed}</td>
                     <td className="py-2">
                       <span
@@ -309,7 +342,7 @@ function SimulationConsole() {
                                 : "bg-destructive/10 text-destructive")
                         }
                       >
-                        {r.status}
+                        {STATUS_NAMES[r.status] ?? r.status}
                       </span>
                     </td>
                     <td className="py-2">{events ? fmt(events) : "—"}</td>
@@ -325,27 +358,27 @@ function SimulationConsole() {
                               search={{ mode: "simulation", run: r.run_id }}
                               className="rounded-md border border-border px-2 py-1 text-xs"
                             >
-                              Ver simulación
+                              Ver sólo la prueba
                             </Link>
                             <Link
                               to="/cms/visitor-intel"
                               search={{ mode: "combined", run: r.run_id }}
                               className="rounded-md border border-border px-2 py-1 text-xs"
                             >
-                              Combinado
+                              Ver con visitas reales
                             </Link>
                             <button
                               type="button"
                               onClick={() => setWipeTarget(r)}
                               className="rounded-md border border-destructive/40 px-2 py-1 text-xs text-destructive"
                             >
-                              Wipe
+                              Borrar
                             </button>
                           </>
                         )}
                         {r.status === "failed" && r.error_message && (
                           <span title={r.error_message} className="text-xs text-destructive">
-                            ⚠ error
+                            ⚠ falló
                           </span>
                         )}
                       </div>
@@ -356,7 +389,7 @@ function SimulationConsole() {
               {(runs.data?.runs.length ?? 0) === 0 && (
                 <tr>
                   <td colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
-                    Aún no hay corridas. Configura una arriba y ejecuta.
+                    Aún no hay pruebas. Prepara una arriba y créala.
                   </td>
                 </tr>
               )}
@@ -373,12 +406,11 @@ function SimulationConsole() {
           aria-modal="true"
         >
           <div className="w-full max-w-lg rounded-xl border border-destructive/40 bg-card p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-destructive">Confirmar Wipe de simulación</h3>
+            <h3 className="text-lg font-semibold text-destructive">Borrar esta prueba</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Se eliminarán todos los eventos con{" "}
-              <code>simulation_run_id = {wipeTarget.run_id.slice(0, 8)}…</code>. El registro del run
-              se conservará como evidencia con estado <strong>wiped</strong>. Esta acción no se
-              puede deshacer.
+              Se borrarán todos los visitantes y movimientos simulados de la prueba{" "}
+              <code>{wipeTarget.run_id.slice(0, 8)}…</code>. Queda el registro de que existió,
+              marcado como <strong>Borrada</strong>. Esto no se puede deshacer.
             </p>
             <label className="mt-4 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Escribe <code>BORRAR SIMULACION</code> para confirmar
@@ -391,7 +423,7 @@ function SimulationConsole() {
             />
             {wipe.isError && (
               <p className="mt-2 text-xs text-destructive">
-                {(wipe.error as Error)?.message ?? "No se pudo eliminar"}
+                {(wipe.error as Error)?.message ?? "No se pudo borrar"}
               </p>
             )}
             <div className="mt-5 flex justify-end gap-3">
@@ -412,7 +444,7 @@ function SimulationConsole() {
                 onClick={() => wipe.mutate(wipeTarget.run_id)}
                 className="rounded-md bg-destructive px-3 py-2 text-sm font-medium text-destructive-foreground disabled:opacity-50"
               >
-                {wipe.isPending ? "Eliminando…" : "Ejecutar Wipe"}
+                {wipe.isPending ? "Borrando…" : "Borrar prueba"}
               </button>
             </div>
           </div>
