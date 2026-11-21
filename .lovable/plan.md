@@ -1,101 +1,97 @@
-# Alux, agente de ventas del Oriente Maya · web + WhatsApp + CRM
+# CRM Alux de Valladolid.mx · réplica mejorada del CRM de Zazil Tunich
 
-## La idea en una frase
+## La idea
 
-Alux deja de ser «un chat que contesta». Pasa a ser un **agente de ventas consultivo**. Conoce todo el territorio por el catálogo publicado. Ayuda primero, pide datos poco a poco y lleva a cada persona a uno de dos cierres:
+Se copia la forma de trabajar del **CRM Alux de Zazil Tunich**: prospectos, embudo, pase a asesor, comandos desde el teléfono y avisos. Se adapta a un destino completo, el Oriente Maya, y se mejora donde Zazil se queda corto.
 
-- **Venta directa:** compra en ese momento algo que ya tiene precio y pago en línea, en la web o por WhatsApp.
-- **Viaje armado:** se registra como viajero y un concierge humano le arma su viaje (CRM Arma tu viaje).
+Alux funciona como **agente de ventas**, no como chat. Conoce todo el catálogo publicado, ayuda primero, pide datos poco a poco y lleva a cada persona a uno de dos cierres:
 
-## Cómo vende Alux: 5 pasos
+- **Venta directa:** compra en ese momento algo que ya tiene precio y pago en línea.
+- **Viaje armado:** se registra como viajero y un concierge humano le arma el viaje (CRM Arma tu viaje).
 
-```text
-1 Descubre   ->  2 Recomienda   ->  3 Califica   ->  4 Pide contacto  ->  5 Cierra
-(qué busca)     (datos reales)     (fechas,        (WhatsApp/correo,   (paga ahora o
-                                    personas,       con permiso)        se registra para
-                                    presupuesto)                        su concierge)
-```
+## 1. Lo que se replica igual que en Zazil
 
-Reglas de estrategia:
+**Etapas del prospecto.** Se pueden cambiar a mano, como en Zazil.
 
-- **Primero da valor y luego pide.** Cada dato se pide después de entregar algo útil: una recomendación, una distancia, una ruta o un borrador del día.
-- **Pide una sola cosa a la vez**, con un motivo claro. Por ejemplo: «¿Cuántos son? Así te digo qué hotel les queda mejor».
-- **Nunca condiciona la ayuda.** Si la persona no quiere dar un dato, Alux sigue ayudando igual.
-- **Solo usa información publicada:** precios, horarios, distancias y disponibilidad del catálogo. Si algo no está confirmado, lo dice y ofrece al concierge.
-- **Siempre propone el siguiente paso:** «¿Lo agrego a tu viaje?», «¿Te paso el enlace para reservar?» o «¿Quieres que un concierge te arme los 3 días?».
-
-## Escalera de datos
-
-| Nivel | Qué sabe Alux | Dónde vive |
+| Zazil | Valladolid.mx | Grupo |
 |---|---|---|
-| 0 · Anónimo | intereses, destinos vistos | sólo en su dispositivo + cifras sin nombre |
-| 1 · Viaje | fechas, personas, tipo de viaje, presupuesto aproximado | su conversación, sin datos personales |
-| 2 · Contacto | WhatsApp o correo + permiso | **CRM Prospectos** |
-| 3 · Viajero | cuenta creada | **CRM Arma tu viaje** (con todo su historial) |
+| Nuevo | Nuevo | Prospectos |
+| Contactado | Contactado | Prospectos |
+| Preventa enviada | Propuesta enviada | Prospectos |
+| Compró | Reservó (con pago confirmado) | Cerradas |
+| Por visitar | Por viajar | Cerradas |
+| Visitó | Viajó | Cerradas |
+| Posventa hecha | Posventa hecha | Cerradas |
+| No interesado / Perdido | No interesado / Perdido | Perdidos |
 
-Temperatura del prospecto, para que el concierge sepa a quién atender primero:
-- **Frío:** solo explora.
-- **Tibio:** dio fechas o personas.
-- **Caliente:** dio fechas, personas e interés concreto, o pidió precio o reservar.
+**Tablero calculado:** Por atender → En conversación → Propuesta activa → Seguimiento agendado → Cerradas. Muestra los prospectos de los últimos 60 días.
 
-## Trato distinto para quien ya es prospecto
+**Entrada sin duplicados:** se busca primero por teléfono o correo y luego por la conversación. Si la persona ya existe, se actualiza su ficha. El nombre de WhatsApp solo se usa si no hay uno mejor.
 
-Cuando Alux reconoce a un prospecto (en la web o por WhatsApp):
+**Avance automático**
+- Al mandar una propuesta del concierge, pasa a «Propuesta enviada».
+- Al abrir el WhatsApp desde el CRM o contestar desde el teléfono, pasa de «Nuevo» a «Contactado».
+- Cuando un pago queda confirmado, pasa sola a «Reservó». Si hay duda sobre a quién pertenece el pago, no adivina: deja una nota para revisarlo.
+- Si una propuesta vence o se cancela, regresa a «Contactado». Nunca pasa sola a «Perdido».
 
-- Retoma lo que ya habló: «La vez pasada viste cenotes para 4 personas en marzo…».
-- No vuelve a pedir lo que ya sabe.
-- Su meta cambia de «conseguir contacto» a **avanzar una etapa**: propuesta, pago o registro.
-- Avisa al concierge cuando el prospecto se calienta o pide hablar con una persona.
+**Pase a asesor:** la conversación queda «pendiente» hasta que un concierge la toma. Se guardan quién la tomó, cuándo y la marca «Intervino asesor».
 
-## Atención por WhatsApp
+**Comandos del concierge desde su WhatsApp:** `#alux` (Alux retoma), `#apagar` (Alux se calla), `#cotizar`, `#enlace` (manda el enlace de pago), `#nota` y `#agenda <fecha>`. Alux borra el comando del chat para que el cliente no lo vea.
 
-1. **Entradas:** el botón «Sigue por WhatsApp» dentro de Alux, los enlaces o códigos QR en fichas y destinos, y cualquier persona que escriba al número.
-2. **Alux contesta por WhatsApp** con el mismo conocimiento y las mismas reglas que en la web. Quien escribe primero queda como prospecto, con su número y el permiso de que le contesten.
-3. **Pase a un humano:** desde CRM Prospectos el concierge «toma la conversación». Alux se pausa y solo sugiere respuestas. El concierge puede devolvérsela a Alux.
-4. **Regreso al registro:** cuando ya hay viaje en puerta, Alux manda un enlace del tipo «Crea tu cuenta y tu concierge te arma el viaje». El enlace viene ligado a ese prospecto. Al registrarse, la persona pasa sola al CRM Arma tu viaje, sin duplicarse.
-5. **Reglas de WhatsApp de Meta:** durante las 24 h después de que la persona escribe, se le contesta libre. Pasado ese tiempo, solo con mensajes de plantilla aprobados por Meta, que tardan hasta 48 h en aprobarse. Si escribe «BAJA», no se le vuelve a escribir.
+**Avisos:** campanita en la app, notificación al celular y correo.
+- Plática nueva.
+- El cliente pide un asesor.
+- El cliente dice que nadie lo ha contactado (urgente).
+- El cliente responde mientras lo atiende el equipo.
+- Una respuesta se atoró o la línea se desconectó.
+- Un enlace de pago está por vencer.
+- Un pase lleva más de 15 minutos sin tomar: aviso extra por tu agente de WhatsApp. Ese aviso no lleva nombre ni teléfono del cliente.
 
-## Qué se vende directo por WhatsApp
+## 2. Lo que se mejora frente a Zazil
 
-- **Sí:** experiencias, eventos y productos que ya tienen precio publicado y cobro en línea activo. Alux manda la ficha y el enlace de pago que ya usa la plataforma.
-- **No (pasa al concierge):** paquetes, combinaciones de hotel con tours, precios especiales y cualquier cosa sin precio publicado.
-- «Reservó» solo se marca cuando el pago está confirmado. Nunca se adivina.
+1. **Venta con estrategia de territorio.** Alux recomienda con distancias, rutas, horarios y resúmenes de reseñas de todo el Oriente Maya, no de un solo negocio.
+2. **Escalera de datos.** Alux pide un dato a la vez y siempre después de dar algo útil: primero fechas y personas, luego el contacto con permiso, y al final la cuenta. Nunca condiciona la ayuda.
+3. **Temperatura del prospecto** (frío, tibio o caliente), para que el concierge sepa a quién atender primero.
+4. **Regreso al registro** (Zazil no lo tiene). Por WhatsApp, Alux manda «Crea tu cuenta y tu concierge te arma el viaje» con un enlace ligado al prospecto. Al registrarse, la persona pasa sola al **CRM Arma tu viaje** con todo su historial.
+5. **Un perdido que vuelve a escribir regresa a Prospectos.** En Zazil esto no está garantizado; aquí sí.
+6. **No se pierden mensajes.** Cada mensaje entrante se guarda antes de procesarse y se reintenta si algo falla.
+7. **Canal intercambiable.** El CRM no depende del proveedor de WhatsApp. Hoy puede usar el mismo servidor de Zazil y mañana pasarse al WhatsApp oficial sin rehacer nada.
+8. **Comisiones.** Si un concierge cerró la venta, queda ligada a las comisiones por venta directa que ya existen.
 
-## Cuándo entra el concierge humano
+## 3. Conexión de WhatsApp
 
-- Pide hablar con una persona, un paquete o un precio especial.
-- Se vuelve «caliente».
-- Tiene una queja o un problema con una reserva.
-- Alux no tiene la información publicada para contestar.
+Zazil usa **Evolution API en Railway**: un teléfono vinculado por QR, no la versión oficial de Meta. Para Valladolid.mx hay dos caminos:
 
-Aviso al equipo: correo por cada prospecto nuevo o caliente y contador en la bandeja. Tu agente personal de WhatsApp solo recibe cifras, sin nombres ni teléfonos (su regla actual no cambia).
+- **Igual que Zazil:** una línea nueva para Valladolid.mx en ese mismo servidor, con su propio número, su propio nombre (`vmx-…`) y su propia clave. Los datos quedan separados de Zazil. Es rápido, pero Meta puede bloquear el número porque no es la vía oficial.
+- **WhatsApp oficial de Meta:** sin riesgo de bloqueo. Requiere aprobación de Meta, y fuera de las 24 horas después del último mensaje del cliente solo se le puede escribir con plantillas aprobadas.
 
-## Lo que se conserva
+El CRM se construye igual en los dos casos. Solo cambia la pieza que conecta.
 
-El CRM Arma tu viaje y sus expedientes, las plantillas públicas, Mi Viaje, el catálogo, los cobros actuales y el agente de WhatsApp del Founder. Los clientes de Zazil no se mezclan.
+## 4. Qué se vende directo y qué pasa al concierge
 
-## Fases
+- **Directo:** experiencias y eventos con precio publicado y cobro en línea activo. Alux manda la ficha y el enlace de pago que ya usa la plataforma.
+- **Al concierge:** paquetes, combinaciones de hotel con tours, precios especiales, bodas, grupos y cualquier cosa sin precio publicado.
 
-- **Fase 1 · Alux vendedor en la web + CRM Prospectos.** Reglas de venta consultiva, escalera de datos, oferta de contacto con permiso, temperatura, bandeja con responsable, notas y próxima fecha de seguimiento, y aviso por correo.
-- **Fase 2 · WhatsApp oficial.** Conectar el número de WhatsApp Business. Alux atiende y crea prospectos, y el concierge toma o devuelve la conversación. Requiere tu número y la aprobación de Meta.
-- **Fase 3 · Regreso al registro y embudo.** Enlace de registro ligado al prospecto, paso automático al CRM Arma tu viaje y tablero del embudo: Nuevo → Contactado → Propuesta enviada → Reservó → Por viajar → Viajó → Posventa.
-- **Fase 4 · Venta y seguimiento por WhatsApp.** Enlace de pago de productos vendibles y plantillas aprobadas por Meta (propuesta lista, recordatorio de pago, antes del viaje, posventa).
+## 5. Lo que se conserva
+
+El CRM Arma tu viaje y sus expedientes, las propuestas y los cobros actuales, Mi Viaje, las plantillas públicas y tu agente personal de WhatsApp. Los clientes de Zazil no se mezclan.
+
+## 6. Fases
+
+1. **CRM Prospectos en el panel del concierge:** ficha, etapas, tablero, responsable, notas, agenda y avisos. Alux en la web ofrece dejar el contacto con permiso.
+2. **WhatsApp:** Alux contesta, crea prospectos, hace el pase a asesor y entiende los comandos `#`. Requiere elegir el camino de conexión.
+3. **Cierre automático:** «Reservó» con pago confirmado, regreso de propuestas vencidas, enlace de registro ligado y paso al CRM Arma tu viaje.
+4. **Venta directa por WhatsApp y seguimiento:** enlace de pago con `#enlace`, recordatorios y posventa.
 
 Cada fase se aprueba por separado. Nada se publica sin tu visto bueno.
-
-## Lo que necesito de ti
-
-- El número que atenderá por WhatsApp. No debe estar ya conectado al servicio de Railway de Zazil.
-- Qué puede vender Alux directo.
-- El horario en que hay concierges humanos, para que Alux diga «te contacta hoy» o «mañana a primera hora».
 
 ---
 
 ## Detalles técnicos
 
-- **Conocimiento:** se reutiliza la búsqueda actual en el catálogo publicado (`converse-retrieval.server.ts`, `canonical-catalog.server.ts`) y el contrato de `converse.functions.ts`. Se añade un modo «venta consultiva» con reglas por nivel de la escalera. La regla 9 («no pidas datos personales») se sustituye por «ofrece una vez dejar contacto, con permiso». El modelo nunca recibe teléfono ni correo, solo un id de prospecto y el contexto del viaje.
-- **Datos:** `public.concierge_prospects` (contacto, consentimiento con fecha, canal, etapa, temperatura, responsable, notas, seguimiento, contexto del viaje y `user_id` vinculado al registrarse). Va con RLS por roles concierge/admin.
-- **WhatsApp (Fase 2):** conector oficial WhatsApp Business por el gateway de Lovable. Receptor firmado en `POST /api/public/whatsapp/webhook` con bandeja duradera `whatsapp_webhook_events` (idempotente por delivery id), mensajes entrantes y salientes con estados de entrega, deduplicación por id de mensaje, recuperación de pendientes y bandera de «tomado por humano» por conversación.
-- **Registro ligado:** enlace de un solo uso que guarda el id del prospecto. Al crear la cuenta se vincula a `user_id` y se crea o une el expediente de Arma tu viaje.
-- **Venta:** se reutiliza el sistema de pagos y órdenes existente (`src/lib/payments/*`, `concierge/orders.functions.ts`). Solo productos con precio y cobro activo.
-- **Controles:** Scope y Preservation Gate, pruebas de reglas (una vez por conversación, nunca bloquear, reservó solo con pago, no duplicar al registrarse), QA 390/834/1440 e inventario de gobernanza.
+- **Tablas (Fase 1):** `concierge_prospects`, modelada sobre `alux_leads` con los mismos campos, más `temperature`, `destination_slug`, `linked_user_id` y `travel_plan_id`. `concierge_prospect_sales`, modelada sobre `alux_lead_sales`. El estado de pase a asesor se agrega a las conversaciones de Alux existentes; no se crea una tabla de conversaciones paralela. Avisos sobre `notifications` y el push existente (`push-dispatch.server.ts`). Las etapas son texto, con la etapa cerrada marcada por trigger, igual que `alux_leads_closed_stamp`.
+- **Reglas en la base:** conciliación de venta (pago `partial`/`paid`, búsqueda única y diagnóstico cuando hay ambigüedad), regreso de propuestas vencidas por cron de un minuto (máximo 100 por corrida) y reapertura de perdidos.
+- **WhatsApp (Fase 2):** puerto de canal `src/lib/crm/channel/*` con dos adaptadores: Evolution (`EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, token del webhook comparado en tiempo constante) y Meta oficial (conector del gateway). Receptor en `/api/public/whatsapp/webhook`, con bandeja duradera idempotente por id de mensaje y un candado para mandar una sola respuesta a la vez por plática.
+- **Alux:** se reutilizan `converse-retrieval.server.ts` y `canonical-catalog.server.ts`. La regla «no pidas datos personales» se cambia por «ofrece el contacto una vez, con permiso». El modelo nunca recibe teléfono ni correo.
+- **Permisos:** RLS solo para concierge, líder y admin; el servidor usa rol de servicio solo después de verificar a quién llama.
+- **Controles:** Scope y Preservation Gate, pruebas de cada regla (sin duplicados, «Reservó» solo con pago, propuesta vencida regresa a «Contactado», el perdido se reabre, el registro liga sin duplicar), QA 390/834/1440 e inventario de gobernanza.

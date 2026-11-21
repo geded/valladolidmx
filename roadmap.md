@@ -3,7 +3,8 @@
 ## CRM del concierge en dos secciones · 2026-11-21
 
 - [ ] Replantear alcance: Alux como agente de ventas (web + WhatsApp), captura progresiva de datos, regreso al registro y venta directa por WhatsApp (plan en revisión).
-- [ ] Conectar un número oficial de WhatsApp Business (espera número y aprobación de Meta).
+- [ ] Replicar y mejorar el CRM Alux de Zazil Tunich (etapas, tablero, pase a asesor, comandos #, avisos, cierre automático por pago) — plan en revisión.
+- [ ] Elegir conexión de WhatsApp: Evolution/Railway como Zazil u oficial de Meta (espera decisión del Founder).
 
 - [ ] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (borrador en la tarjeta de plan).
 - [ ] Fase 1 · Captura consentida de WhatsApp/correo en Alux y bandeja «CRM Prospectos».
