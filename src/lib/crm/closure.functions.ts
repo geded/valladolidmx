@@ -51,6 +51,13 @@ export const createProspectInvite = createServerFn({ method: "POST" })
         purpose: z.enum(["register", "pay"]),
         productId: z.string().uuid().nullable().default(null),
         sendWhatsApp: z.boolean().default(false),
+        quantity: z.number().int().min(1).max(50).default(1),
+        visitDate: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .nullable()
+          .default(null),
+        ttlHours: z.number().int().min(1).max(720).optional(),
       })
       .refine((v) => (v.purpose === "pay") === Boolean(v.productId), "product_required")
       .parse(d),
@@ -77,8 +84,17 @@ export const createProspectInvite = createServerFn({ method: "POST" })
         via: "panel",
         origin: await requestOrigin(),
         send: data.sendWhatsApp,
+        quantity: data.quantity,
+        visitDate: data.visitDate,
+        ...(data.ttlHours !== undefined ? { ttlHours: data.ttlHours } : {}),
       });
-      return { ok: true as const, url: r.url, sent: r.sent, sendError: r.sendError };
+      return {
+        ok: true as const,
+        url: r.url,
+        sent: r.sent,
+        sendError: r.sendError,
+        folio: r.presale?.folio ?? null,
+      };
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";
       if (msg === "not_sellable")
@@ -100,6 +116,12 @@ export type ProspectInviteRow = {
   expires_at: string;
   opened_at: string | null;
   used_at: string | null;
+  folio: string | null;
+  quantity: number;
+  total_amount: number | null;
+  currency: string | null;
+  cancelled_at: string | null;
+  order_id: string | null;
 };
 
 export const listProspectInvites = createServerFn({ method: "POST" })
@@ -109,7 +131,9 @@ export const listProspectInvites = createServerFn({ method: "POST" })
     await assertStaff(context as never);
     const { data: rows, error } = await context.supabase
       .from("crm_prospect_invites")
-      .select("id, created_at, purpose, product_id, channel, expires_at, opened_at, used_at")
+      .select(
+        "id, created_at, purpose, product_id, channel, expires_at, opened_at, used_at, folio, quantity, total_amount, currency, cancelled_at, order_id",
+      )
       .eq("prospect_id", data.prospectId)
       .order("created_at", { ascending: false })
       .limit(20);
@@ -145,7 +169,7 @@ export const markRecontactDone = createServerFn({ method: "POST" })
 /* ───────────────────────────── público ───────────────────────────── */
 
 export type PublicInviteView =
-  | { status: "invalid" | "expired" | "used" }
+  | { status: "invalid" | "expired" | "used" | "cancelled" }
   | {
       status: "valid";
       firstName: string;
@@ -154,6 +178,15 @@ export type PublicInviteView =
       language: string;
       purpose: "register" | "pay";
       product: { name: string; price: number; currency: string } | null;
+      /** Preventa: folio, personas, total congelado (centavos) y vencimiento. */
+      presale: {
+        folio: string;
+        quantity: number;
+        totalCents: number;
+        currency: string;
+        visitDate: string | null;
+        expiresAt: string;
+      } | null;
       destinations: string[];
       items: string[];
       startDate: string | null;
@@ -172,10 +205,13 @@ export const getProspectInvitePublic = createServerFn({ method: "POST" })
     const hash = await rules.hashInviteToken(data.token);
     const { data: inv } = await supabaseAdmin
       .from("crm_prospect_invites")
-      .select("id, prospect_id, purpose, product_id, expires_at, opened_at, used_at")
+      .select(
+        "id, prospect_id, purpose, product_id, expires_at, opened_at, used_at, cancelled_at, folio, quantity, total_amount, currency, visit_date",
+      )
       .eq("token_hash", hash)
       .maybeSingle();
     if (!inv) return { status: "invalid" };
+    if (inv.cancelled_at) return { status: "cancelled" };
     const state = rules.inviteState(inv);
     if (state !== "valid") return { status: state };
     if (!inv.opened_at) {
@@ -210,6 +246,17 @@ export const getProspectInvitePublic = createServerFn({ method: "POST" })
       language: prospect.language,
       purpose: inv.purpose as "register" | "pay",
       product: product ? { name: product.name, price: product.price, currency: product.currency } : null,
+      presale:
+        inv.purpose === "pay" && inv.folio
+          ? {
+              folio: inv.folio,
+              quantity: inv.quantity,
+              totalCents: inv.total_amount ?? (product ? product.price * inv.quantity : 0),
+              currency: inv.currency ?? product?.currency ?? "MXN",
+              visitDate: inv.visit_date,
+              expiresAt: inv.expires_at,
+            }
+          : null,
       destinations: rules.tripDestinations(prospect),
       items: prospect.trip_items
         .map((i) => i.title)
@@ -224,10 +271,10 @@ export const getProspectInvitePublic = createServerFn({ method: "POST" })
 /* ───────────────────────────── viajero con sesión ───────────────────────────── */
 
 export type RedeemResult =
-  | { ok: true; caseId: string; planId: string | null; orderId: string | null }
+  | { ok: true; caseId: string; planId: string | null; orderId: string | null; presaleExpired?: boolean }
   | {
       ok: false;
-      error: "invalid" | "expired" | "used" | "other_account" | "account_has_prospect" | "failed";
+      error: "invalid" | "expired" | "used" | "cancelled" | "other_account" | "account_has_prospect" | "failed";
     };
 
 export const redeemProspectInvite = createServerFn({ method: "POST" })
@@ -255,7 +302,11 @@ export const redeemProspectInvite = createServerFn({ method: "POST" })
       return {
         ok: false,
         error:
-          st === "expired" || st === "used" || st === "other_account" || st === "account_has_prospect"
+          st === "expired" ||
+          st === "used" ||
+          st === "cancelled" ||
+          st === "other_account" ||
+          st === "account_has_prospect"
             ? st
             : "invalid",
       };
@@ -399,12 +450,66 @@ export const redeemProspectInvite = createServerFn({ method: "POST" })
     // 5. Enlace de pago: la orden de venta directa existente (sólo experiencias).
     let orderId: string | null = null;
     if (claim.purpose === "pay" && claim.product_id) {
+      const { data: inv } = await supabaseAdmin
+        .from("crm_prospect_invites")
+        .select("id, folio, quantity, total_amount, expires_at, order_id")
+        .eq("id", claim.invite_id)
+        .maybeSingle();
+      const presale = inv as {
+        id: string;
+        folio: string | null;
+        quantity: number;
+        total_amount: number | null;
+        expires_at: string;
+        order_id: string | null;
+      } | null;
+      if (presale && new Date(presale.expires_at).getTime() < Date.now()) {
+        // La preventa venció: su viaje y su expediente quedan, pero ya no se cobra con ese enlace.
+        return { ok: true, caseId: caseId as string, planId, orderId: null, presaleExpired: true };
+      }
+      // Cobro existente de la plataforma: la reservación de venta directa con sus personas.
       const { data: oid, error: orderError } = await user.rpc("concierge_create_direct_sale_order", {
         _product_id: claim.product_id,
-        _quantity: 1,
+        _quantity: presale?.quantity ?? 1,
       });
       if (orderError) console.warn("[crm.redeem] orden", orderError.message);
       else if (typeof oid === "string") orderId = oid;
+      if (orderId && presale && (!presale.order_id || presale.order_id === orderId)) {
+        const { data: ord } = await supabaseAdmin
+          .from("concierge_orders")
+          .select("id, user_id, total_amount, metadata, status")
+          .eq("id", orderId)
+          .maybeSingle();
+        const o = ord as {
+          id: string;
+          user_id: string | null;
+          total_amount: number;
+          metadata: Record<string, unknown> | null;
+          status: string;
+        } | null;
+        if (o && o.user_id === context.userId) {
+          await supabaseAdmin
+            .from("crm_prospect_invites")
+            .update({ order_id: o.id } as never)
+            .eq("id", presale.id);
+          if (o.status === "draft" || o.status === "awaiting_payment") {
+            await supabaseAdmin
+              .from("concierge_orders")
+              .update({
+                expires_at: presale.expires_at,
+                metadata: {
+                  ...(o.metadata ?? {}),
+                  presale_folio: presale.folio,
+                  presale_invite_id: presale.id,
+                  ...(presale.total_amount !== null && presale.total_amount !== o.total_amount
+                    ? { presale_total_differs: presale.total_amount }
+                    : {}),
+                },
+              } as never)
+              .eq("id", o.id);
+          }
+        }
+      }
     }
     return { ok: true, caseId: caseId as string, planId, orderId };
   });

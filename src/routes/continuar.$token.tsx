@@ -19,6 +19,8 @@ import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
 import { getProspectInvitePublic, redeemProspectInvite, type RedeemResult } from "@/lib/crm/closure.functions";
 import { toClosureLanguage, type ClosureLanguage } from "@/lib/crm/closure-rules";
 import { clearPendingInvite, rememberPendingInvite } from "@/lib/crm/pending-invite";
+import { presaleMoney } from "@/lib/crm/presale-rules";
+import { formatMeridaDateTime } from "@/lib/time/merida";
 
 export const Route = createFileRoute("/continuar/$token")({
   head: () =>
@@ -45,6 +47,10 @@ type Copy = {
   invalid: string;
   expired: string;
   used: string;
+  cancelled: string;
+  presaleExpired: string;
+  total: string;
+  until: (d: string) => string;
   otherAccount: string;
   failed: string;
   retry: string;
@@ -66,6 +72,10 @@ const COPY: Record<ClosureLanguage, Copy> = {
     invalid: "Este enlace no es válido.",
     expired: "Este enlace ya venció. Escríbele a tu concierge para que te mande uno nuevo.",
     used: "Este enlace ya se usó. Entra con tu cuenta para ver tu viaje.",
+    cancelled: "Esta preventa se canceló. Escríbele a tu concierge si quieres reservar.",
+    presaleExpired: "Tu viaje quedó guardado, pero la preventa ya venció. Pide a tu concierge que la amplíe para pagar.",
+    total: "Total",
+    until: (d) => `Vence el ${d} (hora de Yucatán)`,
     otherAccount: "Este enlace pertenece a otra cuenta. Entra con la cuenta con la que te registraste.",
     failed: "No pudimos guardar tu viaje. Inténtalo de nuevo en un momento.",
     retry: "Intentar de nuevo",
@@ -85,6 +95,10 @@ const COPY: Record<ClosureLanguage, Copy> = {
     invalid: "This link is not valid.",
     expired: "This link has expired. Ask your concierge for a new one.",
     used: "This link was already used. Sign in to see your trip.",
+    cancelled: "This pre-booking was cancelled. Message your concierge if you want to book.",
+    presaleExpired: "Your trip was saved, but the pre-booking has expired. Ask your concierge to extend it to pay.",
+    total: "Total",
+    until: (d) => `Expires on ${d} (Yucatán time)`,
     otherAccount: "This link belongs to another account. Sign in with the account you registered with.",
     failed: "We couldn't save your trip. Please try again in a moment.",
     retry: "Try again",
@@ -104,6 +118,10 @@ const COPY: Record<ClosureLanguage, Copy> = {
     invalid: "Ce lien n'est pas valide.",
     expired: "Ce lien a expiré. Demandez-en un nouveau à votre concierge.",
     used: "Ce lien a déjà été utilisé. Connectez-vous pour voir votre voyage.",
+    cancelled: "Cette préréservation a été annulée. Écrivez à votre concierge pour réserver.",
+    presaleExpired: "Votre voyage est enregistré, mais la préréservation a expiré. Demandez à votre concierge de la prolonger.",
+    total: "Total",
+    until: (d) => `Expire le ${d} (heure du Yucatán)`,
     otherAccount: "Ce lien appartient à un autre compte.",
     failed: "Nous n'avons pas pu enregistrer votre voyage. Réessayez dans un instant.",
     retry: "Réessayer",
@@ -123,6 +141,10 @@ const COPY: Record<ClosureLanguage, Copy> = {
     invalid: "Dieser Link ist ungültig.",
     expired: "Dieser Link ist abgelaufen. Bitte deinen Concierge um einen neuen.",
     used: "Dieser Link wurde schon benutzt. Melde dich an, um deine Reise zu sehen.",
+    cancelled: "Diese Vorreservierung wurde storniert. Schreib deinem Concierge, wenn du buchen möchtest.",
+    presaleExpired: "Deine Reise ist gespeichert, aber die Vorreservierung ist abgelaufen. Bitte deinen Concierge, sie zu verlängern.",
+    total: "Gesamt",
+    until: (d) => `Läuft am ${d} ab (Yucatán-Zeit)`,
     otherAccount: "Dieser Link gehört zu einem anderen Konto.",
     failed: "Wir konnten deine Reise nicht speichern. Versuch es gleich noch einmal.",
     retry: "Erneut versuchen",
@@ -142,6 +164,10 @@ const COPY: Record<ClosureLanguage, Copy> = {
     invalid: "Questo link non è valido.",
     expired: "Questo link è scaduto. Chiedine uno nuovo al tuo concierge.",
     used: "Questo link è già stato usato. Accedi per vedere il tuo viaggio.",
+    cancelled: "Questa prevendita è stata annullata. Scrivi al tuo concierge se vuoi prenotare.",
+    presaleExpired: "Il tuo viaggio è salvato, ma la prevendita è scaduta. Chiedi al tuo concierge di prolungarla.",
+    total: "Totale",
+    until: (d) => `Scade il ${d} (ora dello Yucatán)`,
     otherAccount: "Questo link appartiene a un altro account.",
     failed: "Non siamo riusciti a salvare il tuo viaggio. Riprova tra un momento.",
     retry: "Riprova",
@@ -161,20 +187,16 @@ const COPY: Record<ClosureLanguage, Copy> = {
     invalid: "Este link não é válido.",
     expired: "Este link expirou. Peça um novo ao seu concierge.",
     used: "Este link já foi usado. Entre na sua conta para ver sua viagem.",
+    cancelled: "Esta pré-reserva foi cancelada. Fale com o seu concierge se quiser reservar.",
+    presaleExpired: "Sua viagem foi salva, mas a pré-reserva venceu. Peça ao seu concierge para ampliá-la.",
+    total: "Total",
+    until: (d) => `Vence em ${d} (horário de Yucatán)`,
     otherAccount: "Este link pertence a outra conta.",
     failed: "Não conseguimos salvar sua viagem. Tente novamente em instantes.",
     retry: "Tentar novamente",
     back: "Ir para o início",
   },
 };
-
-function money(amount: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(amount);
-  } catch {
-    return `${amount} ${currency}`;
-  }
-}
 
 function ContinueInvitePage() {
   const { token } = Route.useParams();
@@ -234,14 +256,20 @@ function ContinueInvitePage() {
   } else if (redeem === "working") {
     body = <p className="text-sm text-muted-foreground">{t.working}</p>;
   } else if (redeem && redeem.ok) {
-    body = <p className="text-base font-medium text-foreground">{t.done}</p>;
+    body = redeem.presaleExpired ? (
+      <Message text={t.presaleExpired} back={t.back} />
+    ) : (
+      <p className="text-base font-medium text-foreground">{t.done}</p>
+    );
   } else if (redeem && !redeem.ok) {
     const msg =
       redeem.error === "expired"
         ? t.expired
         : redeem.error === "used"
           ? t.used
-          : redeem.error === "other_account" || redeem.error === "account_has_prospect"
+          : redeem.error === "cancelled"
+            ? t.cancelled
+            : redeem.error === "other_account" || redeem.error === "account_has_prospect"
             ? t.otherAccount
             : redeem.error === "failed"
               ? t.failed
@@ -255,7 +283,12 @@ function ContinueInvitePage() {
     );
   } else if (!view.data || view.data.status !== "valid") {
     const st = view.data?.status;
-    body = <Message text={st === "expired" ? t.expired : st === "used" ? t.used : t.invalid} back={t.back} />;
+    body = (
+      <Message
+        text={st === "expired" ? t.expired : st === "used" ? t.used : st === "cancelled" ? t.cancelled : t.invalid}
+        back={t.back}
+      />
+    );
   } else {
     const v = view.data;
     body = (
@@ -268,8 +301,21 @@ function ContinueInvitePage() {
         </header>
         {v.product ? (
           <div className="rounded-lg border border-border bg-card p-4">
+            {v.presale ? <p className="font-mono text-xs text-muted-foreground">{v.presale.folio}</p> : null}
             <p className="font-semibold">{v.product.name}</p>
-            <p className="text-sm text-muted-foreground">{money(v.product.price, v.product.currency)}</p>
+            {v.presale ? (
+              <>
+                <p className="mt-1 text-sm text-muted-foreground">{t.people(v.presale.quantity)}</p>
+                <p className="mt-2 text-base">
+                  {t.total}: <strong>{presaleMoney(v.presale.totalCents, v.presale.currency)}</strong>
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t.until(formatMeridaDateTime(v.presale.expiresAt, lang === "es" ? "es-MX" : lang) ?? "")}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">{presaleMoney(v.product.price, v.product.currency)}</p>
+            )}
           </div>
         ) : null}
         {v.destinations.length || v.items.length || v.startDate || v.partySize ? (

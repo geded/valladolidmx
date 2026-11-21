@@ -43,7 +43,7 @@ import {
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
 import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
 import { ShoppingBag, CalendarDays } from "lucide-react";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Timer } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -616,6 +616,16 @@ const concierge: WorkspaceDefinition = {
       group: "trabajo",
       order: 2,
       surfaces: ["sidebar", "bottom", "palette"],
+    },
+    {
+      id: "concierge.presales",
+      workspaceId: "concierge",
+      label: "Preventa",
+      icon: Timer,
+      to: "/concierge/preventa",
+      group: "trabajo",
+      order: 2.1,
+      surfaces: ["sidebar", "palette"],
     },
     {
       id: "concierge.proposals",

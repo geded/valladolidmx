@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ReservationsTabs } from "@/components/concierge/ReservationsTabs";
 import {
   listConciergeReservations,
   reservationPaymentLabel,
@@ -94,6 +95,7 @@ function ReservationsPage() {
           ERL identifica experiencias en línea; AVL identifica viajes armados por Concierge.
         </p>
       </header>
+      <ReservationsTabs active="/concierge/reservaciones" />
       <section
         className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
         aria-label="Resumen de reservaciones"

@@ -330,13 +330,17 @@ async function sendEnlaceFromCommand(
   if (!session.prospect_id) {
     return "No se envió el enlace: esta plática todavía no tiene ficha de prospecto.";
   }
-  const [{ parseEnlaceArg }, invites] = await Promise.all([
+  const [{ parseEnlaceArg }, invites, { splitQuantity }] = await Promise.all([
     import("@/lib/crm/closure-rules"),
     import("@/lib/crm/invites.server"),
+    import("@/lib/crm/presale-rules"),
   ]);
   const target = parseEnlaceArg(arg);
   let productId: string | null = null;
+  // `#enlace cenote suytun 4` → preventa para 4 personas.
+  const split = splitQuantity(target.query ?? "");
   if (target.purpose === "pay") {
+    target.query = split.query;
     const found = await invites.searchSellableExperiences(admin, target.query ?? "", 3);
     if (found.length !== 1) {
       return found.length
@@ -363,10 +367,11 @@ async function sendEnlaceFromCommand(
       via: "whatsapp_command",
       origin,
       send: true,
+      quantity: target.purpose === "pay" ? split.quantity : 1,
     });
     if (!r.sent) return `Enlace creado, pero no se pudo enviar: ${r.sendError ?? "sin detalle"}`;
     return r.purpose === "pay"
-      ? `Enlace de pago de «${r.productName}» enviado al cliente (#enlace).`
+      ? `Preventa ${r.presale?.folio ?? ""} de «${r.productName}» para ${split.quantity} enviada al cliente (#enlace).`
       : "Enlace personal para crear su cuenta enviado al cliente (#enlace).";
   } catch (e) {
     const msg = e instanceof Error ? e.message : "";

@@ -2,9 +2,9 @@
  * CRM Prospectos · Fase 3 · pase a CRM Arma tu viaje y enlaces personales.
  *
  * - Si ya creó su cuenta: «Convertido a viajero» y acceso a su expediente.
- * - Si no: enlace personal para crear su cuenta (con lo platicado) o enlace de
- *   pago de una experiencia con venta directa. Se copia o se manda por la
- *   plática de WhatsApp.
+ * - Si no: enlace personal para crear su cuenta (con lo platicado) o preventa
+ *   de una experiencia con venta directa (folio, personas, total y vigencia,
+ *   como en Zazil). Se copia o se manda por la plática de WhatsApp.
  */
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,18 +15,19 @@ import { toast } from "@/lib/toast";
 import { meridaDateTime } from "@/lib/time/merida";
 import { inviteState } from "@/lib/crm/closure-rules";
 import {
+  PRESALE_DEFAULT_TTL_HOURS,
+  PRESALE_STATE_LABEL,
+  PRESALE_TTL_OPTIONS,
+  presaleMoney,
+  presaleState,
+  presaleTotal,
+  ttlLabel,
+} from "@/lib/crm/presale-rules";
+import {
   createProspectInvite,
   listProspectInvites,
   searchDirectSaleExperiences,
 } from "@/lib/crm/closure.functions";
-
-function money(amount: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(amount);
-  } catch {
-    return `${amount} ${currency}`;
-  }
-}
 
 const STATE_LABEL = { valid: "Vigente", used: "Usado", expired: "Vencido" } as const;
 
@@ -50,6 +51,9 @@ export function ProspectClosurePanel({
   const [mode, setMode] = useState<"register" | "pay">("register");
   const [query, setQuery] = useState("");
   const [productId, setProductId] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [visitDate, setVisitDate] = useState("");
+  const [ttlHours, setTtlHours] = useState<number>(PRESALE_DEFAULT_TTL_HOURS);
   const [busy, setBusy] = useState(false);
   const [lastUrl, setLastUrl] = useState<string | null>(null);
 
@@ -92,7 +96,13 @@ export function ProspectClosurePanel({
     setBusy(true);
     try {
       const r = await createFn({
-        data: { prospectId, purpose: mode, productId: mode === "pay" ? productId : null, sendWhatsApp: send },
+        data: {
+          prospectId,
+          purpose: mode,
+          productId: mode === "pay" ? productId : null,
+          sendWhatsApp: send,
+          ...(mode === "pay" ? { quantity, visitDate: visitDate || null, ttlHours } : {}),
+        },
       });
       if (!r.ok) {
         toast.error(r.error);
@@ -104,7 +114,8 @@ export function ProspectClosurePanel({
       } catch {
         /* el enlace queda visible para copiarlo a mano */
       }
-      if (send && r.sent) toast.success("Enlace enviado por WhatsApp y copiado.");
+      if (r.folio) void qc.invalidateQueries({ queryKey: ["crm-presales"] });
+      if (send && r.sent) toast.success(r.folio ? `Preventa ${r.folio} enviada por WhatsApp.` : "Enlace enviado por WhatsApp y copiado.");
       else if (send) toast.error(`Enlace copiado, pero no se envió: ${r.sendError ?? "sin detalle"}`);
       else toast.success("Enlace copiado. Pégalo en la plática con el cliente.");
       void qc.invalidateQueries({ queryKey: ["crm-prospect-invites", prospectId] });
@@ -126,7 +137,7 @@ export function ProspectClosurePanel({
         {(
           [
             ["register", "Crear su cuenta"],
-            ["pay", "Pagar una experiencia"],
+            ["pay", "Preventa de experiencia"],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -173,7 +184,9 @@ export function ProspectClosurePanel({
                     }`}
                   >
                     <span className="truncate">{x.name}</span>
-                    <span className="shrink-0 text-xs text-muted-foreground">{money(x.price, x.currency)}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {presaleMoney(x.price, x.currency)} por persona
+                    </span>
                   </button>
                 </li>
               ))}
@@ -183,6 +196,56 @@ export function ProspectClosurePanel({
               No hay experiencias con venta directa que coincidan. Lo demás lo cotiza el concierge.
             </p>
           )}
+          <div className="grid gap-2 sm:grid-cols-3">
+            <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+              Personas
+              <input
+                type="number"
+                min={1}
+                max={50}
+                inputMode="numeric"
+                value={quantity}
+                onChange={(e) => setQuantity(Math.min(Math.max(Number(e.target.value) || 1, 1), 50))}
+                className="min-h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+              Fecha de visita (opcional)
+              <input
+                type="date"
+                value={visitDate}
+                onChange={(e) => setVisitDate(e.target.value)}
+                className="min-h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+              Vence en
+              <select
+                value={ttlHours}
+                onChange={(e) => setTtlHours(Number(e.target.value))}
+                className="min-h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+              >
+                {PRESALE_TTL_OPTIONS.map((h) => (
+                  <option key={h} value={h}>
+                    {ttlLabel(h)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {(() => {
+            const chosen = experiences.data?.find((x) => x.id === productId);
+            return chosen ? (
+              <p className="text-sm">
+                Total de la preventa:{" "}
+                <strong>{presaleMoney(presaleTotal(chosen.price, quantity), chosen.currency)}</strong>
+                <span className="text-muted-foreground">
+                  {" "}
+                  · se paga completo por el cobro de la plataforma · reemplaza otra preventa activa del cliente
+                </span>
+              </p>
+            ) : null;
+          })()}
         </div>
       ) : null}
 
@@ -220,10 +283,24 @@ export function ProspectClosurePanel({
           <h3 className="text-sm font-semibold">Enlaces enviados</h3>
           <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
             {invites.data.map((i) => {
+              if (i.purpose === "pay") {
+                const ps = presaleState(i, null);
+                return (
+                  <li key={i.id}>
+                    <Link to="/concierge/preventa" className="font-mono font-semibold text-primary hover:underline">
+                      {i.folio ?? "Preventa"}
+                    </Link>{" "}
+                    · {presaleMoney(i.total_amount, i.currency ?? "MXN")} · {meridaDateTime(i.created_at)} ·{" "}
+                    <span className={ps === "vigente" ? "text-success" : ""}>{PRESALE_STATE_LABEL[ps]}</span>
+                    {i.opened_at && !i.used_at ? " · lo abrió" : ""}
+                    {i.channel === "whatsapp_command" ? " · desde el teléfono (#enlace)" : ""}
+                  </li>
+                );
+              }
               const st = inviteState(i);
               return (
                 <li key={i.id}>
-                  {i.purpose === "pay" ? "Pago de experiencia" : "Crear cuenta"} · {meridaDateTime(i.created_at)} ·{" "}
+                  Crear cuenta · {meridaDateTime(i.created_at)} ·{" "}
                   <span className={st === "valid" ? "text-success" : ""}>{STATE_LABEL[st]}</span>
                   {i.opened_at && !i.used_at ? " · lo abrió" : ""}
                   {i.channel === "whatsapp_command" ? " · desde el teléfono (#enlace)" : ""}

@@ -15,6 +15,7 @@ import {
   inviteUrl,
   type InvitePurpose,
 } from "./closure-rules";
+import { PRESALE_DEFAULT_TTL_HOURS, presaleMessage, presaleTotal } from "./presale-rules";
 
 type Admin = (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
 
@@ -80,6 +81,14 @@ export interface CreatedInvite {
   url: string;
   purpose: InvitePurpose;
   productName: string | null;
+  /** Sólo preventas (enlace de pago). */
+  presale: {
+    folio: string;
+    quantity: number;
+    totalCents: number;
+    currency: string;
+    expiresAt: string;
+  } | null;
 }
 
 export async function createProspectInviteRecord(
@@ -91,18 +100,35 @@ export async function createProspectInviteRecord(
     createdBy: string | null;
     channel: "panel" | "whatsapp_command";
     origin: string;
+    /** Preventa: personas, fecha de visita y vigencia en horas. */
+    quantity?: number;
+    visitDate?: string | null;
+    ttlHours?: number;
   },
 ): Promise<CreatedInvite> {
-  let productName: string | null = null;
+  let product: SellableExperience | null = null;
   if (input.purpose === "pay") {
     if (!input.productId) throw new Error("product_required");
-    const product = await getSellableExperience(admin, input.productId);
+    product = await getSellableExperience(admin, input.productId);
     if (!product) throw new Error("not_sellable");
-    productName = product.name;
   }
   const token = generateInviteToken();
   const hash = await hashInviteToken(token);
-  const expires = new Date(Date.now() + INVITE_TTL_DAYS * 86_400_000).toISOString();
+  const quantity = Math.min(Math.max(Math.trunc(input.quantity ?? 1) || 1, 1), 50);
+  const ttlHours = input.purpose === "pay" ? (input.ttlHours ?? PRESALE_DEFAULT_TTL_HOURS) : null;
+  const expires = new Date(
+    Date.now() + (ttlHours ? ttlHours * 3_600_000 : INVITE_TTL_DAYS * 86_400_000),
+  ).toISOString();
+  const presaleFields = product
+    ? {
+        quantity,
+        unit_amount: product.price,
+        total_amount: presaleTotal(product.price, quantity),
+        currency: product.currency,
+        visit_date: input.visitDate && /^\d{4}-\d{2}-\d{2}$/.test(input.visitDate) ? input.visitDate : null,
+        ttl_hours: ttlHours,
+      }
+    : {};
   const { data, error } = await admin
     .from("crm_prospect_invites")
     .insert({
@@ -113,22 +139,112 @@ export async function createProspectInviteRecord(
       created_by: input.createdBy,
       channel: input.channel,
       expires_at: expires,
+      ...presaleFields,
     } as never)
-    .select("id")
+    .select("id, folio")
     .single();
   if (error || !data) throw new Error(`invite_insert_failed: ${error?.message ?? "sin fila"}`);
+  const row = data as { id: string; folio: string | null };
+
+  // Una sola preventa activa por cliente (como en Zazil): la nueva reemplaza a las anteriores.
+  if (product) {
+    const { data: older } = await admin
+      .from("crm_prospect_invites")
+      .select("id, order_id, expires_at")
+      .eq("prospect_id", input.prospectId)
+      .eq("purpose", "pay")
+      .is("cancelled_at", null)
+      .neq("id", row.id);
+    for (const o of (older ?? []) as Array<{ id: string; order_id: string | null; expires_at: string }>) {
+      const { error: cErr } = await admin.rpc("crm_presale_cancel", {
+        _invite_id: o.id,
+        _actor: input.createdBy as string,
+        _reason: `Reemplazada por ${row.folio ?? "otra preventa"}`,
+      });
+      // Una preventa ya pagada no se cancela: la base la protege.
+      if (cErr && !/presale_paid/.test(cErr.message)) console.warn("[crm.presale] no se reemplazó", cErr.message);
+    }
+  }
+
   const { error: evError } = await admin.from("concierge_prospect_events").insert({
     prospect_id: input.prospectId,
     kind: "invite_created",
     actor_user_id: input.createdBy,
-    body:
-      input.purpose === "pay"
-        ? `Enlace de pago creado para «${productName}».`
-        : "Enlace personal para crear su cuenta creado.",
-    meta: { invite_id: data.id, purpose: input.purpose, channel: input.channel },
+    body: product
+      ? `Preventa ${row.folio ?? ""} creada: «${product.name}» para ${quantity} ${quantity === 1 ? "persona" : "personas"}.`
+      : "Enlace personal para crear su cuenta creado.",
+    meta: { invite_id: row.id, purpose: input.purpose, channel: input.channel, folio: row.folio },
   } as never);
   if (evError) console.warn("[crm.invite] evento no guardado", evError.message);
-  return { inviteId: data.id as string, url: inviteUrl(input.origin, token), purpose: input.purpose, productName };
+  return {
+    inviteId: row.id,
+    url: inviteUrl(input.origin, token),
+    purpose: input.purpose,
+    productName: product?.name ?? null,
+    presale: product
+      ? {
+          folio: row.folio ?? "",
+          quantity,
+          totalCents: presaleTotal(product.price, quantity),
+          currency: product.currency,
+          expiresAt: expires,
+        }
+      : null,
+  };
+}
+
+/** Nuevo enlace para la misma preventa (el anterior deja de servir). */
+export async function rotatePresaleLink(
+  admin: Admin,
+  inviteId: string,
+  origin: string,
+): Promise<{ url: string; prospectId: string }> {
+  const token = generateInviteToken();
+  const hash = await hashInviteToken(token);
+  const { data, error } = await admin
+    .from("crm_prospect_invites")
+    .update({ token_hash: hash } as never)
+    .eq("id", inviteId)
+    .eq("purpose", "pay")
+    .is("cancelled_at", null)
+    .select("prospect_id")
+    .maybeSingle();
+  if (error || !data) throw new Error("presale_not_found");
+  return { url: inviteUrl(origin, token), prospectId: (data as { prospect_id: string }).prospect_id };
+}
+
+/** Texto para mandar por WhatsApp: preventa con folio, total y vigencia; o enlace de registro. */
+export async function inviteText(
+  admin: Admin,
+  prospectId: string,
+  lang: string | null,
+  invite: Pick<CreatedInvite, "url" | "purpose" | "productName" | "presale">,
+): Promise<string> {
+  const { data: p } = await admin
+    .from("concierge_prospects")
+    .select("first_name, language")
+    .eq("id", prospectId)
+    .maybeSingle();
+  const language = lang ?? p?.language ?? "es";
+  const firstName = p?.first_name ?? "";
+  if (invite.purpose === "pay" && invite.presale && invite.productName) {
+    return presaleMessage(language, {
+      firstName,
+      productName: invite.productName,
+      quantity: invite.presale.quantity,
+      totalCents: invite.presale.totalCents,
+      currency: invite.presale.currency,
+      folio: invite.presale.folio,
+      expiresAt: invite.presale.expiresAt,
+      url: invite.url,
+    });
+  }
+  return inviteMessage(language, {
+    firstName,
+    url: invite.url,
+    purpose: invite.purpose,
+    productName: invite.productName,
+  });
 }
 
 export interface ProspectWhatsAppTarget {
@@ -233,6 +349,9 @@ export async function createAndSendInvite(
     via: "panel" | "whatsapp_command";
     origin: string;
     send: boolean;
+    quantity?: number;
+    visitDate?: string | null;
+    ttlHours?: number;
   },
 ): Promise<CreatedInvite & { sent: boolean; sendError: string | null }> {
   const invite = await createProspectInviteRecord(admin, {
@@ -242,22 +361,25 @@ export async function createAndSendInvite(
     createdBy: input.createdBy,
     channel: input.via,
     origin: input.origin,
+    ...(input.quantity !== undefined ? { quantity: input.quantity } : {}),
+    ...(input.visitDate !== undefined ? { visitDate: input.visitDate } : {}),
+    ...(input.ttlHours !== undefined ? { ttlHours: input.ttlHours } : {}),
   });
   if (!input.send) return { ...invite, sent: false, sendError: null };
-  const target = await findProspectWhatsApp(admin, input.prospectId);
-  if (!target) return { ...invite, sent: false, sendError: "Este prospecto no tiene plática de WhatsApp." };
-  const { data: p } = await admin
-    .from("concierge_prospects")
-    .select("first_name, language")
-    .eq("id", input.prospectId)
-    .maybeSingle();
-  const lang = target.language ?? p?.language ?? "es";
-  const text = inviteMessage(lang, {
-    firstName: p?.first_name ?? "",
-    url: invite.url,
-    purpose: invite.purpose,
-    productName: invite.productName,
-  });
-  const r = await sendToProspectWhatsApp(admin, channel, target, text, "concierge", input.createdBy);
-  return { ...invite, sent: r.ok, sendError: r.ok ? null : r.error };
+  const r = await sendInviteByWhatsApp(admin, channel, input.prospectId, invite, input.createdBy);
+  return { ...invite, ...r };
+}
+
+export async function sendInviteByWhatsApp(
+  admin: Admin,
+  channel: WhatsAppChannel,
+  prospectId: string,
+  invite: Pick<CreatedInvite, "url" | "purpose" | "productName" | "presale">,
+  createdBy: string | null,
+): Promise<{ sent: boolean; sendError: string | null }> {
+  const target = await findProspectWhatsApp(admin, prospectId);
+  if (!target) return { sent: false, sendError: "Este prospecto no tiene plática de WhatsApp." };
+  const text = await inviteText(admin, prospectId, target.language, invite);
+  const r = await sendToProspectWhatsApp(admin, channel, target, text, "concierge", createdBy);
+  return { sent: r.ok, sendError: r.ok ? null : r.error };
 }

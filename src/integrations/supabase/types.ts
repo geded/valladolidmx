@@ -3326,48 +3326,91 @@ export type Database = {
       }
       crm_prospect_invites: {
         Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           channel: string
           created_at: string
           created_by: string | null
+          currency: string | null
+          expired_at: string | null
           expires_at: string
+          folio: string | null
           id: string
           opened_at: string | null
+          order_id: string | null
           product_id: string | null
           prospect_id: string
           purpose: string
+          quantity: number
           token_hash: string
+          total_amount: number | null
+          ttl_hours: number | null
+          unit_amount: number | null
           used_at: string | null
           used_by: string | null
+          visit_date: string | null
         }
         Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           channel?: string
           created_at?: string
           created_by?: string | null
+          currency?: string | null
+          expired_at?: string | null
           expires_at?: string
+          folio?: string | null
           id?: string
           opened_at?: string | null
+          order_id?: string | null
           product_id?: string | null
           prospect_id: string
           purpose: string
+          quantity?: number
           token_hash: string
+          total_amount?: number | null
+          ttl_hours?: number | null
+          unit_amount?: number | null
           used_at?: string | null
           used_by?: string | null
+          visit_date?: string | null
         }
         Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           channel?: string
           created_at?: string
           created_by?: string | null
+          currency?: string | null
+          expired_at?: string | null
           expires_at?: string
+          folio?: string | null
           id?: string
           opened_at?: string | null
+          order_id?: string | null
           product_id?: string | null
           prospect_id?: string
           purpose?: string
+          quantity?: number
           token_hash?: string
+          total_amount?: number | null
+          ttl_hours?: number | null
+          unit_amount?: number | null
           used_at?: string | null
           used_by?: string | null
+          visit_date?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "crm_prospect_invites_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_orders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "crm_prospect_invites_prospect_id_fkey"
             columns: ["prospect_id"]
@@ -9473,6 +9516,15 @@ export type Database = {
         Returns: undefined
       }
       crm_is_prospect_staff: { Args: { _user_id: string }; Returns: boolean }
+      crm_presale_cancel: {
+        Args: { _actor: string; _invite_id: string; _reason: string }
+        Returns: boolean
+      }
+      crm_presale_expire_due: { Args: never; Returns: number }
+      crm_presale_extend: {
+        Args: { _actor: string; _hours: number; _invite_id: string }
+        Returns: string
+      }
       crm_prospect_lifecycle_tick: { Args: never; Returns: Json }
       crm_reconcile_paid_order: {
         Args: { _order_id: string }

@@ -3,7 +3,8 @@
  *
  * Reintenta los avisos de WhatsApp que quedaron pendientes cuando no llegó
  * otro aviso que los procesara. Lo normal es procesar al recibir cada aviso.
- * Fase 3: además envía los recontactos programados en horario de día.
+ * Fase 3: además envía los recontactos programados en horario de día y
+ * marca las preventas vencidas sin pago.
  */
 import type { CronJobResult, CronRunContext, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
 
@@ -34,5 +35,10 @@ export async function runCrmWhatsAppBackstop(
     import("@/lib/crm/channel/evolution.server"),
   ]);
   const outbox = await processWhatsAppOutbox(supabase as never, evolutionChannel);
-  return { body: { ok: true, processed, failed, outbox } };
+  // Preventa: marca las vencidas sin pago (la lista ya las muestra vencidas a su hora exacta).
+  const { data: presalesExpired, error: presaleError } = await (supabase as never as {
+    rpc: (fn: string) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+  }).rpc("crm_presale_expire_due");
+  if (presaleError) console.warn("[crm.presale] vencimiento", presaleError.message);
+  return { body: { ok: true, processed, failed, outbox, presalesExpired: presalesExpired ?? 0 } };
 }
