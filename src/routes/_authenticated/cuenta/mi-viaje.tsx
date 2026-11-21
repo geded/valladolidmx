@@ -725,9 +725,9 @@ function MiViajeVistaBody({
     return (
       <div className="space-y-6">
         {confirmed ? <ConfirmedTripTimeline data={confirmed} /> : null}
-        <ItinerarioViews data={plan} onChanged={onChanged} reservedIds={reservedIds} />
-        <BrandedItinerarySection
+        <ItinerarioViews
           data={plan}
+          onChanged={onChanged}
           reservedIds={reservedIds}
           folio={confirmed?.folio ?? null}
         />
@@ -986,22 +986,24 @@ function VistaHint({ label, body }: { label: string; body: string }) {
 /* CV5.1.2 · Itinerario Lista / Timeline / Mapa                        */
 /* ------------------------------------------------------------------ */
 
-type ItinerarioView = "lista" | "timeline" | "mapa";
+type ItinerarioView = "documento" | "lista" | "timeline" | "mapa";
 
 function ItinerarioViews({
   data,
   onChanged,
   reservedIds,
+  folio,
 }: {
   data: TravelPlanWithItems;
   onChanged: () => void;
   reservedIds: Set<string>;
+  folio: string | null;
 }) {
-  const [view, setView] = useState<ItinerarioView>("lista");
+  const [view, setView] = useState<ItinerarioView>("documento");
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-medium">Tu itinerario</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="shrink-0 text-lg font-medium">Tu itinerario</h2>
         <div
           role="tablist"
           aria-label="Cambiar vista del itinerario"
@@ -1009,6 +1011,7 @@ function ItinerarioViews({
         >
           {(
             [
+              { k: "documento", label: "Días", Icon: BookOpenText },
               { k: "lista", label: "Lista", Icon: List },
               { k: "timeline", label: "Timeline", Icon: Clock },
               { k: "mapa", label: "Mapa", Icon: MapIcon },
@@ -1036,7 +1039,9 @@ function ItinerarioViews({
         </div>
       </div>
 
-      {view === "lista" ? (
+      {view === "documento" ? (
+        <ItinerarioDocumento data={data} reservedIds={reservedIds} folio={folio} />
+      ) : view === "lista" ? (
         <PlanItemsSection data={data} onChanged={onChanged} reservedIds={reservedIds} />
       ) : view === "timeline" ? (
         <ItinerarioTimeline data={data} onChanged={onChanged} />
@@ -1399,10 +1404,11 @@ function ItemScheduleRow({
 
 /**
  * Itinerario con marca — misma autoridad que el enlace compartido y su PDF
- * (TripItineraryDocument). Dentro de Mi Viaje añade folio y reservas del
- * concierge; funciona con la copia sin señal porque usa el mismo plan.
+ * (TripItineraryDocument). Es la vista principal del itinerario en Mi Viaje:
+ * añade folio y reservas del concierge y funciona con la copia sin señal
+ * porque usa el mismo plan.
  */
-function BrandedItinerarySection({
+function ItinerarioDocumento({
   data,
   reservedIds,
   folio,
@@ -1411,7 +1417,6 @@ function BrandedItinerarySection({
   reservedIds: Set<string>;
   folio: string | null;
 }) {
-  const [open, setOpen] = useState(false);
   const fetchGeo = useServerFn(getPlanItemsGeo);
   const itemsPayload = useMemo(
     () =>
@@ -1423,7 +1428,7 @@ function BrandedItinerarySection({
   const geoQ = useQuery({
     queryKey: ["mi-viaje", "itinerario-geo", data.plan.id, itemsPayload.length],
     queryFn: () => fetchGeo({ data: { items: itemsPayload } }),
-    enabled: open && itemsPayload.length > 0,
+    enabled: itemsPayload.length > 0,
   });
   const model = useMemo(() => {
     const geo = new Map<string, { lat: number; lng: number }>();
@@ -1439,54 +1444,19 @@ function BrandedItinerarySection({
       ? `${window.location.origin}/viaje-compartido/${data.plan.share_token}`
       : null;
 
-  if (!open) {
-    return (
-      <section className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-4">
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-          <BookOpenText className="size-5" aria-hidden />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-medium">Itinerario con marca</h2>
-          <p className="text-xs text-muted-foreground">
-            Día por día, con horarios, cómo llegar y casillas para marcar lo que ya hiciste.
-            Guárdalo en PDF o imprímelo.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-pill bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-95"
-        >
-          Ver itinerario
-        </button>
-      </section>
-    );
-  }
   return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between gap-3 print:hidden">
-        <h2 className="text-lg font-medium">Itinerario con marca</h2>
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="inline-flex min-h-11 items-center rounded-pill border px-4 text-sm hover:bg-accent"
-        >
-          Cerrar
-        </button>
-      </div>
-      <TripItineraryDocument
-        planId={data.plan.id}
-        title={data.plan.title}
-        startDate={data.plan.start_date}
-        endDate={data.plan.end_date}
-        partySize={data.plan.party_size}
-        model={model}
-        shareUrl={shareUrl}
-        folio={folio}
-        showConciergeLink
-        footerNote="Tu itinerario del Oriente Maya. Los horarios pueden ajustarse con tu concierge; las paradas marcadas como hechas se guardan sólo en este teléfono."
-      />
-    </section>
+    <TripItineraryDocument
+      planId={data.plan.id}
+      title={data.plan.title}
+      startDate={data.plan.start_date}
+      endDate={data.plan.end_date}
+      partySize={data.plan.party_size}
+      model={model}
+      shareUrl={shareUrl}
+      folio={folio}
+      showConciergeLink
+      footerNote="Tu itinerario del Oriente Maya. Los horarios pueden ajustarse con tu concierge; las paradas marcadas como hechas se guardan sólo en este teléfono."
+    />
   );
 }
 

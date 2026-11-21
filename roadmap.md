@@ -482,3 +482,10 @@
 - [x] Paradas del concierge muestran su nombre real en vez de «Elemento».
 - [ ] WhatsApp del concierge en el itinerario: no hay número oficial configurado (espera dato del Founder).
 - [ ] Fotos en paradas guardadas sin foto (solo 16 de 53 la tienen): pendiente decidir si se toman de la ficha oficial.
+
+## Itinerario con marca como vista principal de Mi Viaje · 2026-11-21
+
+- [x] Founder confirmó que el itinerario en texto plano estaba en Mi Viaje («Mi Viaje en la app») y pidió que el PDF descargado también lleve la marca.
+- [x] Sección Itinerario de Mi Viaje: nueva pestaña «Días» (por defecto) con el itinerario con marca (logo, folio, días con hora, cómo llegar, casillas «hecho», «Guardar PDF / Imprimir»). Lista, Timeline y Mapa se conservan; se retiró la tarjeta duplicada al pie.
+- [x] Verificado con la cuenta demo VMX-DEMO01 a 390 px: las 4 vistas funcionan, sin errores; el PDF es el mismo documento con marca (hoja por día, logo y QR).
+- [x] Gobernanza: anexos PCA-2026-059/PCA-2026-105, inventario regenerado, controles PASS. No publicado.

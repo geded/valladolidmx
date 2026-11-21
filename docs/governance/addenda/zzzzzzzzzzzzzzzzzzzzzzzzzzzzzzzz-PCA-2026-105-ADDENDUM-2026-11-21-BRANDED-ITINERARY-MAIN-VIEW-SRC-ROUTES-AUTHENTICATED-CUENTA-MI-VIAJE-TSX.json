@@ -1,0 +1,22 @@
+{
+  "id": "PCA-2026-105-ADDENDUM-2026-11-21-BRANDED-ITINERARY-MAIN-VIEW-SRC-ROUTES-AUTHENTICATED-CUENTA-MI-VIAJE-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-105",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21: al preguntársele dónde vio el itinerario en texto plano respondió «Mi Viaje en la app» y añadió «Y el pdf que descarga también». Se autoriza hacer del itinerario con marca la vista principal de la sección Itinerario de Mi Viaje (pestaña «Días» por defecto), conservando Lista, Timeline y Mapa. Sin cambiar reservas, pagos, contenido CMS, plantillas públicas ajenas, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cuenta/mi-viaje.tsx",
+    "previous_sha256": "ff2ae5f48f7480e00ce912960b09841551b2e73d40e944d7ff2e70a3ac9cfade",
+    "current_sha256": "c566deab8a9a3d749391a2af956d5b2ec4ea5d0ceb490a13d0bd3a900c6dab34",
+    "semantic_change": "El itinerario con marca (TripItineraryDocument) pasa de tarjeta plegable al pie a ser la vista principal de la sección Itinerario: nueva pestaña «Días» abierta por defecto con portada de logotipo, folio, días con hora, cómo llegar, casillas «hecho» y botón «Guardar PDF / Imprimir» (mismo PDF con marca). Se conservan intactas las vistas Lista, Timeline y Mapa y se retira la tarjeta duplicada. El encabezado «Tu itinerario» se adapta al ancho del celular.",
+    "authority": "Founder · itinerario con marca como vista principal de Mi Viaje · 2026-11-21"
+  },
+  "invariants": [
+    "Las vistas Lista, Timeline y Mapa del itinerario se conservan sin cambios.",
+    "Reservas, pagos, expediente del concierge, documentos y la copia sin señal no cambian.",
+    "El PDF sigue siendo el mismo documento con marca (hoja por día, logotipo y código QR).",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-21"
+}
