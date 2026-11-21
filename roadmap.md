@@ -2,6 +2,8 @@
 
 ## CRM del concierge en dos secciones · 2026-11-21
 
+- [x] Plan del CRM: fase 5 «WhatsApp de cada empresa» (QR por empresa, Alux con su catálogo y sus propios precios) agregada al plan y a la propuesta 19.48; sin implementar, pendiente de aprobación.
+
 - [x] Documentación oficial: propuesta 19.48 «CRM Alux de Prospectos» registrada como mejora del seguimiento de prospectos con Alux (índice oficial y hoja de ruta), sin implementar.
 
 - [x] Correo de GitHub «Governance Integrity falló»: los documentos del plan del CRM no estaban registrados en el inventario de gobernanza; registrados y revisión PASS.
