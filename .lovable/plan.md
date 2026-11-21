@@ -25,6 +25,9 @@ Orden de prioridad de las reglas, igual que en Zazil:
 Adaptado al Oriente Maya:
 - **Siempre libre:** destinos, rutas, distancias, horarios, qué hacer y resúmenes de reseñas. Ese es el gancho.
 - **Pide nombre y WhatsApp antes de:** el enlace de pago, una cotización o un paquete, armar el itinerario completo o pasar con el concierge.
+- **Qué se vende y cómo:**
+  - **Experiencias:** son lo único con precio en la plataforma. Alux puede dar el precio publicado y, con nombre y WhatsApp, mandar el enlace de pago.
+  - **Todo lo demás** (hoteles, restaurantes, transporte, tours, paquetes y viajes completos) no tiene precio. Alux nunca da ni inventa precios: lo agrega al viaje y lo pasa al concierge, que busca los mejores precios y arma la propuesta.
 - **Bitácora de casos (R-xx):** cada error real que corrijas se convierte en una regla con fecha y con su prueba, como en Zazil.
 
 ## 2. Panel del concierge (como tus capturas)
@@ -129,4 +132,5 @@ Cada fase se aprueba por separado. Nada se publica sin tu visto bueno.
 - **WhatsApp:** puerto `src/lib/crm/channel/*` con dos adaptadores, Evolution (token comparado en tiempo constante) y Meta oficial. Bandeja de mensajes idempotente por id y candado de una respuesta por plática.
 - **Traspaso:** el pre-expediente vive en `concierge_prospects` (`trip_brief` jsonb + `trip_items` jsonb con snapshots + `handoff_summary`). Al registrarse se reutiliza `cc_case_create_from_plan(_summary, _items, _travel_plan_id)` con un plan `shared_with_concierge`, luego `cc_case_assign` al concierge del prospecto, `concierge_case_links` (`link_type` prospect/conversation) y `cc_timeline_append`. `concierge_cases.traveler_user_id` es obligatorio, así que no hay expediente sin cuenta. Enlace firmado de un solo uso con el id del prospecto. Al confirmar la cuenta se crean `travel_plans` (`source` Alux/WhatsApp, `meta.prospect_id`) con sus `travel_plan_items` y un `concierge_cases` con `summary` = ficha de traspaso generada por Alux desde la conversación (sin inventar datos), y el concierge responsable como participante.
 - **Agregar al viaje desde WhatsApp:** herramienta de Alux `add_to_trip` que solo acepta entidades publicadas del catálogo. Sin cuenta escribe en `concierge_prospects.trip_items`; con cuenta reutiliza la misma inserción de `travel_plan_items`, con deduplicación por objetivo. Requiere un «sí» explícito en el turno anterior.
+- **Venta directa:** el enlace de pago solo se genera para `products.product_type = experiencia` con precio publicado y cobro activo; cualquier otro tipo responde con «agregar al viaje + pase a concierge». Prueba que falla si Alux cita un precio fuera de experiencias.
 - **Controles:** Scope y Preservation Gate, pruebas por regla, QA 390/834/1440 e inventario de gobernanza.
