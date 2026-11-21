@@ -57,15 +57,7 @@
     },
     {
       "operation": "modify",
-      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx"
-    },
-    {
-      "operation": "modify",
       "path": "src/routes/_authenticated/concierge/prospectos.$prospectId.tsx"
-    },
-    {
-      "operation": "modify",
-      "path": "src/lib/experience-builder/route-inventory.ts"
     }
   ],
   "acknowledged_revisions": [
@@ -143,20 +135,8 @@
     },
     {
       "operation": "modify",
-      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx",
-      "sha256": "741d9496cf2e2efb66f65d51cd6cefe492c312711ad602d2fdaca3c43e00e49e",
-      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
-    },
-    {
-      "operation": "modify",
       "path": "src/routes/_authenticated/concierge/prospectos.$prospectId.tsx",
       "sha256": "0800e282c6050a0e709208132e1d46225961a099a0c7c5c5021d001dc777c98c",
-      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
-    },
-    {
-      "operation": "modify",
-      "path": "src/lib/experience-builder/route-inventory.ts",
-      "sha256": "af77b5cd8add9f1d47c5b53593a48f5788e8490c66f6f2ac02c39fff622a898e",
       "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
     }
   ],
