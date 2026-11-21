@@ -34,8 +34,9 @@
 - [ ] Fase 2 · pendiente: escanear el QR de la línea «Concierge Valladolid.mx» con el teléfono (espera al Founder) y probar con un mensaje real después de que la vista previa en línea se actualice o tras publicar.
 - [ ] Fase 2 · pendiente: comparación con las mismas preguntas en el Alux de Zazil (Zazil sin créditos de IA el 2026-11-21).
 - [ ] Fase 2 · pendiente: «¿Te escribo por WhatsApp?» desde la web y el primer mensaje que retoma la plática (no construido).
-- [ ] Fase 3 · Embudo, unión sin duplicados al registrarse y vínculo con ventas confirmadas.
-- [ ] Fase 3 · Mensajería con viajeros por el canal oficial (no iniciada; espera autorización expresa).
+- [x] Fase 3 · Enlace personal (crear cuenta o pagar una experiencia con venta directa) que pasa al prospecto a Mi Viaje y CRM Arma tu viaje sin duplicar; etapas que avanzan solas con propuestas y pagos; Rescate de propuestas vencidas y Recontactos de 30 días en «Hoy»; comando #enlace.
+- [ ] Fase 3 · pendiente: respuestas del Founder sobre pago sin cuenta y si Alux escribe solo el recontacto (se usó «crea cuenta y paga» y «Alux escribe solo»); ningún mensaje real se envía hasta publicar y vincular el QR.
+- [ ] Fase 3 · pendiente: control de gobernanza con tres archivos generados compartidos por autorizaciones anteriores (types, inventario de rutas, árbol de rutas) — requiere decisión del Founder.
 
 ## Monitor de visitantes y registro de viajeros · 2026-11-20
 
