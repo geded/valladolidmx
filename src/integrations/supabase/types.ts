@@ -3053,9 +3053,11 @@ export type Database = {
         Row: {
           assigned_concierge_user_id: string | null
           capture_reason: string | null
+          case_id: string | null
           consent_at: string
           consent_contact: boolean
           consent_text: string
+          converted_at: string | null
           created_at: string
           destination_slug: string | null
           email: string | null
@@ -3068,6 +3070,9 @@ export type Database = {
           lost_reason: string | null
           next_followup_at: string | null
           phone_e164: string
+          recontact_due_at: string | null
+          recontact_trip_date: string | null
+          rescue_since: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           source: string
@@ -3081,9 +3086,11 @@ export type Database = {
         Insert: {
           assigned_concierge_user_id?: string | null
           capture_reason?: string | null
+          case_id?: string | null
           consent_at?: string
           consent_contact: boolean
           consent_text: string
+          converted_at?: string | null
           created_at?: string
           destination_slug?: string | null
           email?: string | null
@@ -3096,6 +3103,9 @@ export type Database = {
           lost_reason?: string | null
           next_followup_at?: string | null
           phone_e164: string
+          recontact_due_at?: string | null
+          recontact_trip_date?: string | null
+          rescue_since?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           source?: string
@@ -3109,9 +3119,11 @@ export type Database = {
         Update: {
           assigned_concierge_user_id?: string | null
           capture_reason?: string | null
+          case_id?: string | null
           consent_at?: string
           consent_contact?: boolean
           consent_text?: string
+          converted_at?: string | null
           created_at?: string
           destination_slug?: string | null
           email?: string | null
@@ -3124,6 +3136,9 @@ export type Database = {
           lost_reason?: string | null
           next_followup_at?: string | null
           phone_e164?: string
+          recontact_due_at?: string | null
+          recontact_trip_date?: string | null
+          rescue_since?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           source?: string
@@ -3309,6 +3324,59 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_prospect_invites: {
+        Row: {
+          channel: string
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          opened_at: string | null
+          product_id: string | null
+          prospect_id: string
+          purpose: string
+          token_hash: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          opened_at?: string | null
+          product_id?: string | null
+          prospect_id: string
+          purpose: string
+          token_hash: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          opened_at?: string | null
+          product_id?: string | null
+          prospect_id?: string
+          purpose?: string
+          token_hash?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_prospect_invites_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_whatsapp_inbox: {
         Row: {
           attempts: number
@@ -3362,6 +3430,7 @@ export type Database = {
       crm_whatsapp_lines: {
         Row: {
           alux_enabled: boolean
+          auto_recontact: boolean
           created_at: string
           created_by: string | null
           id: string
@@ -3379,6 +3448,7 @@ export type Database = {
         }
         Insert: {
           alux_enabled?: boolean
+          auto_recontact?: boolean
           created_at?: string
           created_by?: string | null
           id?: string
@@ -3396,6 +3466,7 @@ export type Database = {
         }
         Update: {
           alux_enabled?: boolean
+          auto_recontact?: boolean
           created_at?: string
           created_by?: string | null
           id?: string
@@ -3412,6 +3483,56 @@ export type Database = {
           webhook_base_url?: string | null
         }
         Relationships: []
+      }
+      crm_whatsapp_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          dedupe_key: string
+          id: string
+          kind: string
+          last_error: string | null
+          next_attempt_at: string
+          payload: Json
+          prospect_id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          dedupe_key: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          prospect_id: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          dedupe_key?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          prospect_id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_whatsapp_outbox_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "concierge_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       destination_media: {
         Row: {
@@ -9331,7 +9452,33 @@ export type Database = {
           reopened: boolean
         }[]
       }
+      crm_claim_prospect_invite: {
+        Args: { _token_hash: string; _user_id: string }
+        Returns: {
+          invite_id: string
+          product_id: string
+          prospect_id: string
+          purpose: string
+          status: string
+        }[]
+      }
+      crm_finalize_prospect_conversion: {
+        Args: {
+          _case_id: string
+          _prospect_id: string
+          _summary: string
+          _travel_plan_id: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
       crm_is_prospect_staff: { Args: { _user_id: string }; Returns: boolean }
+      crm_prospect_lifecycle_tick: { Args: never; Returns: Json }
+      crm_reconcile_paid_order: {
+        Args: { _order_id: string }
+        Returns: undefined
+      }
+      crm_safe_date: { Args: { _v: string }; Returns: string }
       crm_whatsapp_acquire_reply_lock: {
         Args: { _seconds: number; _session_id: string }
         Returns: boolean

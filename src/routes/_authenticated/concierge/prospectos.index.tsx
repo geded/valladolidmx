@@ -6,10 +6,12 @@
  * Pestañas: Hoy · Prospectos · Pláticas de Alux · Estadísticas.
  */
 import { createFileRoute, ErrorComponent, Link, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { CalendarClock, Check, MessageCircle, Phone } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { markRecontactDone } from "@/lib/crm/closure.functions";
 import { translateTranscriptToSpanish } from "@/lib/crm/whatsapp.functions";
 import { WhatsAppConversationPanel } from "@/components/crm/WhatsAppConversationPanel";
 import { meridaDateTime } from "@/lib/time/merida";
@@ -137,6 +139,11 @@ function ProspectCard({ p, showWaiting }: { p: ProspectRow; showWaiting?: boolea
           {p.first_name}
         </Link>
         <div className="flex flex-wrap items-center gap-1.5">
+          {p.case_id ? (
+            <span className="inline-flex items-center rounded-full border border-success/30 bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">
+              Convertido a viajero
+            </span>
+          ) : null}
           <StageBadge stage={p.stage} />
           <TemperatureBadge temperature={p.temperature} />
         </div>
@@ -215,6 +222,68 @@ function Section({
   );
 }
 
+function RecontactCard({ p }: { p: ProspectRow }) {
+  const qc = useQueryClient();
+  const doneFn = useServerFn(markRecontactDone);
+  const [busy, setBusy] = useState(false);
+  const btn =
+    "inline-flex min-h-10 items-center gap-1.5 rounded-full border border-border px-3 text-xs font-semibold hover:bg-muted";
+  return (
+    <li className="rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Link
+          to="/concierge/prospectos/$prospectId"
+          params={{ prospectId: p.id }}
+          className="font-semibold text-foreground hover:text-primary hover:underline"
+        >
+          {p.first_name}
+        </Link>
+        <StageBadge stage={p.stage} />
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Viaja el {p.recontact_trip_date ?? "—"}
+        {p.destination_slug ? ` · ${p.destination_slug}` : ""}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <a href={`tel:${p.phone_e164}`} className={btn}>
+          <Phone className="size-3.5" aria-hidden />
+          Llamar
+        </a>
+        <a href={whatsappHref(p.phone_e164)} target="_blank" rel="noopener noreferrer" className={btn}>
+          <MessageCircle className="size-3.5" aria-hidden />
+          Escribir
+        </a>
+        <Link to="/concierge/prospectos/$prospectId" params={{ prospectId: p.id }} className={btn}>
+          <CalendarClock className="size-3.5" aria-hidden />
+          Agendar
+        </Link>
+        <Link to="/concierge/prospectos/$prospectId" params={{ prospectId: p.id }} className={btn}>
+          Ver
+        </Link>
+        <button
+          type="button"
+          disabled={busy}
+          className={`${btn} disabled:opacity-60`}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await doneFn({ data: { prospectId: p.id } });
+              await qc.invalidateQueries({ queryKey: ["crm-prospects-today"] });
+            } catch {
+              toast.error("No se pudo marcar el recontacto.");
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <Check className="size-3.5" aria-hidden />
+          Listo
+        </button>
+      </div>
+    </li>
+  );
+}
+
 function TodayTab() {
   const fn = useServerFn(getProspectsToday);
   const q = useQuery({
@@ -246,6 +315,33 @@ function TodayTab() {
         hint="Quieren reservar, cotizar o hablar con un concierge y nadie los ha tomado."
         rows={d.hotUnassigned}
         empty="Todos los prospectos calientes ya tienen responsable."
+      />
+      <section className="space-y-2">
+        <div>
+          <h2 className="text-base font-semibold">
+            Recontactos de hoy <span className="text-muted-foreground">({d.recontacts.length})</span>
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Faltan 30 días para su viaje. Si tiene plática de WhatsApp, Alux le escribe; aquí lo das por atendido.
+          </p>
+        </div>
+        {d.recontacts.length ? (
+          <ul className="grid gap-3 md:grid-cols-2">
+            {d.recontacts.map((p) => (
+              <RecontactCard key={p.id} p={p} />
+            ))}
+          </ul>
+        ) : (
+          <p className="rounded-lg border border-border bg-card p-5 text-center text-sm text-muted-foreground">
+            No hay recontactos para hoy.
+          </p>
+        )}
+      </section>
+      <Section
+        title="Rescate · propuestas vencidas"
+        hint="La propuesta venció sin pago y regresaron a «Contactado». Nunca pasan solos a «Perdido»."
+        rows={d.rescue}
+        empty="No hay propuestas por rescatar."
       />
     </div>
   );

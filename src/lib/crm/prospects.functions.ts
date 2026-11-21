@@ -120,7 +120,7 @@ async function assertStaff(context: {
 }
 
 const PROSPECT_COLUMNS =
-  "id, created_at, updated_at, source, first_name, phone_e164, email, language, stage, temperature, capture_reason, destination_slug, trip_brief, trip_items, handoff_summary, assigned_concierge_user_id, reviewed_at, next_followup_at, last_activity_at, linked_user_id, lost_reason, consent_at";
+  "id, created_at, updated_at, source, first_name, phone_e164, email, language, stage, temperature, capture_reason, destination_slug, trip_brief, trip_items, handoff_summary, assigned_concierge_user_id, reviewed_at, next_followup_at, last_activity_at, linked_user_id, lost_reason, consent_at, case_id, converted_at, rescue_since, recontact_due_at, recontact_trip_date";
 
 export type ProspectRow = {
   id: string;
@@ -145,6 +145,14 @@ export type ProspectRow = {
   linked_user_id: string | null;
   lost_reason: string | null;
   consent_at: string;
+  /** Fase 3: expediente de CRM Arma tu viaje creado al registrarse. */
+  case_id: string | null;
+  converted_at: string | null;
+  /** Fase 3: la propuesta venció sin pago; está en Rescate desde esta fecha. */
+  rescue_since: string | null;
+  /** Fase 3: recontacto de 30 días pendiente para el concierge. */
+  recontact_due_at: string | null;
+  recontact_trip_date: string | null;
 };
 
 export const listProspects = createServerFn({ method: "POST" })
@@ -180,7 +188,7 @@ export const getProspectsToday = createServerFn({ method: "GET" })
     await assertStaff(context as never);
     const endOfDay = new Date();
     endOfDay.setUTCHours(23, 59, 59, 999);
-    const [waiting, followups, hot] = await Promise.all([
+    const [waiting, followups, hot, rescue, recontacts] = await Promise.all([
       context.supabase
         .from("concierge_prospects")
         .select(PROSPECT_COLUMNS)
@@ -204,12 +212,31 @@ export const getProspectsToday = createServerFn({ method: "GET" })
         .not("stage", "in", "(no_interesado,perdido)")
         .order("last_activity_at", { ascending: false })
         .limit(50),
+      // Fase 3 · Rescate: propuestas vencidas sin pago (regresaron a «Contactado»).
+      context.supabase
+        .from("concierge_prospects")
+        .select(PROSPECT_COLUMNS)
+        .not("rescue_since", "is", null)
+        .not("stage", "in", "(no_interesado,perdido,reservo,por_viajar,viajo,posventa)")
+        .order("rescue_since", { ascending: true })
+        .limit(50),
+      // Fase 3 · Recontactos de hoy: faltan 30 días para el viaje.
+      context.supabase
+        .from("concierge_prospects")
+        .select(PROSPECT_COLUMNS)
+        .not("recontact_due_at", "is", null)
+        .not("stage", "in", "(no_interesado,perdido,viajo,posventa)")
+        .order("recontact_trip_date", { ascending: true })
+        .limit(50),
     ]);
-    for (const r of [waiting, followups, hot]) if (r.error) throw new Error(r.error.message);
+    for (const r of [waiting, followups, hot, rescue, recontacts])
+      if (r.error) throw new Error(r.error.message);
     return {
       waiting: (waiting.data ?? []) as unknown as ProspectRow[],
       followups: (followups.data ?? []) as unknown as ProspectRow[],
       hotUnassigned: (hot.data ?? []) as unknown as ProspectRow[],
+      rescue: (rescue.data ?? []) as unknown as ProspectRow[],
+      recontacts: (recontacts.data ?? []) as unknown as ProspectRow[],
     };
   });
 

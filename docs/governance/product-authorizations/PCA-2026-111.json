@@ -1,0 +1,139 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-111",
+  "title": "CRM Prospectos Fase 3: enlace personal, pago de experiencias, rescate, recontacto de 30 días y pase a CRM Arma tu viaje",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Mensaje Founder del 2026-11-21 «Pasemos a las siguiente face del plan» sobre el plan aprobado 19.48, Fase 3: pagos, rescate de propuestas, recontactos 30 días antes y paso al CRM Arma tu viaje. Delta acotado: enlace personal (registro o pago de una experiencia con venta directa) en /continuar/$token, canje que reutiliza el viaje activo y el expediente existente, avance de etapas por propuestas y pagos, Rescate y Recontactos en «Hoy», comando #enlace y envío programado. Sólo experiencias tienen enlace de pago; lo demás lo cotiza el concierge. En auth.tsx sólo se precargan modo, nombre y correo desde el enlace. Sin cambiar CRM Arma tu viaje, plantillas públicas, pagos existentes, reservaciones ni publicación.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/components/crm/ProspectClosurePanel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/traveler/TravelerSignupNotifier.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/closure-rules.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/closure.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/invites.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/pending-invite.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/outbox.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/rules.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cron/jobs/crm-whatsapp.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/auth.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/continuar.$token.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/components/crm/ProspectClosurePanel.tsx",
+      "sha256": "028b06c8563e30dc14b38db738b7ac40266827e9c2357a55ec7a284b61f253b7",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/traveler/TravelerSignupNotifier.tsx",
+      "sha256": "f0d5d61f06bfb53e7e01ec7800d9c69d7a9d57cfc9911c774989532ff90a45e7",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/closure-rules.ts",
+      "sha256": "79b49f461d73516e7f78a3eab95eca758c108cbcfef4ed1e1abe21763756aa04",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/closure.functions.ts",
+      "sha256": "81a2123d35b48edeb930a6e449b4050918622892af2d21501c9cda2082abb8ab",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/invites.server.ts",
+      "sha256": "cc2238c7999a977c02372f4006356f51bafb68ba1bb558af531e6a8bbea7e7d5",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/pending-invite.ts",
+      "sha256": "377855cd32d83b409a8fe3906cba4ac9167c86aa335fac5a831b08ebe143fc0f",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/outbox.server.ts",
+      "sha256": "9f4468b5b20e764b7f1143ddad805476584794931a5abbf3169fdda09ca40034",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts",
+      "sha256": "526e7539d6e4af8ca047c21a88de4d5f8a545946d931f8eb6b7c3896685dd0aa",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/rules.ts",
+      "sha256": "e56c0b8a6bd0fe613f1e75544bc2c0a33b292bb20454b08601fb36f3c883caaa",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cron/jobs/crm-whatsapp.server.ts",
+      "sha256": "29fd435d7f9328cbef85892f82bdc26dc96c0274d1a68e4cde4e68fd0c7cf05c",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/auth.tsx",
+      "sha256": "bc9a020abd6f093af0467f324520761480667992a91ca415a2d00c8a8cb6197f",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/continuar.$token.tsx",
+      "sha256": "17d4a29c2e8e8c203edfb527c4a021954a60cfec82a6d0522634f1af635d6a28",
+      "authority": "Founder · CRM Prospectos Fase 3 (cierre automático) · 2026-11-21"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun test scripts/omxds/crm/closure-rules.contract.test.ts",
+    "bun run typecheck"
+  ]
+}

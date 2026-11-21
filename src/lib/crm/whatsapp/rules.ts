@@ -208,7 +208,7 @@ export const CONCIERGE_COMMAND_HELP: Record<ConciergeCommand, string> = {
   alux: "Devuelve la plática a Alux.",
   apagar: "Alux deja de contestar en esta plática.",
   cotizar: "Marca que estás preparando la cotización (Alux se calla).",
-  enlace: "Registra que hay que mandar el enlace de pago (se automatiza en la Fase 3).",
+  enlace: "Manda al cliente su enlace personal para crear su cuenta; con el nombre de una experiencia, su enlace de pago.",
   nota: "Guarda una nota en la ficha: #nota texto.",
   agenda: "Agenda el seguimiento: #agenda 2026-11-25 10:00 o #agenda 25/11 10:00.",
 };

@@ -3,9 +3,12 @@
  * cuenta es un registro nuevo de viajero, la administración recibe el correo
  * «Nuevo viajero registrado» y el monitor registra el paso Anónimo →
  * Identificado. No pinta nada y nunca interrumpe la sesión.
+ * Además regresa al enlace personal del CRM si quedó pendiente (Fase 3).
  */
 import { useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useNavigate } from "@tanstack/react-router";
+import { readPendingInvite } from "@/lib/crm/pending-invite";
 import { useAuth } from "@/hooks/useAuth";
 import { registerTravelerSignup } from "@/lib/notifications/traveler-signup-admin.functions";
 
@@ -34,6 +37,16 @@ function markChecked(userId: string) {
 export function TravelerSignupNotifier() {
   const { user, loading } = useAuth();
   const register = useServerFn(registerTravelerSignup);
+  const navigate = useNavigate();
+
+  // CRM Prospectos · Fase 3: si confirmó su correo en otra pestaña, lo regresa
+  // a su enlace personal para terminar el pase a CRM Arma tu viaje.
+  useEffect(() => {
+    if (loading || !user?.id || typeof window === "undefined") return;
+    const token = readPendingInvite();
+    if (!token || window.location.pathname.startsWith("/continuar/")) return;
+    void navigate({ to: "/continuar/$token", params: { token } });
+  }, [loading, navigate, user?.id]);
 
   useEffect(() => {
     if (loading || !user?.id || typeof window === "undefined") return;

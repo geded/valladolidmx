@@ -38,6 +38,7 @@ import {
 } from "@/components/crm/ProspectBadges";
 import { TranscriptList } from "./prospectos.index";
 import { WhatsAppConversationPanel } from "@/components/crm/WhatsAppConversationPanel";
+import { ProspectClosurePanel } from "@/components/crm/ProspectClosurePanel";
 
 export const Route = createFileRoute("/_authenticated/concierge/prospectos/$prospectId")({
   component: ProspectDetailPage,
@@ -64,6 +65,14 @@ const EVENT_LABEL: Record<string, string> = {
   reviewed: "Marcado como revisado",
   contact_updated: "Datos actualizados",
   followup_set: "Seguimiento programado",
+  converted: "Pasó a CRM Arma tu viaje",
+  invite_created: "Enlace personal",
+  payment_confirmed: "Pago confirmado",
+  payment_review: "Pago por revisar",
+  proposal_sent: "Propuesta enviada",
+  proposal_expired: "Propuesta vencida · Rescate",
+  recontact: "Recontacto de 30 días",
+  trip_status: "Estado del viaje",
 };
 
 function toLocalInput(iso: string | null): string {
@@ -309,6 +318,14 @@ function ProspectDetailPage() {
           </ul>
         ) : null}
       </section>
+
+      <ProspectClosurePanel
+        prospectId={p.id}
+        firstName={p.first_name}
+        caseId={p.case_id ?? null}
+        convertedAt={p.converted_at ?? null}
+        hasWhatsApp={(sessions as Array<{ channel?: string }>).some((s) => s.channel === "whatsapp")}
+      />
 
       <section className="rounded-lg border border-border bg-card p-4">
         <h2 className="text-base font-semibold">Plática con Alux</h2>

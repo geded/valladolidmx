@@ -50,6 +50,7 @@ import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
+import { Route as ContinuarTokenRouteImport } from './routes/continuar.$token'
 import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
@@ -486,6 +487,11 @@ const AuthenticatedPortalRouteRoute =
 const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   id: '/api/generate-image',
   path: '/api/generate-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContinuarTokenRoute = ContinuarTokenRouteImport.update({
+  id: '/continuar/$token',
+  path: '/continuar/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventosIndexRoute = EventosIndexRouteImport.update({
@@ -1858,6 +1864,7 @@ export interface FileRoutesByFullPath {
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
@@ -2121,6 +2128,7 @@ export interface FileRoutesByTo {
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
@@ -2388,6 +2396,7 @@ export interface FileRoutesById {
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
@@ -2660,6 +2669,7 @@ export interface FileRouteTypes {
     | '/mi-viaje'
     | '/paginas'
     | '/api/generate-image'
+    | '/continuar/$token'
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
@@ -2923,6 +2933,7 @@ export interface FileRouteTypes {
     | '/mi-viaje'
     | '/paginas'
     | '/api/generate-image'
+    | '/continuar/$token'
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
@@ -3189,6 +3200,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mi-viaje'
     | '/_authenticated/paginas'
     | '/api/generate-image'
+    | '/continuar/$token'
     | '/eventos/$slug'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
@@ -3453,6 +3465,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
+  ContinuarTokenRoute: typeof ContinuarTokenRoute
   LSlugRoute: typeof LSlugRoute
   LovableBusinessMotherTemplatePreviewRoute: typeof LovableBusinessMotherTemplatePreviewRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
@@ -3830,6 +3843,13 @@ declare module '@tanstack/react-router' {
       path: '/api/generate-image'
       fullPath: '/api/generate-image'
       preLoaderRoute: typeof ApiGenerateImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/continuar/$token': {
+      id: '/continuar/$token'
+      path: '/continuar/$token'
+      fullPath: '/continuar/$token'
+      preLoaderRoute: typeof ContinuarTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eventos/': {
@@ -6057,6 +6077,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
+  ContinuarTokenRoute: ContinuarTokenRoute,
   LSlugRoute: LSlugRoute,
   LovableBusinessMotherTemplatePreviewRoute:
     LovableBusinessMotherTemplatePreviewRoute,

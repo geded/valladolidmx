@@ -66,6 +66,14 @@ function AuthRoute() {
     if (target) rememberAuthReturnPath(target);
     setReturnTarget(target);
     setJourney(trail);
+    // Enlace personal del concierge (/continuar): llega con modo, nombre y correo escritos.
+    const params = new URLSearchParams(window.location.search);
+    const presetMode = params.get("mode");
+    if (presetMode === "signup" || presetMode === "signin") setMode(presetMode);
+    const presetEmail = params.get("email");
+    if (presetEmail && presetEmail.length <= 254) setEmail(presetEmail);
+    const presetName = params.get("name");
+    if (presetName && presetName.length <= 80) setName(presetName);
   }, []);
 
   useEffect(() => {

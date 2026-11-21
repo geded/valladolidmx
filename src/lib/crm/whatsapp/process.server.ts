@@ -274,7 +274,7 @@ async function runCommand(
       }
       break;
     case "enlace":
-      note = `Enlace de pago solicitado (#enlace)${parsed.arg ? `: ${parsed.arg}` : ""}. El envío automático llega en la Fase 3.`;
+      note = await sendEnlaceFromCommand(admin, line, session, parsed.arg, channel);
       break;
     case "nota":
       note = parsed.arg ? `Nota desde WhatsApp: ${parsed.arg}` : "";
@@ -313,6 +313,67 @@ async function runCommand(
   await channel
     .deleteForEveryone(line.instance_name, { id: msg.id, remoteJid: msg.remoteJid, fromMe: true })
     .catch(() => undefined);
+}
+
+/**
+ * `#enlace` → enlace personal para crear la cuenta; `#enlace <experiencia>` →
+ * enlace de pago de esa experiencia (sólo experiencias con venta directa).
+ * Se le manda al cliente por la misma línea, en su idioma.
+ */
+async function sendEnlaceFromCommand(
+  admin: Admin,
+  line: LineRow,
+  session: SessionRow,
+  arg: string,
+  channel: WhatsAppChannel,
+): Promise<string> {
+  if (!session.prospect_id) {
+    return "No se envió el enlace: esta plática todavía no tiene ficha de prospecto.";
+  }
+  const [{ parseEnlaceArg }, invites] = await Promise.all([
+    import("@/lib/crm/closure-rules"),
+    import("@/lib/crm/invites.server"),
+  ]);
+  const target = parseEnlaceArg(arg);
+  let productId: string | null = null;
+  if (target.purpose === "pay") {
+    const found = await invites.searchSellableExperiences(admin, target.query ?? "", 3);
+    if (found.length !== 1) {
+      return found.length
+        ? `No se envió el enlace: «${target.query}» coincide con varias experiencias (${found
+            .map((f) => f.name)
+            .join(", ")}). Escribe el nombre exacto.`
+        : `No se envió el enlace: no hay una experiencia con venta directa que coincida con «${target.query}». Hoteles, restaurantes y lo demás los cotiza el concierge.`;
+    }
+    productId = found[0]!.id;
+  }
+  const { data: l } = await admin
+    .from("crm_whatsapp_lines")
+    .select("webhook_base_url")
+    .eq("id", line.id)
+    .maybeSingle();
+  const origin = (l as { webhook_base_url: string | null } | null)?.webhook_base_url;
+  if (!origin) return "No se envió el enlace: la línea no tiene dirección del sitio.";
+  try {
+    const r = await invites.createAndSendInvite(admin, channel, {
+      prospectId: session.prospect_id,
+      purpose: target.purpose,
+      productId,
+      createdBy: null,
+      via: "whatsapp_command",
+      origin,
+      send: true,
+    });
+    if (!r.sent) return `Enlace creado, pero no se pudo enviar: ${r.sendError ?? "sin detalle"}`;
+    return r.purpose === "pay"
+      ? `Enlace de pago de «${r.productName}» enviado al cliente (#enlace).`
+      : "Enlace personal para crear su cuenta enviado al cliente (#enlace).";
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "";
+    return msg === "not_sellable"
+      ? "No se envió el enlace: esa experiencia no tiene venta directa activa."
+      : "No se pudo crear el enlace (#enlace).";
+  }
 }
 
 async function recordHumanReply(admin: Admin, session: SessionRow, msg: InboundMessage) {

@@ -256,6 +256,11 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     notes: "Puerta de entrada — gate de sesión.",
   },
   "src/routes/reset-password.tsx": { businessPriority: "high", maturity: "L4" },
+  "src/routes/continuar.$token.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    notes: "CRM Prospectos · Fase 3 — enlace personal del prospecto (registro o pago de experiencia), noindex.",
+  },
   "src/routes/offline.tsx": {
     businessPriority: "low",
     maturity: "L2",
@@ -638,6 +643,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/casas-de-vacaciones.tsx",
   "src/routes/contacto.tsx",
   "src/routes/convertir-en-anfitrion.tsx",
+  "src/routes/continuar.$token.tsx",
   "src/routes/empresas.tsx",
   "src/routes/eventos.$slug.tsx",
   "src/routes/eventos.index.tsx",

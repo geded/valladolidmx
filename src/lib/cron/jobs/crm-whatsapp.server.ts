@@ -3,6 +3,7 @@
  *
  * Reintenta los avisos de WhatsApp que quedaron pendientes cuando no llegó
  * otro aviso que los procesara. Lo normal es procesar al recibir cada aviso.
+ * Fase 3: además envía los recontactos programados en horario de día.
  */
 import type { CronJobResult, CronRunContext, CronSupabase } from "@/lib/cron/cron-hook-auth.server";
 
@@ -27,5 +28,11 @@ export async function runCrmWhatsAppBackstop(
     failed += r.failed;
     if (r.processed + r.failed === 0) break;
   }
-  return { body: { ok: true, processed, failed } };
+  // Fase 3: recontactos programados (30 días antes del viaje).
+  const [{ processWhatsAppOutbox }, { evolutionChannel }] = await Promise.all([
+    import("@/lib/crm/whatsapp/outbox.server"),
+    import("@/lib/crm/channel/evolution.server"),
+  ]);
+  const outbox = await processWhatsAppOutbox(supabase as never, evolutionChannel);
+  return { body: { ok: true, processed, failed, outbox } };
 }

@@ -71,6 +71,13 @@
       "when": 1795297355531,
       "tag": "0009_crm_whatsapp_message_dedupe_index",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795303310453,
+      "tag": "0010_crm_prospects_phase3_closure",
+      "breakpoints": true
     }
   ]
 }
