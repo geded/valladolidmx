@@ -1,5 +1,12 @@
 # Roadmap
 
+## CRM del concierge en dos secciones · 2026-11-21
+
+- [ ] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (borrador en la tarjeta de plan).
+- [ ] Fase 1 · Captura consentida de WhatsApp/correo en Alux y bandeja «CRM Prospectos».
+- [ ] Fase 2 · Embudo, unión sin duplicados al registrarse y vínculo con ventas confirmadas.
+- [ ] Fase 3 · Mensajería con viajeros por el canal oficial (no iniciada; espera autorización expresa).
+
 ## Monitor de visitantes y registro de viajeros · 2026-11-20
 
 - [x] Estadísticas del monitor visibles: la pantalla Inteligencia del visitante fallaba para todos (lectura de un esquema no expuesto) y se topaba en 1,000 registros; ahora lee todo por páginas. Verificado como administrador: 1,084 visitantes y 1,739 visitas en 30 días.
