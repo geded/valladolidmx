@@ -10338,7 +10338,48 @@ export type Database = {
         Args: { _kind?: string; _since?: string }
         Returns: number
       }
+      visitor_intel_create_simulation_run: {
+        Args: {
+          _scale: string
+          _scenario_id: string
+          _scenario_payload: Json
+          _scenario_version: string
+          _seed: string
+          _triggered_by: string
+        }
+        Returns: string
+      }
+      visitor_intel_finish_simulation_run: {
+        Args: {
+          _error_message?: string
+          _rows_inserted?: Json
+          _run_id: string
+          _status: string
+        }
+        Returns: undefined
+      }
       visitor_intel_ingest_event: { Args: { p_row: Json }; Returns: boolean }
+      visitor_intel_insert_simulation_events: {
+        Args: { _rows: Json; _run_id: string }
+        Returns: number
+      }
+      visitor_intel_list_simulation_runs: {
+        Args: { _limit?: number }
+        Returns: {
+          completed_at: string
+          error_message: string
+          rows_inserted: Json
+          run_id: string
+          scale: string
+          scenario_id: string
+          scenario_version: string
+          seed: string
+          started_at: string
+          status: string
+          triggered_by: string
+          wiped_at: string
+        }[]
+      }
       visitor_intel_read_events: {
         Args: {
           _kind?: string
@@ -10364,6 +10405,10 @@ export type Database = {
           subject_id: string
           surface: string
         }[]
+      }
+      visitor_intel_wipe_simulation_run: {
+        Args: { _run_id: string }
+        Returns: number
       }
       withdraw_business_review: {
         Args: { _business_id: string; _notes?: string }

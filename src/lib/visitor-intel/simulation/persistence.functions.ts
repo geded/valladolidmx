@@ -87,11 +87,19 @@ const ExecuteInput = z.object({
   confirm_full: z.boolean().optional().default(false),
 });
 
-type AdminChain = {
-  schema: (s: string) => {
-    from: (t: string) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  };
+// `visitor_intel` no está expuesto en la Data API: todo pasa por funciones
+// internas `public.visitor_intel_*_simulation_*` (sólo service_role).
+type RpcClient = {
+  rpc: (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: { code?: string; message: string } | null }>;
 };
+
+async function adminRpc(): Promise<RpcClient> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin as unknown as RpcClient;
+}
 
 function eventToRow(ev: SimulatedEvent) {
   const e = ev.event;
@@ -138,31 +146,25 @@ export const executeSimulationRun = createServerFn({ method: "POST" })
     }
 
     const scenario = buildOrienteMayaScenario({ seed: data.seed, scale: data.scale });
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const admin = supabaseAdmin as unknown as AdminChain;
+    const admin = await adminRpc();
 
     // 1) Crear el run (status=running).
-    const startedAt = new Date().toISOString();
-    const { data: inserted, error: insertErr } = await admin
-      .schema("visitor_intel")
-      .from("simulation_runs")
-      .insert({
-        scenario_id: scenario.scenario_id,
-        scenario_version: scenario.scenario_version,
-        seed: scenario.seed,
-        scale: scenario.scale,
-        scenario_payload: scenario,
-        status: "running",
-        started_at: startedAt,
-        triggered_by: context.userId,
-      })
-      .select("run_id")
-      .single();
-    if (insertErr || !inserted) {
+    const { data: inserted, error: insertErr } = await admin.rpc(
+      "visitor_intel_create_simulation_run",
+      {
+        _scenario_id: scenario.scenario_id,
+        _scenario_version: scenario.scenario_version,
+        _seed: scenario.seed,
+        _scale: scenario.scale,
+        _scenario_payload: scenario,
+        _triggered_by: context.userId,
+      },
+    );
+    if (insertErr || typeof inserted !== "string") {
       console.error("[cv8.s.4] create run failed", insertErr);
-      throw new Response("No se pudo crear la corrida", { status: 500 });
+      throw new Response("No se pudo crear la prueba", { status: 500 });
     }
-    const runId = (inserted as { run_id: string }).run_id;
+    const runId = inserted;
 
     try {
       // 2) Ejecutar el escenario en memoria (determinístico).
@@ -173,28 +175,26 @@ export const executeSimulationRun = createServerFn({ method: "POST" })
       let insertedRows = 0;
       for (let i = 0; i < rows.length; i += BULK_CHUNK) {
         const slice = rows.slice(i, i + BULK_CHUNK);
-        const { error } = await admin
-          .schema("visitor_intel")
-          .from("events")
-          .upsert(slice, { onConflict: "event_id", ignoreDuplicates: true });
-        if (error) throw new Error(String((error as { message?: string }).message ?? error));
-        insertedRows += slice.length;
+        const { data: count, error } = await admin.rpc("visitor_intel_insert_simulation_events", {
+          _run_id: runId,
+          _rows: slice,
+        });
+        if (error) throw new Error(error.message);
+        insertedRows += typeof count === "number" ? count : 0;
       }
 
       // 4) Cerrar run.
-      await admin
-        .schema("visitor_intel")
-        .from("simulation_runs")
-        .update({
-          status: "completed",
-          completed_at: new Date().toISOString(),
-          rows_inserted: {
-            events: insertedRows,
-            visitors: result.stats.visitors,
-            revenue_usd: result.stats.commerce_revenue_usd,
-          },
-        })
-        .eq("run_id", runId);
+      const { error: finishErr } = await admin.rpc("visitor_intel_finish_simulation_run", {
+        _run_id: runId,
+        _status: "completed",
+        _rows_inserted: {
+          events: insertedRows,
+          visitors: result.stats.visitors,
+          revenue_usd: result.stats.commerce_revenue_usd,
+        },
+        _error_message: null,
+      });
+      if (finishErr) throw new Error(finishErr.message);
 
       return {
         run_id: runId,
@@ -203,15 +203,12 @@ export const executeSimulationRun = createServerFn({ method: "POST" })
       };
     } catch (err) {
       const message = err instanceof Error ? err.message : "Error desconocido durante la ejecución";
-      await admin
-        .schema("visitor_intel")
-        .from("simulation_runs")
-        .update({
-          status: "failed",
-          completed_at: new Date().toISOString(),
-          error_message: message.slice(0, 500),
-        })
-        .eq("run_id", runId);
+      await admin.rpc("visitor_intel_finish_simulation_run", {
+        _run_id: runId,
+        _status: "failed",
+        _rows_inserted: null,
+        _error_message: message.slice(0, 500),
+      });
       console.error("[cv8.s.4] run failed", err);
       throw new Response(`Simulación falló: ${message}`, { status: 500 });
     }
@@ -225,21 +222,15 @@ export const listSimulationRuns = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const admin = supabaseAdmin as unknown as AdminChain;
-    const { data: rows, error } = await admin
-      .schema("visitor_intel")
-      .from("simulation_runs")
-      .select(
-        "run_id, scenario_id, scenario_version, seed, scale, status, started_at, completed_at, wiped_at, rows_inserted, triggered_by, error_message",
-      )
-      .order("started_at", { ascending: false })
-      .limit(data.limit);
+    const admin = await adminRpc();
+    const { data: rows, error } = await admin.rpc("visitor_intel_list_simulation_runs", {
+      _limit: data.limit,
+    });
     if (error) {
       console.error("[cv8.s.4] list runs failed", error);
       throw new Response("Read failed", { status: 500 });
     }
-    return { runs: (rows ?? []) as SimulationRunSummary[] };
+    return { runs: (Array.isArray(rows) ? rows : []) as SimulationRunSummary[] };
   });
 
 // ── Wipe seguro (por run_id únicamente) ────────────────────────────────
@@ -253,28 +244,19 @@ export const wipeSimulationRun = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => WipeInput.parse(data))
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const admin = supabaseAdmin as unknown as AdminChain;
+    const admin = await adminRpc();
 
-    // 1) DELETE sólo por simulation_run_id (aislamiento absoluto).
-    const { error: delErr, count } = await admin
-      .schema("visitor_intel")
-      .from("events")
-      .delete({ count: "exact" })
-      .eq("simulation_run_id", data.run_id);
-    if (delErr) {
-      console.error("[cv8.s.4] wipe events failed", delErr);
-      throw new Response("Wipe failed", { status: 500 });
+    // Borra sólo las visitas simuladas de esta prueba y la marca como borrada;
+    // las visitas reales siguen protegidas contra borrado.
+    const { data: count, error } = await admin.rpc("visitor_intel_wipe_simulation_run", {
+      _run_id: data.run_id,
+    });
+    if (error) {
+      console.error("[cv8.s.4] wipe failed", error);
+      throw new Response("No se pudo borrar la prueba", { status: 500 });
     }
 
-    // 2) Marcar el run como wiped (evidencia administrativa).
-    await admin
-      .schema("visitor_intel")
-      .from("simulation_runs")
-      .update({ status: "wiped", wiped_at: new Date().toISOString() })
-      .eq("run_id", data.run_id);
-
-    return { run_id: data.run_id, deleted_events: count ?? 0 };
+    return { run_id: data.run_id, deleted_events: Number(count ?? 0) };
   });
 
 // ── Info del escenario por defecto ─────────────────────────────────────

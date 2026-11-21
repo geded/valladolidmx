@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-099-ADDENDUM-2026-11-21-SIMULATION-CONSOLE-REPAIR-SRC-INTEGRATIONS-SUPABASE-TYPES-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-099",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Si corrije»): reparar la pantalla «Pruebas con visitantes simulados» mediante funciones internas sólo de servidor para listar, crear, cerrar y borrar pruebas simuladas del monitor. Sin cambiar plantillas públicas, Alux para viajeros, pagos, reservaciones ni datos reales.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/integrations/supabase/types.ts",
+    "previous_sha256": "7921a7a30fc6a0da63e64e4a0bd450b46daacbcf3f8717a058b8a5abdfedf4b8",
+    "current_sha256": "1b3ee8e53d2f28752f35ed40e67a228180b394cb67cca23fe110fac7a461bca5",
+    "semantic_change": "Tipos generados con las cinco funciones internas de pruebas simuladas (listar, crear, guardar visitas, cerrar y borrar).",
+    "authority": "Founder · reparar Pruebas con visitantes simulados · 2026-11-21"
+  },
+  "invariants": [
+    "Las visitas reales siguen siendo append-only.",
+    "Plantillas públicas, Alux para viajeros, pagos, reservaciones y permisos no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

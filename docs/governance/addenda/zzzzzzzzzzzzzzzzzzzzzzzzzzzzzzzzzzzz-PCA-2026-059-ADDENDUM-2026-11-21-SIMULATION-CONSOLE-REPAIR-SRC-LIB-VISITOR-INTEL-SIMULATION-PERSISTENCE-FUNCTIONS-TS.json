@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-SIMULATION-CONSOLE-REPAIR-SRC-LIB-VISITOR-INTEL-SIMULATION-PERSISTENCE-FUNCTIONS-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Si corrije»), tras el reporte de que la pantalla «Pruebas con visitantes simulados» no abría: reparar la lectura, creación, cierre y borrado de pruebas simuladas mediante funciones internas sólo de servidor, porque el esquema visitor_intel no está expuesto en la Data API y el registro append-only impedía borrar pruebas.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/visitor-intel/simulation/persistence.functions.ts",
+    "previous_sha256": "1535e97071e81ec2186df6078bb6de0198a610b2ce473801fd4913d5b0366c5d",
+    "current_sha256": "bf6c001f552549d2c2eec3f2c706f2c603464b469db8062f039a9f562f0937fc",
+    "semantic_change": "Las server functions de simulación usan las RPC service-role visitor_intel_{list,create,insert,finish,wipe}_simulation_* en lugar de consultas directas al esquema no expuesto; mismos contratos de entrada/salida, mismo guard admin/super_admin, misma frase de confirmación.",
+    "authority": "Founder · reparar Pruebas con visitantes simulados («Si corrije») · 2026-11-21"
+  },
+  "invariants": [
+    "Las visitas reales siguen siendo append-only: no se pueden borrar ni modificar.",
+    "El borrado sólo elimina visitas simuladas de la prueba indicada.",
+    "Permisos de la pantalla, diseño y textos no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

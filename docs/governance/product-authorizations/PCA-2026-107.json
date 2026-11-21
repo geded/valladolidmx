@@ -86,6 +86,10 @@
     {
       "operation": "modify",
       "path": "src/lib/demo-pack/status.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/simulation/persistence.functions.ts"
     }
   ],
   "acknowledged_revisions": [
@@ -208,6 +212,12 @@
       "path": "src/lib/demo-pack/status.functions.ts",
       "sha256": "8c3f437761ce3fbef4d3533e61fb6a67811f35a64f93a773992638ce479739e8",
       "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/simulation/persistence.functions.ts",
+      "sha256": "bf6c001f552549d2c2eec3f2c706f2c603464b469db8062f039a9f562f0937fc",
+      "authority": "Founder · reparar Pruebas con visitantes simulados («Si corrije») · 2026-11-21"
     }
   ],
   "public_routes": [],
