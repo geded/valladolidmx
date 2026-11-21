@@ -222,6 +222,7 @@ import { Route as AuthenticatedCmsZonasNuevaRouteImport } from './routes/_authen
 import { Route as AuthenticatedConciergeExpedientesCaseIdRouteImport } from './routes/_authenticated/concierge/expedientes.$caseId'
 import { Route as AuthenticatedConciergeProspectosIndexRouteImport } from './routes/_authenticated/concierge/prospectos.index'
 import { Route as AuthenticatedConciergeProspectosProspectIdRouteImport } from './routes/_authenticated/concierge/prospectos.$prospectId'
+import { Route as AuthenticatedConciergeProspectosWhatsappRouteImport } from './routes/_authenticated/concierge/prospectos.whatsapp'
 import { Route as AuthenticatedConciergeReservacionesOrderIdRouteImport } from './routes/_authenticated/concierge/reservaciones.$orderId'
 import { Route as AuthenticatedCuentaCheckoutOrderIdRouteImport } from './routes/_authenticated/cuenta/checkout.$orderId'
 import { Route as AuthenticatedCuentaConciergeCaseIdRouteImport } from './routes/_authenticated/cuenta/concierge.$caseId'
@@ -239,6 +240,7 @@ import { Route as ApiPublicAluxChatRouteImport } from './routes/api/public/alux/
 import { Route as ApiPublicAluxSignalRouteImport } from './routes/api/public/alux/signal'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
+import { Route as ApiPublicHooksCrmWhatsappRouteImport } from './routes/api/public/hooks/crm-whatsapp'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as ApiPublicHooksMediaSignatureRenewRouteImport } from './routes/api/public/hooks/media-signature-renew'
 import { Route as ApiPublicHooksProposalPaymentRemindersRouteImport } from './routes/api/public/hooks/proposal-payment-reminders'
@@ -248,6 +250,7 @@ import { Route as ApiPublicHooksWhatsappAgentRouteImport } from './routes/api/pu
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicMediaDerivedSplatRouteImport } from './routes/api/public/media-derived.$'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
+import { Route as ApiPublicWhatsappEvolutionRouteImport } from './routes/api/public/whatsapp/evolution'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -1483,6 +1486,12 @@ const AuthenticatedConciergeProspectosProspectIdRoute =
     path: '/prospectos/$prospectId',
     getParentRoute: () => AuthenticatedConciergeRouteRoute,
   } as any)
+const AuthenticatedConciergeProspectosWhatsappRoute =
+  AuthenticatedConciergeProspectosWhatsappRouteImport.update({
+    id: '/prospectos/whatsapp',
+    path: '/prospectos/whatsapp',
+    getParentRoute: () => AuthenticatedConciergeRouteRoute,
+  } as any)
 const AuthenticatedConciergeReservacionesOrderIdRoute =
   AuthenticatedConciergeReservacionesOrderIdRouteImport.update({
     id: '/$orderId',
@@ -1582,6 +1591,12 @@ const ApiPublicHooksCouponReviewRemindersRoute =
     path: '/api/public/hooks/coupon-review-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCrmWhatsappRoute =
+  ApiPublicHooksCrmWhatsappRouteImport.update({
+    id: '/api/public/hooks/crm-whatsapp',
+    path: '/api/public/hooks/crm-whatsapp',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksEbProcessScheduledPublishRoute =
   ApiPublicHooksEbProcessScheduledPublishRouteImport.update({
     id: '/api/public/hooks/eb-process-scheduled-publish',
@@ -1633,6 +1648,12 @@ const ApiPublicStudioMediaSplatRoute =
   ApiPublicStudioMediaSplatRouteImport.update({
     id: '/api/public/studio-media/$',
     path: '/api/public/studio-media/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicWhatsappEvolutionRoute =
+  ApiPublicWhatsappEvolutionRouteImport.update({
+    id: '/api/public/whatsapp/evolution',
+    path: '/api/public/whatsapp/evolution',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
@@ -1995,6 +2016,7 @@ export interface FileRoutesByFullPath {
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
   '/concierge/prospectos/$prospectId': typeof AuthenticatedConciergeProspectosProspectIdRoute
+  '/concierge/prospectos/whatsapp': typeof AuthenticatedConciergeProspectosWhatsappRoute
   '/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -2009,6 +2031,7 @@ export interface FileRoutesByFullPath {
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
+  '/api/public/hooks/crm-whatsapp': typeof ApiPublicHooksCrmWhatsappRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
@@ -2018,6 +2041,7 @@ export interface FileRoutesByFullPath {
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
+  '/api/public/whatsapp/evolution': typeof ApiPublicWhatsappEvolutionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -2251,6 +2275,7 @@ export interface FileRoutesByTo {
   '/cms/visitor-intel/decisions': typeof AuthenticatedCmsVisitorIntelDecisionsRoute
   '/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/concierge/prospectos/$prospectId': typeof AuthenticatedConciergeProspectosProspectIdRoute
+  '/concierge/prospectos/whatsapp': typeof AuthenticatedConciergeProspectosWhatsappRoute
   '/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -2265,6 +2290,7 @@ export interface FileRoutesByTo {
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
+  '/api/public/hooks/crm-whatsapp': typeof ApiPublicHooksCrmWhatsappRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
@@ -2274,6 +2300,7 @@ export interface FileRoutesByTo {
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
+  '/api/public/whatsapp/evolution': typeof ApiPublicWhatsappEvolutionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -2519,6 +2546,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/zonas/nueva': typeof AuthenticatedCmsZonasNuevaRoute
   '/_authenticated/concierge/expedientes/$caseId': typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
   '/_authenticated/concierge/prospectos/$prospectId': typeof AuthenticatedConciergeProspectosProspectIdRoute
+  '/_authenticated/concierge/prospectos/whatsapp': typeof AuthenticatedConciergeProspectosWhatsappRoute
   '/_authenticated/concierge/reservaciones/$orderId': typeof AuthenticatedConciergeReservacionesOrderIdRoute
   '/_authenticated/cuenta/checkout/$orderId': typeof AuthenticatedCuentaCheckoutOrderIdRoute
   '/_authenticated/cuenta/concierge/$caseId': typeof AuthenticatedCuentaConciergeCaseIdRouteWithChildren
@@ -2533,6 +2561,7 @@ export interface FileRoutesById {
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
+  '/api/public/hooks/crm-whatsapp': typeof ApiPublicHooksCrmWhatsappRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
@@ -2542,6 +2571,7 @@ export interface FileRoutesById {
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
+  '/api/public/whatsapp/evolution': typeof ApiPublicWhatsappEvolutionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -2788,6 +2818,7 @@ export interface FileRouteTypes {
     | '/cms/zonas/nueva'
     | '/concierge/expedientes/$caseId'
     | '/concierge/prospectos/$prospectId'
+    | '/concierge/prospectos/whatsapp'
     | '/concierge/reservaciones/$orderId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
@@ -2802,6 +2833,7 @@ export interface FileRouteTypes {
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
+    | '/api/public/hooks/crm-whatsapp'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
@@ -2811,6 +2843,7 @@ export interface FileRouteTypes {
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
+    | '/api/public/whatsapp/evolution'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -3044,6 +3077,7 @@ export interface FileRouteTypes {
     | '/cms/visitor-intel/decisions'
     | '/cms/zonas/nueva'
     | '/concierge/prospectos/$prospectId'
+    | '/concierge/prospectos/whatsapp'
     | '/concierge/reservaciones/$orderId'
     | '/cuenta/checkout/$orderId'
     | '/cuenta/concierge/$caseId'
@@ -3058,6 +3092,7 @@ export interface FileRouteTypes {
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
+    | '/api/public/hooks/crm-whatsapp'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
@@ -3067,6 +3102,7 @@ export interface FileRouteTypes {
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
+    | '/api/public/whatsapp/evolution'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -3311,6 +3347,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/zonas/nueva'
     | '/_authenticated/concierge/expedientes/$caseId'
     | '/_authenticated/concierge/prospectos/$prospectId'
+    | '/_authenticated/concierge/prospectos/whatsapp'
     | '/_authenticated/concierge/reservaciones/$orderId'
     | '/_authenticated/cuenta/checkout/$orderId'
     | '/_authenticated/cuenta/concierge/$caseId'
@@ -3325,6 +3362,7 @@ export interface FileRouteTypes {
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
+    | '/api/public/hooks/crm-whatsapp'
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
@@ -3334,6 +3372,7 @@ export interface FileRouteTypes {
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
     | '/api/public/studio-media/$'
+    | '/api/public/whatsapp/evolution'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -3487,6 +3526,7 @@ export interface RootRouteChildren {
   ApiPublicAluxSignalRoute: typeof ApiPublicAluxSignalRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
+  ApiPublicHooksCrmWhatsappRoute: typeof ApiPublicHooksCrmWhatsappRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
   ApiPublicHooksMediaSignatureRenewRoute: typeof ApiPublicHooksMediaSignatureRenewRoute
   ApiPublicHooksProposalPaymentRemindersRoute: typeof ApiPublicHooksProposalPaymentRemindersRoute
@@ -3496,6 +3536,7 @@ export interface RootRouteChildren {
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicMediaDerivedSplatRoute: typeof ApiPublicMediaDerivedSplatRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
+  ApiPublicWhatsappEvolutionRoute: typeof ApiPublicWhatsappEvolutionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -4995,6 +5036,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConciergeProspectosProspectIdRouteImport
       parentRoute: typeof AuthenticatedConciergeRouteRoute
     }
+    '/_authenticated/concierge/prospectos/whatsapp': {
+      id: '/_authenticated/concierge/prospectos/whatsapp'
+      path: '/prospectos/whatsapp'
+      fullPath: '/concierge/prospectos/whatsapp'
+      preLoaderRoute: typeof AuthenticatedConciergeProspectosWhatsappRouteImport
+      parentRoute: typeof AuthenticatedConciergeRouteRoute
+    }
     '/_authenticated/concierge/reservaciones/$orderId': {
       id: '/_authenticated/concierge/reservaciones/$orderId'
       path: '/$orderId'
@@ -5114,6 +5162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksCouponReviewRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/crm-whatsapp': {
+      id: '/api/public/hooks/crm-whatsapp'
+      path: '/api/public/hooks/crm-whatsapp'
+      fullPath: '/api/public/hooks/crm-whatsapp'
+      preLoaderRoute: typeof ApiPublicHooksCrmWhatsappRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/eb-process-scheduled-publish': {
       id: '/api/public/hooks/eb-process-scheduled-publish'
       path: '/api/public/hooks/eb-process-scheduled-publish'
@@ -5175,6 +5230,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/studio-media/$'
       fullPath: '/api/public/studio-media/$'
       preLoaderRoute: typeof ApiPublicStudioMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/whatsapp/evolution': {
+      id: '/api/public/whatsapp/evolution'
+      path: '/api/public/whatsapp/evolution'
+      fullPath: '/api/public/whatsapp/evolution'
+      preLoaderRoute: typeof ApiPublicWhatsappEvolutionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/preview': {
@@ -5455,6 +5517,7 @@ interface AuthenticatedConciergeRouteRouteChildren {
   AuthenticatedConciergeIndexRoute: typeof AuthenticatedConciergeIndexRoute
   AuthenticatedConciergeExpedientesCaseIdRoute: typeof AuthenticatedConciergeExpedientesCaseIdRouteWithChildren
   AuthenticatedConciergeProspectosProspectIdRoute: typeof AuthenticatedConciergeProspectosProspectIdRoute
+  AuthenticatedConciergeProspectosWhatsappRoute: typeof AuthenticatedConciergeProspectosWhatsappRoute
   AuthenticatedConciergeProspectosIndexRoute: typeof AuthenticatedConciergeProspectosIndexRoute
 }
 
@@ -5472,6 +5535,8 @@ const AuthenticatedConciergeRouteRouteChildren: AuthenticatedConciergeRouteRoute
       AuthenticatedConciergeExpedientesCaseIdRouteWithChildren,
     AuthenticatedConciergeProspectosProspectIdRoute:
       AuthenticatedConciergeProspectosProspectIdRoute,
+    AuthenticatedConciergeProspectosWhatsappRoute:
+      AuthenticatedConciergeProspectosWhatsappRoute,
     AuthenticatedConciergeProspectosIndexRoute:
       AuthenticatedConciergeProspectosIndexRoute,
   }
@@ -6086,6 +6151,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
   ApiPublicHooksCouponReviewRemindersRoute:
     ApiPublicHooksCouponReviewRemindersRoute,
+  ApiPublicHooksCrmWhatsappRoute: ApiPublicHooksCrmWhatsappRoute,
   ApiPublicHooksEbProcessScheduledPublishRoute:
     ApiPublicHooksEbProcessScheduledPublishRoute,
   ApiPublicHooksMediaSignatureRenewRoute:
@@ -6099,6 +6165,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
   ApiPublicMediaDerivedSplatRoute: ApiPublicMediaDerivedSplatRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
+  ApiPublicWhatsappEvolutionRoute: ApiPublicWhatsappEvolutionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,

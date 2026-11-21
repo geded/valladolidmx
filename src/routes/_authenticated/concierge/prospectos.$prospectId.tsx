@@ -37,6 +37,7 @@ import {
   whatsappHref,
 } from "@/components/crm/ProspectBadges";
 import { TranscriptList } from "./prospectos.index";
+import { WhatsAppConversationPanel } from "@/components/crm/WhatsAppConversationPanel";
 
 export const Route = createFileRoute("/_authenticated/concierge/prospectos/$prospectId")({
   component: ProspectDetailPage,
@@ -130,7 +131,9 @@ function ProspectDetailPage() {
     briefBits.push(`Destinos: ${(brief["destinations"] as string[]).join(", ")}`);
   if (brief["partySize"]) briefBits.push(`${String(brief["partySize"])} personas`);
   if (brief["startDate"])
-    briefBits.push(`Del ${String(brief["startDate"])}${brief["endDate"] ? ` al ${String(brief["endDate"])}` : ""}`);
+    briefBits.push(
+      `Del ${String(brief["startDate"])}${brief["endDate"] ? ` al ${String(brief["endDate"])}` : ""}`,
+    );
   if (brief["durationDays"]) briefBits.push(`${String(brief["durationDays"])} días`);
   if (Array.isArray(brief["interests"]) && brief["interests"].length)
     briefBits.push(`Le interesa: ${(brief["interests"] as string[]).join(", ")}`);
@@ -155,7 +158,9 @@ function ProspectDetailPage() {
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <StageBadge stage={p.stage} />
               <TemperatureBadge temperature={p.temperature} />
-              {p.stage === "nuevo" && !p.reviewed_at ? <WaitingLabel since={p.last_activity_at} /> : null}
+              {p.stage === "nuevo" && !p.reviewed_at ? (
+                <WaitingLabel since={p.last_activity_at} />
+              ) : null}
             </div>
           </div>
           <a
@@ -204,7 +209,10 @@ function ProspectDetailPage() {
             value={p.temperature}
             disabled={busy}
             onChange={(e) =>
-              void run({ temperature: e.target.value as ProspectTemperature }, "Temperatura actualizada")
+              void run(
+                { temperature: e.target.value as ProspectTemperature },
+                "Temperatura actualizada",
+              )
             }
             className="mt-1 block min-h-11 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground"
           >
@@ -224,7 +232,8 @@ function ProspectDetailPage() {
             onBlur={(e) => {
               const v = e.target.value;
               const iso = v ? new Date(v).toISOString() : null;
-              if (iso !== p.next_followup_at) void run({ nextFollowupAt: iso }, "Seguimiento guardado");
+              if (iso !== p.next_followup_at)
+                void run({ nextFollowupAt: iso }, "Seguimiento guardado");
             }}
             className="mt-1 block min-h-11 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground"
           />
@@ -265,7 +274,9 @@ function ProspectDetailPage() {
               disabled={busy}
               onClick={() =>
                 void run(
-                  p.stage === "nuevo" ? { reviewed: true, stage: "contactado" } : { reviewed: true },
+                  p.stage === "nuevo"
+                    ? { reviewed: true, stage: "contactado" }
+                    : { reviewed: true },
                   "Marcado como revisado",
                 )
               }
@@ -286,7 +297,9 @@ function ProspectDetailPage() {
               .join(" · ")}
           </p>
         ) : (
-          <p className="mt-1 text-sm text-muted-foreground">Todavía no compartió fechas ni personas.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Todavía no compartió fechas ni personas.
+          </p>
         )}
         {p.trip_items?.length ? (
           <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm">
@@ -300,9 +313,29 @@ function ProspectDetailPage() {
       <section className="rounded-lg border border-border bg-card p-4">
         <h2 className="text-base font-semibold">Plática con Alux</h2>
         <p className="text-xs text-muted-foreground">
-          {sessions.length} {sessions.length === 1 ? "plática" : "pláticas"} ligadas a este prospecto.
+          {sessions.length} {sessions.length === 1 ? "plática" : "pláticas"} ligadas a este
+          prospecto.
         </p>
         <TranscriptList messages={messages} />
+        {(() => {
+          const wa = (
+            sessions as Array<{
+              id: string;
+              channel?: string;
+              alux_mode?: "alux" | "human";
+              conversation_language?: string | null;
+              handoff_requested_at?: string | null;
+            }>
+          ).find((s) => s.channel === "whatsapp");
+          return wa ? (
+            <WhatsAppConversationPanel
+              sessionId={wa.id}
+              mode={wa.alux_mode ?? "alux"}
+              language={wa.conversation_language ?? p.language ?? null}
+              handoffRequestedAt={wa.handoff_requested_at ?? null}
+            />
+          ) : null;
+        })()}
       </section>
 
       <section className="rounded-lg border border-border bg-card p-4">
@@ -353,7 +386,9 @@ function ProspectDetailPage() {
                   ? `: ${PROSPECT_STAGE_LABEL[ev.meta["to"] as ProspectStage] ?? ev.meta["to"]}`
                   : ""}
               </p>
-              {ev.body ? <p className="whitespace-pre-wrap text-muted-foreground">{ev.body}</p> : null}
+              {ev.body ? (
+                <p className="whitespace-pre-wrap text-muted-foreground">{ev.body}</p>
+              ) : null}
             </li>
           ))}
         </ol>

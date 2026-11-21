@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-106-ADDENDUM-2026-11-21-ZZZ-CRM-WHATSAPP-PHASE2-MODIFY-SRC-ROUTETREE-GEN-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-106",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Respuesta Founder del 2026-11-21: «Empezar la Fase 2» del plan aprobado 19.48 (WhatsApp por QR), acotada por PCA-2026-110. Sin cambiar CRM Arma tu viaje, plantillas públicas, pagos, reservaciones ni publicación.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routeTree.gen.ts",
+    "previous_sha256": "5398a7cc57e4f60c53fac04aabd43713b23059cde2220f723b3ab3776bc1841b",
+    "current_sha256": "83a79f9b0999f8919e634e7c0dd56942afc6f98053e24fc5dbb992ead18ad440",
+    "semantic_change": "Árbol de rutas regenerado con Líneas de WhatsApp, receptor de avisos y revisión de respaldo.",
+    "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+  },
+  "invariants": [
+    "CRM Arma tu viaje conserva expedientes, propuestas, órdenes y permisos.",
+    "Las líneas de Zazil (zt-*) del servidor compartido nunca se tocan.",
+    "Plantillas públicas, pagos y reservaciones no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

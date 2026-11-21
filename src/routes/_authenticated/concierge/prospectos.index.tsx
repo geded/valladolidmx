@@ -6,10 +6,12 @@
  * Pestañas: Hoy · Prospectos · Pláticas de Alux · Estadísticas.
  */
 import { createFileRoute, ErrorComponent, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
+import { translateTranscriptToSpanish } from "@/lib/crm/whatsapp.functions";
+import { WhatsAppConversationPanel } from "@/components/crm/WhatsAppConversationPanel";
 import { meridaDateTime } from "@/lib/time/merida";
 import {
   getAluxConversation,
@@ -54,12 +56,14 @@ export const Route = createFileRoute("/_authenticated/concierge/prospectos/")({
       { title: "CRM Prospectos | Centro Concierge" },
       {
         name: "description",
-        content: "Personas que dejaron su nombre y WhatsApp con Alux y esperan seguimiento del concierge.",
+        content:
+          "Personas que dejaron su nombre y WhatsApp con Alux y esperan seguimiento del concierge.",
       },
       { property: "og:title", content: "CRM Prospectos | Centro Concierge" },
       {
         property: "og:description",
-        content: "Personas que dejaron su nombre y WhatsApp con Alux y esperan seguimiento del concierge.",
+        content:
+          "Personas que dejaron su nombre y WhatsApp con Alux y esperan seguimiento del concierge.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -86,6 +90,12 @@ function ProspectsPage() {
           </Link>
           .
         </p>
+        <Link
+          to="/concierge/prospectos/whatsapp"
+          className="mt-2 inline-flex min-h-9 items-center text-sm font-medium text-primary hover:underline"
+        >
+          Líneas de WhatsApp
+        </Link>
       </header>
 
       <nav aria-label="Secciones del CRM" className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
@@ -207,7 +217,11 @@ function Section({
 
 function TodayTab() {
   const fn = useServerFn(getProspectsToday);
-  const q = useQuery({ queryKey: ["crm-prospects-today"], queryFn: () => fn(), refetchInterval: 60_000 });
+  const q = useQuery({
+    queryKey: ["crm-prospects-today"],
+    queryFn: () => fn(),
+    refetchInterval: 60_000,
+  });
   if (q.isLoading) return <p className="text-sm text-muted-foreground">Cargando prospectos…</p>;
   if (q.isError)
     return <p className="text-sm text-destructive">No se pudieron cargar los prospectos.</p>;
@@ -316,7 +330,7 @@ function ListTab() {
 
 function ConversationsTab() {
   const listFn = useServerFn(listAluxConversations);
-  const [filter, setFilter] = useState<"todas" | "con_datos" | "sin_datos">("todas");
+  const [filter, setFilter] = useState<"todas" | "con_datos" | "sin_datos" | "whatsapp">("todas");
   const [openId, setOpenId] = useState<string | null>(null);
   const q = useQuery({
     queryKey: ["crm-alux-conversations", filter],
@@ -334,6 +348,7 @@ function ConversationsTab() {
             ["todas", "Todas"],
             ["con_datos", "Dejaron sus datos"],
             ["sin_datos", "Sin datos"],
+            ["whatsapp", "WhatsApp"],
           ] as const
         ).map(([k, label]) => (
           <button
@@ -367,7 +382,20 @@ function ConversationsTab() {
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs text-muted-foreground">
-                    {meridaDateTime(s.last_seen_at)} · {s.message_count} {s.message_count === 1 ? "mensaje" : "mensajes"}
+                    {s.channel === "whatsapp" ? (
+                      <span className="mr-1 font-semibold text-success">WhatsApp ·</span>
+                    ) : null}
+                    {s.channel === "whatsapp" && s.alux_mode === "human" ? (
+                      <span
+                        className={
+                          s.handoff_requested_at ? "mr-1 font-semibold text-destructive" : "mr-1"
+                        }
+                      >
+                        {s.handoff_requested_at ? "Pidió concierge ·" : "Atiende concierge ·"}
+                      </span>
+                    ) : null}
+                    {meridaDateTime(s.last_seen_at)} · {s.message_count}{" "}
+                    {s.message_count === 1 ? "mensaje" : "mensajes"}
                     {s.last_destination_slug ? ` · ${s.last_destination_slug}` : ""}
                   </span>
                   <span className="text-[11px] font-medium">
@@ -407,41 +435,116 @@ function Transcript({ sessionId }: { sessionId: string }) {
     queryFn: () => fn({ data: { sessionId } }),
   });
   if (q.isLoading) return <p className="mt-2 text-xs text-muted-foreground">Cargando plática…</p>;
-  return <TranscriptList messages={q.data?.messages ?? []} />;
+  const session = q.data?.session as
+    | {
+        channel?: string;
+        alux_mode?: "alux" | "human";
+        conversation_language?: string | null;
+        handoff_requested_at?: string | null;
+      }
+    | null
+    | undefined;
+  return (
+    <>
+      <TranscriptList messages={q.data?.messages ?? []} />
+      {session?.channel === "whatsapp" ? (
+        <WhatsAppConversationPanel
+          sessionId={sessionId}
+          mode={session.alux_mode ?? "alux"}
+          language={session.conversation_language ?? null}
+          handoffRequestedAt={session.handoff_requested_at ?? null}
+        />
+      ) : null}
+    </>
+  );
 }
 
-export function TranscriptList({
-  messages,
-}: {
-  messages: ReadonlyArray<{ id: string; role: string; content: string; created_at: string }>;
-}) {
+type TranscriptMessage = {
+  id: string;
+  role: string;
+  content: string;
+  created_at: string;
+  author?: string | null;
+  channel?: string;
+  send_status?: string | null;
+  original_text?: string | null;
+};
+
+function authorLabel(m: TranscriptMessage): string {
+  if (m.role === "user") return "Explorador";
+  if (m.author === "concierge") return "Concierge";
+  if (m.author === "system") return "Nota del CRM";
+  return "Alux";
+}
+
+export function TranscriptList({ messages }: { messages: ReadonlyArray<TranscriptMessage> }) {
+  const translateFn = useServerFn(translateTranscriptToSpanish);
+  const [spanish, setSpanish] = useState<Record<string, string> | null>(null);
+  const recent = messages.slice(-40);
+  const translate = useMutation({
+    mutationFn: () => translateFn({ data: { texts: recent.map((m) => m.content.slice(0, 2000)) } }),
+    onSuccess: (r) => {
+      const map: Record<string, string> = {};
+      recent.forEach((m, i) => {
+        map[m.id] = r.texts[i] ?? m.content;
+      });
+      setSpanish(map);
+    },
+  });
   if (!messages.length)
     return <p className="mt-2 text-xs text-muted-foreground">Sin mensajes guardados.</p>;
   return (
-    <ol className="mt-3 space-y-2 border-t border-border pt-3">
-      {messages.map((m) => (
-        <li key={m.id} className={m.role === "user" ? "flex justify-end" : "flex"}>
-          <div
-            className={[
-              "max-w-[88%] rounded-2xl px-3 py-2 text-[13px] leading-snug",
-              m.role === "user" ? "bg-primary/10" : "bg-muted",
-            ].join(" ")}
-          >
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              {m.role === "user" ? "Explorador" : "Alux"} · {meridaDateTime(m.created_at)}
-            </p>
-            <p className="mt-0.5 whitespace-pre-wrap">{m.content}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
+    <div className="mt-3 border-t border-border pt-3">
+      <div className="mb-2 flex justify-end">
+        <button
+          type="button"
+          onClick={() => (spanish ? setSpanish(null) : translate.mutate())}
+          disabled={translate.isPending}
+          className="inline-flex min-h-8 items-center rounded-full border border-border bg-card px-3 text-[11px] font-medium hover:bg-muted disabled:opacity-60"
+        >
+          {translate.isPending ? "Traduciendo…" : spanish ? "Ver original" : "Ver en español"}
+        </button>
+      </div>
+      <ol className="space-y-2">
+        {messages.map((m) => (
+          <li key={m.id} className={m.role === "user" ? "flex justify-end" : "flex"}>
+            <div
+              className={[
+                "max-w-[88%] rounded-2xl px-3 py-2 text-[13px] leading-snug",
+                m.role === "user"
+                  ? "bg-primary/10"
+                  : m.author === "system"
+                    ? "border border-dashed border-border bg-background"
+                    : "bg-muted",
+              ].join(" ")}
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                {authorLabel(m)} · {meridaDateTime(m.created_at)}
+                {m.send_status === "failed" ? (
+                  <span className="ml-1 text-destructive">· no se envió</span>
+                ) : null}
+              </p>
+              <p className="mt-0.5 whitespace-pre-wrap">{spanish?.[m.id] ?? m.content}</p>
+              {m.original_text && !spanish ? (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Escrito en español: {m.original_text}
+                </p>
+              ) : null}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
 function StatsTab() {
   const fn = useServerFn(getProspectStats);
   const [days, setDays] = useState(30);
-  const q = useQuery({ queryKey: ["crm-prospect-stats", days], queryFn: () => fn({ data: { days } }) });
+  const q = useQuery({
+    queryKey: ["crm-prospect-stats", days],
+    queryFn: () => fn({ data: { days } }),
+  });
   const d = q.data;
   const rate =
     d && d.anonymousConversations > 0

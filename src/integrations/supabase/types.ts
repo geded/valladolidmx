@@ -351,40 +351,58 @@ export type Database = {
       }
       alux_public_messages: {
         Row: {
+          author: string | null
+          channel: string
           content: string
           created_at: string
+          created_by: string | null
+          external_id: string | null
           id: string
           ip_hash: string
           knowledge_ids: string[]
           latency_ms: number | null
           model: string | null
+          original_text: string | null
           role: string
+          send_status: string | null
           session_id: string
           tokens_in: number | null
           tokens_out: number | null
         }
         Insert: {
+          author?: string | null
+          channel?: string
           content: string
           created_at?: string
+          created_by?: string | null
+          external_id?: string | null
           id?: string
           ip_hash: string
           knowledge_ids?: string[]
           latency_ms?: number | null
           model?: string | null
+          original_text?: string | null
           role: string
+          send_status?: string | null
           session_id: string
           tokens_in?: number | null
           tokens_out?: number | null
         }
         Update: {
+          author?: string | null
+          channel?: string
           content?: string
           created_at?: string
+          created_by?: string | null
+          external_id?: string | null
           id?: string
           ip_hash?: string
           knowledge_ids?: string[]
           latency_ms?: number | null
           model?: string | null
+          original_text?: string | null
           role?: string
+          send_status?: string | null
           session_id?: string
           tokens_in?: number | null
           tokens_out?: number | null
@@ -401,12 +419,18 @@ export type Database = {
       }
       alux_public_sessions: {
         Row: {
+          alux_mode: string
+          channel: string
           contact_capture_count: number
           contact_offer_count: number
           contact_offer_last_message_count: number | null
+          conversation_language: string | null
           created_at: string
           destination_visit_count: number
           first_seen_at: string
+          handoff_reason: string | null
+          handoff_requested_at: string | null
+          human_reply_at: string | null
           id: string
           ip_hash: string
           last_category_slug: string | null
@@ -418,6 +442,7 @@ export type Database = {
           last_spatial_state: string | null
           message_count: number
           prospect_id: string | null
+          reply_lock_until: string | null
           session_key: string
           summary: string | null
           summary_message_count: number
@@ -426,14 +451,22 @@ export type Database = {
           user_agent: string | null
           visited_categories: Json
           visited_destinations: Json
+          wa_remote_jid: string | null
+          whatsapp_line_id: string | null
         }
         Insert: {
+          alux_mode?: string
+          channel?: string
           contact_capture_count?: number
           contact_offer_count?: number
           contact_offer_last_message_count?: number | null
+          conversation_language?: string | null
           created_at?: string
           destination_visit_count?: number
           first_seen_at?: string
+          handoff_reason?: string | null
+          handoff_requested_at?: string | null
+          human_reply_at?: string | null
           id?: string
           ip_hash: string
           last_category_slug?: string | null
@@ -445,6 +478,7 @@ export type Database = {
           last_spatial_state?: string | null
           message_count?: number
           prospect_id?: string | null
+          reply_lock_until?: string | null
           session_key: string
           summary?: string | null
           summary_message_count?: number
@@ -453,14 +487,22 @@ export type Database = {
           user_agent?: string | null
           visited_categories?: Json
           visited_destinations?: Json
+          wa_remote_jid?: string | null
+          whatsapp_line_id?: string | null
         }
         Update: {
+          alux_mode?: string
+          channel?: string
           contact_capture_count?: number
           contact_offer_count?: number
           contact_offer_last_message_count?: number | null
+          conversation_language?: string | null
           created_at?: string
           destination_visit_count?: number
           first_seen_at?: string
+          handoff_reason?: string | null
+          handoff_requested_at?: string | null
+          human_reply_at?: string | null
           id?: string
           ip_hash?: string
           last_category_slug?: string | null
@@ -472,6 +514,7 @@ export type Database = {
           last_spatial_state?: string | null
           message_count?: number
           prospect_id?: string | null
+          reply_lock_until?: string | null
           session_key?: string
           summary?: string | null
           summary_message_count?: number
@@ -480,6 +523,8 @@ export type Database = {
           user_agent?: string | null
           visited_categories?: Json
           visited_destinations?: Json
+          wa_remote_jid?: string | null
+          whatsapp_line_id?: string | null
         }
         Relationships: [
           {
@@ -487,6 +532,13 @@ export type Database = {
             columns: ["prospect_id"]
             isOneToOne: false
             referencedRelation: "concierge_prospects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alux_public_sessions_whatsapp_line_id_fkey"
+            columns: ["whatsapp_line_id"]
+            isOneToOne: false
+            referencedRelation: "crm_whatsapp_lines"
             referencedColumns: ["id"]
           },
         ]
@@ -3254,6 +3306,110 @@ export type Database = {
           status?: Database["public"]["Enums"]["content_status"]
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      crm_whatsapp_inbox: {
+        Row: {
+          attempts: number
+          delivery_key: string
+          event: string
+          id: string
+          lease_until: string | null
+          line_id: string
+          next_attempt_at: string
+          payload: Json
+          processed_at: string | null
+          processing_error: string | null
+          received_at: string
+        }
+        Insert: {
+          attempts?: number
+          delivery_key: string
+          event: string
+          id?: string
+          lease_until?: string | null
+          line_id: string
+          next_attempt_at?: string
+          payload: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+        }
+        Update: {
+          attempts?: number
+          delivery_key?: string
+          event?: string
+          id?: string
+          lease_until?: string | null
+          line_id?: string
+          next_attempt_at?: string
+          payload?: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_whatsapp_inbox_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "crm_whatsapp_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_whatsapp_lines: {
+        Row: {
+          alux_enabled: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          instance_name: string
+          label: string
+          last_state_at: string | null
+          owner_business_id: string | null
+          phone_e164: string | null
+          profile_name: string | null
+          qr_code: string | null
+          qr_updated_at: string | null
+          status: string
+          updated_at: string
+          webhook_base_url: string | null
+        }
+        Insert: {
+          alux_enabled?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          instance_name: string
+          label: string
+          last_state_at?: string | null
+          owner_business_id?: string | null
+          phone_e164?: string | null
+          profile_name?: string | null
+          qr_code?: string | null
+          qr_updated_at?: string | null
+          status?: string
+          updated_at?: string
+          webhook_base_url?: string | null
+        }
+        Update: {
+          alux_enabled?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          instance_name?: string
+          label?: string
+          last_state_at?: string | null
+          owner_business_id?: string | null
+          phone_e164?: string | null
+          profile_name?: string | null
+          qr_code?: string | null
+          qr_updated_at?: string | null
+          status?: string
+          updated_at?: string
+          webhook_base_url?: string | null
         }
         Relationships: []
       }
@@ -9176,6 +9332,49 @@ export type Database = {
         }[]
       }
       crm_is_prospect_staff: { Args: { _user_id: string }; Returns: boolean }
+      crm_whatsapp_acquire_reply_lock: {
+        Args: { _seconds: number; _session_id: string }
+        Returns: boolean
+      }
+      crm_whatsapp_claim_inbox: {
+        Args: { _id: string; _lease_seconds: number; _limit: number }
+        Returns: {
+          attempts: number
+          delivery_key: string
+          event: string
+          id: string
+          lease_until: string | null
+          line_id: string
+          next_attempt_at: string
+          payload: Json
+          processed_at: string | null
+          processing_error: string | null
+          received_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "crm_whatsapp_inbox"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      crm_whatsapp_notify_staff: {
+        Args: {
+          _alt: string
+          _event_id: string
+          _event_type: string
+          _url: string
+        }
+        Returns: undefined
+      }
+      crm_whatsapp_touch_prospect: {
+        Args: { _first_name: string; _language: string; _phone_e164: string }
+        Returns: {
+          is_new: boolean
+          prospect_id: string
+          reopened: boolean
+        }[]
+      }
       cron_hooks_bootstrap_secret: { Args: { _value: string }; Returns: Json }
       cron_hooks_get_secret: { Args: never; Returns: string }
       cron_hooks_invoke: {

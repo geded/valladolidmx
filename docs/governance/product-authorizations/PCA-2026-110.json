@@ -1,0 +1,169 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-110",
+  "title": "CRM Prospectos Fase 2: Alux y el concierge atienden por WhatsApp (QR)",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Respuesta Founder del 2026-11-21 a «¿Qué prefieres hacer ahora con el CRM de prospectos?»: «Empezar la Fase 2» del plan aprobado 19.48 (WhatsApp: Alux atiende, pase a concierge, comandos # y escribir desde el panel), con la conexión por QR en el servidor de mensajes de Zazil decidida en el plan. Delta acotado: líneas vmx-* propias, bandeja durable de avisos, pláticas sobre las tablas de Alux existentes, pantalla de líneas y controles en Pláticas y en la ficha. Sin cambiar CRM Arma tu viaje, plantillas públicas, pagos, reservaciones ni publicación. En route-inventory.ts además se registran tres rutas internas existentes que faltaban (generate-image, stt, tts) para que la revisión de inventario pase.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/crm/channel/types.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/channel/evolution.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/rules.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/alux-reply.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/process.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/crm-whatsapp.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/whatsapp/evolution.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/hooks/crm-whatsapp.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/prospectos.whatsapp.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/crm/WhatsAppConversationPanel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/prospects.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.$prospectId.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/lib/crm/channel/types.ts",
+      "sha256": "a3936eb2431af5be2b9df6a16032c61736ca240434368d4a64e8ae6316f228d2",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/channel/evolution.server.ts",
+      "sha256": "d649c474eca1951eabef2525d76b365b90b7b2d14a4e87409ccdbd1c637f2cda",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/rules.ts",
+      "sha256": "99c04998618492bd6ffa49aa43393cab5a729eb7ab717caaf438d3d4373c7304",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/alux-reply.server.ts",
+      "sha256": "cf98d67757fea492208f7b3a8419c321896165241e22f49beb63944b695031c1",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/process.server.ts",
+      "sha256": "7b5a3b942bf798943c37e833fdf4ae490aebbcc4ef0547df20c184e26276760e",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp.functions.ts",
+      "sha256": "314593237302aa22ebba8281ecee89e699237257aa5979b984c73e92f2656249",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/cron/jobs/crm-whatsapp.server.ts",
+      "sha256": "49eab6a367f74a1667a81ddd574b7de63ca74efb5c20a50d16d9366d72573e87",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/whatsapp/evolution.ts",
+      "sha256": "fc915f9f43f94058a32d57da55aca7a04d6e09b3d0aacad23c26a201636004bf",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/hooks/crm-whatsapp.ts",
+      "sha256": "7bd3d5fad6a1bd02b97e34061cc5ff8698b2fbf2f24123779573cf28a30e32df",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/prospectos.whatsapp.tsx",
+      "sha256": "ce9f39e01b23319d509aa813c4efca7634f1b220560e35f6b36a3dd088792b91",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/crm/WhatsAppConversationPanel.tsx",
+      "sha256": "8bd73493e25ad1d68f29b2197757c157d980d51e39f7d1346f56f4e8d4196329",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/prospects.functions.ts",
+      "sha256": "eabd2215cb8f38fd1fc24d0af27462e5ce6362fd82d686b4ffdc03769b601ed6",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx",
+      "sha256": "741d9496cf2e2efb66f65d51cd6cefe492c312711ad602d2fdaca3c43e00e49e",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.$prospectId.tsx",
+      "sha256": "0800e282c6050a0e709208132e1d46225961a099a0c7c5c5021d001dc777c98c",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "af77b5cd8add9f1d47c5b53593a48f5788e8490c66f6f2ac02c39fff622a898e",
+      "authority": "Founder · CRM Prospectos Fase 2 (WhatsApp por QR) · 2026-11-21"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "scripts/omxds/crm/whatsapp-rules.contract.test.ts",
+    "scripts/omxds/crm/prospect-rules.contract.test.ts"
+  ]
+}

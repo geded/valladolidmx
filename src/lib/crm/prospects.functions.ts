@@ -228,7 +228,17 @@ export type AluxTranscriptMessage = {
   role: string;
   content: string;
   created_at: string;
+  /** Fase 2: quién escribió en WhatsApp (alux, concierge, system) o null en la web. */
+  author?: string | null;
+  channel?: string;
+  send_status?: string | null;
+  original_text?: string | null;
 };
+
+const TRANSCRIPT_COLUMNS =
+  "id, session_id, role, content, created_at, author, channel, send_status, original_text";
+const SESSION_LIST_COLUMNS =
+  "id, first_seen_at, last_seen_at, message_count, last_destination_slug, prospect_id, traveler_user_id, channel, alux_mode, handoff_requested_at, handoff_reason, conversation_language";
 
 export const getProspect = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -249,7 +259,9 @@ export const getProspect = createServerFn({ method: "POST" })
         .limit(100),
       context.supabase
         .from("alux_public_sessions")
-        .select("id, first_seen_at, last_seen_at, message_count, last_destination_slug")
+        .select(
+          "id, first_seen_at, last_seen_at, message_count, last_destination_slug, channel, alux_mode, handoff_requested_at, conversation_language",
+        )
         .eq("prospect_id", data.id)
         .order("last_seen_at", { ascending: false })
         .limit(10),
@@ -261,7 +273,7 @@ export const getProspect = createServerFn({ method: "POST" })
     const messagesRes = sessionIds.length
       ? await context.supabase
           .from("alux_public_messages")
-          .select("id, session_id, role, content, created_at")
+          .select(TRANSCRIPT_COLUMNS)
           .in("session_id", sessionIds)
           .order("created_at", { ascending: true })
           .limit(400)
@@ -350,6 +362,11 @@ export type AluxConversationRow = {
   prospect_id: string | null;
   traveler_user_id: string | null;
   preview: string | null;
+  channel: "web" | "whatsapp";
+  alux_mode: "alux" | "human";
+  handoff_requested_at: string | null;
+  handoff_reason: string | null;
+  conversation_language: string | null;
 };
 
 export const listAluxConversations = createServerFn({ method: "POST" })
@@ -358,7 +375,7 @@ export const listAluxConversations = createServerFn({ method: "POST" })
     z
       .object({
         days: z.number().int().min(1).max(90).default(7),
-        filter: z.enum(["todas", "con_datos", "sin_datos"]).default("todas"),
+        filter: z.enum(["todas", "con_datos", "sin_datos", "whatsapp"]).default("todas"),
       })
       .parse(d ?? {}),
   )
@@ -367,15 +384,14 @@ export const listAluxConversations = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - data.days * 86400000).toISOString();
     let q = context.supabase
       .from("alux_public_sessions")
-      .select(
-        "id, first_seen_at, last_seen_at, message_count, last_destination_slug, prospect_id, traveler_user_id",
-      )
+      .select(SESSION_LIST_COLUMNS)
       .gte("last_seen_at", since)
       .gt("message_count", 0)
       .order("last_seen_at", { ascending: false })
       .limit(60);
     if (data.filter === "con_datos") q = q.not("prospect_id", "is", null);
     if (data.filter === "sin_datos") q = q.is("prospect_id", null);
+    if (data.filter === "whatsapp") q = q.eq("channel", "whatsapp");
     const { data: sessions, error } = await q;
     if (error) throw new Error(error.message);
     const ids = (sessions ?? []).map((s) => s.id);
@@ -406,14 +422,12 @@ export const getAluxConversation = createServerFn({ method: "POST" })
     const [sessionRes, msgsRes] = await Promise.all([
       context.supabase
         .from("alux_public_sessions")
-        .select(
-          "id, first_seen_at, last_seen_at, message_count, last_destination_slug, prospect_id, traveler_user_id",
-        )
+        .select(SESSION_LIST_COLUMNS)
         .eq("id", data.sessionId)
         .maybeSingle(),
       context.supabase
         .from("alux_public_messages")
-        .select("id, session_id, role, content, created_at")
+        .select(TRANSCRIPT_COLUMNS)
         .eq("session_id", data.sessionId)
         .order("created_at", { ascending: true })
         .limit(300),

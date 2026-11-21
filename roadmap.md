@@ -25,12 +25,16 @@
 - [ ] Regla de venta: solo experiencias se venden directo con enlace de pago; lo demás pasa al concierge, que busca los mejores precios (en plan).
 - [x] Conexión de WhatsApp elegida: QR como Zazil (Evolution en Railway), con líneas administradas desde el panel.
 - [ ] Organización: CRM Prospectos (Hoy, Pláticas, Prospectos, Estadísticas) en el panel del concierge; configuración, reglas, entrenamiento y canales de Alux en las pantallas de Alux del CMS que ya existen, con acceso directo (en plan).
-- [ ] Recibir del Founder la dirección y clave del servidor Evolution de Railway (al iniciar la Fase 2).
+- [x] Recibir del Founder la dirección y clave del servidor Evolution de Railway (guardadas 2026-11-21; servidor responde, versión 2.3.7).
 
 - [x] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (plan aprobado 2026-11-21).
 - [x] Fase 1 · Captura consentida de nombre y WhatsApp en Alux (ventana flotante) y sección «CRM Prospectos» (Hoy, Prospectos, Pláticas, Estadísticas, ficha con etapa, temperatura, responsable, seguimiento y notas); aviso al equipo sin teléfono; bandeja renombrada «CRM Arma tu viaje».
 - [ ] Fase 1 · pendiente: tarjeta de contacto también en la página completa /alux (usa otra conexión de Alux) y comparación con las mismas preguntas en Zazil — espera aprobación del Founder.
-- [ ] Fase 2 · Embudo, unión sin duplicados al registrarse y vínculo con ventas confirmadas.
+- [x] Fase 2 · WhatsApp: líneas `vmx-*` por QR desde «Líneas de WhatsApp», bandeja durable de avisos, Alux contesta en el idioma del cliente con el catálogo publicado, pase a concierge con aviso al equipo, comandos #alux/#apagar/#cotizar/#enlace/#nota/#agenda, escribir desde el panel con traducción, «Ver en español», «Tomar plática» / «Devolver a Alux».
+- [ ] Fase 2 · pendiente: escanear el QR de la línea «Concierge Valladolid.mx» con el teléfono (espera al Founder) y probar con un mensaje real después de que la vista previa en línea se actualice o tras publicar.
+- [ ] Fase 2 · pendiente: comparación con las mismas preguntas en el Alux de Zazil (Zazil sin créditos de IA el 2026-11-21).
+- [ ] Fase 2 · pendiente: «¿Te escribo por WhatsApp?» desde la web y el primer mensaje que retoma la plática (no construido).
+- [ ] Fase 3 · Embudo, unión sin duplicados al registrarse y vínculo con ventas confirmadas.
 - [ ] Fase 3 · Mensajería con viajeros por el canal oficial (no iniciada; espera autorización expresa).
 
 ## Monitor de visitantes y registro de viajeros · 2026-11-20
