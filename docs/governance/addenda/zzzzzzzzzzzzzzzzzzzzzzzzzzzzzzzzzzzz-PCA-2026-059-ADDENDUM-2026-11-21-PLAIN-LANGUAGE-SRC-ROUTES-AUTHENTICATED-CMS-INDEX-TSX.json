@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-PLAIN-LANGUAGE-SRC-ROUTES-AUTHENTICATED-CMS-INDEX-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Quiero que revises toda la parte de Inteligencia de alux y estadísticas que ya está haciendo la plataforma y lo pongas en un lenguaje más de usuario, veo muchas secciones con términos técnicos y en inglés, debemos hacerlos más entendibles y saber qué significa cada sección que esté acumulando estadísticas y datos»): sólo textos de presentación en el monitor de visitantes, decisiones del equipo, Consola de Alux y sus subpantallas, salud del sitio, actividad y panel de inteligencia; las tres subpantallas de Alux vuelven a abrirse. Sin cambiar cálculos, cifras, identificadores, permisos, plantillas públicas, Alux para viajeros, pagos, reservaciones ni datos. Seguimiento del Founder («Mira la imagen estas opciones quedaron claras?»): las tarjetas de la pantalla «Hoy» del CMS que llevan a estas secciones.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cms/index.tsx",
+    "previous_sha256": "3e984579aa67aa73bf04154ef92e4b8c99ad3dc3c73615c4fc51c7fe4f183459",
+    "current_sha256": "85011b24c1f3ad101d60d587f141bb25eaa6504f341f6db83d90c07c3cfbbbbb",
+    "semantic_change": "Sólo nombres y descripciones en lenguaje de usuario de cinco tarjetas (viajes en curso, inteligencia del visitante, decisiones, simulaciones y datos de demostración); destinos de los enlaces y orden no cambian.",
+    "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+  },
+  "invariants": [
+    "Enlaces, orden y diseño de las tarjetas no cambian.",
+    "Cálculos, cifras, permisos y datos no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

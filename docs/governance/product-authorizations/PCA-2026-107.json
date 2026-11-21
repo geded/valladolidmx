@@ -70,6 +70,10 @@
     {
       "operation": "modify",
       "path": "src/routes/_authenticated/cms/visitor-intel_.decisions.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/index.tsx"
     }
   ],
   "acknowledged_revisions": [
@@ -167,6 +171,12 @@
       "operation": "modify",
       "path": "src/routes/_authenticated/cms/visitor-intel_.decisions.tsx",
       "sha256": "d6342a103a20ca2a3606b8adb1e476c1fd0d46f394df64268881555f551e8dcf",
+      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/index.tsx",
+      "sha256": "85011b24c1f3ad101d60d587f141bb25eaa6504f341f6db83d90c07c3cfbbbbb",
       "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
     }
   ],

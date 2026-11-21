@@ -87,34 +87,36 @@ const ENTITIES: EntityCard[] = [
   },
   {
     key: "travel_plans_ops",
-    name: "Viajes en curso (CV1.1)",
-    description: "Vista operativa read-only de Travel Plans activos, Alux y Concierge.",
+    name: "Viajes en curso",
+    description:
+      "Los viajes que están armando los viajeros ahora, con lo que sugirió Alux y lo que atiende el concierge. Sólo para consultar.",
     to: "/cms/travel-plans",
   },
   {
     key: "visitor_intel",
-    name: "Visitor Intelligence (CV8.3)",
-    description: "Centro de Inteligencia del Visitante — decisiones accionables sobre el Journey.",
+    name: "Inteligencia del visitante",
+    description:
+      "Cómo descubren, planean y reservan los visitantes, y qué conviene mejorar en cada paso.",
     to: "/cms/visitor-intel",
   },
   {
     key: "decision_queue",
-    name: "Cola de decisiones (CV8.9)",
-    description: "Pendientes, asignación, evidencia e historial de decisiones.",
+    name: "Decisiones del equipo",
+    description: "Las mejoras que decidió el equipo: quién las hace, para cuándo y si funcionaron.",
     to: "/cms/visitor-intel/decisions",
   },
   {
     key: "simulation",
-    name: "Simulation Console (CV8.S.4)",
+    name: "Pruebas con visitantes simulados",
     description:
-      "Ejecuta, audita y elimina simulaciones del Visitor Intelligence sin afectar datos reales.",
+      "Crea y borra visitantes de práctica para probar el monitor sin tocar las cifras reales.",
     to: "/cms/simulation",
   },
   {
     key: "demo_pack",
-    name: "Demo Pack v1",
+    name: "Datos de demostración",
     description:
-      "Estado del Demo World Oriente Maya: catálogo, KB multilingüe, reseñas y orden VMX-DEMO01.",
+      "Revisa los lugares, la información para Alux en varios idiomas, las reseñas y la reserva de ejemplo (VMX-DEMO01) que usamos para mostrar la plataforma.",
     to: "/cms/demo-pack",
   },
 ];
