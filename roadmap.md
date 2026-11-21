@@ -445,3 +445,9 @@
 
 ## App sin señal · 2026-11-20 (Founder reporta: la app no abre sin señal)
 - [x] Causa: sin señal, si una pieza flotante (Alux, Tu viaje, aviso de sesión) no estaba guardada, toda la página se reemplazaba por «Sin conexión». Corregido: la pieza se omite y la página se ve. Pendiente publicar y probar en iPhone real.
+
+## Memoria de la app al seguir rutas · 2026-11-21
+- [ ] Medir cuánta memoria usa la app (y espacio en el teléfono) con una ruta abierta y Mi Viaje; revisar qué pasa con rutas guardadas sin señal. Solo diagnóstico.
+- [ ] Requisito Founder: el viajero debe ver su itinerario una vez que el concierge le armó el viaje (también sin señal). Hoy Mi Viaje con cuenta no abre sin señal.
+- [ ] Hallazgo: la memoria crece ~1 MB por cada cambio entre fichas de rutas (16→40 MB en 20 cambios) porque el mapa compartido no se libera al salir. Propuesta: liberar mapa, pines y trazos al salir. Espera autorización.
+- [ ] Hallazgo: la app guarda en el teléfono respuestas de datos con sesión (lecturas GET) en la memoria sin señal, aunque la regla dice no guardar nada de la cuenta. Revisar junto con el itinerario sin señal.
