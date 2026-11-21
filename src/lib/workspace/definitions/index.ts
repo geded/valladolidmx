@@ -598,6 +598,16 @@ const concierge: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "concierge.whatsapp-lines",
+      workspaceId: "concierge",
+      label: "Líneas de WhatsApp",
+      icon: MessageCircle,
+      to: "/concierge/prospectos/whatsapp",
+      group: "trabajo",
+      order: 1.6,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "concierge.reservations",
       workspaceId: "concierge",
       label: "Reservaciones",

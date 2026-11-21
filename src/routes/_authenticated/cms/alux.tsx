@@ -171,6 +171,13 @@ function AluxConsolePage() {
           >
             🎯 Calidad de las respuestas
           </Link>
+          <span className="mx-3 text-muted-foreground">·</span>
+          <Link
+            to="/concierge/prospectos/whatsapp"
+            className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
+          >
+            💬 WhatsApp de Alux
+          </Link>
         </div>
       </header>
 
