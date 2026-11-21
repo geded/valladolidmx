@@ -44,17 +44,17 @@ const SCALES: Array<{ id: SimulationScale; label: string; desc: string }> = [
   {
     id: "light",
     label: "Pequeña (1,000 visitantes)",
-    desc: "Unos 15,000 movimientos · prueba rápida",
+    desc: "Unos 3,000 movimientos · prueba rápida",
   },
   {
     id: "medium",
     label: "Mediana (10,000 visitantes)",
-    desc: "Unos 150,000 movimientos · prueba completa",
+    desc: "Unos 30,000 movimientos · prueba completa",
   },
   {
     id: "full",
     label: "Grande (100,000 visitantes)",
-    desc: "Unos 1.5 millones de movimientos · pide doble confirmación",
+    desc: "Unos 300,000 movimientos · pide doble confirmación",
   },
 ];
 
@@ -254,7 +254,7 @@ function SimulationConsole() {
           <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">
             <strong className="text-destructive">Confirmación adicional.</strong>
             <p className="mt-1 text-xs text-muted-foreground">
-              La prueba grande (100,000 visitantes) puede crear unos 1.5 millones de movimientos.
+              La prueba grande (100,000 visitantes) puede crear unos 300,000 movimientos.
               {allowFull
                 ? " Marca la casilla para autorizarla."
                 : " No está habilitada en este entorno; pídela al equipo técnico."}

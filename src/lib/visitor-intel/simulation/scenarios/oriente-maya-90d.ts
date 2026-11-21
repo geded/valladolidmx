@@ -97,10 +97,11 @@ export function estimateVolume(scale: SimulationScale): {
   storage_mb_high: number;
 } {
   const visitors = scale === "light" ? 1_000 : scale === "medium" ? 10_000 : 100_000;
-  // Promedio observado en CV8.S.3: ~12–22 eventos por visitante (Journey + sub-motores).
-  const low = visitors * 12;
-  const high = visitors * 22;
-  // ~1.2 KB por row en jsonb (payload + causality).
+  // Medido con el motor actual: 2.4–3.4 eventos por visitante según la seed
+  // (la mayoría abandona tras las primeras transiciones del Journey).
+  const low = visitors * 2;
+  const high = visitors * 4;
+  // ~1.2 KB por row en jsonb (payload + causality + índices).
   return {
     visitors,
     events_low: low,

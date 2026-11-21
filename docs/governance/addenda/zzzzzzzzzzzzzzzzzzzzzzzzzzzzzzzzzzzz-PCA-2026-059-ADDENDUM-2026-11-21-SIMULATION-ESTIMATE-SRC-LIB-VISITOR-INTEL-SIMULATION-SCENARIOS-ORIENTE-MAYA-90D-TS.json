@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-SIMULATION-ESTIMATE-SRC-LIB-VISITOR-INTEL-SIMULATION-SCENARIOS-ORIENTE-MAYA-90D-TS",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Corrije»): la estimación «Lo que va a crear» de Pruebas con visitantes simulados anunciaba 12,000–22,000 movimientos y la prueba pequeña creaba unos 2,800; ajustar la estimación a lo que el motor realmente genera.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/lib/visitor-intel/simulation/scenarios/oriente-maya-90d.ts",
+    "previous_sha256": "b7681ad300374c06064917635b3160dbf72145d773679dbe275982e7a1b98637",
+    "current_sha256": "408af78a407f35ea353da77c5b2d70e82aa22ba68b72dfd28e9cda83f879195f",
+    "semantic_change": "La estimación previa usa 2–4 movimientos por visitante, medidos con el motor actual (antes 12–22); el motor y los escenarios no cambian.",
+    "authority": "Founder · corregir estimación de Pruebas con visitantes simulados («Corrije») · 2026-11-21"
+  },
+  "invariants": [
+    "El motor de simulación, los escenarios y lo que se guarda no cambian.",
+    "Diseño, permisos y visitas reales no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}

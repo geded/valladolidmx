@@ -90,6 +90,10 @@
     {
       "operation": "modify",
       "path": "src/lib/visitor-intel/simulation/persistence.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/simulation/scenarios/oriente-maya-90d.ts"
     }
   ],
   "acknowledged_revisions": [
@@ -197,12 +201,6 @@
     },
     {
       "operation": "modify",
-      "path": "src/routes/_authenticated/cms/simulation.tsx",
-      "sha256": "ab18ce0f535c15602d28f30add057c448cd8dcc48a485f65b67686338d60851d",
-      "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
-    },
-    {
-      "operation": "modify",
       "path": "src/routes/_authenticated/cms/demo-pack.tsx",
       "sha256": "b442fcf3fea8efe13c726096a87fdb02994b94512c4ae54ac980858e6666805b",
       "authority": "Founder · lenguaje de usuario en inteligencia y estadísticas · 2026-11-21"
@@ -218,6 +216,18 @@
       "path": "src/lib/visitor-intel/simulation/persistence.functions.ts",
       "sha256": "bf6c001f552549d2c2eec3f2c706f2c603464b469db8062f039a9f562f0937fc",
       "authority": "Founder · reparar Pruebas con visitantes simulados («Si corrije») · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/visitor-intel/simulation/scenarios/oriente-maya-90d.ts",
+      "sha256": "408af78a407f35ea353da77c5b2d70e82aa22ba68b72dfd28e9cda83f879195f",
+      "authority": "Founder · corregir estimación de Pruebas con visitantes simulados («Corrije») · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/simulation.tsx",
+      "sha256": "2c504488897a9dede41fe53823684e54672409dec4b15725cb4f0864b427dafc",
+      "authority": "Founder · corregir estimación de Pruebas con visitantes simulados («Corrije») · 2026-11-21"
     }
   ],
   "public_routes": [],

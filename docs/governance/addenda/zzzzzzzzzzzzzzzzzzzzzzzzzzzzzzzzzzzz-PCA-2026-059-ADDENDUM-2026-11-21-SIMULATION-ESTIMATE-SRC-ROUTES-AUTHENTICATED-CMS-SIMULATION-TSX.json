@@ -1,0 +1,20 @@
+{
+  "id": "PCA-2026-059-ADDENDUM-2026-11-21-SIMULATION-ESTIMATE-SRC-ROUTES-AUTHENTICATED-CMS-SIMULATION-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-059",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-21 («Corrije»): la estimación «Lo que va a crear» de Pruebas con visitantes simulados anunciaba 12,000–22,000 movimientos y la prueba pequeña creaba unos 2,800; ajustar la estimación a lo que el motor realmente genera.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/_authenticated/cms/simulation.tsx",
+    "previous_sha256": "ab18ce0f535c15602d28f30add057c448cd8dcc48a485f65b67686338d60851d",
+    "current_sha256": "2c504488897a9dede41fe53823684e54672409dec4b15725cb4f0864b427dafc",
+    "semantic_change": "Textos de los tamaños y de la confirmación adicional con los movimientos reales estimados (3,000 / 30,000 / 300,000).",
+    "authority": "Founder · corregir estimación de Pruebas con visitantes simulados («Corrije») · 2026-11-21"
+  },
+  "invariants": [
+    "El motor de simulación, los escenarios y lo que se guarda no cambian.",
+    "Diseño, permisos y visitas reales no cambian."
+  ],
+  "recorded_at": "2026-11-21"
+}
