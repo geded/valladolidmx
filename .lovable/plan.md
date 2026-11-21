@@ -84,6 +84,12 @@ Cuando un prospecto quiere que le armen el viaje, el concierge (o Alux) le manda
 
 El concierge abre el expediente y ya tiene el contexto completo. Solo arma la propuesta.
 
+**Cómo se guarda, en dos momentos**
+- **Mientras no tiene cuenta:** la ficha del prospecto es su «pre-expediente». Guarda los datos del viaje en campos separados (fechas, personas, destinos, presupuesto e intereses), la lista de lugares que vio o eligió, la ficha de traspaso y todas sus pláticas de WhatsApp y de Alux. Alux y el concierge la actualizan en cada plática.
+- **Al registrarse:** con ese pre-expediente se crea, con el mismo mecanismo que ya usa «Enviar a mi concierge», el **viaje** en Mi Viaje y el **expediente** en CRM Arma tu viaje. Queda asignado al mismo concierge, con la ficha de traspaso como resumen, los lugares como partes del viaje, el enlace a las pláticas y una línea en el historial: «Llegó desde CRM Prospectos».
+
+El expediente de Arma tu viaje siempre pertenece a la cuenta del viajero. Por eso el registro es el paso que lo crea; antes de eso, todo vive en la ficha del prospecto.
+
 ## 4. Etapas y reglas automáticas (iguales a Zazil)
 
 Nuevo → Contactado → Propuesta enviada → Reservó → Por viajar → Viajó → Posventa; No interesado y Perdido aparte. Se pueden cambiar a mano.
@@ -114,5 +120,5 @@ Cada fase se aprueba por separado. Nada se publica sin tu visto bueno.
 - **Reglas en base:** trigger de etapa cerrada, conciliación de venta (`partial`/`paid`, búsqueda única y diagnóstico cuando hay duda), cron de rescate (100 por minuto) y reapertura de perdidos.
 - **Alux:** se reutilizan `converse-retrieval.server.ts` y `canonical-catalog.server.ts`. Se añaden bloques de reglas por jerarquía y un registro de reglas R-xx con pruebas. La regla «no pidas datos personales» se sustituye por «contacto antes de cerrar». El modelo nunca recibe teléfono ni correo; el servidor los guarda aparte.
 - **WhatsApp:** puerto `src/lib/crm/channel/*` con dos adaptadores, Evolution (token comparado en tiempo constante) y Meta oficial. Bandeja de mensajes idempotente por id y candado de una respuesta por plática.
-- **Traspaso:** enlace firmado de un solo uso con el id del prospecto. Al confirmar la cuenta se crean `travel_plans` (`source` Alux/WhatsApp, `meta.prospect_id`) con sus `travel_plan_items` y un `concierge_cases` con `summary` = ficha de traspaso generada por Alux desde la conversación (sin inventar datos), y el concierge responsable como participante.
+- **Traspaso:** el pre-expediente vive en `concierge_prospects` (`trip_brief` jsonb + `trip_items` jsonb con snapshots + `handoff_summary`). Al registrarse se reutiliza `cc_case_create_from_plan(_summary, _items, _travel_plan_id)` con un plan `shared_with_concierge`, luego `cc_case_assign` al concierge del prospecto, `concierge_case_links` (`link_type` prospect/conversation) y `cc_timeline_append`. `concierge_cases.traveler_user_id` es obligatorio, así que no hay expediente sin cuenta. Enlace firmado de un solo uso con el id del prospecto. Al confirmar la cuenta se crean `travel_plans` (`source` Alux/WhatsApp, `meta.prospect_id`) con sus `travel_plan_items` y un `concierge_cases` con `summary` = ficha de traspaso generada por Alux desde la conversación (sin inventar datos), y el concierge responsable como participante.
 - **Controles:** Scope y Preservation Gate, pruebas por regla, QA 390/834/1440 e inventario de gobernanza.
