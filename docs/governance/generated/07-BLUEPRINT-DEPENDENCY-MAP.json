@@ -4,7 +4,7 @@
     "document": "docs/governance/06-BLUEPRINT-MASTER-INDEX.md",
     "version": "0.87",
     "state": "Approved",
-    "source_sha256": "faf1bf50f179aac7f5bff37509d303906bf612bddd2109035df9989042899fa3",
+    "source_sha256": "943abd36533af2ef4bc644eb21a52dac0df8f6213ec02b1d6b4d228cf29ac060",
     "generator": "scripts/governance/sync-governance.mjs",
     "projection_mode": "canonical-plus-frozen-curated-baseline",
     "curated_baseline_sha256": "94bfae90da2ce7a499a268774f01f3b6aa5ebee4e4ce66c95ac1f632c5ce7f3a"
@@ -12224,8 +12224,23 @@
       "type": "blueprint",
       "path": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
       "owner": "D09 · concierge-service",
-      "state": "Draft",
+      "state": "Approved",
       "version": "1.0"
+    },
+    {
+      "id": "ART:docs/governance/product-authorizations/PCA-2026-108.json",
+      "type": "artifact",
+      "path": "docs/governance/product-authorizations/PCA-2026-108.json"
+    },
+    {
+      "id": "ART:src/lib/crm/prospect-rules.ts",
+      "type": "artifact",
+      "path": "src/lib/crm/prospect-rules.ts"
+    },
+    {
+      "id": "ART:src/lib/crm/prospects.functions.ts",
+      "type": "artifact",
+      "path": "src/lib/crm/prospects.functions.ts"
     }
   ],
   "edges": [
@@ -37518,6 +37533,33 @@
       "evidence": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md § Implementación",
       "source_row": "docs/blueprint/16.CV6.6-SCOPE-RECONCILIATION-ADENDA-v1.0.md",
       "verified_at": "2026-09-15"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:docs/governance/product-authorizations/PCA-2026-108.json:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "origin": "ART:docs/governance/product-authorizations/PCA-2026-108.json",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "evidence": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "verified_at": "2026-11-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/crm/prospect-rules.ts:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "origin": "ART:src/lib/crm/prospect-rules.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "evidence": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "verified_at": "2026-11-21"
+    },
+    {
+      "id": "AUTO:IMPLEMENTS:src/lib/crm/prospects.functions.ts:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "origin": "ART:src/lib/crm/prospects.functions.ts",
+      "relation": "implements",
+      "destination": "DOC:docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "evidence": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md § Implementación",
+      "source_row": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+      "verified_at": "2026-11-21"
     }
   ],
   "critical_chain_coverage": [

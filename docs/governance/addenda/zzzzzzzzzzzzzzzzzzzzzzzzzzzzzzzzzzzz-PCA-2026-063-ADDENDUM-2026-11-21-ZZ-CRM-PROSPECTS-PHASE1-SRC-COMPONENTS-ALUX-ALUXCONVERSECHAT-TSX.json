@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-063-ADDENDUM-2026-11-21-ZZ-CRM-PROSPECTS-PHASE1-SRC-COMPONENTS-ALUX-ALUXCONVERSECHAT-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-063",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Aprobación Founder del 2026-11-21 del plan del CRM Alux sin cambios («Plan aprobado»), Fase 1 acotada por PCA-2026-108: captura consentida de nombre y WhatsApp en Alux y sección CRM Prospectos del concierge. Sin cambiar plantillas públicas, pagos, reservaciones ni CRM Arma tu viaje.",
+  "supersedes_acknowledged_revision": {
+    "operation": "create",
+    "path": "src/components/alux/AluxConverseChat.tsx",
+    "previous_sha256": "7f52e8a5281f49c68ead1227af39461ff2aa099147fd51fa05e3f69de85e2790",
+    "current_sha256": "b8263a5280402569275124d64a5412037bc34423d0470e44cbf3bdb331170b3a",
+    "semantic_change": "Muestra la tarjeta opcional para dejar nombre y WhatsApp sólo cuando el servidor la ofrece; el resto de la conversación no cambia.",
+    "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+  },
+  "invariants": [
+    "CRM Arma tu viaje conserva expedientes, propuestas, órdenes y permisos.",
+    "Plantillas públicas, pagos y reservaciones no cambian.",
+    "El modelo de Alux nunca recibe teléfono ni correo."
+  ],
+  "recorded_at": "2026-11-21"
+}

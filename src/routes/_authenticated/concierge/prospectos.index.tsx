@@ -367,7 +367,7 @@ function ConversationsTab() {
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs text-muted-foreground">
-                    {meridaDateTime(s.last_seen_at)} · {s.message_count} mensajes
+                    {meridaDateTime(s.last_seen_at)} · {s.message_count} {s.message_count === 1 ? "mensaje" : "mensajes"}
                     {s.last_destination_slug ? ` · ${s.last_destination_slug}` : ""}
                   </span>
                   <span className="text-[11px] font-medium">

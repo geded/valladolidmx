@@ -21,8 +21,9 @@
 - [ ] Organización: CRM Prospectos (Hoy, Pláticas, Prospectos, Estadísticas) en el panel del concierge; configuración, reglas, entrenamiento y canales de Alux en las pantallas de Alux del CMS que ya existen, con acceso directo (en plan).
 - [ ] Recibir del Founder la dirección y clave del servidor Evolution de Railway (al iniciar la Fase 2).
 
-- [ ] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (borrador en la tarjeta de plan).
-- [ ] Fase 1 · Captura consentida de WhatsApp/correo en Alux y bandeja «CRM Prospectos».
+- [x] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (plan aprobado 2026-11-21).
+- [x] Fase 1 · Captura consentida de nombre y WhatsApp en Alux (ventana flotante) y sección «CRM Prospectos» (Hoy, Prospectos, Pláticas, Estadísticas, ficha con etapa, temperatura, responsable, seguimiento y notas); aviso al equipo sin teléfono; bandeja renombrada «CRM Arma tu viaje».
+- [ ] Fase 1 · pendiente: tarjeta de contacto también en la página completa /alux (usa otra conexión de Alux) y comparación con las mismas preguntas en Zazil — espera aprobación del Founder.
 - [ ] Fase 2 · Embudo, unión sin duplicados al registrarse y vínculo con ventas confirmadas.
 - [ ] Fase 3 · Mensajería con viajeros por el canal oficial (no iniciada; espera autorización expresa).
 

@@ -1,0 +1,169 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-108",
+  "title": "CRM Prospectos Fase 1: captura consentida de nombre y WhatsApp en Alux y sección del concierge",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Aprobación Founder del 2026-11-21 del plan «CRM Alux de Valladolid.mx · réplica mejorada del CRM de Zazil» sin cambios («Plan aprobado»), Fase 1: Alux en la web ofrece, como máximo dos veces por plática y sin bloquear la ayuda, dejar nombre y WhatsApp con permiso explícito; se crea un prospecto único por número; el equipo concierge recibe aviso sin el teléfono y lo atiende en «CRM Prospectos» (Hoy, Prospectos, Pláticas de Alux, Estadísticas) separado de «CRM Arma tu viaje», que conserva expedientes, propuestas y órdenes. Reglas de idioma, nombre y tono humano heredadas de Zazil. Sin cambiar plantillas públicas, pagos, reservaciones, CRM Arma tu viaje ni publicación.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/lib/crm/prospect-rules.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/prospects.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/alux/AluxProspectContactCard.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/crm/ProspectBadges.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/prospectos.$prospectId.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-contract.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/notifications/event-titles.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/lib/crm/prospect-rules.ts",
+      "sha256": "8a47420a41f6ca5cac623fee857b84891316ebd509510a5f43b763e6437db622",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/prospects.functions.ts",
+      "sha256": "65fa3e6f229494b47228b8ebedff7c23cb33b1c383c877bab27a611f3fc80a74",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/alux/AluxProspectContactCard.tsx",
+      "sha256": "acfbe8482dd68ac8c256076ef4fa5f76d9e464aa57ab558da7b1120fb4529daf",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/components/crm/ProspectBadges.tsx",
+      "sha256": "d3300224e6843d122b1b418af92bc51822ba5d66c3b54c364ab3109df98f51b7",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx",
+      "sha256": "208e61ed8fb27a18e9287efbdcb85aab5c32e637460961fc589dfb19b6b73c5b",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/prospectos.$prospectId.tsx",
+      "sha256": "1f8d0ed06df9ae4923cfc6c40f9ee8728858fb6213c43b71f38cfb54aeeff7ba",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts",
+      "sha256": "dcd714eb8f6f0b69e720da93f5faf63a59049476f885a090dfaf886a6d00a4fa",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse-contract.ts",
+      "sha256": "ccbc2e54c7dbe24171060bab6932c82363fc70827797ac2267ef6bf5db463340",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/alux/AluxConverseChat.tsx",
+      "sha256": "b8263a5280402569275124d64a5412037bc34423d0470e44cbf3bdb331170b3a",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/notifications/event-titles.ts",
+      "sha256": "e89e82ef2810598445cf509d9c57e7338d4c03bec5f6cc80b42b8b8c0f755e0b",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts",
+      "sha256": "055fa3015da0a63c10167b6ed9dd32472d47893c8dbbf443821985462c0536c8",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "39c07434127ceef46f0a2378e8c020f496cb887d0ee72f6b05579992debac4aa",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts",
+      "sha256": "5398a7cc57e4f60c53fac04aabd43713b23059cde2220f723b3ab3776bc1841b",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts",
+      "sha256": "9b2c16100bb3d7e6397b2d949f3b3e4425216da22c33a8bc016d1a95262386b9",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx",
+      "sha256": "208e61ed8fb27a18e9287efbdcb85aab5c32e637460961fc589dfb19b6b73c5b",
+      "authority": "Founder · CRM Prospectos Fase 1 (plan aprobado sin cambios) · 2026-11-21"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "scripts/omxds/crm/prospect-rules.contract.test.ts",
+    "scripts/omxds/l3k/alux-converse.contract.test.ts"
+  ]
+}
