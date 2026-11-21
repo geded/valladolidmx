@@ -2,6 +2,8 @@
 
 ## CRM del concierge en dos secciones · 2026-11-21
 
+- [x] Correo de GitHub «Governance Integrity falló»: los documentos del plan del CRM no estaban registrados en el inventario de gobernanza; registrados y revisión PASS.
+
 - [ ] Replantear alcance: Alux como agente de ventas (web + WhatsApp), captura progresiva de datos, regreso al registro y venta directa por WhatsApp (plan en revisión).
 - [ ] Replicar y mejorar el CRM Alux de Zazil Tunich (etapas, tablero, pase a asesor, comandos #, avisos, cierre automático por pago) — plan en revisión.
 - [x] Revisar el CRM de Zazil Tunich en vivo (reglas, configuración, embudo) y las 9 capturas; plan ajustado.
