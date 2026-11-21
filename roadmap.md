@@ -4,7 +4,7 @@
 
 - [ ] Replantear alcance: Alux como agente de ventas (web + WhatsApp), captura progresiva de datos, regreso al registro y venta directa por WhatsApp (plan en revisión).
 - [ ] Replicar y mejorar el CRM Alux de Zazil Tunich (etapas, tablero, pase a asesor, comandos #, avisos, cierre automático por pago) — plan en revisión.
-- [ ] Revisar el CRM de Zazil Tunich en vivo con su acceso para asistentes (inicio de sesión del Founder) y ajustar el plan.
+- [x] Revisar el CRM de Zazil Tunich en vivo (reglas, configuración, embudo) y las 9 capturas; plan ajustado.
 - [ ] Elegir conexión de WhatsApp: Evolution/Railway como Zazil u oficial de Meta (espera decisión del Founder).
 
 - [ ] Definir y aprobar el alcance del CRM Prospectos + CRM Arma tu viaje (borrador en la tarjeta de plan).
