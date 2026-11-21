@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-103",
+  "title": "La app abre sin señal aunque falte una pieza flotante por descargar",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Mira la imagen, revisa porque no entra la aplicación si estoy sin señal»; «Un viajero debe poder ver y seguir trabajando con la aplicación sin señal, ¿no?»): cuando falta señal y una pieza flotante (Alux, Tu viaje, aviso de inicio de sesión y demás piezas diferidas del marco público) no se puede descargar, se omite esa pieza en vez de reemplazar toda la página por «Sin conexión»; con señal todo se comporta igual. Sin cambiar plantillas, diseño, contenido CMS, datos, reglas de guardado sin conexión, publicar ni desplegar.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/pwa/resilient-lazy.ts"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/pwa/resilient-lazy.ts",
+      "sha256": "baaa97cd4332d553568105a8aea4066be6cc86b8cf02c12060db921e28809dcd",
+      "authority": "Founder · la app abre sin señal aunque falte una pieza flotante · 2026-11-20"
+    }
+  ],
+  "public_routes": ["/", "/oriente-maya/valladolid"],
+  "required_feature_flags": [],
+  "required_tests": []
+}

@@ -1,0 +1,21 @@
+{
+  "id": "PCA-2026-095-ADDENDUM-2026-11-20-ZZ-OFFLINE-RESILIENT-WIDGETS-SRC-ROUTES-ROOT-TSX",
+  "status": "Approved",
+  "parent": "PCA-2026-095",
+  "blueprint": "docs/blueprint/16.AC1-ANONYMOUS-TRAVEL-CONTINUITY-v1.0.md",
+  "founder_authority": "Solicitud Founder del 2026-11-20 («Mira la imagen, revisa porque no entra la aplicación si estoy sin señal»; «Un viajero debe poder ver y seguir trabajando con la aplicación sin señal, ¿no?»): cuando falta señal y una pieza flotante (Alux, Tu viaje, aviso de inicio de sesión y demás piezas diferidas del marco público) no se puede descargar, se omite esa pieza en vez de reemplazar toda la página por «Sin conexión»; con señal todo se comporta igual. Sin cambiar plantillas, diseño, contenido CMS, datos, reglas de guardado sin conexión, publicar ni desplegar.",
+  "supersedes_acknowledged_revision": {
+    "operation": "modify",
+    "path": "src/routes/__root.tsx",
+    "previous_sha256": "682cb4096e0bb08c86ffbf1003935a197e6b20613d359f5ddfe259eff981cb15",
+    "current_sha256": "bd581d94cfd74bbcb1850e058c8e6dcb96ff4994c6390fa2aa535d90b7c3eb96",
+    "semantic_change": "Las doce piezas diferidas del marco público se cargan con resilientLazy (PCA-2026-103): idénticas con señal; sin señal se omiten en vez de tumbar la página.",
+    "authority": "Founder · la app abre sin señal aunque falte una pieza flotante · 2026-11-20"
+  },
+  "invariants": [
+    "Header, footer, plantillas, orden, contenido CMS, Alux y Mi Viaje sin cambios con señal.",
+    "Reglas de guardado sin conexión del service worker sin cambios.",
+    "No se publica ni despliega como parte de esta autorización."
+  ],
+  "recorded_at": "2026-11-20"
+}

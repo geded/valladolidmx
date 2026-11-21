@@ -442,3 +442,6 @@
 - [x] Acomodar foto (punto de enfoque) al subir y en fotos ya subidas
 - [x] Tarjeta de Valladolid en Inicio con su portada real
 - [ ] Probar "Acomodar fotos" guardando como editor real (pendiente de validación del usuario)
+
+## App sin señal · 2026-11-20 (Founder reporta: la app no abre sin señal)
+- [x] Causa: sin señal, si una pieza flotante (Alux, Tu viaje, aviso de sesión) no estaba guardada, toda la página se reemplazaba por «Sin conexión». Corregido: la pieza se omite y la página se ve. Pendiente publicar y probar en iPhone real.

@@ -28,22 +28,25 @@ import { PublicHeader, PublicFooter, OfflineBanner } from "@/components/discover
 // interactúa (clic, hidratación completa, evento) el chunk ya está en
 // caché del router (`preload` durante idle vía onIdlePrefetchWidgets).
 import * as React from "react";
-const AluxMemorySyncRunner = React.lazy(() =>
+// Sin señal, una pieza flotante que no se pudo descargar se omite en vez de
+// reemplazar toda la página por «Sin conexión».
+import { resilientLazy } from "@/pwa/resilient-lazy";
+const AluxMemorySyncRunner = resilientLazy(() =>
   import("@/components/alux/AluxMemorySyncRunner").then((m) => ({
     default: m.AluxMemorySyncRunner,
   })),
 );
-const AluxFloatingTrigger = React.lazy(() =>
+const AluxFloatingTrigger = resilientLazy(() =>
   import("@/components/layout/AluxFloatingTrigger").then((m) => ({
     default: m.AluxFloatingTrigger,
   })),
 );
-const FloatingTravelPlanDock = React.lazy(() =>
+const FloatingTravelPlanDock = resilientLazy(() =>
   import("@/components/travel-plan/FloatingTravelPlanDock").then((m) => ({
     default: m.FloatingTravelPlanDock,
   })),
 );
-const ConciergeProposalObserver = React.lazy(() =>
+const ConciergeProposalObserver = resilientLazy(() =>
   import("@/components/travel-plan/ConciergeProposalObserver").then((m) => ({
     default: m.ConciergeProposalObserver,
   })),
@@ -51,44 +54,44 @@ const ConciergeProposalObserver = React.lazy(() =>
 // H2·P2 — Aislamiento del Studio: el botón "Editar esta página"
 // renderiza null para todo visitante que no sea editor. Se difiere
 // para que su código no viaje en el entry principal.
-const EditThisPageButton = React.lazy(() =>
+const EditThisPageButton = resilientLazy(() =>
   import("@/components/experience-builder/EditThisPageButton").then((m) => ({
     default: m.EditThisPageButton,
   })),
 );
-const SignInPromptSheet = React.lazy(() =>
+const SignInPromptSheet = resilientLazy(() =>
   import("@/components/protected-actions/SignInPromptSheet").then((m) => ({
     default: m.SignInPromptSheet,
   })),
 );
-const AnonymousDraftImportRunner = React.lazy(() =>
+const AnonymousDraftImportRunner = resilientLazy(() =>
   import("@/components/traveler/AnonymousDraftImportRunner").then((m) => ({
     default: m.AnonymousDraftImportRunner,
   })),
 );
 // Aviso «Nuevo viajero registrado» + paso Anónimo → Identificado del monitor.
-const TravelerSignupNotifier = React.lazy(() =>
+const TravelerSignupNotifier = resilientLazy(() =>
   import("@/components/traveler/TravelerSignupNotifier").then((m) => ({
     default: m.TravelerSignupNotifier,
   })),
 );
 // Monitor de usuarios · M1 — sonda de señales de página (no pinta nada).
-const PageSignalsProbe = React.lazy(() =>
+const PageSignalsProbe = resilientLazy(() =>
   import("@/components/analytics/PageSignalsProbe").then((m) => ({
     default: m.PageSignalsProbe,
   })),
 );
-const SyncStatusBanner = React.lazy(() =>
+const SyncStatusBanner = resilientLazy(() =>
   import("@/components/discovery/SyncStatusBanner").then((m) => ({
     default: m.SyncStatusBanner,
   })),
 );
-const PullToRefreshIndicator = React.lazy(() =>
+const PullToRefreshIndicator = resilientLazy(() =>
   import("@/components/discovery/PullToRefreshIndicator").then((m) => ({
     default: m.PullToRefreshIndicator,
   })),
 );
-const UpdateBanner = React.lazy(() =>
+const UpdateBanner = resilientLazy(() =>
   import("@/components/discovery/UpdateBanner").then((m) => ({
     default: m.UpdateBanner,
   })),
