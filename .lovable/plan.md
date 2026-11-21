@@ -79,6 +79,12 @@ Adaptado al Oriente Maya:
 
 ## 3a. Alux en WhatsApp arma el viaje mientras platica
 
+**Quién contesta en WhatsApp:** contesta **Alux**, el mismo de la web, con la misma memoria.
+- Si la persona dejó su WhatsApp en la web, Alux le pregunta «¿Te escribo por WhatsApp para seguir aquí?». Si dice que sí, Alux le manda un solo mensaje que retoma lo platicado, y desde ahí sigue la conversación por WhatsApp.
+- Si alguien escribe directo al número, Alux contesta.
+- El concierge humano entra cuando hay pase (lo pide el cliente, quiere cotización o un viaje armado) o cuando él mismo contesta desde el teléfono. En ese momento Alux se calla. Con `#alux` se le devuelve la plática.
+
+
 - Contesta cualquier pregunta de **todo el Oriente Maya**, con el mismo conocimiento que en la web: destinos, lugares, hoteles, restaurantes, experiencias, eventos, rutas, distancias, horarios y resúmenes de reseñas.
 - Cada vez que recomienda algo concreto, pregunta **«¿Lo agrego a tu viaje?»**. Si la persona dice que sí, lo guarda en su pre-expediente. Si ya tiene cuenta, lo agrega directo a su viaje en Mi Viaje.
 - Puede decirle en cualquier momento qué lleva: «Llevas 4 lugares: Valladolid, Ek Balam…».
