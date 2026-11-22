@@ -9,8 +9,6 @@
  */
 import { useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import {
   UserRound,
   LogOut,
@@ -26,7 +24,8 @@ import { useTranslation } from "@/i18n/context";
 import { ROLE_LABELS, type AppRole } from "@/types/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { ProfileModeSwitcher } from "@/components/layout/ProfileModeSwitcher";
-import { getProfileModeState, type ProfileMode } from "@/lib/profile-mode/mode.functions";
+import type { ProfileMode } from "@/lib/profile-mode/mode.functions";
+import { useProfileModeState } from "@/lib/profile-mode/use-profile-mode";
 import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
 
 type MenuLink = {
@@ -100,13 +99,7 @@ export function UserMenu({
   const { authUser, role, signOut, loading } = useAuth();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const fetchMode = useServerFn(getProfileModeState);
-  const modeQ = useQuery({
-    queryKey: ["profile-mode-state"],
-    queryFn: () => fetchMode(),
-    enabled: Boolean(authUser),
-    staleTime: 60_000,
-  });
+  const modeQ = useProfileModeState();
   const activeMode: ProfileMode = modeQ.data?.active ?? "traveler";
   const location = useRouterState({ select: (s) => s.location });
   const pathname = location.pathname;

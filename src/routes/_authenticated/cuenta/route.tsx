@@ -16,7 +16,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { getMyTravelerProfile } from "@/lib/traveler/traveler-account.functions";
 import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions";
-import { getProfileModeState } from "@/lib/profile-mode/mode.functions";
+import { useProfileModeState } from "@/lib/profile-mode/use-profile-mode";
 import { WelcomeOnboardingModal } from "@/components/traveler/WelcomeOnboardingModal";
 import { PendingReviewsBanner } from "@/components/traveler/PendingReviewsBanner";
 import { JourneyBackLink } from "@/components/navigation/JourneyBackLink";
@@ -65,15 +65,9 @@ function useOfflineTripCopy() {
 
 function TravelerOnboardingMount() {
   const { user } = useAuth();
-  const fetchMode = useServerFn(getProfileModeState);
   const fetchProfile = useServerFn(getMyTravelerProfile);
   const fetchPersonal = useServerFn(getMyPersonalProfile);
-  const modeQ = useQuery({
-    queryKey: ["profile-mode-state"],
-    queryFn: () => fetchMode(),
-    enabled: Boolean(user?.id),
-    staleTime: 60_000,
-  });
+  const modeQ = useProfileModeState();
   const isTraveler = (modeQ.data?.active ?? "traveler") === "traveler";
   const profileQ = useQuery({
     queryKey: ["traveler", "profile", user?.id],

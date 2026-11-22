@@ -20,7 +20,8 @@ import {
   upsertMyPersonalProfile,
   type PersonalProfileInput,
 } from "@/lib/traveler/profile-personal.functions";
-import { getProfileModeState, type ProfileMode } from "@/lib/profile-mode/mode.functions";
+import type { ProfileMode } from "@/lib/profile-mode/mode.functions";
+import { useProfileModeState } from "@/lib/profile-mode/use-profile-mode";
 import { ROLE_LABELS } from "@/types/auth";
 import { AvatarUploader } from "@/components/traveler/AvatarUploader";
 import { toast } from "@/lib/toast";
@@ -79,14 +80,8 @@ function CuentaPerfilPage() {
   const saveProfile = useServerFn(upsertMyTravelerProfile);
   const fetchPersonal = useServerFn(getMyPersonalProfile);
   const savePersonal = useServerFn(upsertMyPersonalProfile);
-  const fetchMode = useServerFn(getProfileModeState);
 
-  const modeQ = useQuery({
-    queryKey: ["profile-mode-state"],
-    queryFn: () => fetchMode(),
-    enabled: Boolean(user?.id),
-    staleTime: 60_000,
-  });
+  const modeQ = useProfileModeState();
   const active: ProfileMode = modeQ.data?.active ?? "traveler";
 
   const { data, isLoading } = useQuery({

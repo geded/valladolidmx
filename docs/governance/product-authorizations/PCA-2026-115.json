@@ -1,0 +1,99 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-115",
+  "title": "Perfiles: el modo activo sigue al panel abierto (Staff en CMS/Fundador, Empresa en Portal, Concierge, Viajero en Mi Cuenta)",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Mensaje Founder del 2026-11-22 «Revisa los pases a los diferentes perfiles que tenga un mismo usuario, siento que se están confundiendo los roles, estoy como staff y veo mi perfil de viajero». Delta acotado: el menú de usuario, el cambio de modo y Mi Cuenta leen el mismo modo, que dentro de un panel corresponde a ese panel y se guarda sin navegar. Sin cambiar diseño, rutas, permisos, plantillas públicas ni datos.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/layout/ProfileModeSwitcher.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/UserMenu.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/perfil.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/route.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/profile-mode/workspace-mode.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/profile-mode/use-profile-mode.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/profile-mode/AGENTS.md"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/layout/ProfileModeSwitcher.tsx",
+      "sha256": "6ead0fa5cbe498ab511bfe29f90170054af192273508e76c89f2e3f5bff9b3a3",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/UserMenu.tsx",
+      "sha256": "11574dd9fba883a8ea3c006346be4343a7834706cdf5f67c7ba8a88889d6ea2c",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/index.tsx",
+      "sha256": "e1ed5c72b0fb84b1e5bb64a13c01379b929eb8902c88f76f114d7ff86aea76ce",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/perfil.tsx",
+      "sha256": "4a8dd4b2801e57a592279248de71e852bf3d447c4b894352f3156b4571929748",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cuenta/route.tsx",
+      "sha256": "8d2729a9e3f6e1cdeb3a00f6cae0965285de16b20fbbe6efc2592f66fea0826d",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/profile-mode/workspace-mode.ts",
+      "sha256": "7d85c5049de353a4a53876ffc69151d5ff97fb6f2b1bb42bb47b339e6e05143a",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/profile-mode/use-profile-mode.ts",
+      "sha256": "a6c71d5556df6715cd5c88e99071e1883f03341a472f7506211c1ec765bf692e",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/profile-mode/AGENTS.md",
+      "sha256": "549e6bbad3d973e1ea4e0d8c1c5985abfe3e61599ccbfb6fdf3af4dff8c7b1f3",
+      "authority": "Founder · Perfiles de un mismo usuario alineados con el panel abierto · 2026-11-22"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun test scripts/omxds/profile-mode/workspace-mode.contract.test.ts",
+    "bun run typecheck"
+  ]
+}

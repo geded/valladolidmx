@@ -10,15 +10,12 @@
  * la preferencia. La integración con superficies (portal/cms/concierge)
  * seguirá siendo por URL directa; el switcher es aditivo.
  */
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Briefcase, Check, Compass, Headphones, Shield } from "lucide-react";
-import {
-  getProfileModeState,
-  setActiveMode,
-  type ProfileMode,
-} from "@/lib/profile-mode/mode.functions";
+import { setActiveMode, type ProfileMode } from "@/lib/profile-mode/mode.functions";
+import { PROFILE_MODE_QUERY_KEY, useProfileModeState } from "@/lib/profile-mode/use-profile-mode";
 
 const MODE_META: Record<ProfileMode, { label: string; description: string; Icon: typeof Compass }> =
   {
@@ -57,19 +54,14 @@ const MODE_LANDING: Record<ProfileMode, string> = {
 export function ProfileModeSwitcher({ onSwitched }: { onSwitched?: () => void }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const fetchState = useServerFn(getProfileModeState);
   const persist = useServerFn(setActiveMode);
 
-  const state = useQuery({
-    queryKey: ["profile-mode-state"],
-    queryFn: () => fetchState(),
-    staleTime: 60_000,
-  });
+  const state = useProfileModeState();
 
   const mutate = useMutation({
     mutationFn: (mode: ProfileMode) => persist({ data: { mode } }),
     onSuccess: (next, mode) => {
-      qc.setQueryData(["profile-mode-state"], next);
+      qc.setQueryData(PROFILE_MODE_QUERY_KEY, next);
       onSwitched?.();
       const target = MODE_LANDING[mode];
       if (target) navigate({ to: target }).catch(() => undefined);

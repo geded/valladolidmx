@@ -16,7 +16,8 @@ import { PublicProfileBenefitsCard } from "@/components/traveler/PublicProfileBe
 import { getMyPublicProfile } from "@/lib/traveler/traveler-public.functions";
 import { ReviewerBadge } from "@/components/traveler/ReviewerBadge";
 import { getMyReviewerStats } from "@/lib/reviews/reviewer-stats.functions";
-import { getProfileModeState, type ProfileMode } from "@/lib/profile-mode/mode.functions";
+import type { ProfileMode } from "@/lib/profile-mode/mode.functions";
+import { useProfileModeState } from "@/lib/profile-mode/use-profile-mode";
 import { Briefcase, Compass, Headphones, Mail, Shield, UserRound } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cuenta/")({
@@ -25,13 +26,7 @@ export const Route = createFileRoute("/_authenticated/cuenta/")({
 
 function CuentaResumen() {
   const { user } = useAuth();
-  const fetchMode = useServerFn(getProfileModeState);
-  const modeQ = useQuery({
-    queryKey: ["profile-mode-state"],
-    queryFn: () => fetchMode(),
-    enabled: Boolean(user?.id),
-    staleTime: 60_000,
-  });
+  const modeQ = useProfileModeState();
   const active: ProfileMode = modeQ.data?.active ?? "traveler";
 
   if (modeQ.isLoading) {
