@@ -10,8 +10,11 @@ import {
 } from "../../../src/lib/alux/knowledge-gaps";
 import {
   channelsFromFlags,
+  embedSitesFromFlags,
   embedSnippet,
+  matchEmbedHost,
   normalizeEmbedHost,
+  resolveEmbedContext,
   withChannel,
 } from "../../../src/lib/alux/channels";
 
@@ -60,6 +63,57 @@ describe("Canales de Alux", () => {
   test("el código para pegar apunta al script de Alux", () => {
     expect(embedSnippet("https://www.quehacerenvalladolid.com", null)).toBe(
       '<script src="https://www.quehacerenvalladolid.com/alux-embed.js" async></script>',
+    );
+  });
+});
+
+describe("Alux en la página de un aliado: la consola manda", () => {
+  test("si la consola fijó destino y negocio, el código pegado no los cambia", () => {
+    const r = resolveEmbedContext(
+      { destination: "valladolid", business: "hotel-meson" },
+      { destination: "izamal", business: "otro-hotel" },
+    );
+    expect(r.destination).toBe("valladolid");
+    expect(r.business).toBe("hotel-meson");
+    expect(r.businessFrom).toBe("consola");
+  });
+  test("si la consola dejó el negocio vacío, el código puede indicarlo", () => {
+    const r = resolveEmbedContext(
+      { destination: "valladolid", business: null },
+      { business: "cafe-de-la-plaza" },
+    );
+    expect(r.destination).toBe("valladolid");
+    expect(r.business).toBe("cafe-de-la-plaza");
+    expect(r.businessFrom).toBe("codigo");
+  });
+  test("sin consola ni código, Alux no supone destino ni negocio", () => {
+    expect(resolveEmbedContext(null, null)).toEqual({
+      destination: null,
+      destinationFrom: null,
+      business: null,
+      businessFrom: null,
+    });
+  });
+  test("un valor raro en el código se ignora", () => {
+    expect(resolveEmbedContext(null, { business: '"><script>' }).business).toBeNull();
+  });
+  test("un subdominio usa lo configurado para su sitio", () => {
+    expect(matchEmbedHost("reservas.hotelmeson.com", ["hotelmeson.com"])).toBe("hotelmeson.com");
+    expect(matchEmbedHost("hotelmeson.com.evil.io", ["hotelmeson.com"])).toBeNull();
+  });
+  test("lo que guarda la consola se lee por sitio", () => {
+    expect(
+      embedSitesFromFlags({ embed_sites: { "hotelmeson.com": { destination: "izamal" } } }),
+    ).toEqual({ "hotelmeson.com": { destination: "izamal", business: null } });
+  });
+  test("el código para pegar puede llevar destino y empresa", () => {
+    expect(
+      embedSnippet("https://www.quehacerenvalladolid.com", {
+        destination: "valladolid",
+        business: "hotel-meson",
+      }),
+    ).toBe(
+      '<script src="https://www.quehacerenvalladolid.com/alux-embed.js" async data-destino="valladolid" data-empresa="hotel-meson"></script>',
     );
   });
 });

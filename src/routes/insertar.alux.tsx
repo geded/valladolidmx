@@ -5,6 +5,7 @@
  * sitio. Solo responde si el canal está encendido y el sitio autorizado.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -15,7 +16,11 @@ import { useAluxBrand } from "@/lib/brand/brand-context";
 import { SITE } from "@/config/site";
 
 export const Route = createFileRoute("/insertar/alux")({
-  validateSearch: z.object({ host: z.string().max(255).optional() }),
+  validateSearch: z.object({
+    host: z.string().max(255).optional(),
+    destino: z.string().max(120).optional(),
+    empresa: z.string().max(120).optional(),
+  }),
   head: () => ({
     meta: [
       { title: "Alux · Concierge del Oriente Maya" },
@@ -31,9 +36,13 @@ export const Route = createFileRoute("/insertar/alux")({
 });
 
 function AluxEmbedPage() {
-  const { host: rawHost } = Route.useSearch();
+  const { host: rawHost, destino, empresa } = Route.useSearch();
   const host = normalizeEmbedHost(rawHost ?? "");
   const alux = useAluxBrand();
+  const hint = useMemo(
+    () => ({ destination: destino ?? null, business: empresa ?? null }),
+    [destino, empresa],
+  );
   const statusFn = useServerFn(getAluxEmbedStatus);
   const q = useQuery({
     queryKey: ["alux-embed-status", host],
@@ -61,7 +70,7 @@ function AluxEmbedPage() {
         ) : !q.data ? (
           <div className="min-h-48 animate-pulse rounded-2xl border border-border/60 bg-muted/30" />
         ) : (
-          <PublicAluxChat embedHost={host} />
+          <PublicAluxChat embedHost={host} embedHint={hint} />
         )}
       </main>
       <footer className="px-4 pb-3 text-center text-[11px] text-muted-foreground">

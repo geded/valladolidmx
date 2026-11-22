@@ -65,8 +65,17 @@ function ensureSessionKey(): string {
   return key;
 }
 
-/** `embedHost`: sitio que muestra la ventana insertada (Fase 4 · Alux en otras páginas). */
-export function PublicAluxChat({ embedHost }: { embedHost?: string } = {}) {
+/**
+ * `embedHost`: sitio que muestra la ventana insertada (Fase 4 · Alux en otras páginas).
+ * `embedHint`: destino/empresa que trae el código pegado; el servidor decide con la consola.
+ */
+export function PublicAluxChat({
+  embedHost,
+  embedHint,
+}: {
+  embedHost?: string;
+  embedHint?: { destination: string | null; business: string | null };
+} = {}) {
   const alux = useAluxBrand();
   const suggestions = [
     alux.copy("publicStarterSeason"),
@@ -184,7 +193,9 @@ export function PublicAluxChat({ embedHost }: { embedHost?: string } = {}) {
             sessionKey,
             message: trimmed,
             history: messages.slice(-16),
-            ...(embedHost !== undefined ? { surface: "embed", embedHost } : {}),
+            ...(embedHost !== undefined
+              ? { surface: "embed", embedHost, ...(embedHint ? { embedHint } : {}) }
+              : {}),
             visitor: location ?? undefined,
             locale,
             pathContext: (() => {
@@ -301,7 +312,17 @@ export function PublicAluxChat({ embedHost }: { embedHost?: string } = {}) {
         setSending(false);
       }
     },
-    [messages, sending, sessionKey, location, locale, anonymous.trip, anonymousTripReady, embedHost],
+    [
+      messages,
+      sending,
+      sessionKey,
+      location,
+      locale,
+      anonymous.trip,
+      anonymousTripReady,
+      embedHost,
+      embedHint,
+    ],
   );
 
   return (

@@ -585,6 +585,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           locale?: string;
           surface?: string;
           embedHost?: string;
+          embedHint?: unknown;
         };
         try {
           body = await request.json();
@@ -628,6 +629,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         // Fase 4 · interruptores de canales: «Alux en Valladolid.mx» y
         // «Alux en otras páginas» (solo sitios autorizados). Si la lectura
         // falla, la página propia sigue atendiendo y la insertada no.
+        let embedFlags: Record<string, unknown> | null = null;
+        let embedHostName: string | null = null;
         {
           const ch = await import("@/lib/alux/channels.server");
           const { channelsFromFlags, normalizeEmbedHost } = await import("@/lib/alux/channels");
@@ -636,6 +639,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           let allowed = channels.web;
           if (body.surface === "embed") {
             const host = normalizeEmbedHost(String(body.embedHost ?? ""));
+            embedFlags = flags;
+            embedHostName = host;
             const hosts = flags ? ch.embedHostsFromFlags(flags) : [];
             allowed =
               flags !== null &&
@@ -750,9 +755,27 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           nearbyProposals = nearby.slice(0, 3);
         }
 
+        // 4c-bis) Página de aliado: destino y negocio (la consola manda;
+        // el código pegado solo completa lo que ella dejó vacío).
+        const embedModule =
+          embedFlags !== null ? await import("@/lib/alux/embed-context.server") : null;
+        const embedCtx =
+          embedModule && embedFlags
+            ? await embedModule
+                .loadEmbedHostContextServer(
+                  supabaseAdmin,
+                  embedFlags,
+                  embedHostName,
+                  body.embedHint,
+                )
+                .catch(() => null)
+            : null;
+        const embedBlock = embedModule ? embedModule.embedHostToPromptBlock(embedCtx) : "";
+
         // 4d) Contexto temporal + eventos activos (Ola A9).
         const temporal = getTemporalContext();
         const activeDestination =
+          embedCtx?.destinationSlug ??
           pathContext?.destination ??
           (sessionRow as { last_destination_slug?: string | null }).last_destination_slug ??
           null;
@@ -761,9 +784,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         );
         const eventsBlock = eventsToPromptBlock(activeEvents);
         // Fase 4 · ficha oficial del destino (Entrenamiento de Alux).
-        const { loadDestinationBriefServer, recordKnowledgeGapServer } = await import(
-          "@/lib/alux/knowledge-gaps.server"
-        );
+        const { loadDestinationBriefServer, recordKnowledgeGapServer } =
+          await import("@/lib/alux/knowledge-gaps.server");
         const destinationBrief = await loadDestinationBriefServer(supabaseAdmin, activeDestination);
 
         // 4e) Clima real (Ola A10 · Open-Meteo, sin API key).
@@ -815,6 +837,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           localeBlock,
           memoryBlock,
           temporal.block,
+          embedBlock,
           knowledgeBlock,
           destinationBrief,
           nearbyBlock,
@@ -930,7 +953,11 @@ export const Route = createFileRoute("/api/public/alux/chat")({
                 : 0;
             const geoMoved = geoMovedKm >= GEO_MOVE_KM_THRESHOLD;
 
-            const nextDestination = pathContext?.destination ?? prev.last_destination_slug ?? null;
+            const nextDestination =
+              embedCtx?.destinationSlug ??
+              pathContext?.destination ??
+              prev.last_destination_slug ??
+              null;
             const nextCategory = pathContext?.category ?? prev.last_category_slug ?? null;
             const territoryChanged =
               (!!pathContext?.destination &&

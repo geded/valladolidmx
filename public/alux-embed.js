@@ -2,6 +2,8 @@
  * Alux · ventana para páginas de aliados (Valladolid.mx · CRM Fase 4).
  * Uso: <script src="https://www.quehacerenvalladolid.com/alux-embed.js" async></script>
  * Solo aparece si el sitio está autorizado en «Dónde atiende Alux».
+ * Opcional: data-destino="valladolid" data-empresa="slug-de-la-empresa".
+ * La consola manda; estos datos solo completan lo que ella dejó vacío.
  */
 (function () {
   if (window.__vmxAluxEmbed) return;
@@ -11,6 +13,12 @@
   if (!script) return;
   var origin = new URL(script.src, location.href).origin;
   var host = location.hostname;
+  function attr(name) {
+    var v = (script.getAttribute(name) || "").trim().toLowerCase();
+    return /^[a-z0-9][a-z0-9-]{0,119}$/.test(v) ? v : "";
+  }
+  var destino = attr("data-destino");
+  var empresa = attr("data-empresa");
 
   function start() {
     var btn = document.createElement("button");
@@ -53,7 +61,12 @@
       if (!frame) {
         frame = document.createElement("iframe");
         frame.title = "Alux, concierge del Oriente Maya";
-        frame.src = origin + "/insertar/alux?host=" + encodeURIComponent(host);
+        frame.src =
+          origin +
+          "/insertar/alux?host=" +
+          encodeURIComponent(host) +
+          (destino ? "&destino=" + encodeURIComponent(destino) : "") +
+          (empresa ? "&empresa=" + encodeURIComponent(empresa) : "");
         frame.allow = "microphone; geolocation; clipboard-write";
         frame.style.cssText = "width:100%;flex:1;border:0";
         panel.appendChild(frame);

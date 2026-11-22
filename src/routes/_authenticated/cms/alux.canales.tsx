@@ -12,6 +12,7 @@ import {
   getAluxChannelsAdmin,
   setAluxChannel,
   setAluxEmbedHosts,
+  setAluxEmbedSite,
 } from "@/lib/alux/channels.functions";
 import { embedSnippet, type AluxChannelKey } from "@/lib/alux/channels";
 import { SITE } from "@/config/site";
@@ -19,6 +20,13 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/lib/toast";
 
 export const Route = createFileRoute("/_authenticated/cms/alux/canales")({
@@ -70,7 +78,8 @@ function AluxChannelsPage() {
     onError: () => toast.error("No se pudieron guardar los sitios."),
   });
 
-  const snippet = embedSnippet(SITE.url.replace(/\/$/, ""), null);
+  const origin = SITE.url.replace(/\/$/, "");
+  const snippet = embedSnippet(origin, null);
   const d = q.data;
 
   return (
@@ -167,9 +176,32 @@ function AluxChannelsPage() {
                 Guardar sitios
               </Button>
             </div>
+            {d.embedHosts.length > 0 ? (
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-medium">
+                    2. Qué destino y qué negocio atiende Alux en cada sitio
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Lo que elijas aquí manda. Si lo dejas en «Lo decide el código», Alux usa lo que
+                    diga el código pegado en esa página.
+                  </p>
+                </div>
+                {d.embedHosts.map((h) => (
+                  <EmbedSiteRow
+                    key={h}
+                    host={h}
+                    saved={d.embedSites[h] ?? { destination: null, business: null }}
+                    destinations={d.destinations}
+                    businesses={d.businesses}
+                  />
+                ))}
+              </div>
+            ) : null}
             <div className="space-y-2">
               <p className="text-xs font-medium">
-                2. Copia este código y pégalo en esa página, justo antes de donde termina
+                {d.embedHosts.length > 0 ? "3" : "2"}. Copia este código y pégalo en esa página,
+                justo antes de donde termina
               </p>
               <pre className="overflow-x-auto rounded-md border border-border bg-muted/40 p-3 text-xs">
                 <code>{snippet}</code>
@@ -186,6 +218,16 @@ function AluxChannelsPage() {
               >
                 <Copy className="mr-1.5 size-3.5" aria-hidden /> Copiar código
               </Button>
+              <p className="text-[11px] text-muted-foreground">
+                Si la consola no fija la empresa, el aliado puede indicarla en el mismo código, por
+                ejemplo:{" "}
+                <code className="break-all">
+                  {embedSnippet(origin, {
+                    destination: "valladolid",
+                    business: "nombre-de-la-empresa",
+                  })}
+                </code>
+              </p>
               <p className="text-[11px] text-muted-foreground">
                 Aparece un botón de Alux en la esquina. Si el sitio no está en la lista o apagas
                 este canal, el botón no aparece.
@@ -241,5 +283,89 @@ function ChannelCard(props: {
       </div>
       {props.children}
     </section>
+  );
+}
+
+const FROM_CODE = "__codigo";
+
+function EmbedSiteRow(props: {
+  host: string;
+  saved: { destination: string | null; business: string | null };
+  destinations: Array<{ slug: string; name: string }>;
+  businesses: Array<{ slug: string; name: string; destination: string | null }>;
+}) {
+  const qc = useQueryClient();
+  const saveFn = useServerFn(setAluxEmbedSite);
+  const [destination, setDestination] = useState(props.saved.destination);
+  const [business, setBusiness] = useState(props.saved.business);
+  const options = props.businesses.filter(
+    (b) => !destination || b.destination === destination || b.slug === business,
+  );
+  const dirty = destination !== props.saved.destination || business !== props.saved.business;
+  const save = useMutation({
+    mutationFn: () => saveFn({ data: { host: props.host, destination, business } }),
+    onSuccess: () => {
+      toast.success(`Guardado para ${props.host}`);
+      void qc.invalidateQueries({ queryKey: ["cms", "alux-channels"] });
+    },
+    onError: () => toast.error("No se pudo guardar. Guarda primero el sitio en la lista."),
+  });
+  return (
+    <div className="space-y-2 rounded-xl border border-border/70 p-3">
+      <p className="text-sm font-medium break-all">{props.host}</p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="space-y-1 text-xs">
+          <span className="text-muted-foreground">Destino</span>
+          <Select
+            value={destination ?? FROM_CODE}
+            onValueChange={(v) => {
+              const next = v === FROM_CODE ? null : v;
+              setDestination(next);
+              const keep = props.businesses.find((b) => b.slug === business);
+              if (next && keep && keep.destination !== next) setBusiness(null);
+            }}
+          >
+            <SelectTrigger aria-label={`Destino de ${props.host}`}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={FROM_CODE}>Lo decide el código</SelectItem>
+              {props.destinations.map((x) => (
+                <SelectItem key={x.slug} value={x.slug}>
+                  {x.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+        <label className="space-y-1 text-xs">
+          <span className="text-muted-foreground">Negocio</span>
+          <Select
+            value={business ?? FROM_CODE}
+            onValueChange={(v) => setBusiness(v === FROM_CODE ? null : v)}
+          >
+            <SelectTrigger aria-label={`Negocio de ${props.host}`}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={FROM_CODE}>Lo decide el código</SelectItem>
+              {options.map((x) => (
+                <SelectItem key={x.slug} value={x.slug}>
+                  {x.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => save.mutate()}
+        disabled={!dirty || save.isPending}
+      >
+        Guardar
+      </Button>
+    </div>
   );
 }

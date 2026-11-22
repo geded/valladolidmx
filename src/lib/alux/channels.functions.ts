@@ -6,7 +6,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { ALUX_CHANNEL_KEYS, channelsFromFlags, normalizeEmbedHost, withChannel } from "./channels";
+import {
+  ALUX_CHANNEL_KEYS,
+  channelsFromFlags,
+  embedSitesFromFlags,
+  normalizeEmbedHost,
+  normalizeEmbedSlug,
+  withChannel,
+} from "./channels";
 
 async function assertAdmin(context: {
   supabase: { rpc: (fn: never, args: never) => PromiseLike<{ data: unknown }> };
@@ -91,9 +98,48 @@ export const getAluxChannelsAdmin = createServerFn({ method: "GET" })
     const flags = ((settings.data as { flags?: Record<string, unknown> } | null)?.flags ??
       {}) as Record<string, unknown>;
     const { embedHostsFromFlags } = await import("./channels.server");
+    // Destinos y empresas publicadas para elegir qué atiende cada sitio.
+    type Chain = PromiseLike<{ data: unknown }> & {
+      select: (s: string) => Chain;
+      eq: (a: string, b: unknown) => Chain;
+      is: (a: string, b: null) => Chain;
+      order: (c: string) => Chain;
+    };
+    const pub = context.supabase as unknown as { from: (t: string) => Chain };
+    const { PUBLIC_BUSINESS_ELIGIBILITY_EQ } = await import("@/lib/omxds/public-eligibility");
+    const [dests, bizs] = await Promise.all([
+      pub
+        .from("destinations")
+        .select("id, slug, name")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("name"),
+      pub
+        .from("businesses")
+        .select("slug, display_name, destination_id")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .eq(PUBLIC_BUSINESS_ELIGIBILITY_EQ[0], PUBLIC_BUSINESS_ELIGIBILITY_EQ[1])
+        .order("display_name"),
+    ]);
+    const destRows = (dests.data as Array<{ id: string; slug: string; name: string }> | null) ?? [];
+    const slugById = new Map(destRows.map((d) => [d.id, d.slug]));
     return {
       channels: channelsFromFlags(flags),
       embedHosts: embedHostsFromFlags(flags),
+      embedSites: embedSitesFromFlags(flags),
+      destinations: destRows.map((d) => ({ slug: d.slug, name: d.name })),
+      businesses: (
+        (bizs.data as Array<{
+          slug: string;
+          display_name: string;
+          destination_id: string | null;
+        }> | null) ?? []
+      ).map((b) => ({
+        slug: b.slug,
+        name: b.display_name,
+        destination: b.destination_id ? (slugById.get(b.destination_id) ?? null) : null,
+      })),
       lines: (
         (lines.data as Array<{
           id: string;
@@ -171,6 +217,39 @@ export const setAluxEmbedHosts = createServerFn({ method: "POST" })
     const hosts = Array.from(
       new Set(data.hosts.map(normalizeEmbedHost).filter((h): h is string => h !== null)),
     );
-    await writeFlags(context.supabase, (f) => ({ ...f, embed_hosts: hosts }));
+    await writeFlags(context.supabase, (f) => {
+      // Al quitar un sitio también se olvida qué destino y empresa atendía.
+      const sites = embedSitesFromFlags(f);
+      const kept = Object.fromEntries(Object.entries(sites).filter(([h]) => hosts.includes(h)));
+      return { ...f, embed_hosts: hosts, embed_sites: kept };
+    });
     return { hosts };
+  });
+
+/** La consola fija destino y empresa de un sitio autorizado (vacío = lo decide el código). */
+export const setAluxEmbedSite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        host: z.string().max(255),
+        destination: z.string().max(120).nullable(),
+        business: z.string().max(120).nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const host = normalizeEmbedHost(data.host);
+    if (!host) throw new Error("invalid_host");
+    const site = {
+      destination: normalizeEmbedSlug(data.destination),
+      business: normalizeEmbedSlug(data.business),
+    };
+    await writeFlags(context.supabase, (f) => {
+      const allowed = Array.isArray(f["embed_hosts"]) ? (f["embed_hosts"] as unknown[]) : [];
+      if (!allowed.includes(host)) throw new Error("host_not_allowed");
+      return { ...f, embed_sites: { ...embedSitesFromFlags(f), [host]: site } };
+    });
+    return { host, ...site };
   });
