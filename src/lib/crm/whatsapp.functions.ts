@@ -35,6 +35,29 @@ async function assertAdmin(context: Ctx) {
   throw new Error("forbidden");
 }
 
+/**
+ * Fase 5 · quién puede atender una plática: el equipo concierge sólo las de
+ * Valladolid.mx; el equipo de una empresa (editor+) sólo las de su WhatsApp.
+ */
+async function assertCanAttend(
+  context: Ctx,
+  sessionOwnerBusinessId: string | null,
+  businessId: string | undefined,
+) {
+  if (businessId) {
+    const { data, error } = await context.supabase.rpc(
+      "has_business_access" as never,
+      { _user_id: context.userId, _business_id: businessId, _min_role: "editor" } as never,
+    );
+    if (error || data !== true || sessionOwnerBusinessId !== businessId) {
+      throw new Error("forbidden");
+    }
+    return;
+  }
+  await assertStaff(context);
+  if (sessionOwnerBusinessId) throw new Error("forbidden");
+}
+
 function friendlyError(e: unknown): string {
   const msg = e instanceof Error ? e.message : "";
   if (msg.includes("no está configurado")) return "El servidor de mensajes no está configurado.";
@@ -283,11 +306,26 @@ export const setWhatsAppLineAlux = createServerFn({ method: "POST" })
 export const setWhatsAppConversationMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ sessionId: z.string().uuid(), mode: z.enum(["alux", "human"]) }).parse(d),
+    z
+      .object({
+        sessionId: z.string().uuid(),
+        mode: z.enum(["alux", "human"]),
+        businessId: z.string().uuid().optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertStaff(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: owner } = await supabaseAdmin
+      .from("alux_public_sessions")
+      .select("owner_business_id")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    await assertCanAttend(
+      context as never,
+      (owner as { owner_business_id: string | null } | null)?.owner_business_id ?? null,
+      data.businessId,
+    );
     const patch: Record<string, unknown> = { alux_mode: data.mode };
     if (data.mode === "alux") {
       patch["handoff_requested_at"] = null;
@@ -310,8 +348,12 @@ export const setWhatsAppConversationMode = createServerFn({ method: "POST" })
       created_by: context.userId,
       content:
         data.mode === "alux"
-          ? "Un concierge devolvió la plática a Alux desde el panel."
-          : "Un concierge tomó la plática desde el panel; Alux deja de contestar.",
+          ? data.businessId
+            ? "El equipo devolvió la plática a Alux desde el Portal."
+            : "Un concierge devolvió la plática a Alux desde el panel."
+          : data.businessId
+            ? "El equipo tomó la plática desde el Portal; Alux deja de contestar."
+            : "Un concierge tomó la plática desde el panel; Alux deja de contestar.",
     } as never);
     return { ok: true };
   });
@@ -324,11 +366,11 @@ export const sendWhatsAppFromPanel = createServerFn({ method: "POST" })
         sessionId: z.string().uuid(),
         text: z.string().trim().min(1).max(2000),
         translate: z.boolean().default(true),
+        businessId: z.string().uuid().optional(),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertStaff(context as never);
     const [{ supabaseAdmin }, { evolutionChannel }, reply, rules] = await Promise.all([
       import("@/integrations/supabase/client.server"),
       import("@/lib/crm/channel/evolution.server"),
@@ -337,9 +379,12 @@ export const sendWhatsAppFromPanel = createServerFn({ method: "POST" })
     ]);
     const { data: s } = await supabaseAdmin
       .from("alux_public_sessions")
-      .select("id, prospect_id, wa_remote_jid, whatsapp_line_id, conversation_language, channel")
+      .select(
+        "id, prospect_id, wa_remote_jid, whatsapp_line_id, conversation_language, channel, owner_business_id, business_contact_id",
+      )
       .eq("id", data.sessionId)
       .maybeSingle();
+    await assertCanAttend(context as never, s?.owner_business_id ?? null, data.businessId);
     if (!s || s.channel !== "whatsapp" || !s.wa_remote_jid || !s.whatsapp_line_id) {
       return { ok: false as const, error: "Esta plática no es de WhatsApp." };
     }
@@ -379,6 +424,20 @@ export const sendWhatsAppFromPanel = createServerFn({ method: "POST" })
       .from("alux_public_sessions")
       .update({ alux_mode: "human", human_reply_at: now, reply_lock_until: null } as never)
       .eq("id", s.id);
+    if (s.business_contact_id && !sendError) {
+      const { data: c } = await supabaseAdmin
+        .from("business_whatsapp_contacts")
+        .select("stage")
+        .eq("id", s.business_contact_id)
+        .maybeSingle();
+      await supabaseAdmin
+        .from("business_whatsapp_contacts")
+        .update({
+          last_activity_at: now,
+          ...(c?.stage === "nuevo" ? { stage: "en_platica" } : {}),
+        } as never)
+        .eq("id", s.business_contact_id);
+    }
     if (s.prospect_id && !sendError) {
       const { data: p } = await supabaseAdmin
         .from("concierge_prospects")

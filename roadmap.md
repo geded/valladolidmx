@@ -45,6 +45,8 @@
 - [x] Fase 4 · Código para poner la ventana de Alux en otras páginas web (pedido por el Founder 2026-11-22).
 - [ ] Fase 4 · pendiente: comparar las mismas preguntas con el Alux de Zazil (sin créditos de IA) y publicar con el visto bueno del Founder; el código para otras páginas funciona solo tras publicar.
 - [ ] Fase 3 · pendiente: control de gobernanza con tres archivos generados compartidos por autorizaciones anteriores (types, inventario de rutas, árbol de rutas) — requiere decisión del Founder.
+- [x] Fase 5 · WhatsApp de cada empresa: Portal → «WhatsApp con Alux» (conectar por QR, «Cómo se presenta», «Preguntas y respuestas», «Pláticas» con etapa y notas); Alux hereda las reglas de la Consola y contesta solo con la ficha, productos con sus precios, horario, ubicación y preguntas de esa empresa; se presenta como «Alux, el asistente de [Empresa]»; contactos y pláticas de la empresa no se mezclan con CRM Prospectos.
+- [ ] Fase 5 · pendiente: escanear el QR con el teléfono real de una empresa y probar mensajes reales (tras publicar); datos de demostración en «DEMO · Experiencias Sac-Be» (línea «DEMO Fase 5 · datos temporales», dos pláticas de Laura y dos preguntas) se conservan hasta la frase de validación del Founder.
 
 ## Monitor de visitantes y registro de viajeros · 2026-11-20
 

@@ -3,7 +3,8 @@
  *
  * El concierge toma la plática (Alux se calla), escribe en español y el
  * mensaje sale traducido al idioma del cliente; con «Devolver a Alux» Alux
- * vuelve a contestar. Se usa en Pláticas y en la ficha del prospecto.
+ * vuelve a contestar. Se usa en Pláticas y en la ficha del prospecto, y
+ * (Fase 5, con `businessId`) en el WhatsApp de cada empresa del Portal.
  */
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,11 +26,14 @@ export function WhatsAppConversationPanel({
   mode,
   language,
   handoffRequestedAt,
+  businessId,
 }: {
   sessionId: string;
   mode: "alux" | "human";
   language: string | null;
   handoffRequestedAt: string | null;
+  /** Fase 5 · plática del WhatsApp de una empresa (la atiende su equipo). */
+  businessId?: string;
 }) {
   const qc = useQueryClient();
   const sendFn = useServerFn(sendWhatsAppFromPanel);
@@ -42,13 +46,16 @@ export function WhatsAppConversationPanel({
     void qc.invalidateQueries({ queryKey: ["crm-alux-conversation", sessionId] });
     void qc.invalidateQueries({ queryKey: ["crm-alux-conversations"] });
     void qc.invalidateQueries({ queryKey: ["crm-prospect"] });
+    if (businessId) void qc.invalidateQueries({ queryKey: ["portal", businessId, "whatsapp"] });
   };
+  const scope = businessId ? { businessId } : {};
+  const team = businessId ? "tu equipo" : "un concierge";
 
   const send = async () => {
     if (!text.trim() || busy) return;
     setBusy(true);
     try {
-      const r = await sendFn({ data: { sessionId, text: text.trim(), translate } });
+      const r = await sendFn({ data: { sessionId, text: text.trim(), translate, ...scope } });
       if (r.ok) {
         setText("");
         toast.success(r.translated ? `Enviado en ${LANGUAGE_LABEL[lang] ?? lang}` : "Enviado");
@@ -64,7 +71,7 @@ export function WhatsAppConversationPanel({
   const changeMode = async (next: "alux" | "human") => {
     setBusy(true);
     try {
-      await modeFn({ data: { sessionId, mode: next } });
+      await modeFn({ data: { sessionId, mode: next, ...scope } });
       toast.success(next === "alux" ? "Alux vuelve a contestar" : "Tomaste la plática");
       refresh();
     } catch {
@@ -78,9 +85,11 @@ export function WhatsAppConversationPanel({
     <div className="mt-3 space-y-2 rounded-lg border border-border bg-background p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-medium">
-          {mode === "alux" ? "Atiende Alux" : "Atiende un concierge · Alux en pausa"}
+          {mode === "alux" ? "Atiende Alux" : `Atiende ${team} · Alux en pausa`}
           {handoffRequestedAt && mode === "human" ? (
-            <span className="ml-2 text-destructive">Pidió concierge</span>
+            <span className="ml-2 text-destructive">
+              {businessId ? "Pidió hablar con una persona" : "Pidió concierge"}
+            </span>
           ) : null}
         </p>
         {mode === "alux" ? (

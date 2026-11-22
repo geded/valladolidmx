@@ -1,0 +1,150 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-114",
+  "title": "CRM Prospectos · Fase 5: WhatsApp de cada empresa con Alux desde el Portal Empresarial",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Mensaje Founder del 2026-11-22 «Autorizado , empieza» (Fase 5 del plan aprobado: WhatsApp de cada empresa por QR desde su Portal), con las decisiones del mismo día «No quiero que inicie de cero en cada empresa» (reglas y forma de contestar heredadas de la Consola de Alux) y «Alux de la empresa» (se presenta siempre como «Soy Alux, el asistente de [Empresa]»). Delta acotado: el Portal gana «WhatsApp con Alux» (conexión por QR, cómo se presenta, preguntas y respuestas, pláticas con etapa y notas); el procesador de WhatsApp atiende líneas de empresa con sus propios datos y precios; el Centro Concierge deja de ver pláticas de empresas. Sin cambiar plantillas públicas, cobro, checkout, reservaciones ni publicación.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/crm/WhatsAppConversationPanel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/alux-reply.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/AGENTS.md"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/business-rules.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/business-context.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/portal/business-whatsapp.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/portal/whatsapp.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/crm/WhatsAppConversationPanel.tsx",
+      "sha256": "672a9ee9e322207ea359e134326aa4371e3ab5159e4f877c695e60076a6a12c8",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp.functions.ts",
+      "sha256": "a9b5ee76989465fcc67445bcfafbfc68e77b4a759ffdbc49067b0b0c39c817fd",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/alux-reply.server.ts",
+      "sha256": "74385419c713952fd9d9ea00cb6c3b18ccdc9187a58eb300203744fa09d635a4",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts",
+      "sha256": "fc59630862dff32b0c726d3eb983ca3c605adcc83c8aa7d5a4d0c9e6d87195a2",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "f158ca29b338accd3eb9d7e8eda0af838e94e9ca6fa6888f96e33bed48610bf7",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts",
+      "sha256": "f068713cbe5c5ee20c1f2797293284013d10204249e7c5c3adf6b8d0b2fac8a9",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/AGENTS.md",
+      "sha256": "e85ced86667675a1ea3547b0630dc88d3fb77a876225c6923ea896d112f8ff37",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/integrations/supabase/types.ts",
+      "sha256": "118db5ae2dd21a75e3f5fdb53f1bf24f61e9f64b90d4f4643e9e90b319c33573",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routeTree.gen.ts",
+      "sha256": "9c9a01c2fa7003fda400bcb99dbbe1612c64deb4fe838b6d685fb8929ec65bfa",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/business-rules.ts",
+      "sha256": "c3456abb93f437cc862e1183ac6d5f8d272e1bc4320ac53461aa55b0436dda37",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/whatsapp/business-context.server.ts",
+      "sha256": "ad1b3e391e431411547c0413d93c49a8de212e6654dfe7f6e36d27008bebf286",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/portal/business-whatsapp.functions.ts",
+      "sha256": "63be716ed710a5cf48766c90ed4e1a49e57647a5d283e6b9cc178cac36f77e68",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/portal/whatsapp.tsx",
+      "sha256": "b0d322f775b7c710cea1fb0e7d70515d3f164665a2a57da315a6bb24b5832fd6",
+      "authority": "Founder · CRM Fase 5 (WhatsApp de cada empresa con Alux) · 2026-11-22"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun test scripts/omxds/crm/business-whatsapp-rules.contract.test.ts",
+    "bun test scripts/omxds/crm/whatsapp-rules.contract.test.ts",
+    "bun run typecheck"
+  ]
+}

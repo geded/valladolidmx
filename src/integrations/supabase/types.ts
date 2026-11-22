@@ -476,6 +476,7 @@ export type Database = {
       alux_public_sessions: {
         Row: {
           alux_mode: string
+          business_contact_id: string | null
           channel: string
           contact_capture_count: number
           contact_offer_count: number
@@ -497,6 +498,7 @@ export type Database = {
           last_signals: Json | null
           last_spatial_state: string | null
           message_count: number
+          owner_business_id: string | null
           prospect_id: string | null
           reply_lock_until: string | null
           session_key: string
@@ -512,6 +514,7 @@ export type Database = {
         }
         Insert: {
           alux_mode?: string
+          business_contact_id?: string | null
           channel?: string
           contact_capture_count?: number
           contact_offer_count?: number
@@ -533,6 +536,7 @@ export type Database = {
           last_signals?: Json | null
           last_spatial_state?: string | null
           message_count?: number
+          owner_business_id?: string | null
           prospect_id?: string | null
           reply_lock_until?: string | null
           session_key: string
@@ -548,6 +552,7 @@ export type Database = {
         }
         Update: {
           alux_mode?: string
+          business_contact_id?: string | null
           channel?: string
           contact_capture_count?: number
           contact_offer_count?: number
@@ -569,6 +574,7 @@ export type Database = {
           last_signals?: Json | null
           last_spatial_state?: string | null
           message_count?: number
+          owner_business_id?: string | null
           prospect_id?: string | null
           reply_lock_until?: string | null
           session_key?: string
@@ -583,6 +589,13 @@ export type Database = {
           whatsapp_line_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "alux_public_sessions_business_contact_id_fkey"
+            columns: ["business_contact_id"]
+            isOneToOne: false
+            referencedRelation: "business_whatsapp_contacts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "alux_public_sessions_prospect_id_fkey"
             columns: ["prospect_id"]
@@ -1690,6 +1703,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      business_whatsapp_contacts: {
+        Row: {
+          business_id: string
+          created_at: string
+          first_name: string
+          id: string
+          language: string
+          last_activity_at: string
+          notes: string | null
+          phone_e164: string
+          stage: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          language?: string
+          last_activity_at?: string
+          notes?: string | null
+          phone_e164: string
+          stage?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          language?: string
+          last_activity_at?: string
+          notes?: string | null
+          phone_e164?: string
+          stage?: string
+        }
+        Relationships: []
       }
       businesses: {
         Row: {
@@ -3529,6 +3578,9 @@ export type Database = {
       crm_whatsapp_lines: {
         Row: {
           alux_enabled: boolean
+          alux_greeting: string | null
+          alux_highlights: string | null
+          alux_tone: string
           auto_recontact: boolean
           created_at: string
           created_by: string | null
@@ -3547,6 +3599,9 @@ export type Database = {
         }
         Insert: {
           alux_enabled?: boolean
+          alux_greeting?: string | null
+          alux_highlights?: string | null
+          alux_tone?: string
           auto_recontact?: boolean
           created_at?: string
           created_by?: string | null
@@ -3565,6 +3620,9 @@ export type Database = {
         }
         Update: {
           alux_enabled?: boolean
+          alux_greeting?: string | null
+          alux_highlights?: string | null
+          alux_tone?: string
           auto_recontact?: boolean
           created_at?: string
           created_by?: string | null
@@ -8842,6 +8900,23 @@ export type Database = {
           impressions: number
           placement: string
           surface: string
+        }[]
+      }
+      business_whatsapp_notify: {
+        Args: {
+          _alt: string
+          _business_id: string
+          _event_id: string
+          _event_type: string
+          _url: string
+        }
+        Returns: undefined
+      }
+      business_whatsapp_touch_contact: {
+        Args: { _business_id: string; _first_name: string; _phone_e164: string }
+        Returns: {
+          contact_id: string
+          is_new: boolean
         }[]
       }
       cancel_business_ownership_transfer: {

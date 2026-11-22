@@ -9,7 +9,13 @@ import { createHash } from "node:crypto";
 import { evolutionChannel } from "@/lib/crm/channel/evolution.server";
 import type { WhatsAppChannel } from "@/lib/crm/channel/types";
 import { cleanFirstName } from "@/lib/crm/prospect-rules";
-import { composeWhatsAppReply, fallbackReply, type WhatsAppTripItem } from "./alux-reply.server";
+import {
+  composeBusinessWhatsAppReply,
+  composeWhatsAppReply,
+  fallbackReply,
+  type WhatsAppTripItem,
+} from "./alux-reply.server";
+import { businessFallbackReply, isBusinessCommand, normalizeTone } from "./business-rules";
 import {
   MAX_SENDS_PER_MINUTE,
   decideInboundAction,
@@ -41,7 +47,15 @@ interface LineRow {
   label: string;
   status: string;
   alux_enabled: boolean;
+  /** Fase 5 · línea propia de una empresa (null = Valladolid.mx). */
+  owner_business_id: string | null;
+  alux_greeting: string | null;
+  alux_tone: string | null;
+  alux_highlights: string | null;
 }
+
+const LINE_COLUMNS =
+  "id, instance_name, label, status, alux_enabled, owner_business_id, alux_greeting, alux_tone, alux_highlights";
 
 interface SessionRow {
   id: string;
@@ -51,14 +65,16 @@ interface SessionRow {
   conversation_language: string | null;
   wa_remote_jid: string | null;
   handoff_requested_at: string | null;
+  business_contact_id: string | null;
 }
 
 const SESSION_COLUMNS =
-  "id, prospect_id, message_count, alux_mode, conversation_language, wa_remote_jid, handoff_requested_at";
+  "id, prospect_id, message_count, alux_mode, conversation_language, wa_remote_jid, handoff_requested_at, business_contact_id";
 
 export interface ProcessDeps {
   readonly channel?: WhatsAppChannel;
   readonly compose?: typeof composeWhatsAppReply;
+  readonly composeBusiness?: typeof composeBusinessWhatsAppReply;
 }
 
 function sessionKeyFor(lineId: string, jid: string): string {
@@ -74,6 +90,7 @@ async function getOrCreateSession(
   line: LineRow,
   jid: string,
   prospectId: string | null,
+  businessContactId: string | null = null,
 ): Promise<SessionRow> {
   const key = sessionKeyFor(line.id, jid);
   const { data: existing, error } = await admin
@@ -85,6 +102,8 @@ async function getOrCreateSession(
   if (existing) {
     const patch: Record<string, unknown> = { last_seen_at: new Date().toISOString() };
     if (prospectId && !existing.prospect_id) patch["prospect_id"] = prospectId;
+    if (businessContactId && !existing.business_contact_id)
+      patch["business_contact_id"] = businessContactId;
     const { error: upErr } = await admin
       .from("alux_public_sessions")
       .update(patch as never)
@@ -93,6 +112,7 @@ async function getOrCreateSession(
     return {
       ...(existing as unknown as SessionRow),
       prospect_id: existing.prospect_id ?? prospectId,
+      business_contact_id: existing.business_contact_id ?? businessContactId,
     };
   }
   const { data: created, error: insErr } = await admin
@@ -106,6 +126,8 @@ async function getOrCreateSession(
         whatsapp_line_id: line.id,
         wa_remote_jid: jid,
         prospect_id: prospectId,
+        owner_business_id: line.owner_business_id,
+        business_contact_id: businessContactId,
         last_seen_at: new Date().toISOString(),
       } as never,
       { onConflict: "session_key" },
@@ -203,7 +225,15 @@ async function handleConnection(
     .update(patch as never)
     .eq("id", line.id);
   if (error) throw new Error(`line_update_failed: ${error.message}`);
-  if (status === "disconnected" && line.status === "connected") {
+  if (status === "disconnected" && line.status === "connected" && line.owner_business_id) {
+    await admin.rpc("business_whatsapp_notify", {
+      _business_id: line.owner_business_id,
+      _event_id: `biz-wa-line-down:${line.id}:${new Date().toISOString().slice(0, 13)}`,
+      _event_type: "Business.WhatsApp.LineDisconnected",
+      _url: "/portal/whatsapp",
+      _alt: "Tu WhatsApp con Alux se desconectó",
+    });
+  } else if (status === "disconnected" && line.status === "connected") {
     await admin.rpc("crm_whatsapp_notify_staff", {
       _event_id: `crm-wa-line-down:${line.id}:${new Date().toISOString().slice(0, 13)}`,
       _event_type: "CRM.WhatsApp.LineDisconnected",
@@ -249,6 +279,19 @@ async function runCommand(
 ) {
   const parsed = parseConciergeCommand(msg.text);
   if (!parsed) return;
+  if (line.owner_business_id && !isBusinessCommand(parsed.command)) {
+    await insertMessage(admin, {
+      session_id: session.id,
+      role: "assistant",
+      author: "system",
+      content: `#${parsed.command} sólo funciona en el Centro Concierge; aquí sirven #alux, #apagar y #nota.`,
+      external_id: msg.id,
+    });
+    await channel
+      .deleteForEveryone(line.instance_name, { id: msg.id, remoteJid: msg.remoteJid, fromMe: true })
+      .catch(() => undefined);
+    return;
+  }
   const now = new Date().toISOString();
   const sessionPatch: Record<string, unknown> = {};
   let note = "";
@@ -381,6 +424,27 @@ async function sendEnlaceFromCommand(
   }
 }
 
+async function touchBusinessContact(
+  admin: Admin,
+  contactId: string | null,
+  patch: Record<string, unknown> = {},
+) {
+  if (!contactId) return;
+  const { data: c } = await admin
+    .from("business_whatsapp_contacts")
+    .select("stage")
+    .eq("id", contactId)
+    .maybeSingle();
+  await admin
+    .from("business_whatsapp_contacts")
+    .update({
+      last_activity_at: new Date().toISOString(),
+      ...(c?.stage === "nuevo" ? { stage: "en_platica" } : {}),
+      ...patch,
+    } as never)
+    .eq("id", contactId);
+}
+
 async function recordHumanReply(admin: Admin, session: SessionRow, msg: InboundMessage) {
   const inserted = await insertMessage(admin, {
     session_id: session.id,
@@ -396,6 +460,7 @@ async function recordHumanReply(admin: Admin, session: SessionRow, msg: InboundM
     .from("alux_public_sessions")
     .update({ alux_mode: "human", human_reply_at: now, last_seen_at: now } as never)
     .eq("id", session.id);
+  await touchBusinessContact(admin, session.business_contact_id);
   if (session.prospect_id) {
     const { data: p } = await admin
       .from("concierge_prospects")
@@ -439,12 +504,29 @@ async function startHandoff(
   session: SessionRow,
   reason: HandoffReason,
   name: string,
+  line: LineRow | null = null,
 ) {
   const now = new Date().toISOString();
   await admin
     .from("alux_public_sessions")
     .update({ alux_mode: "human", handoff_requested_at: now, handoff_reason: reason } as never)
     .eq("id", session.id);
+  if (line?.owner_business_id) {
+    const what =
+      reason === "concierge"
+        ? "pidió hablar con una persona"
+        : reason === "booking"
+          ? "quiere reservar o comprar"
+          : "quiere que le armen el plan";
+    await admin.rpc("business_whatsapp_notify", {
+      _business_id: line.owner_business_id,
+      _event_id: `biz-wa-handoff:${session.id}:${now.slice(0, 16)}`,
+      _event_type: "Business.WhatsApp.Handoff",
+      _url: "/portal/whatsapp",
+      _alt: `${name} ${what} por WhatsApp`,
+    });
+    return;
+  }
   if (session.prospect_id) {
     await admin
       .from("concierge_prospects")
@@ -557,23 +639,57 @@ async function replyAsAlux(
           : [];
         memory = (web ?? []).map((w) => String(w.summary ?? "")).filter(Boolean);
       }
+      // Fase 5 · línea de empresa: sólo los datos de esa empresa y su contacto.
+      let business: Awaited<
+        ReturnType<typeof import("./business-context.server").loadBusinessWhatsAppContext>
+      > = null;
+      let contactName: string | null = null;
+      if (line.owner_business_id) {
+        const { loadBusinessWhatsAppContext } = await import("./business-context.server");
+        business = await loadBusinessWhatsAppContext(admin, line.owner_business_id);
+        if (!business) return;
+        if (session.business_contact_id) {
+          const { data: c } = await admin
+            .from("business_whatsapp_contacts")
+            .select("first_name")
+            .eq("id", session.business_contact_id)
+            .maybeSingle();
+          contactName =
+            c?.first_name && c.first_name !== "Contacto de WhatsApp" ? c.first_name : null;
+          firstName = contactName;
+        }
+      }
 
       const t0 = Date.now();
       const mediaOnly = pending.every((m) => m.content.startsWith("(mensaje con archivo"));
-      const result = await deps
-        .compose({
-          pending: pending.map((m) => m.content),
-          history,
-          firstName,
-          language: toChatLanguage(session.conversation_language),
-          otherChannelMemory: memory,
-          tripItems,
-          handoff,
-          isFirstReply: lastReply < 0,
-          mediaOnly,
-        })
-        .catch(() => null);
-      const text = result?.text ?? fallbackReply(toChatLanguage(session.conversation_language));
+      const composeInput = {
+        pending: pending.map((m) => m.content),
+        history,
+        firstName,
+        language: toChatLanguage(session.conversation_language),
+        otherChannelMemory: memory,
+        tripItems,
+        handoff,
+        isFirstReply: lastReply < 0,
+        mediaOnly,
+      };
+      const result = await (
+        business
+          ? deps.composeBusiness({
+              ...composeInput,
+              business,
+              presentation: {
+                greeting: line.alux_greeting,
+                tone: normalizeTone(line.alux_tone),
+                highlights: line.alux_highlights,
+              },
+            })
+          : deps.compose(composeInput)
+      ).catch(() => null);
+      const lang = toChatLanguage(session.conversation_language);
+      const text =
+        result?.text ??
+        (business ? businessFallbackReply(business.name, lang) : fallbackReply(lang));
 
       let sentId: string | null = null;
       let sendError: string | null = null;
@@ -593,7 +709,14 @@ async function replyAsAlux(
         knowledge_ids: result?.knowledgeIds ?? [],
         latency_ms: Date.now() - t0,
       });
-      if (result?.gap) {
+      if (result?.gap && business) {
+        const { recordBusinessQuestionGap } = await import("./business-context.server");
+        await recordBusinessQuestionGap(
+          admin,
+          business.businessId,
+          pending.map((m) => m.content).join(" "),
+        );
+      } else if (result?.gap) {
         const { recordKnowledgeGapServer } = await import("@/lib/alux/knowledge-gaps.server");
         await recordKnowledgeGapServer(admin, {
           channel: "whatsapp",
@@ -611,6 +734,13 @@ async function replyAsAlux(
         } as never)
         .eq("id", sessionId);
 
+      if (business && result) {
+        const cleanName = result.firstName ? cleanFirstName(result.firstName) : null;
+        await touchBusinessContact(admin, session.business_contact_id, {
+          ...(result.language ? { language: result.language } : {}),
+          ...(cleanName && !contactName ? { first_name: cleanName } : {}),
+        });
+      }
       if (session.prospect_id && result) {
         const patch: Record<string, unknown> = { last_activity_at: now };
         if (result.language) patch["language"] = result.language;
@@ -634,7 +764,13 @@ async function replyAsAlux(
           .eq("id", session.prospect_id);
       }
       if (result?.handoff && !handoff && session.alux_mode === "alux") {
-        await startHandoff(admin, session, "concierge", firstName ?? "Un prospecto");
+        await startHandoff(
+          admin,
+          session,
+          "concierge",
+          firstName ?? (business ? "Un cliente" : "Un prospecto"),
+          line,
+        );
       }
       if (sendError) throw new Error(`send_failed: ${sendError}`);
       handoff = null;
@@ -686,7 +822,19 @@ async function handleMessage(
   // Cliente
   const phone = jidToE164(msg.remoteJid) ?? jidToE164(msg.altJid);
   let prospectId: string | null = null;
-  if (phone) {
+  let businessContactId: string | null = null;
+  if (phone && line.owner_business_id) {
+    // Fase 5 · el contacto es de la empresa; no entra a CRM Prospectos.
+    const name = cleanFirstName(msg.pushName ?? "") ?? "";
+    const { data: touched, error } = await admin.rpc("business_whatsapp_touch_contact", {
+      _business_id: line.owner_business_id,
+      _phone_e164: phone,
+      _first_name: name,
+    });
+    if (error) throw new Error(`business_contact_failed: ${error.message}`);
+    const row = Array.isArray(touched) ? touched[0] : touched;
+    businessContactId = (row as { contact_id?: string } | null)?.contact_id ?? null;
+  } else if (phone) {
     const name = cleanFirstName(msg.pushName ?? "") ?? "";
     const { data: touched, error } = await admin.rpc("crm_whatsapp_touch_prospect", {
       _phone_e164: phone,
@@ -697,7 +845,13 @@ async function handleMessage(
     const row = Array.isArray(touched) ? touched[0] : touched;
     prospectId = (row as { prospect_id?: string } | null)?.prospect_id ?? null;
   }
-  const session = await getOrCreateSession(admin, line, msg.remoteJid, prospectId);
+  const session = await getOrCreateSession(
+    admin,
+    line,
+    msg.remoteJid,
+    prospectId,
+    businessContactId,
+  );
   const inserted = await insertMessage(admin, {
     session_id: session.id,
     role: "user",
@@ -713,7 +867,15 @@ async function handleMessage(
 
   const handoff = session.alux_mode === "alux" ? detectHandoffReason(msg.text) : null;
   if (handoff) {
-    let name = "Un prospecto";
+    let name = line.owner_business_id ? "Un cliente" : "Un prospecto";
+    if (session.business_contact_id) {
+      const { data: c } = await admin
+        .from("business_whatsapp_contacts")
+        .select("first_name")
+        .eq("id", session.business_contact_id)
+        .maybeSingle();
+      if (c?.first_name && c.first_name !== "Contacto de WhatsApp") name = c.first_name;
+    }
     if (session.prospect_id) {
       const { data: p } = await admin
         .from("concierge_prospects")
@@ -722,7 +884,7 @@ async function handleMessage(
         .maybeSingle();
       if (p?.first_name && p.first_name !== "Contacto de WhatsApp") name = p.first_name;
     }
-    await startHandoff(admin, session, handoff, name);
+    await startHandoff(admin, session, handoff, name, line);
   }
   if (session.alux_mode === "human" && !handoff) return; // el concierge atiende
   await replyAsAlux(admin, line, session.id, handoff, deps);
@@ -738,11 +900,12 @@ export async function processInboxRow(
   const full: Required<ProcessDeps> = {
     channel: deps.channel ?? evolutionChannel,
     compose: deps.compose ?? composeWhatsAppReply,
+    composeBusiness: deps.composeBusiness ?? composeBusinessWhatsAppReply,
   };
   try {
     const { data: line, error } = await admin
       .from("crm_whatsapp_lines")
-      .select("id, instance_name, label, status, alux_enabled")
+      .select(LINE_COLUMNS)
       .eq("id", row.line_id)
       .maybeSingle();
     if (error) throw new Error(`line_read_failed: ${error.message}`);

@@ -179,6 +179,7 @@ import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_auth
 import { Route as AuthenticatedPortalReportesRouteImport } from './routes/_authenticated/portal/reportes'
 import { Route as AuthenticatedPortalVentasEnLineaRouteImport } from './routes/_authenticated/portal/ventas-en-linea'
 import { Route as AuthenticatedPortalVisibilidadRouteImport } from './routes/_authenticated/portal/visibilidad'
+import { Route as AuthenticatedPortalWhatsappRouteImport } from './routes/_authenticated/portal/whatsapp'
 import { Route as ApiDevMediaPipelineDeriveRouteImport } from './routes/api/dev/media-pipeline-derive'
 import { Route as ApiDevMediaShadowEvalRouteImport } from './routes/api/dev/media-shadow-eval'
 import { Route as ApiPublicSttRouteImport } from './routes/api/public/stt'
@@ -1239,6 +1240,12 @@ const AuthenticatedPortalVisibilidadRoute =
     path: '/visibilidad',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedPortalWhatsappRoute =
+  AuthenticatedPortalWhatsappRouteImport.update({
+    id: '/whatsapp',
+    path: '/whatsapp',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const ApiDevMediaPipelineDeriveRoute =
   ApiDevMediaPipelineDeriveRouteImport.update({
     id: '/api/dev/media-pipeline-derive',
@@ -2022,6 +2029,7 @@ export interface FileRoutesByFullPath {
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
   '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
+  '/portal/whatsapp': typeof AuthenticatedPortalWhatsappRoute
   '/api/dev/media-pipeline-derive': typeof ApiDevMediaPipelineDeriveRoute
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/api/public/stt': typeof ApiPublicSttRoute
@@ -2289,6 +2297,7 @@ export interface FileRoutesByTo {
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
   '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
+  '/portal/whatsapp': typeof AuthenticatedPortalWhatsappRoute
   '/api/dev/media-pipeline-derive': typeof ApiDevMediaPipelineDeriveRoute
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/api/public/stt': typeof ApiPublicSttRoute
@@ -2564,6 +2573,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/reportes': typeof AuthenticatedPortalReportesRoute
   '/_authenticated/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/_authenticated/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
+  '/_authenticated/portal/whatsapp': typeof AuthenticatedPortalWhatsappRoute
   '/api/dev/media-pipeline-derive': typeof ApiDevMediaPipelineDeriveRoute
   '/api/dev/media-shadow-eval': typeof ApiDevMediaShadowEvalRoute
   '/api/public/stt': typeof ApiPublicSttRoute
@@ -2842,6 +2852,7 @@ export interface FileRouteTypes {
     | '/portal/reportes'
     | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
+    | '/portal/whatsapp'
     | '/api/dev/media-pipeline-derive'
     | '/api/dev/media-shadow-eval'
     | '/api/public/stt'
@@ -3109,6 +3120,7 @@ export interface FileRouteTypes {
     | '/portal/reportes'
     | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
+    | '/portal/whatsapp'
     | '/api/dev/media-pipeline-derive'
     | '/api/dev/media-shadow-eval'
     | '/api/public/stt'
@@ -3383,6 +3395,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/reportes'
     | '/_authenticated/portal/ventas-en-linea'
     | '/_authenticated/portal/visibilidad'
+    | '/_authenticated/portal/whatsapp'
     | '/api/dev/media-pipeline-derive'
     | '/api/dev/media-shadow-eval'
     | '/api/public/stt'
@@ -4814,6 +4827,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalVisibilidadRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/portal/whatsapp': {
+      id: '/_authenticated/portal/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/portal/whatsapp'
+      preLoaderRoute: typeof AuthenticatedPortalWhatsappRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/api/dev/media-pipeline-derive': {
       id: '/api/dev/media-pipeline-derive'
       path: '/api/dev/media-pipeline-derive'
@@ -5784,6 +5804,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalReportesRoute: typeof AuthenticatedPortalReportesRoute
   AuthenticatedPortalVentasEnLineaRoute: typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   AuthenticatedPortalVisibilidadRoute: typeof AuthenticatedPortalVisibilidadRoute
+  AuthenticatedPortalWhatsappRoute: typeof AuthenticatedPortalWhatsappRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
   AuthenticatedPortalEmpresasBusinessIdRoute: typeof AuthenticatedPortalEmpresasBusinessIdRoute
   AuthenticatedPortalInvitacionesTokenRoute: typeof AuthenticatedPortalInvitacionesTokenRoute
@@ -5810,6 +5831,7 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalVentasEnLineaRoute:
       AuthenticatedPortalVentasEnLineaRouteWithChildren,
     AuthenticatedPortalVisibilidadRoute: AuthenticatedPortalVisibilidadRoute,
+    AuthenticatedPortalWhatsappRoute: AuthenticatedPortalWhatsappRoute,
     AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
     AuthenticatedPortalEmpresasBusinessIdRoute:
       AuthenticatedPortalEmpresasBusinessIdRoute,

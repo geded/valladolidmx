@@ -622,6 +622,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/_authenticated/portal/ventas-en-linea.tsx",
   "src/routes/_authenticated/portal/ventas-en-linea.ordenes.tsx",
   "src/routes/_authenticated/portal/visibilidad.tsx",
+  "src/routes/_authenticated/portal/whatsapp.tsx",
   "src/routes/alux.tsx",
   "src/routes/api/dev/media-pipeline-derive.ts",
   "src/routes/api/dev/media-shadow-eval.ts",

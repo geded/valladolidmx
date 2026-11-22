@@ -320,6 +320,16 @@ const portal: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "portal.whatsapp",
+      workspaceId: "portal",
+      label: "WhatsApp con Alux",
+      icon: MessageCircle,
+      to: "/portal/whatsapp",
+      group: "presencia",
+      order: 4.5,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "portal.galeria",
       workspaceId: "portal",
       label: "Galería",
