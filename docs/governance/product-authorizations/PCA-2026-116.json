@@ -1,0 +1,79 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-116",
+  "title": "Perfiles: como Staff no se muestran Mi Viaje, «Tu viaje» ni Mi Cuenta de viajero",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Mensaje Founder del 2026-11-22 «Si estoy como editor solo debo ver lo que se usara como editor y nada de mi viaje de mi perfil de viajero, ok?». Delta acotado: en modo Staff no se renderizan el botón «Mi Viaje» del encabezado, el «Tu viaje» flotante ni «Mi Cuenta» en el cambio de panel. Sin cambiar plantillas públicas, sus botones, Alux, rutas, permisos ni datos.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/travel-plan/MiViajeChip.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/travel-plan/FloatingTravelPlanDock.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/workspace/WorkspaceSwitcher.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/profile-mode/workspace-mode.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/profile-mode/use-profile-mode.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/profile-mode/AGENTS.md"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/travel-plan/MiViajeChip.tsx",
+      "sha256": "d3c4154cb5a5e219e448ebf4d2b2e0c5efbcbec03fe50a2d0a51f7307dab2b18",
+      "authority": "Founder · Staff sin Mi Viaje ni perfil de viajero · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/travel-plan/FloatingTravelPlanDock.tsx",
+      "sha256": "67533cc8ebe7ea7f0e73f6407b3604109ab804c5f45b176c2e0904c444b625fd",
+      "authority": "Founder · Staff sin Mi Viaje ni perfil de viajero · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/workspace/WorkspaceSwitcher.tsx",
+      "sha256": "ebd65ae25bd90e8c7d2f4390f3e03ffc3f9d09ad87fc68abe49197f4f4c2de8a",
+      "authority": "Founder · Staff sin Mi Viaje ni perfil de viajero · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/profile-mode/workspace-mode.ts",
+      "sha256": "2058f1e991179debebd4396c950f8b46fab680bbcf23466a0fa527f3a249599e",
+      "authority": "Founder · Staff sin Mi Viaje ni perfil de viajero · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/profile-mode/use-profile-mode.ts",
+      "sha256": "f7f9859780787ac5446d934e71874fb25ab6b34ee2fae0d1e8d996f6728768e1",
+      "authority": "Founder · Staff sin Mi Viaje ni perfil de viajero · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/profile-mode/AGENTS.md",
+      "sha256": "d7189ac90a104511b87af28a1674aceaaf945ea0b3854fff2e2555fdb57462bb",
+      "authority": "Founder · Staff sin Mi Viaje ni perfil de viajero · 2026-11-22"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun test scripts/omxds/profile-mode/workspace-mode.contract.test.ts",
+    "bun run typecheck"
+  ]
+}

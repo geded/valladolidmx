@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { effectiveMode, modeForPath } from "../../../src/lib/profile-mode/workspace-mode";
+import {
+  effectiveMode,
+  hidesTravelerSurfaces,
+  modeForPath,
+} from "../../../src/lib/profile-mode/workspace-mode";
 
 const ALL = ["traveler", "business", "concierge", "staff"] as const;
 
@@ -34,5 +38,14 @@ describe("el panel donde estás es el perfil con el que operas", () => {
   test("rutas parecidas no se confunden con un panel", () => {
     expect(modeForPath("/cmsx", ALL)).toBeNull();
     expect(modeForPath("/cuentas-claras", ALL)).toBeNull();
+  });
+});
+
+describe("como Staff no se ve nada de Mi Viaje ni del perfil de viajero", () => {
+  test("Staff oculta las piezas de viajero", () => {
+    expect(hidesTravelerSurfaces("staff")).toBe(true);
+  });
+  test("Viajero sí ve Mi Viaje", () => {
+    expect(hidesTravelerSurfaces("traveler")).toBe(false);
   });
 });

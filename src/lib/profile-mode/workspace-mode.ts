@@ -35,6 +35,14 @@ export function modeForPath(
   return entry.candidates.find((m) => available.includes(m)) ?? null;
 }
 
+/**
+ * Perfiles operativos que no deben ver piezas personales del viajero
+ * (Mi Viaje, «Tu viaje», Mi Cuenta). Staff = editores y administración.
+ */
+export function hidesTravelerSurfaces(mode: ProfileMode): boolean {
+  return mode === "staff";
+}
+
 /** Modo efectivo: el del panel actual; si no hay panel, el guardado. */
 export function effectiveMode(
   pathname: string,

@@ -23,6 +23,7 @@ import { getMyActivePlan } from "@/lib/traveler/travel-plans.functions";
 import { getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
 import { onPlanChanged } from "@/lib/alux/plan-signals";
 import { cn } from "@/lib/utils";
+import { useHidesTravelerSurfaces } from "@/lib/profile-mode/use-profile-mode";
 
 interface Props {
   isOverlay?: boolean;
@@ -30,7 +31,9 @@ interface Props {
 
 export function MiViajeChip({ isOverlay = false }: Props) {
   const { user } = useAuth();
-  const enabled = !!user;
+  // Como Staff (editor/administración) no se muestra Mi Viaje.
+  const hideTraveler = useHidesTravelerSurfaces();
+  const enabled = !!user && !hideTraveler;
 
   const fetchActive = useServerFn(getMyActivePlan);
   const activeQ = useQuery({

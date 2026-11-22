@@ -17,7 +17,7 @@ import {
   type ProfileMode,
   type ProfileModeState,
 } from "./mode.functions";
-import { effectiveMode } from "./workspace-mode";
+import { effectiveMode, hidesTravelerSurfaces } from "./workspace-mode";
 
 export const PROFILE_MODE_QUERY_KEY = ["profile-mode-state"] as const;
 
@@ -59,4 +59,10 @@ export function useProfileModeState(): {
     data: stored && active ? { ...stored, active } : undefined,
     isLoading: query.isLoading,
   };
+}
+
+/** true cuando la persona opera como Staff: sin Mi Viaje ni perfil de viajero. */
+export function useHidesTravelerSurfaces(): boolean {
+  const { data } = useProfileModeState();
+  return Boolean(data && hidesTravelerSurfaces(data.active));
 }

@@ -57,6 +57,7 @@ import {
   type AnonymousItemKind,
 } from "@/lib/traveler/anonymous-draft";
 import { ProgressiveRegistrationButton } from "@/components/traveler/ProgressiveRegistrationButton";
+import { useHidesTravelerSurfaces } from "@/lib/profile-mode/use-profile-mode";
 
 const HIDE_PREFIXES = [
   "/cuenta",
@@ -123,7 +124,9 @@ export function FloatingTravelPlanDock() {
     acknowledgeReturn,
   } = useAnonymousTrip();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isHiddenRoute = HIDE_PREFIXES.some((p) => pathname.startsWith(p));
+  // Como Staff (editor/administración) no se muestra «Tu viaje».
+  const hideTraveler = useHidesTravelerSurfaces();
+  const isHiddenRoute = HIDE_PREFIXES.some((p) => pathname.startsWith(p)) || hideTraveler;
   const hasStickyCta = useHasStickyCta();
   const enabled = !!user && !isHiddenRoute;
   /* Cuando hay una barra sticky (ficha con CTA comercial), elevar el dock

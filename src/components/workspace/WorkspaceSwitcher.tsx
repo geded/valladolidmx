@@ -10,11 +10,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useWorkspace } from "./WorkspaceProvider";
 import { cn } from "@/lib/utils";
+import { useHidesTravelerSurfaces } from "@/lib/profile-mode/use-profile-mode";
 
 export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
   const { workspace, workspaces, setActiveWorkspace } = useWorkspace();
   const navigate = useNavigate();
+  // Como Staff no se ofrece «Mi Cuenta» de viajero; se vuelve a Viajero
+  // desde «Cambiar de modo» en el menú de la foto.
+  const hideTraveler = useHidesTravelerSurfaces();
   if (!workspace) return null;
+  const options = hideTraveler
+    ? workspaces.filter((w) => w.id !== "cuenta" || w.id === workspace.id)
+    : workspaces;
   const Icon = workspace.icon;
 
   return (
@@ -52,7 +59,7 @@ export function WorkspaceSwitcher({ compact = false }: { compact?: boolean }) {
       <DropdownMenuContent align="start" className="w-64">
         <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {workspaces.map((w) => {
+        {options.map((w) => {
           const I = w.icon;
           return (
             <DropdownMenuItem
