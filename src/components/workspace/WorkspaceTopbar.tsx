@@ -98,8 +98,13 @@ export function WorkspaceTopbar({
       (a, b) => b.to.length - a.to.length,
     );
     // Raíz del workspace (item primario o el más corto).
+    // La raíz es la portada declarada del workspace (`rootPath`); varios
+    // items pueden ser `primary` (p. ej. «Hoy» y «Editor de páginas» en CMS)
+    // y elegir el primero hacía que «Regresar» llevara al Editor de páginas.
     const rootItem =
-      uniq.find((i) => i.primary) ?? [...uniq].sort((a, b) => a.to.length - b.to.length)[0];
+      uniq.find((i) => i.to === workspace.rootPath) ??
+      uniq.find((i) => i.primary) ??
+      [...uniq].sort((a, b) => a.to.length - b.to.length)[0];
     const rootTo = rootItem?.to ?? "/";
     const rootLabel = workspace.label;
 
