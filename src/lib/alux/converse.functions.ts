@@ -332,8 +332,9 @@ REGLAS INQUEBRANTABLES
 11. Si el explorador pide un momento del día (momento=noche), recomienda sólo opciones cuyos DATOS muestren que se viven en ese momento (evento o cena nocturna, horario que cierra tarde). Nunca ofrezcas un lugar diciendo que "no especifica horario nocturno"; si no hay opciones así, dilo con claridad.
 12. Idioma: contesta siempre en el idioma del último mensaje del explorador y no lo cambies si él no lo cambia. Los nombres de lugares, empresas y platillos se quedan como están publicados.
 13. Suena humano: varía saludos y cierres, no empieces todos los mensajes igual, no repitas lo que ya dijiste y nunca vuelvas a preguntar algo que el explorador ya contestó en HISTORIAL, Memoria o Datos del viaje. Si el mensaje es claro, no digas que no entendiste.
-14. Precios: sólo las experiencias de Valladolid.mx se venden directo; menciona un precio únicamente si aparece en DATOS como hecho. Para hoteles, restaurantes, transporte y paquetes, explica que un concierge le consigue el mejor precio.
-15. Responde ÚNICAMENTE con un objeto JSON válido (sin markdown, sin texto fuera del JSON) con esta forma exacta:
+14. Precios: lo único que se vende en línea en Valladolid.mx son las experiencias (y artesanías autorizadas) cuyo hecho dice «Se vende en línea»; da ese precio tal cual. Si DATOS trae «Precio de referencia», puedes darlo aclarando que es sólo de referencia y que un concierge lo cotiza y le consigue el mejor precio. Si no hay precio en DATOS, no lo inventes: ofrece al concierge.
+16. Las entidades con recomendado=sí son aliados con visibilidad contratada: si encajan con lo que pide, menciónalas primero dentro de su tipo; si no encajan, no las fuerces. La pantalla las marca como «Recomendado»; nunca lo ocultes ni digas que son la única opción.
+17. Responde ÚNICAMENTE con un objeto JSON válido (sin markdown, sin texto fuera del JSON) con esta forma exacta:
 {"text": string (máx ${ALUX_CONVERSE_LIMITS.maxTextChars} caracteres, mensaje al explorador),
  "clarifyingQuestions": string[] (0-${ALUX_CONVERSE_LIMITS.maxClarifyingQuestions}),
  "recommendations": [{"id": string, "reason": string (≤200, por qué, sólo con hechos o inferencias declaradas), "day": number|null}] (0-${ALUX_CONVERSE_LIMITS.maxRecommendations}),
@@ -787,6 +788,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
       maxExtraDestinationSlugs: selectedRoute ? extraDestinationSlugs.length : undefined,
       selectedRoute: Boolean(selectedRoute),
       selectedRefs: selectedRoute?.stopRefs,
+      searchText: message,
     });
     phases["retrieval"] = Date.now() - tRetrieval;
 
@@ -995,6 +997,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const ranked = rankConverseCandidates(alternativeCandidates, ctx, {
       keepSaved,
       limit: ALUX_CONVERSE_LIMITS.maxCandidatesForModel - selectedForModel.length,
+      queryTerms: retrieved.searchTerms,
     });
     const rankedCandidates = ranked.map((r) => r.candidate);
     const modelCandidates = [...selectedForModel, ...rankedCandidates];

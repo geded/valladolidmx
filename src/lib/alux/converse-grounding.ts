@@ -38,6 +38,7 @@ import {
   type AluxTravelIntent,
   type AluxUnavailableFactKind,
 } from "./converse-contract";
+import { termHits } from "./converse-priority";
 
 export interface GroundingContext {
   /** Clave `entityType:entityId` de la entidad activa (no se repite). */
@@ -110,6 +111,7 @@ function toRecommendation(
     imageUrl: c.imageUrl,
     subtitle: c.subtitle,
     day,
+    ...((c.aluxWeight ?? 0) > 0 ? { sponsored: true } : {}),
   };
 }
 
@@ -131,6 +133,10 @@ export interface RankedCandidate {
   readonly candidate: AluxConverseCandidate;
   readonly score: number;
   readonly reasons: readonly string[];
+  /** Encaja con la familia pedida; habilita el primer lugar pagado. */
+  readonly relevant?: boolean;
+  /** Coincidencias de tema (intereses + palabras de la pregunta). */
+  readonly hits?: number;
 }
 
 /**
@@ -140,13 +146,17 @@ export interface RankedCandidate {
  *  2. puntúa por familias solicitadas, intereses, accesibilidad, horario,
  *     alcance territorial (destino > cercanía > región) y datos disponibles;
  *  3. diversifica por familia (round-robin) para que Alux proponga un plan
- *     equilibrado, no seis hoteles.
+ *     equilibrado, no seis hoteles;
+ *  4. como Google: dentro de cada familia, UNA empresa con visibilidad
+ *     contratada sube al primer lugar sólo si encaja con lo pedido; la
+ *     tarjeta la declara «Recomendado».
  */
 export function rankConverseCandidates(
   candidates: readonly AluxConverseCandidate[],
   ctx: Pick<GroundingContext, "activeKey" | "tripItems" | "intent">,
-  opts: { limit?: number; keepSaved?: boolean } = {},
+  opts: { limit?: number; keepSaved?: boolean; queryTerms?: readonly string[] } = {},
 ): RankedCandidate[] {
+  const queryTerms = opts.queryTerms ?? [];
   const limit = opts.limit ?? ALUX_CONVERSE_LIMITS.maxCandidatesForModel;
   const saved = tripKeySet(ctx.tripItems);
   const intent = ctx.intent;
@@ -182,6 +192,16 @@ export function rankConverseCandidates(
       score += 10 * Math.min(3, tagHits.length);
       reasons.push(`afín a ${tagHits.slice(0, 2).join(" y ")}`);
     }
+    const textHits = termHits(
+      queryTerms,
+      [c.title, c.subtitle ?? "", c.summary ?? "", ...c.tags, ...c.facts.map((f) => f.text)].join(" "),
+    );
+    if (textHits > 0) {
+      score += 12 * Math.min(3, textHits);
+      reasons.push("coincide con lo que preguntas");
+    }
+    const hits = tagHits.length + textHits;
+    const relevant = wantedFamilies.size === 0 || wantedFamilies.has(c.family);
     if (intent.company === "familia" && c.tags.includes("familias")) {
       score += 8;
       reasons.push("pensado para familias");
@@ -204,7 +224,7 @@ export function rankConverseCandidates(
     if (c.openState === "open") score += 3;
     score += Math.min(5, c.facts.length);
     if (c.imageUrl) score += 1;
-    scored.push({ candidate: c, score, reasons });
+    scored.push({ candidate: c, score, reasons, relevant, hits });
   }
 
   scored.sort(
@@ -217,6 +237,22 @@ export function rankConverseCandidates(
     const arr = buckets.get(r.candidate.family) ?? [];
     arr.push(r);
     buckets.set(r.candidate.family, arr);
+  }
+  // Primer lugar pagado por familia (máx. 1), sólo si encaja con lo pedido:
+  // con tema, la pagada debe cubrir al menos la mitad de las coincidencias
+  // de la mejor opción de su familia (como un anuncio relevante en Google).
+  const asksTopic = queryTerms.length > 0 || interestTags.size > 0;
+  for (const [family, arr] of buckets) {
+    const bestHits = Math.max(0, ...arr.map((r) => r.hits ?? 0));
+    const minHits = asksTopic ? Math.max(1, Math.ceil(bestHits / 2)) : 0;
+    const paidIndex = arr.findIndex(
+      (r) => (r.candidate.aluxWeight ?? 0) > 0 && r.relevant && (r.hits ?? 0) >= minHits,
+    );
+    if (paidIndex > 0) {
+      const [paid] = arr.splice(paidIndex, 1);
+      if (paid) arr.unshift(paid);
+      buckets.set(family, arr);
+    }
   }
   const families = FAMILY_ORDER.filter((f) => buckets.has(f)).sort((a, b) => {
     const sa = buckets.get(a)![0]!.score;
@@ -596,15 +632,21 @@ export function composeDeterministicResponse(
 
 /** Texto compacto de un candidato para el bloque DATOS del prompt. */
 export function candidateToPromptLine(c: AluxConverseCandidate, index: number): string {
+  // Productos y experiencias llevan su ficha completa (precio, cupo, reserva).
+  const maxFacts =
+    c.entityType === "product"
+      ? ALUX_CONVERSE_LIMITS.maxFactsPerCandidate + 3
+      : ALUX_CONVERSE_LIMITS.maxFactsPerCandidate;
   const facts = c.facts
-    .slice(0, ALUX_CONVERSE_LIMITS.maxFactsPerCandidate)
+    .slice(0, maxFacts)
     .map((f) => `${f.id}="${f.text}"`)
     .join(" · ");
   const missing = c.unavailable.length ? ` · sin dato: ${c.unavailable.join(", ")}` : "";
   const scope =
     c.scope === "destination" ? "destino" : c.scope === "nearby" ? "CERCANÍA (rotular)" : "región";
   const saved = c.planKind ? "" : " · no se puede guardar";
-  return `${index + 1}. id="${c.entityId}" tipo=${c.family} título="${c.title}" destino=${c.destinationSlug ?? "—"} alcance=${scope}${saved}${
+  const paid = (c.aluxWeight ?? 0) > 0 ? " recomendado=sí" : "";
+  return `${index + 1}. id="${c.entityId}" tipo=${c.family} título="${c.title}" destino=${c.destinationSlug ?? "—"} alcance=${scope}${paid}${saved}${
     c.summary ? ` resumen="${c.summary}"` : ""
   }${facts ? ` hechos: ${facts}` : ""}${missing}`;
 }

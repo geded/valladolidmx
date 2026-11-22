@@ -551,3 +551,12 @@
 - [x] Productos y zonas guardan el tamaño de cada foto igual que empresas.
 - [ ] Ubicación en el mapa para zonas — espera respuesta del Founder.
 - [ ] Fotos para categorías — espera respuesta del Founder.
+
+## Alux lee mejor el CMS · 2026-11-22
+
+- [x] Alux ve todas las empresas y experiencias (sin corte alfabético) y elige según lo que preguntan.
+- [x] Visibilidad pagada como Google: primero en su categoría si encaja, marcada «Recomendado».
+- [x] Precios: venta en línea solo experiencias; lo demás «Precio de referencia» que cotiza el concierge.
+- [x] Ficha completa de experiencias (cupo, anticipación, cancelación, descripción).
+- [x] Artesanías: se venden en línea si el administrador autorizó su venta al subirlas.
+- [x] El chat sin cuenta (y el insertado en sitios aliados) ya recibe el catálogo publicado; antes no veía empresas ni experiencias.

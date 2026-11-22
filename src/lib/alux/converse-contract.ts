@@ -247,6 +247,8 @@ export interface AluxConverseRecommendation {
   readonly subtitle: string | null;
   /** Día sugerido dentro de la secuencia (si aplica). */
   readonly day: number | null;
+  /** Empresa con visibilidad contratada: la tarjeta lo declara como «Recomendado». */
+  readonly sponsored?: boolean;
 }
 
 export type AluxConverseSequenceEntityType = AluxConverseEntityType | "route_stop";
@@ -497,6 +499,11 @@ export interface AluxConverseCandidate {
    * ("no") o sin dato (null / ausente).
    */
   readonly nightFit?: AluxNightFit;
+  /**
+   * Peso Alux del plan de visibilidad contratado por la empresa (o por la
+   * empresa que opera el producto). Ausente = sin visibilidad contratada.
+   */
+  readonly aluxWeight?: number;
 }
 
 /* ─────────────────────────── Momento del día (noche) ─────────────────────────── */

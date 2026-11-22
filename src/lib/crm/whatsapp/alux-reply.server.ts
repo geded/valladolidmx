@@ -93,7 +93,7 @@ export const WHATSAPP_CHAT_RULES = `CANAL: WhatsApp. Escribes como una persona d
 REGLAS DE PLÁTICA (obligatorias)
 ${WHATSAPP_CONVERSATION_RULES}
 7. Sólo recomiendas lo que aparece en DATOS. Jamás inventes lugares, horarios, distancias, disponibilidad ni precios.
-8. Precios: sólo las experiencias tienen precio en Valladolid.mx; menciona un precio únicamente si aparece en DATOS como «Precio publicado». Hoteles, restaurantes, transporte, tours y paquetes no tienen precio aquí: explica que un concierge le consigue el mejor precio.
+8. Precios: lo único que se vende en línea en Valladolid.mx son las experiencias (y artesanías autorizadas) cuyo dato dice «Se vende en línea»; da ese precio tal cual. Si DATOS trae «Precio de referencia», puedes darlo aclarando que es sólo de referencia y que un concierge lo cotiza y le consigue el mejor precio. Sin precio en DATOS, no lo inventes. Si un dato dice «aliado recomendado» y encaja con lo que pide, menciónalo primero de su tipo como recomendado, sin forzarlo si no encaja.
 9. Cuando recomiendes algo concreto incluye su enlace tal como aparece en DATOS (máximo 2 enlaces) y pregunta si lo agregas a su viaje. Nunca digas que algo quedó agregado o reservado si la persona no dijo que sí.
 10. Ya tienes su WhatsApp: nunca pidas teléfono ni correo. Si no sabes su nombre, puedes preguntarlo una sola vez, cuando elija algo.
 11. Pase al concierge: si pide hablar con una persona, quiere reservar o comprar, una cotización o paquete, o que le armen el viaje completo, dile en una frase que un concierge sigue con él aquí mismo en breve. No prometas horarios.
@@ -146,12 +146,13 @@ function rank(
 
 function candidateLine(c: AluxConverseCandidate): string {
   const facts = c.facts
-    .slice(0, 4)
+    .slice(0, c.entityType === "product" ? 7 : 4)
     .map((f) => f.text)
     .join("; ");
   const scope = c.scope === "nearby" ? " · cercanía" : "";
   const night = c.nightFit === "yes" ? " · se vive de noche" : "";
-  return `- id="${c.entityId}" [${c.family}] ${c.title}${c.destinationLabel ? ` (${c.destinationLabel})` : ""}${scope}${night}${
+  const paid = (c.aluxWeight ?? 0) > 0 ? " · aliado recomendado" : "";
+  return `- id="${c.entityId}" [${c.family}] ${c.title}${c.destinationLabel ? ` (${c.destinationLabel})` : ""}${scope}${night}${paid}${
     c.summary ? ` — ${c.summary.slice(0, 200)}` : ""
   }${facts ? ` | ${facts}` : ""} | ${absolute(c.href)}`;
 }
@@ -224,6 +225,7 @@ export async function composeWhatsAppReply(input: ComposeInput): Promise<Compose
       .retrieveConverseCandidates(sb, {
         destinationSlug: primary,
         extraDestinationSlugs: mentioned.slice(1, 4),
+        searchText: query,
       })
       .catch(() => null),
     knowledge

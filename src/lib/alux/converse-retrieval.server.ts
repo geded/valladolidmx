@@ -37,6 +37,12 @@ import {
   type AluxConverseScope,
   type AluxUnavailableFactKind,
 } from "./converse-contract";
+import {
+  aluxWeightFromLevers,
+  extractSearchTerms,
+  prioritizeRows,
+  productOfferFacts,
+} from "./converse-priority";
 
 const TZ = "America/Merida";
 /** Ruta pública canónica de rutas editoriales (`src/routes/rutas.$slug.tsx`). */
@@ -63,10 +69,51 @@ export interface ConverseRetrievalInput {
     entityId: string;
   }[];
   readonly nowIso?: string;
+  /**
+   * Lo que pregunta la persona. Alux elige qué contenido leer según esas
+   * palabras (sin acentos) en lugar del corte alfabético.
+   */
+  readonly searchText?: string | null;
+}
+
+/** Prioridad compartida por todas las cargas de una misma pregunta. */
+interface RetrievalPriority {
+  readonly terms: readonly string[];
+  /** businessId → alux_weight del plan de visibilidad vigente. */
+  readonly weights: ReadonlyMap<string, number>;
+}
+
+const NO_PRIORITY: RetrievalPriority = { terms: [], weights: new Map() };
+
+/** Tope de empresas leídas por destino antes de elegir (no es el tope del modelo). */
+const BUSINESS_SCAN_LIMIT = 500;
+
+/**
+ * Empresas con visibilidad contratada vigente (vista pública
+ * `business_effective_visibility`). Si falla, Alux sigue sin prioridad pagada.
+ */
+async function loadPaidWeights(sb: SupabaseClient): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  try {
+    const { data } = await sb
+      .from("business_effective_visibility")
+      .select("business_id, levers, is_default")
+      .eq("is_default", false)
+      .limit(1000);
+    for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+      const weight = aluxWeightFromLevers(row["levers"]);
+      if (weight > 0 && typeof row["business_id"] === "string") out.set(row["business_id"], weight);
+    }
+  } catch {
+    /* sin prioridad pagada */
+  }
+  return out;
 }
 
 export interface ConverseRetrievalResult {
   readonly candidates: readonly AluxConverseCandidate[];
+  /** Palabras de búsqueda usadas (para ordenar lo que ve el modelo). */
+  readonly searchTerms: readonly string[];
   readonly destination: ConverseDestination | null;
   readonly knownDestinations: readonly ConverseDestination[];
   readonly familiesLoaded: readonly string[];
@@ -262,6 +309,7 @@ async function loadBusinessesFor(
   scope: AluxConverseScope,
   limit: number,
   requiredIds?: readonly string[],
+  priority: RetrievalPriority = NO_PRIORITY,
 ): Promise<{
   candidates: AluxConverseCandidate[];
   ids: string[];
@@ -278,10 +326,12 @@ async function loadBusinessesFor(
     .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
     .order("display_name", { ascending: true });
   if (requiredIds) query = query.in("id", [...requiredIds]);
-  const { data, error } = await query.limit(requiredIds ? Math.max(1, requiredIds.length) : limit);
+  const { data, error } = await query.limit(
+    requiredIds ? Math.max(1, requiredIds.length) : BUSINESS_SCAN_LIMIT,
+  );
   if (error || !data) return { candidates: [], ids: [], index: new Map() };
 
-  const rows = (data as Array<Record<string, unknown>>).map((row) => {
+  const allRows = (data as Array<Record<string, unknown>>).map((row) => {
     const cat = (row["business_categories"] as { slug?: unknown; name?: unknown } | null) ?? null;
     return {
       id: String(row["id"]),
@@ -294,6 +344,34 @@ async function loadBusinessesFor(
       categoryName: typeof cat?.name === "string" ? cat.name : "",
     };
   });
+  // Índice de TODAS las empresas publicadas: sus productos y experiencias
+  // siempre pueden llegar a Alux aunque la empresa no sea candidata.
+  const index = new Map<string, { slug: string; categorySlug: string; name: string }>();
+  const hrefBy = new Map<string, string>();
+  for (const r of allRows) {
+    const href = buildCanonicalEntityUrl({
+      entityType: "business",
+      slug: r.slug,
+      destinationSlug: destination.slug,
+      categorySlug: r.categorySlug,
+    });
+    if (!href) continue;
+    hrefBy.set(r.id, href);
+    index.set(r.id, { slug: r.slug, categorySlug: r.categorySlug, name: r.name });
+  }
+  const rows = requiredIds
+    ? allRows
+    : prioritizeRows(
+        allRows.filter((r) => hrefBy.has(r.id)),
+        {
+          limit,
+          terms: priority.terms,
+          idOf: (r) => r.id,
+          nameOf: (r) => r.name,
+          textOf: (r) => [r.name, r.tagline ?? "", r.description ?? "", r.categoryName].join(" "),
+          weightOf: (r) => priority.weights.get(r.id) ?? 0,
+        },
+      );
   const ids = rows.map((r) => r.id);
 
   const [hoursRes, locRes] = await Promise.all([
@@ -332,17 +410,11 @@ async function loadBusinessesFor(
       coordsBy.set(bid, { lat, lng });
   }
 
-  const index = new Map<string, { slug: string; categorySlug: string; name: string }>();
   const candidates: AluxConverseCandidate[] = [];
   for (const r of rows) {
-    const href = buildCanonicalEntityUrl({
-      entityType: "business",
-      slug: r.slug,
-      destinationSlug: destination.slug,
-      categorySlug: r.categorySlug,
-    });
+    const href = hrefBy.get(r.id);
     if (!href) continue;
-    index.set(r.id, { slug: r.slug, categorySlug: r.categorySlug, name: r.name });
+    const aluxWeight = priority.weights.get(r.id) ?? 0;
     const family = familyFromCategory(r.categorySlug);
     const facts: AluxConverseFact[] = [];
     const unavailable: AluxUnavailableFactKind[] = [];
@@ -376,9 +448,10 @@ async function loadBusinessesFor(
       coords: coordsBy.get(r.id) ?? null,
       openState: open.state,
       nightFit: nightFitFromHours(hoursBy.get(r.id)),
+      ...(aluxWeight > 0 ? { aluxWeight } : {}),
     });
   }
-  return { candidates, ids, index };
+  return { candidates, ids: Array.from(index.keys()), index };
 }
 
 async function enrichCatalog(
@@ -387,6 +460,7 @@ async function enrichCatalog(
   scope: AluxConverseScope,
   catalog: readonly AluxCanonicalCandidate[],
   businessIndex: ReadonlyMap<string, { slug: string; categorySlug: string; name: string }>,
+  priority: RetrievalPriority = NO_PRIORITY,
 ): Promise<AluxConverseCandidate[]> {
   const placeIds = catalog.filter((c) => c.entityKind === "place").map((c) => c.entityId);
   const productIds = catalog.filter((c) => c.entityKind === "product").map((c) => c.entityId);
@@ -411,7 +485,7 @@ async function enrichCatalog(
       ? sb
           .from("products")
           .select(
-            "id, business_id, product_type, price_amount, price_currency, duration_minutes, conversion_mode, filter_attributes",
+            "id, business_id, product_type, tagline, description, status, deleted_at, price_amount, price_currency, duration_minutes, capacity, conversion_mode, filter_attributes, direct_sale_enabled, direct_sale_price_amount, direct_sale_currency, direct_sale_min_lead_hours, direct_sale_cancellation_policy",
           )
           .in("id", productIds)
       : Promise.resolve({ data: [] as unknown[] }),
@@ -461,6 +535,8 @@ async function enrichCatalog(
     let openState: AluxConverseCandidate["openState"] = null;
     let nightFit: AluxConverseCandidate["nightFit"] = null;
     let subtitle: string | null = c.categoryName;
+    let summaryText: string | null = sanitizeCmsText(c.summary, 140) || null;
+    let aluxWeight = 0;
 
     if (c.entityKind === "place") {
       family = "lugar";
@@ -517,16 +593,30 @@ async function enrichCatalog(
         subtitle = operator;
       }
       if (p) {
+        aluxWeight = priority.weights.get(String(p["business_id"])) ?? 0;
+        // Ficha completa: frase corta + descripción (antes sólo una de las dos).
+        summaryText =
+          sanitizeCmsText(
+            [p["tagline"], p["description"]]
+              .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+              .join(" — "),
+            260,
+          ) || summaryText;
+        // Precio: venta en línea sólo experiencias; lo demás es referencia.
+        const offer = productOfferFacts(p);
+        const priceFact = offer.hasPrice ? (offer.facts[0] ?? null) : null;
+        const offerDetails = offer.hasPrice ? offer.facts.slice(1) : offer.facts;
+        if (priceFact) facts.push(fact(priceFact));
+        else unavailable.push("precio");
+        if (offer.sellsOnline) tags.push("venta-en-linea");
+        const dur = Number(p["duration_minutes"]);
+        if (Number.isFinite(dur) && dur > 0) facts.push(fact(`Duración: ${dur} min`));
+        else unavailable.push("duracion");
+        for (const detail of offerDetails) facts.push(fact(detail));
         if (typeof p["product_type"] === "string") {
           facts.push(fact(`Tipo: ${humanize(p["product_type"])}`));
           tags.push(normalizeText(p["product_type"]));
         }
-        const price = money(p["price_amount"], p["price_currency"]);
-        if (price) facts.push(fact(`Precio publicado: ${price}`));
-        else unavailable.push("precio");
-        const dur = Number(p["duration_minutes"]);
-        if (Number.isFinite(dur) && dur > 0) facts.push(fact(`Duración: ${dur} min`));
-        else unavailable.push("duracion");
         const attrs = attributeFacts(p["filter_attributes"]);
         facts.push(...attrs.facts);
         tags.push(...attrs.tags);
@@ -575,7 +665,7 @@ async function enrichCatalog(
       destinationSlug: destination.slug,
       destinationLabel: destination.name,
       scope,
-      summary: sanitizeCmsText(c.summary, 140) || null,
+      summary: summaryText,
       facts,
       unavailable,
       tags: [
@@ -590,6 +680,7 @@ async function enrichCatalog(
       coords: c.coords ? { lat: c.coords.lat, lng: c.coords.lng } : null,
       openState,
       nightFit,
+      ...(aluxWeight > 0 ? { aluxWeight } : {}),
     });
   }
   return out;
@@ -757,6 +848,7 @@ async function loadDestinationBundle(
   scope: AluxConverseScope,
   limits: { businesses: number; perFamily: number },
   selectedRefs?: ConverseRetrievalInput["selectedRefs"],
+  priority: RetrievalPriority = NO_PRIORITY,
 ): Promise<AluxConverseCandidate[]> {
   const idsOf = (type: AluxConverseCandidate["entityType"]) =>
     selectedRefs?.filter((ref) => ref.entityType === type).map((ref) => ref.entityId) ?? [];
@@ -776,6 +868,7 @@ async function loadDestinationBundle(
     scope,
     limits.businesses,
     selectedRefs ? requiredBusinessIds : undefined,
+    priority,
   );
   const catalog = await loadAluxCanonicalCandidates(sb, {
     destinationId: destination.id,
@@ -784,6 +877,7 @@ async function loadDestinationBundle(
     businessIndex: biz.index,
     limitPerFamily: limits.perFamily,
     includeDemoSeed: true,
+    ...(selectedRefs ? {} : { searchTerms: priority.terms, businessWeights: priority.weights }),
     requiredEntityIds: selectedRefs
       ? {
           place: idsOf("place"),
@@ -798,6 +892,7 @@ async function loadDestinationBundle(
     scope,
     catalog.candidates.filter((c) => c.entityKind !== "destination"),
     biz.index,
+    priority,
   );
   return [...biz.candidates, ...enriched];
 }
@@ -806,13 +901,16 @@ export async function retrieveConverseCandidates(
   sb: SupabaseClient,
   input: ConverseRetrievalInput,
 ): Promise<ConverseRetrievalResult> {
-  const { data: destRows } = await sb
-    .from("destinations")
-    .select("id, slug, name")
-    .eq("status", "published")
-    .is("deleted_at", null)
-    .order("name", { ascending: true })
-    .limit(40);
+  const [{ data: destRows }, weights] = await Promise.all([
+    sb
+      .from("destinations")
+      .select("id, slug, name")
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .order("name", { ascending: true })
+      .limit(40),
+    loadPaidWeights(sb),
+  ]);
   const sampledDestinations: ConverseDestination[] = (
     (destRows ?? []) as Array<Record<string, unknown>>
   )
@@ -846,6 +944,11 @@ export async function retrieveConverseCandidates(
     ).values(),
   );
   const bySlug = new Map(knownDestinations.map((d) => [d.slug, d] as const));
+  const searchTerms = extractSearchTerms(
+    input.searchText,
+    knownDestinations.flatMap((d) => [d.name, d.slug]),
+  );
+  const priority: RetrievalPriority = { terms: searchTerms, weights };
   const destination =
     (input.destinationSlug ? bySlug.get(input.destinationSlug) : undefined) ??
     knownDestinations.find((d) => selectedDestinationIds.has(d.id)) ??
@@ -893,11 +996,11 @@ export async function retrieveConverseCandidates(
         )
       : [];
     const [own, routes, destCandidates, ...extraBundles] = await Promise.all([
-      loadDestinationBundle(sb, destination, "destination", routeLimits),
+      loadDestinationBundle(sb, destination, "destination", routeLimits, undefined, priority),
       loadRoutes(sb, knownDestinations, destination, "destination", 6),
       loadDestinationCandidates(sb, others),
       ...extras.map(async (extra) => [
-        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits)),
+        ...(await loadDestinationBundle(sb, extra, "nearby", nearbyLimits, undefined, priority)),
         ...(await loadRoutes(sb, knownDestinations, extra, "nearby", 3)),
       ]),
     ]);
@@ -923,6 +1026,7 @@ export async function retrieveConverseCandidates(
       knownDestinations,
       familiesLoaded: Array.from(familiesLoaded),
       scope: "destination",
+      searchTerms,
     };
   }
 
@@ -934,6 +1038,7 @@ export async function retrieveConverseCandidates(
       knownDestinations,
       familiesLoaded: [],
       scope: "none",
+      searchTerms,
     };
   }
   // Muestra acotada por destino (empresas + catálogo) para poder proponer
@@ -942,7 +1047,9 @@ export async function retrieveConverseCandidates(
   const [destCandidates, routes, ...bundles] = await Promise.all([
     loadDestinationCandidates(sb, knownDestinations),
     loadRoutes(sb, knownDestinations, null, "region", 8),
-    ...sample.map((d) => loadDestinationBundle(sb, d, "region", { businesses: 8, perFamily: 3 })),
+    ...sample.map((d) =>
+      loadDestinationBundle(sb, d, "region", { businesses: 8, perFamily: 3 }, undefined, priority),
+    ),
   ]);
   const candidates = renumberFacts([
     ...collect(destCandidates),
@@ -955,5 +1062,6 @@ export async function retrieveConverseCandidates(
     knownDestinations,
     familiesLoaded: Array.from(familiesLoaded),
     scope: "region",
+    searchTerms,
   };
 }

@@ -128,6 +128,7 @@ export async function answerOwnerQuestion(question: string): Promise<string> {
     retrieval.retrieveConverseCandidates(sb, {
       destinationSlug: primary,
       extraDestinationSlugs: mentioned.slice(1, 4),
+      searchText: question,
     }),
     knowledge.retrieveAluxKnowledgeServer(supabaseAdmin, question, { matchCount: 4 }),
     aluxActivityBlock(supabaseAdmin).catch(() => ""),

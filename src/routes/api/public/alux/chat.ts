@@ -787,6 +787,21 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const { loadDestinationBriefServer, recordKnowledgeGapServer } =
           await import("@/lib/alux/knowledge-gaps.server");
         const destinationBrief = await loadDestinationBriefServer(supabaseAdmin, activeDestination);
+        // Catálogo publicado (empresas, experiencias, lugares, eventos) con la
+        // misma prioridad del Alux conversacional; si falla, sigue sin él.
+        const { loadPublicCatalogBlock } = await import("@/lib/alux/catalog-prompt.server");
+        const catalogBlock = await loadPublicCatalogBlock({
+          query: [
+            message,
+            ...history
+              .filter((m) => m.role === "user")
+              .slice(-2)
+              .map((m) => m.content),
+          ]
+            .join(" ")
+            .slice(0, 600),
+          destinationSlug: activeDestination,
+        });
 
         // 4e) Clima real (Ola A10 · Open-Meteo, sin API key).
         // Fuente: GPS del visitante si compartió ubicación; si no,
@@ -840,6 +855,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           embedBlock,
           knowledgeBlock,
           destinationBrief,
+          catalogBlock,
           nearbyBlock,
           eventsBlock,
           weatherBlock,

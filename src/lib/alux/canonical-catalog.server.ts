@@ -49,6 +49,7 @@ import {
 import { PILOT_NON_DEMO_FILTER } from "@/lib/omxds/pilot-allowlist";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/alux/proximity";
+import { prioritizeRows, productSellsOnline } from "@/lib/alux/converse-priority";
 import {
   nextEventOccurrence,
   normalizeExceptionDates,
@@ -132,7 +133,27 @@ export interface LoadCanonicalCandidatesInput {
   readonly requiredEntityIds?: Partial<
     Readonly<Record<"place" | "product" | "event" | "destination", readonly string[]>>
   >;
+  /**
+   * Alux conversacional · palabras de lo que pregunta la persona. Cuando se
+   * declara (aunque sea vacío), lugares y productos se eligen por prioridad
+   * (`converse-priority.ts`) en lugar del corte alfabético.
+   */
+  readonly searchTerms?: readonly string[];
+  /** Peso de visibilidad contratada por empresa (businessId → alux_weight). */
+  readonly businessWeights?: ReadonlyMap<string, number>;
 }
+
+/** Tamaño de lote para filtros `in` (mantiene la URL de lectura acotada). */
+const IN_CHUNK = 120;
+
+function chunks<T>(items: readonly T[], size = IN_CHUNK): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
+  return out;
+}
+
+/** Tope de lectura cuando se prioriza en memoria (no es el tope para el modelo). */
+const PRIORITIZED_SCAN_LIMIT = 300;
 
 export interface CanonicalCatalogResult {
   readonly candidates: readonly AluxCanonicalCandidate[];
@@ -178,11 +199,16 @@ export async function loadAluxCanonicalCandidates(
    */
   const businessCoords = new Map<string, AccreditedCoords>();
   if (input.publishedBusinessIds.length) {
-    const { data } = await sb
-      .from("business_locations")
-      .select("business_id, latitude, longitude, is_primary")
-      .in("business_id", input.publishedBusinessIds as string[]);
-    for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+    const results = await Promise.all(
+      chunks(input.publishedBusinessIds).map((ids) =>
+        sb
+          .from("business_locations")
+          .select("business_id, latitude, longitude, is_primary")
+          .in("business_id", ids),
+      ),
+    );
+    const data = results.flatMap((r) => (r.data ?? []) as Array<Record<string, unknown>>);
+    for (const row of data) {
       const bizId = clean(row.business_id);
       if (!bizId) continue;
       if (businessCoords.has(bizId) && row.is_primary !== true) continue;
@@ -205,9 +231,28 @@ export async function loadAluxCanonicalCandidates(
       .order("name", { ascending: true });
     const selected = requiredIds("place");
     if (selected) query = query.in("id", requiredOrSentinel("place"));
-    const { data, error } = await query.limit(selected ? Math.max(1, selected.length) : limit);
+    const prioritized = !selected && input.searchTerms !== undefined;
+    const { data, error } = await query.limit(
+      selected ? Math.max(1, selected.length) : prioritized ? PRIORITIZED_SCAN_LIMIT : limit,
+    );
 
-    const rows = error ? [] : (data ?? []);
+    const loadedRows = (error ? [] : (data ?? [])) as Array<Record<string, unknown>>;
+    const rows = prioritized
+      ? prioritizeRows(loadedRows, {
+          limit,
+          terms: input.searchTerms ?? [],
+          idOf: (row) => String(row.id),
+          nameOf: (row) => clean(row.official_name) || clean(row.name),
+          textOf: (row) =>
+            [
+              clean(row.name),
+              clean(row.official_name),
+              clean(row.short_description),
+              clean(row.description),
+              clean((row.place_types as { name?: unknown } | null)?.name),
+            ].join(" "),
+        })
+      : loadedRows;
     let eligible = 0;
     for (const row of rows as Array<Record<string, unknown>>) {
       const slug = clean(row.slug);
@@ -279,19 +324,55 @@ export async function loadAluxCanonicalCandidates(
 
   // ── Productos: experiencias, tours y producto genérico ──
   if (input.publishedBusinessIds.length) {
-    let query = sb
-      .from("products")
-      .select("id, slug, name, tagline, description, product_type, business_id")
-      .in("business_id", input.publishedBusinessIds as string[])
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .or(demoFilter)
-      .order("name", { ascending: true });
     const selected = requiredIds("product");
-    if (selected) query = query.in("id", requiredOrSentinel("product"));
-    const { data, error } = await query.limit(selected ? Math.max(1, selected.length) : limit * 2);
-
-    const rows = error ? [] : (data ?? []);
+    const prioritized = !selected && input.searchTerms !== undefined;
+    const productLimit = limit * 2;
+    const results = await Promise.all(
+      chunks(input.publishedBusinessIds).map((ids) => {
+        let query = sb
+          .from("products")
+          .select(
+            "id, slug, name, tagline, description, product_type, business_id, status, deleted_at, direct_sale_enabled, direct_sale_price_amount, visibility_level",
+          )
+          .in("business_id", ids)
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .or(demoFilter)
+          .order("name", { ascending: true });
+        if (selected) query = query.in("id", requiredOrSentinel("product"));
+        return query.limit(
+          selected
+            ? Math.max(1, selected.length)
+            : prioritized
+              ? PRIORITIZED_SCAN_LIMIT
+              : productLimit,
+        );
+      }),
+    );
+    const error = results.find((r) => r.error)?.error ?? null;
+    const loadedRows = results
+      .flatMap((r) => (r.data ?? []) as Array<Record<string, unknown>>)
+      .sort((a, b) => clean(a.name).localeCompare(clean(b.name), "es"));
+    const weights = input.businessWeights;
+    const rows = prioritized
+      ? prioritizeRows(loadedRows, {
+          limit: productLimit,
+          terms: input.searchTerms ?? [],
+          idOf: (row) => String(row.id),
+          nameOf: (row) => clean(row.name),
+          textOf: (row) =>
+            [clean(row.name), clean(row.tagline), clean(row.description), clean(row.product_type)].join(
+              " ",
+            ),
+          weightOf: (row) => weights?.get(clean(row.business_id)) ?? 0,
+          bonusOf: (row) =>
+            (productSellsOnline(row) ? 40 : 0) +
+            (row.product_type === "experiencia" ? 20 : 0) +
+            (row.visibility_level === "premium" ? 10 : row.visibility_level === "destacado" ? 6 : 0),
+        })
+      : selected
+        ? loadedRows
+        : loadedRows.slice(0, productLimit);
     let eligible = 0;
     for (const row of rows as Array<Record<string, unknown>>) {
       const slug = clean(row.slug);

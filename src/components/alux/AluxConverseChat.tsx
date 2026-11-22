@@ -939,6 +939,14 @@ function RecommendationCard({
             Cercanía
           </span>
         ) : null}
+        {rec.sponsored ? (
+          <span
+            className="rounded-full bg-muted px-2 py-0.5 text-foreground/80 normal-case tracking-normal"
+            title="Empresa con visibilidad contratada en Valladolid.mx"
+          >
+            Recomendado
+          </span>
+        ) : null}
         {inTrip ? (
           <span className="rounded-full bg-alux/10 px-2 py-0.5 text-alux normal-case tracking-normal">
             En Mi Viaje
