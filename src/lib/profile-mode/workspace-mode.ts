@@ -37,10 +37,11 @@ export function modeForPath(
 
 /**
  * Perfiles operativos que no deben ver piezas personales del viajero
- * (Mi Viaje, «Tu viaje», Mi Cuenta). Staff = editores y administración.
+ * (Mi Viaje, «Tu viaje», Mi Cuenta, «Agregar a Mi Viaje»). Staff = editores
+ * y administración; Empresa = anfitrión que sólo administra su negocio.
  */
 export function hidesTravelerSurfaces(mode: ProfileMode): boolean {
-  return mode === "staff";
+  return mode === "staff" || mode === "business";
 }
 
 /** Modo efectivo: el del panel actual; si no hay panel, el guardado. */

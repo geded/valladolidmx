@@ -45,6 +45,9 @@ describe("como Staff no se ve nada de Mi Viaje ni del perfil de viajero", () => 
   test("Staff oculta las piezas de viajero", () => {
     expect(hidesTravelerSurfaces("staff")).toBe(true);
   });
+  test("Empresa (anfitrión) oculta las piezas de viajero", () => {
+    expect(hidesTravelerSurfaces("business")).toBe(true);
+  });
   test("Viajero sí ve Mi Viaje", () => {
     expect(hidesTravelerSurfaces("traveler")).toBe(false);
   });
