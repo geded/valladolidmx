@@ -38,6 +38,7 @@ import {
 } from "@/lib/traveler/anonymous-draft";
 import { useProgressiveRegistration } from "@/lib/traveler/anonymous-draft/use-progressive-registration";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
+import { useHidesTravelerSurfaces } from "@/lib/profile-mode/use-profile-mode";
 
 export interface AddToTravelPlanButtonProps {
   kind: TravelItemKind;
@@ -91,7 +92,9 @@ export function AddToTravelPlanButton({
     title,
     mode: eligibilityMode,
   });
-  if (!eligibility.eligible) return null;
+  // Staff mode has no traveler panel: hide the personal trip action.
+  const hideForStaff = useHidesTravelerSurfaces();
+  if (!eligibility.eligible || hideForStaff) return null;
 
   const { user } = useAuth();
   const queryClient = useQueryClient();
