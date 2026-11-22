@@ -1,0 +1,160 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-112",
+  "title": "Reservaciones · Preventa: folio PRE-, personas, total, vigencia de 24 horas, ampliar, cancelar y reenviar, con el cobro actual de la plataforma",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Mensaje Founder del 2026-11-21 «Sigue el proceso de pago de la plataforma … debemos crear una sección en la parte de reservaciones que se llame preventa y ahí se van creando con su tiempo de caducidad, como está en Zaziltunich.app», y respuestas del 2026-11-22: vigencia 24 horas y solo pago total. Delta acotado: la preventa reutiliza el enlace de pago existente (crm_prospect_invites) con folio, personas, total, fecha y vigencia; pestaña «Preventa» junto a Reservaciones y entrada en el menú del Centro Concierge; #enlace acepta personas; /continuar muestra folio, total y vencimiento. Sin cambiar el cobro, el checkout, la tabla de Reservaciones existente, plantillas públicas ni publicación.",
+  "permissions": [
+    {
+      "operation": "create",
+      "path": "src/components/concierge/ReservationsTabs.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/crm/ProspectClosurePanel.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/closure.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/invites.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/presale-rules.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/presales.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/rules.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cron/jobs/crm-whatsapp.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/preventa.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/reservaciones.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/continuar.$token.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "create",
+      "path": "src/components/concierge/ReservationsTabs.tsx",
+      "sha256": "b792d9fb3a075d8302f85fbe681e3b307b8110dad4245d94529e55884c91de1d",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/crm/ProspectClosurePanel.tsx",
+      "sha256": "9e7b8768f8b24991627f06e10d9eb903a7fa46da85c38c6f440f1650aaa82a76",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/closure.functions.ts",
+      "sha256": "a23073cc17fdf21ad09bc27bb242aaf0e8dd217555b3002f4bf4fb0c77be07b0",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/invites.server.ts",
+      "sha256": "43bc7a1584e7cc429223b3d0d1865030c6ae178223e43bcfdf34ac6c7c5a4131",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/presale-rules.ts",
+      "sha256": "6ebcbf35a5991a4cb6ddc4ed04c92d884db0b4a8b304bf2dcc4afa69906dff4b",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/presales.functions.ts",
+      "sha256": "ff1667f1bdbffc395b8d3892cb3a544f4235f91954317f735dd78593941845ad",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts",
+      "sha256": "4f3a704fc56bc548e29dea25bca8e6c153284862dcc60bc477960e55368f1baa",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/rules.ts",
+      "sha256": "12a550ad31e72fcf2dc1085e91042d7c699cf5c56d4c9488876fc10db634b9c4",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/cron/jobs/crm-whatsapp.server.ts",
+      "sha256": "591beae0b13269abd411875beb274a7512236dc99b99361439072e7c5e36b6c4",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "eb97522903f7a97559fbecc9de58bdf13ea25440d15477dc2e02a9bd8a52dfbd",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/workspace/definitions/index.ts",
+      "sha256": "90dc49ac65ebaca549bd32a75d8b31e994e12888505aeba622b407aa281a99d9",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/concierge/preventa.tsx",
+      "sha256": "62afa7eb20dfe09cce22d9b884267032069a4be16fd78b1ec02509b299fde23a",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/reservaciones.tsx",
+      "sha256": "cdd3ab217b1127cc62ccd52eb92dc934047fcfb010deabe9ce1218a06dbf0f2a",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/continuar.$token.tsx",
+      "sha256": "f4806076064621272c0f138f84d4371dbc3eb21f38326bba820d5359be25b624",
+      "authority": "Founder · Preventa en Reservaciones (como en Zazil) · 2026-11-21"
+    }
+  ],
+  "public_routes": [],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun test scripts/omxds/crm/presale-rules.contract.test.ts",
+    "bun test scripts/omxds/crm/closure-rules.contract.test.ts",
+    "bun run typecheck"
+  ]
+}

@@ -36,6 +36,8 @@
 - [ ] Fase 2 · pendiente: «¿Te escribo por WhatsApp?» desde la web y el primer mensaje que retoma la plática (no construido).
 - [x] Fase 3 · Enlace personal (crear cuenta o pagar una experiencia con venta directa) que pasa al prospecto a Mi Viaje y CRM Arma tu viaje sin duplicar; etapas que avanzan solas con propuestas y pagos; Rescate de propuestas vencidas y Recontactos de 30 días en «Hoy»; comando #enlace.
 - [ ] Fase 3 · pendiente: respuestas del Founder sobre pago sin cuenta y si Alux escribe solo el recontacto (se usó «crea cuenta y paga» y «Alux escribe solo»); ningún mensaje real se envía hasta publicar y vincular el QR.
+- [x] Preventa (como en Zazil): sección «Preventa» junto a Reservaciones con folio PRE-, personas, total, vigencia de 24 horas por omisión, ampliar, cancelar y reenviar; una sola activa por cliente; solo pago total por el cobro actual de la plataforma.
+- [ ] Preventa · pendiente: confirmar qué enlace se pidió «de nuevo» (no se envió ninguno) y prueba con un pago real tras publicar.
 - [ ] Fase 3 · pendiente: control de gobernanza con tres archivos generados compartidos por autorizaciones anteriores (types, inventario de rutas, árbol de rutas) — requiere decisión del Founder.
 
 ## Monitor de visitantes y registro de viajeros · 2026-11-20
