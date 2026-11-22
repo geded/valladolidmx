@@ -5,7 +5,8 @@
  * Cumple VISUAL-GATES-CHECKLIST (12D): tokens semánticos, jerarquía clara,
  * estados vacíos y de error explícitos.
  */
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { CMS_SEARCH_DEBOUNCE_MS, shouldRunSearch } from "@/lib/cms/accent-search";
 import { getEditorialStatusLabel } from "@/lib/cms/editorial-language";
 
 export interface EntityColumn<Row> {
@@ -66,6 +67,26 @@ export function EntityListView<Row>(props: Props<Row>) {
   const inputId = useId();
   const [draft, setDraft] = useState(search);
 
+  // Si la búsqueda llega restaurada (al volver del editor), reflejarla.
+  const lastSearch = useRef(search);
+  useEffect(() => {
+    if (search !== lastSearch.current) {
+      lastSearch.current = search;
+      setDraft(search);
+    }
+  }, [search]);
+
+  // Buscar mientras escribes: desde 2 letras, sin Enter, con una breve espera.
+  useEffect(() => {
+    const next = draft.trim();
+    if (next === search || !shouldRunSearch(next)) return;
+    const t = window.setTimeout(() => {
+      lastSearch.current = next;
+      onSearchChange(next);
+    }, CMS_SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [draft, search, onSearchChange]);
+
   return (
     <section className="mx-auto w-full max-w-6xl min-w-0 overflow-x-clip">
       <header
@@ -121,6 +142,7 @@ export function EntityListView<Row>(props: Props<Row>) {
         }
         onSubmit={(e) => {
           e.preventDefault();
+          lastSearch.current = draft.trim();
           onSearchChange(draft.trim());
         }}
       >
@@ -136,7 +158,8 @@ export function EntityListView<Row>(props: Props<Row>) {
             type="search"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Filtrar por nombre…"
+            placeholder="Escribe 2 letras o más…"
+            autoComplete="off"
             className={
               toolbarVariant === "compact"
                 ? "h-10 w-full rounded-lg border border-border bg-background px-3 text-sm shadow-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
@@ -144,21 +167,12 @@ export function EntityListView<Row>(props: Props<Row>) {
             }
           />
         </div>
-        <button
-          type="submit"
-          className={
-            toolbarVariant === "compact"
-              ? "h-10 shrink-0 rounded-lg bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"
-              : "h-9 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95"
-          }
-        >
-          Aplicar
-        </button>
-        {search && (
+        {(search || draft) && (
           <button
             type="button"
             onClick={() => {
               setDraft("");
+              lastSearch.current = "";
               onSearchChange("");
             }}
             className={

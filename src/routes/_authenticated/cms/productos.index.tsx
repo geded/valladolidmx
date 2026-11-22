@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
@@ -10,6 +10,8 @@ import {
   CmsSelectFilter,
 } from "@/components/cms/CmsFilters";
 import { useCmsTerritory } from "@/lib/cms/territory-context";
+import { useCmsListField, useCmsListMemory } from "@/lib/cms/list-memory";
+import { missingContentOptions } from "@/lib/cms/missing-content";
 import { listProductsCms } from "@/lib/cms/reads.functions";
 
 type Row = {
@@ -32,9 +34,11 @@ export const Route = createFileRoute("/_authenticated/cms/productos/")({
 function ProductosPage() {
   const options = useCmsTerritoryOptions();
   const { territory } = useCmsTerritory();
-  const [businessId, setBusinessId] = useState("");
-  const [productType, setProductType] = useState("");
-  const [status, setStatus] = useState("");
+  const listMemory = useCmsListMemory("products.filters");
+  const [missing, setMissing] = useCmsListField(listMemory, "missing");
+  const [businessId, setBusinessId] = useCmsListField(listMemory, "businessId");
+  const [productType, setProductType] = useCmsListField(listMemory, "productType");
+  const [status, setStatus] = useCmsListField(listMemory, "status");
 
   // Las empresas del selector siguen el destino de trabajo activo.
   const businesses = useMemo(
@@ -60,6 +64,7 @@ function ProductosPage() {
         businessId: businessId || null,
         productType: productType || null,
         status: status || null,
+        missing: missing || null,
       }}
       filters={
         <>
@@ -85,6 +90,13 @@ function ProductosPage() {
               onChange={setStatus}
               allLabel="Todos los estados"
               options={CMS_STATUS_OPTIONS}
+            />
+            <CmsSelectFilter
+              label="Le falta"
+              value={missing}
+              onChange={setMissing}
+              allLabel="Ver todas"
+              options={missingContentOptions("products")}
             />
           </CmsFilterGrid>
         </>

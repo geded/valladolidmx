@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,6 +11,9 @@ import {
   type TerritorialZone,
 } from "@/lib/places/place-territory";
 import { useCmsTerritory } from "@/lib/cms/territory-context";
+import { useCmsListField, useCmsListMemory } from "@/lib/cms/list-memory";
+import { missingContentOptions } from "@/lib/cms/missing-content";
+import { CMS_SEARCH_DEBOUNCE_MS, shouldRunSearch } from "@/lib/cms/accent-search";
 
 export const Route = createFileRoute("/_authenticated/cms/lugares/")({
   head: () => ({
@@ -38,19 +41,34 @@ function LugaresPage() {
   const optionsFn = useServerFn(listPlaceFormOptions);
   const listFn = useServerFn(listPlacesCms);
 
-  const [search, setSearch] = useState("");
+  // Búsqueda y filtros se recuerdan al ir al editor y volver.
+  const listMemory = useCmsListMemory("places.filters");
+  const [search, setSearch] = useCmsListField(listMemory, "search");
+  const [missing, setMissing] = useCmsListField(listMemory, "missing");
+  // Lo que se escribe se busca solo, desde 2 letras y con una breve espera.
+  const [draft, setDraft] = useState("");
+  useEffect(() => {
+    if (listMemory.ready) setDraft(search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sólo al restaurar
+  }, [listMemory.ready]);
+  useEffect(() => {
+    const next = draft.trim();
+    if (!listMemory.ready || next === search || !shouldRunSearch(next)) return;
+    const t = window.setTimeout(() => setSearch(next), CMS_SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [draft, search, setSearch, listMemory.ready]);
   /* El destino y la zona de trabajo se recuerdan entre recargas y se comparten
      con el resto del CMS (empresas, productos, eventos). */
   const { territory, setDestination, setZone } = useCmsTerritory();
   const destinationId = territory.destinationId;
   const zoneId = territory.zoneId;
   const setZoneId = setZone;
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useCmsListField(listMemory, "status");
   /* Adenda 3: segmentación por taxonomía canónica (familia documental,
      `place_types` y `place_categories`). Sin etiquetas inventadas. */
-  const [family, setFamily] = useState("");
-  const [placeTypeId, setPlaceTypeId] = useState("");
-  const [categoryId, setCategoryId] = useState("");
+  const [family, setFamily] = useCmsListField(listMemory, "family");
+  const [placeTypeId, setPlaceTypeId] = useCmsListField(listMemory, "placeTypeId");
+  const [categoryId, setCategoryId] = useCmsListField(listMemory, "categoryId");
 
   const options = useQuery({
     queryKey: ["cms", "places", "options"],
@@ -80,8 +98,9 @@ function LugaresPage() {
       "cms",
       "places",
       "list",
-      { search, destinationId, zoneId, status, family, placeTypeId, categoryId },
+      { search, destinationId, zoneId, status, family, placeTypeId, categoryId, missing },
     ],
+    enabled: listMemory.ready,
     queryFn: () =>
       listFn({
         data: {
@@ -92,6 +111,7 @@ function LugaresPage() {
           attractionFamily: family || undefined,
           placeTypeId: placeTypeId || undefined,
           categoryId: categoryId || undefined,
+          missing: missing || undefined,
         },
       }),
   });
@@ -124,9 +144,11 @@ function LugaresPage() {
           <span className="text-xs font-medium text-foreground">Buscar</span>
           <input
             className={`${inputClass} mt-1.5`}
-            value={search}
-            placeholder="Nombre o slug…"
-            onChange={(e) => setSearch(e.target.value)}
+            type="search"
+            autoComplete="off"
+            value={draft}
+            placeholder="Escribe 2 letras o más…"
+            onChange={(e) => setDraft(e.target.value)}
           />
         </label>
         <label className="block">
@@ -221,6 +243,21 @@ function LugaresPage() {
             <option value="approved">Aprobado</option>
             <option value="published">Publicado</option>
             <option value="archived">Archivado</option>
+          </select>
+        </label>
+        <label className="block">
+          <span className="text-xs font-medium text-foreground">Le falta</span>
+          <select
+            className={`${inputClass} mt-1.5`}
+            value={missing}
+            onChange={(e) => setMissing(e.target.value)}
+          >
+            <option value="">Ver todos</option>
+            {missingContentOptions("places").map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
           </select>
         </label>
       </div>

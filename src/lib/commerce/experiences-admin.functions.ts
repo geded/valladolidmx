@@ -12,6 +12,7 @@
  * Autorización: requireSupabaseAuth + rol admin / super_admin / editor.
  */
 import { createServerFn } from "@tanstack/react-start";
+import { accentInsensitiveOr } from "@/lib/cms/accent-search";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -158,7 +159,10 @@ export const listCommerceExperiences = createServerFn({ method: "POST" })
         );
       if (data.sellable === "sellable") query = query.eq("direct_sale_enabled", true);
       if (data.sellable === "not_sellable") query = query.eq("direct_sale_enabled", false);
-      if (data.search) query = query.ilike("name", `%${data.search}%`);
+      if (data.search) {
+        const f = accentInsensitiveOr(["name", "slug"], data.search);
+        if (f) query = query.or(f);
+      }
 
       const { data: rows, error, count } = await query;
       if (error) throw new Error(error.message);

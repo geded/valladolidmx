@@ -1,10 +1,11 @@
-import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { CmsTerritoryBar, useCmsTerritoryOptions } from "@/components/cms/CmsTerritoryBar";
 import { CMS_STATUS_OPTIONS, CmsFilterGrid, CmsSelectFilter } from "@/components/cms/CmsFilters";
 import { useCmsTerritory } from "@/lib/cms/territory-context";
+import { useCmsListField, useCmsListMemory } from "@/lib/cms/list-memory";
+import { missingContentOptions } from "@/lib/cms/missing-content";
 import { listBusinessesCms } from "@/lib/cms/reads.functions";
 
 type Row = {
@@ -27,9 +28,11 @@ export const Route = createFileRoute("/_authenticated/cms/empresas/")({
 function EmpresasPage() {
   const options = useCmsTerritoryOptions();
   const { territory } = useCmsTerritory();
-  const [categoryId, setCategoryId] = useState("");
-  const [status, setStatus] = useState("");
-  const [verified, setVerified] = useState("");
+  const listMemory = useCmsListMemory("businesses.filters");
+  const [missing, setMissing] = useCmsListField(listMemory, "missing");
+  const [categoryId, setCategoryId] = useCmsListField(listMemory, "categoryId");
+  const [status, setStatus] = useCmsListField(listMemory, "status");
+  const [verified, setVerified] = useCmsListField(listMemory, "verified");
 
   const destinationName = (id: string | null) =>
     id ? (options.destinations.find((d) => d.id === id)?.name ?? "—") : "—";
@@ -45,6 +48,7 @@ function EmpresasPage() {
         destinationId: territory.destinationId || null,
         categoryId: categoryId || null,
         status: status || null,
+        missing: missing || null,
         verified: verified || null,
       }}
       filters={
@@ -64,6 +68,13 @@ function EmpresasPage() {
               onChange={setStatus}
               allLabel="Todos los estados"
               options={CMS_STATUS_OPTIONS}
+            />
+            <CmsSelectFilter
+              label="Le falta"
+              value={missing}
+              onChange={setMissing}
+              allLabel="Ver todas"
+              options={missingContentOptions("businesses")}
             />
             <CmsSelectFilter
               label="Verificadas"

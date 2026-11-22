@@ -5,13 +5,14 @@
  * No sustituye ni duplica el editor editorial de /cms/productos:
  * desde aquí se navega a la ficha comercial y al editor existente.
  */
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { CmsTerritoryBar, useCmsTerritoryOptions } from "@/components/cms/CmsTerritoryBar";
 import { CMS_STATUS_OPTIONS, CmsFilterGrid, CmsSelectFilter } from "@/components/cms/CmsFilters";
 import { useCmsTerritory } from "@/lib/cms/territory-context";
+import { useCmsListField, useCmsListMemory } from "@/lib/cms/list-memory";
 import {
   listCommerceExperiences,
   SELLABLE_PRODUCT_TYPES,
@@ -57,10 +58,11 @@ export const Route = createFileRoute("/_authenticated/cms/experiencias/")({
 function ExperienciasCmsPage() {
   const options = useCmsTerritoryOptions();
   const { territory } = useCmsTerritory();
-  const [businessId, setBusinessId] = useState("");
-  const [productType, setProductType] = useState("");
-  const [status, setStatus] = useState("");
-  const [sellable, setSellable] = useState("");
+  const listMemory = useCmsListMemory("experiences.filters");
+  const [businessId, setBusinessId] = useCmsListField(listMemory, "businessId");
+  const [productType, setProductType] = useCmsListField(listMemory, "productType");
+  const [status, setStatus] = useCmsListField(listMemory, "status");
+  const [sellable, setSellable] = useCmsListField(listMemory, "sellable");
 
   const businesses = useMemo(
     () =>

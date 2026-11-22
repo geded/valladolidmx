@@ -12,6 +12,8 @@
  *  - No se escribe contenido turístico real desde el código.
  */
 import { createServerFn } from "@tanstack/react-start";
+import { accentInsensitiveOr } from "@/lib/cms/accent-search";
+import { parseMissingContent } from "@/lib/cms/missing-content";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertAllowedTransition, type ContentStatus } from "@/lib/cms/workflow";
 import { ZONE_DESTINATION_MISMATCH, isSelectableZone } from "./place-territory";
@@ -142,6 +144,8 @@ interface ListPlacesInput {
   /** Adenda 3: familia documental del Inventario (tangible | intangible). */
   attractionFamily?: string;
   status?: string;
+  /** Filtro «Le falta» (foto, descripción, ubicación o barrio). */
+  missing?: string;
   limit?: number;
   offset?: number;
 }
@@ -177,7 +181,21 @@ export const listPlacesCms = createServerFn({ method: "POST" })
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
 
-    if (search) q = q.or(`name.ilike.%${search}%,slug.ilike.%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["name", "slug"], search);
+      if (f) q = q.or(f);
+    }
+    const missing = parseMissingContent("places", data.missing);
+    if (missing === "location") q = q.or("latitude.is.null,longitude.is.null");
+    if (missing === "zone") q = q.is("destination_zone_id", null);
+    if (missing === "description") q = q.or("description.is.null,description.eq.");
+    if (missing === "photo") {
+      const media = unwrap(
+        await (context as Ctx).supabase.from("place_media").select("place_id").limit(5000),
+      ) as Array<{ place_id: string }>;
+      const withPhoto = [...new Set(media.map((m) => m.place_id))];
+      if (withPhoto.length) q = q.not("id", "in", `(${withPhoto.join(",")})`);
+    }
     if (data.destinationId) q = q.eq("destination_id", data.destinationId);
     if (data.destinationZoneId) q = q.eq("destination_zone_id", data.destinationZoneId);
     if (data.placeTypeId) q = q.eq("place_type_id", data.placeTypeId);

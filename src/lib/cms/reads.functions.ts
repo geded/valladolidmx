@@ -10,6 +10,8 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { accentInsensitiveOr } from "@/lib/cms/accent-search";
+import { parseMissingContent } from "@/lib/cms/missing-content";
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
@@ -50,7 +52,10 @@ export const listRegionsCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("name", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["name"], search);
+      if (f) q = q.or(f);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -72,7 +77,10 @@ export const listDestinationsCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("name", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["name"], search);
+      if (f) q = q.or(f);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -96,7 +104,10 @@ export const listZonesCms = createServerFn({ method: "POST" })
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
     if (destinationId) q = q.eq("destination_id", destinationId);
-    if (search) q = q.ilike("name", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["name"], search);
+      if (f) q = q.or(f);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -118,7 +129,10 @@ export const listCategoriesCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("sort_order", { ascending: true })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("name", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["name"], search);
+      if (f) q = q.or(f);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -179,6 +193,7 @@ interface ListBusinessesInput extends ListInput {
   categoryId?: string;
   status?: string;
   verified?: string;
+  missing?: string;
 }
 
 export const listBusinessesCms = createServerFn({ method: "POST" })
@@ -195,11 +210,42 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("display_name", { ascending: true })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("display_name", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["display_name", "slug"], search);
+      if (f) q = q.or(f);
+    }
     if (data?.destinationId) q = q.eq("destination_id", data.destinationId);
     if (data?.status) q = q.eq("status", data.status as never);
     if (data?.verified === "yes") q = q.eq("verified", true);
     if (data?.verified === "no") q = q.eq("verified", false);
+    const missing = parseMissingContent("businesses", data?.missing);
+    if (missing === "photo") q = q.is("cover_media_id", null);
+    if (missing === "description") q = q.or("description.is.null,description.eq.");
+    if (missing === "location" || missing === "zone") {
+      // Empresas que ya tienen pin (o barrio) en alguna de sus ubicaciones.
+      const { data: locs, error: locError } = await context.supabase
+        .from("business_locations")
+        .select("business_id, latitude, longitude, destination_zone_id")
+        .limit(5000);
+      if (locError) throw locError;
+      const done = new Set(
+        (
+          (locs ?? []) as Array<{
+            business_id: string;
+            latitude: number | null;
+            longitude: number | null;
+            destination_zone_id: string | null;
+          }>
+        )
+          .filter((l) =>
+            missing === "location"
+              ? l.latitude != null && l.longitude != null
+              : l.destination_zone_id != null,
+          )
+          .map((l) => l.business_id),
+      );
+      if (done.size) q = q.not("id", "in", `(${[...done].join(",")})`);
+    }
     if (data?.categoryId) {
       // La categoría puede ser la principal o venir de la tabla de enlaces.
       const { data: links, error: linkError } = await context.supabase
@@ -225,6 +271,7 @@ interface ListProductsInput extends ListInput {
   businessId?: string;
   productType?: string;
   status?: string;
+  missing?: string;
 }
 
 export const listProductsCms = createServerFn({ method: "POST" })
@@ -239,10 +286,16 @@ export const listProductsCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("name", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["name", "slug"], search);
+      if (f) q = q.or(f);
+    }
     if (data?.businessId) q = q.eq("business_id", data.businessId);
     if (data?.productType) q = q.eq("product_type", data.productType as never);
     if (data?.status) q = q.eq("status", data.status as never);
+    const missing = parseMissingContent("products", data?.missing);
+    if (missing === "photo") q = q.is("cover_media_id", null);
+    if (missing === "description") q = q.or("description.is.null,description.eq.");
     if (data?.destinationId && !data?.businessId) {
       // Productos del destino = productos de las empresas de ese destino.
       const { data: bizRows, error: bizError } = await context.supabase
@@ -441,7 +494,10 @@ export const listReviewsCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("title", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["title"], search);
+      if (f) q = q.or(f);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };
@@ -469,7 +525,10 @@ export const listEventsCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("starts_at", { ascending: false })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("title", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["title"], search);
+      if (f) q = q.or(f);
+    }
     if (data?.destinationId) q = q.eq("destination_id", data.destinationId);
     if (data?.status) q = q.eq("status", data.status as never);
     if (data?.period === "upcoming") q = q.gte("starts_at", new Date().toISOString());
@@ -499,7 +558,10 @@ export const listEditorialRoutesCms = createServerFn({ method: "POST" })
       .is("deleted_at", null)
       .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
-    if (search) q = q.ilike("name", `%${search}%`);
+    if (search) {
+      const f = accentInsensitiveOr(["name"], search);
+      if (f) q = q.or(f);
+    }
     const { data: rows, count, error } = await q;
     if (error) throw error;
     return { rows: rows ?? [], total: count ?? 0, limit, offset };

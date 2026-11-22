@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { CmsEntityPage } from "@/components/cms/CmsEntityPage";
 import { StatusBadge } from "@/components/cms/EntityListView";
 import { CmsTerritoryBar, useCmsTerritoryOptions } from "@/components/cms/CmsTerritoryBar";
 import { CMS_STATUS_OPTIONS, CmsFilterGrid, CmsSelectFilter } from "@/components/cms/CmsFilters";
 import { useCmsTerritory } from "@/lib/cms/territory-context";
+import { useCmsListField, useCmsListMemory } from "@/lib/cms/list-memory";
 import { listEventsCms } from "@/lib/cms/reads.functions";
 
 type Row = {
@@ -28,8 +28,9 @@ export const Route = createFileRoute("/_authenticated/cms/eventos/")({
 function EventosCmsPage() {
   const options = useCmsTerritoryOptions();
   const { territory } = useCmsTerritory();
-  const [status, setStatus] = useState("");
-  const [period, setPeriod] = useState("");
+  const listMemory = useCmsListMemory("events.filters");
+  const [status, setStatus] = useCmsListField(listMemory, "status");
+  const [period, setPeriod] = useCmsListField(listMemory, "period");
 
   const destinationName = (id: string | null) =>
     id ? (options.destinations.find((d) => d.id === id)?.name ?? "—") : "—";

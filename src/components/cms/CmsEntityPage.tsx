@@ -1,11 +1,12 @@
 /**
  * CmsEntityPage — Adaptador entre una server fn de lectura y EntityListView.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EntityListView, type EntityColumn } from "@/components/cms/EntityListView";
 import type { ReactNode } from "react";
+import { useCmsListMemory } from "@/lib/cms/list-memory";
 
 interface ListResult<Row> {
   rows: Row[];
@@ -39,19 +40,30 @@ interface Props<Row> {
 
 export function CmsEntityPage<Row>(props: Props<Row>) {
   const callFn = useServerFn(props.fn);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
+  // Búsqueda y página se recuerdan al ir al editor y volver.
+  const memory = useCmsListMemory(props.queryKey);
+  const search = typeof memory.values.search === "string" ? memory.values.search : "";
+  const page = typeof memory.values.page === "number" ? memory.values.page : 1;
+  const { set } = memory;
+  const setSearch = useCallback((next: string) => set("search", next), [set]);
+  const setPage = useCallback((next: number) => set("page", next), [set]);
   const pageSize = props.pageSize ?? 50;
   const params = props.extraParams ?? {};
   const paramsKey = JSON.stringify(params);
 
-  // Cualquier cambio de búsqueda o filtro vuelve a la primera página.
+  // Cualquier cambio de búsqueda o filtro vuelve a la primera página
+  // (no al restaurar lo recordado).
+  const filterKey = `${search}|${paramsKey}`;
+  const lastFilterKey = useRef<string | null>(null);
   useEffect(() => {
-    setPage(1);
-  }, [search, paramsKey]);
+    if (!memory.ready) return;
+    if (lastFilterKey.current !== null && lastFilterKey.current !== filterKey) setPage(1);
+    lastFilterKey.current = filterKey;
+  }, [memory.ready, filterKey, setPage]);
 
   const query = useQuery<ListResult<Row>>({
     queryKey: ["cms", props.queryKey, { search, page, pageSize, ...params }],
+    enabled: memory.ready,
     queryFn: () =>
       callFn({
         data: {
