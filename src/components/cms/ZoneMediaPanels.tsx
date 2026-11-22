@@ -18,7 +18,7 @@ import {
   reorderZoneGallery,
   signZoneImageUpload,
 } from "@/lib/cms/zones-media.functions";
-import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
+import { prepareImageForRole, readImageDimensions, withRetry } from "@/lib/cms/image-upload";
 import { SinglePanel, GalleryPanel } from "@/components/cms/MediaUploadPanels";
 
 interface Props {
@@ -48,6 +48,7 @@ export function ZoneMediaPanels({ zoneId, onChanged }: Props) {
 
   const uploadOne = async (file: File, role: "hero" | "gallery") => {
     const prepared = await prepareImageForRole(file, role);
+    const dims = await readImageDimensions(prepared);
     await withRetry(async () => {
       const signed = await signFn({
         data: { zoneId, filename: prepared.name, contentType: prepared.type },
@@ -67,6 +68,8 @@ export function ZoneMediaPanels({ zoneId, onChanged }: Props) {
           alt: file.name,
           mime: prepared.type,
           sizeBytes: prepared.size,
+          width: dims.width,
+          height: dims.height,
         },
       });
       deriveVariantsInBackground(prepared, registered);

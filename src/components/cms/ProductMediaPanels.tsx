@@ -19,7 +19,7 @@ import {
   reorderProductGallery,
   signProductImageUpload,
 } from "@/lib/cms/products-media.functions";
-import { prepareImageForRole, withRetry } from "@/lib/cms/image-upload";
+import { prepareImageForRole, readImageDimensions, withRetry } from "@/lib/cms/image-upload";
 import { SinglePanel, GalleryPanel } from "@/components/cms/MediaUploadPanels";
 
 interface Props {
@@ -47,6 +47,7 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
 
   const uploadOne = async (file: File, role: "cover" | "gallery") => {
     const prepared = await prepareImageForRole(file, role);
+    const dims = await readImageDimensions(prepared);
     await withRetry(async () => {
       const signed = await signFn({
         data: {
@@ -70,6 +71,8 @@ export function ProductMediaPanels({ productId, onChanged }: Props) {
           alt: file.name,
           mime: prepared.type,
           sizeBytes: prepared.size,
+          width: dims.width,
+          height: dims.height,
         },
       });
       deriveVariantsInBackground(prepared, registered);

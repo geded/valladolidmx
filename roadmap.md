@@ -545,3 +545,9 @@
 - [x] Preguntas por WhatsApp contestadas con el contenido publicado y cifras de Alux (probado localmente: respuesta en ~7 s).
 - [x] Revisión programada cada minuto; pruebas 50 PASS, gobernanza PCA-2026-106 + anexos.
 - [ ] Funciona solo tras publicar (la revisión programada llama al sitio publicado).
+
+## Auditoría de carga de contenido en el CMS · 2026-11-22
+
+- [x] Productos y zonas guardan el tamaño de cada foto igual que empresas.
+- [ ] Ubicación en el mapa para zonas — espera respuesta del Founder.
+- [ ] Fotos para categorías — espera respuesta del Founder.
