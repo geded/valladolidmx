@@ -1,5 +1,7 @@
 /**
- * PullToRefreshIndicator — «Jalar para actualizar» en las páginas públicas.
+ * PullToRefreshIndicator — «Jalar para actualizar» en las páginas públicas y
+ * en los paneles (CMS, Portal, Concierge, Cuenta). Antes de actualizar pide a
+ * los formularios del CMS que guarden su respaldo local.
  *
  * Reutiliza el gesto oficial `usePullToRefresh` del Workspace Engine sobre el
  * scroll de la ventana. Sólo se activa en pantallas táctiles cuando la app está
@@ -13,6 +15,7 @@ import { useRouter } from "@tanstack/react-router";
 import { usePullToRefresh } from "@/components/workspace/hooks/gestures/usePullToRefresh";
 import logoSymbol from "@/assets/brand/logo-symbol.png.asset.json";
 import { cn } from "@/lib/utils";
+import { requestDraftFlush } from "@/pwa/unsaved-work";
 
 const THRESHOLD = 72;
 const MIN_SPIN_MS = 900;
@@ -70,6 +73,7 @@ export function PullToRefreshIndicator() {
     canStart: canStartAt,
     onRefresh: async () => {
       const started = Date.now();
+      requestDraftFlush();
       await Promise.allSettled([queryClient.invalidateQueries(), router.invalidate()]);
       const remaining = MIN_SPIN_MS - (Date.now() - started);
       if (remaining > 0) await new Promise((resolve) => window.setTimeout(resolve, remaining));

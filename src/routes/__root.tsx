@@ -466,7 +466,7 @@ function RootComponent() {
               <PublicChrome pathname={pathname} headerVariant={headerVariant} position="header" />
             ) : null}
             {!isAppShellRoute ? <OfflineBanner /> : null}
-            {!isAppShellRoute ? (
+            {!pathname.startsWith("/insertar/") ? (
               <React.Suspense fallback={null}>
                 <PullToRefreshIndicator />
               </React.Suspense>

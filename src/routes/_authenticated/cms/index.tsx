@@ -8,6 +8,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { EDITORIAL_STATUS_ORDER, getEditorialStatusLabel } from "@/lib/cms/editorial-language";
+import { useAuth } from "@/hooks/useAuth";
+import { canViewTravelOps } from "@/lib/admin/travel-ops-access";
 
 export const Route = createFileRoute("/_authenticated/cms/")({
   head: () => ({
@@ -122,6 +124,9 @@ const ENTITIES: EntityCard[] = [
 ];
 
 function CmsDashboard() {
+  const { roles } = useAuth();
+  /* «Viajes en curso» sólo se muestra a quien el servidor deja abrirlo. */
+  const entities = ENTITIES.filter((e) => e.key !== "travel_plans_ops" || canViewTravelOps(roles));
   return (
     <div className="mx-auto w-full max-w-5xl">
       <header className="border-b border-border pb-6">
@@ -173,7 +178,7 @@ function CmsDashboard() {
           Entidades gobernadas
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {ENTITIES.map((e) => (
+          {entities.map((e) => (
             <Link
               key={e.key}
               to={e.to}

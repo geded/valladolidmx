@@ -19,6 +19,8 @@ import { ActiveTravelPlansTable } from "@/components/admin/travel-plans/ActiveTr
 import { TravelPlanOperationalDrawer } from "@/components/admin/travel-plans/TravelPlanOperationalDrawer";
 import { AttentionQueue } from "@/components/admin/travel-plans/AttentionQueue";
 import { useSheetStack } from "@/components/workspace/sheets/SheetStackProvider";
+import { useAuth } from "@/hooks/useAuth";
+import { canViewTravelOps } from "@/lib/admin/travel-ops-access";
 
 export const Route = createFileRoute("/_authenticated/cms/travel-plans")({
   head: () => ({
@@ -31,10 +33,31 @@ export const Route = createFileRoute("/_authenticated/cms/travel-plans")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: TravelPlansOpsPage,
+  component: TravelPlansOpsGate,
 });
 
 const PAGE_SIZE = 25;
+
+/** Quien no tiene permiso (p. ej. un editor) ve un aviso claro, no errores. */
+function TravelPlansOpsGate() {
+  const { loading, roles } = useAuth();
+  if (loading && roles.length === 0) return null;
+  if (!canViewTravelOps(roles)) {
+    return (
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border bg-card p-6">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          Viajes en curso
+        </p>
+        <h1 className="mt-2 text-xl font-semibold">Esta sección es del equipo de concierge</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Sólo administración y concierge pueden ver los viajes de los viajeros. Como editor puedes
+          seguir trabajando con destinos, lugares, empresas y páginas.
+        </p>
+      </div>
+    );
+  }
+  return <TravelPlansOpsPage />;
+}
 
 function TravelPlansOpsPage() {
   const [kpi, setKpi] = useState<KpiFilter>(null);
