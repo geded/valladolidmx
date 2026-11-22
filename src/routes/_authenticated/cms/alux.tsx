@@ -178,6 +178,20 @@ function AluxConsolePage() {
           >
             💬 WhatsApp de Alux
           </Link>
+          <span className="mx-3 text-muted-foreground">·</span>
+          <Link
+            to="/cms/alux/entrenamiento"
+            className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
+          >
+            🧭 Entrenamiento por destino
+          </Link>
+          <span className="mx-3 text-muted-foreground">·</span>
+          <Link
+            to="/cms/alux/canales"
+            className="inline-flex items-center gap-2 text-sm underline underline-offset-4 hover:text-primary"
+          >
+            🔌 Dónde atiende Alux
+          </Link>
         </div>
       </header>
 

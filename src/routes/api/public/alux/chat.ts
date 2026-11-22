@@ -583,6 +583,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           pathContext?: PathContext;
           tripContext?: unknown;
           locale?: string;
+          surface?: string;
+          embedHost?: string;
         };
         try {
           body = await request.json();
@@ -622,6 +624,35 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (!apiKey) return json({ error: "missing_api_key" }, 500);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+        // Fase 4 · interruptores de canales: «Alux en Valladolid.mx» y
+        // «Alux en otras páginas» (solo sitios autorizados). Si la lectura
+        // falla, la página propia sigue atendiendo y la insertada no.
+        {
+          const ch = await import("@/lib/alux/channels.server");
+          const { channelsFromFlags, normalizeEmbedHost } = await import("@/lib/alux/channels");
+          const flags = await ch.readAluxSettingsFlagsServer(supabaseAdmin).catch(() => null);
+          const channels = channelsFromFlags(flags ?? {});
+          let allowed = channels.web;
+          if (body.surface === "embed") {
+            const host = normalizeEmbedHost(String(body.embedHost ?? ""));
+            const hosts = flags ? ch.embedHostsFromFlags(flags) : [];
+            allowed =
+              flags !== null &&
+              channels.embed &&
+              host !== null &&
+              hosts.some((h) => host === h || host.endsWith(`.${h}`));
+          }
+          if (!allowed) {
+            return json(
+              {
+                error: "alux_unavailable",
+                message: "Alux no está disponible en este momento. Escríbenos más tarde.",
+              },
+              503,
+            );
+          }
+        }
 
         // 1) Rate-limit atómico por IP.
         const { data: rate, error: rateErr } = await supabaseAdmin.rpc("alux_public_check_rate", {
@@ -729,6 +760,11 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           () => [],
         );
         const eventsBlock = eventsToPromptBlock(activeEvents);
+        // Fase 4 · ficha oficial del destino (Entrenamiento de Alux).
+        const { loadDestinationBriefServer, recordKnowledgeGapServer } = await import(
+          "@/lib/alux/knowledge-gaps.server"
+        );
+        const destinationBrief = await loadDestinationBriefServer(supabaseAdmin, activeDestination);
 
         // 4e) Clima real (Ola A10 · Open-Meteo, sin API key).
         // Fuente: GPS del visitante si compartió ubicación; si no,
@@ -780,6 +816,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           memoryBlock,
           temporal.block,
           knowledgeBlock,
+          destinationBrief,
           nearbyBlock,
           eventsBlock,
           weatherBlock,
@@ -857,6 +894,25 @@ export const Route = createFileRoute("/api/public/alux/chat")({
               tokens_out: tokensOut,
             });
             const newMessageCount = (sessionRow.message_count ?? 0) + 1;
+
+            // Fase 4 · si Alux admitió no tener el dato, queda para entrenarlo.
+            {
+              const { detectKnowledgeGap } = await import("@/lib/alux/knowledge-gaps");
+              const reason = detectKnowledgeGap({
+                question: message,
+                reply: text,
+                candidateCount: 1,
+                knowledgeMatches: matches.length,
+              });
+              if (reason) {
+                await recordKnowledgeGapServer(supabaseAdmin, {
+                  channel: "chat",
+                  destinationSlug: activeDestination,
+                  question: message,
+                  reason,
+                });
+              }
+            }
 
             // 6b) M3 · Refresco por SEÑALES DE VIAJE (concierge, no chatbot).
             const detected = detectSignals(message);

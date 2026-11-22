@@ -485,6 +485,10 @@ async function replyAsAlux(
   if (locked.error) throw new Error(`lock_failed: ${locked.error.message}`);
   if (locked.data !== true) return; // otra respuesta ya está en curso y verá estos mensajes
   try {
+    // Fase 4 · interruptor global «Alux en WhatsApp»: los mensajes quedan guardados
+    // para el concierge; solo Alux deja de contestar.
+    const { readAluxChannelsServer } = await import("@/lib/alux/channels.server");
+    if (!(await readAluxChannelsServer(admin)).whatsapp) return;
     for (let round = 0; round < 2; round++) {
       const { data: s } = await admin
         .from("alux_public_sessions")
@@ -589,6 +593,15 @@ async function replyAsAlux(
         knowledge_ids: result?.knowledgeIds ?? [],
         latency_ms: Date.now() - t0,
       });
+      if (result?.gap) {
+        const { recordKnowledgeGapServer } = await import("@/lib/alux/knowledge-gaps.server");
+        await recordKnowledgeGapServer(admin, {
+          channel: "whatsapp",
+          destinationSlug: result.gap.destinationSlug,
+          question: pending.map((m) => m.content).join(" "),
+          reason: result.gap.reason,
+        });
+      }
       const now = new Date().toISOString();
       await admin
         .from("alux_public_sessions")

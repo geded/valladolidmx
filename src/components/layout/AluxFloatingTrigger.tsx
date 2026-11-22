@@ -98,6 +98,7 @@ import { ShareSheet } from "@/components/share/ShareSheet";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
 import { useAluxBrand } from "@/lib/brand/brand-context";
+import { getAluxPublicChannels } from "@/lib/alux/channels.functions";
 
 function ContextChip({ slot }: { slot: AluxContextSlot }) {
   const content = (
@@ -117,6 +118,15 @@ function ContextChip({ slot }: { slot: AluxContextSlot }) {
 }
 
 export function AluxFloatingTrigger() {
+  // Fase 4 · interruptor «Alux en Valladolid.mx» (la respuesta también se apaga en el servidor).
+  const publicChannelsFn = useServerFn(getAluxPublicChannels);
+  const publicChannels = useQuery({
+    queryKey: ["alux-public-channels"],
+    queryFn: () => publicChannelsFn(),
+    staleTime: 60_000,
+    retry: false,
+  });
+  const webChannelOff = publicChannels.data?.web === false;
   const { t, locale } = useTranslation();
   const alux = useAluxBrand();
   const user = useOptionalAuth()?.user ?? null;
@@ -594,7 +604,7 @@ export function AluxFloatingTrigger() {
         data-alux-saved-items={String(unified.trip.savedItemCount)}
         data-alux-party-size={unified.trip.partySize == null ? "" : String(unified.trip.partySize)}
         data-alux-reason={unified.reason}
-        hidden={presence.shouldHide || (open && !minimized)}
+        hidden={webChannelOff || presence.shouldHide || (open && !minimized)}
         className="pointer-events-none fixed right-4 z-40 transition-[bottom] duration-300 md:right-6"
         style={{
           bottom: `calc(env(safe-area-inset-bottom, 0px) + ${1 + presence.bottomOffset / 16}rem)`,
@@ -649,7 +659,7 @@ export function AluxFloatingTrigger() {
       </div>
 
       <Sheet
-        open={open && !minimized}
+        open={!webChannelOff && open && !minimized}
         onOpenChange={(v) => {
           setMinimized(false);
           setOpen(v);

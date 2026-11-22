@@ -1,0 +1,5 @@
+# Alux rules
+
+- Channel switches: web, WhatsApp and embed on/off live as `channel_*` keys inside `alux_settings.flags` (`channels.ts`); a missing key means on, every writer merges flags instead of replacing them, and servers enforce them (`aluxConverse`, `/api/public/alux/chat`, WhatsApp reply and outbox), never only the UI. Why: one settings row, instant kill switch, older console saves cannot reset channels.
+- Training: a destination brief is the Knowledge Base entry `destino-<slug>` (category `destinos`) injected into web and WhatsApp prompts; unanswered questions go only through `recordKnowledgeGapServer` (PII-scrubbed, best-effort, service-role RPC) into `alux_knowledge_gaps`. Why: reuse the existing KB authority and never let training break or leak a reply.
+- Embed: partner sites load `public/alux-embed.js`, which checks `/api/public/alux/embed-status` and frames `/insertar/alux` (existing `PublicAluxChat`, no site chrome); only hosts listed in `flags.embed_hosts` get Alux. Why: one chat authority and controlled AI cost on third-party pages.

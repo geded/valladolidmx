@@ -39,6 +39,11 @@
 - [x] Preventa (como en Zazil): sección «Preventa» junto a Reservaciones con folio PRE-, personas, total, vigencia de 24 horas por omisión, ampliar, cancelar y reenviar; una sola activa por cliente; solo pago total por el cobro actual de la plataforma.
 - [x] Preventa · «de nuevo el enlace» = reenviar la preventa al cliente: ya existe con «Copiar enlace» y «Mandar por WhatsApp» en cada preventa (al reenviar se crea enlace nuevo y el anterior deja de servir).
 - [ ] Preventa · pendiente: prueba con un pago real tras publicar y vincular el QR de WhatsApp.
+- [x] Fase 4 · Estadísticas por canal (Hoy, 7 días, 30 días, Este mes, Todo; ventas, cobrado, con concierge, enlaces de pago; exportar a Excel).
+- [x] Fase 4 · Entrenamiento de Alux: ficha oficial de cada destino con etiquetas clave (aplica al instante en web y WhatsApp) y lista de preguntas que Alux no supo contestar.
+- [x] Fase 4 · Canales de Alux: interruptores para Alux en Valladolid.mx y WhatsApp; Instagram y Messenger como «sin conectar».
+- [x] Fase 4 · Código para poner la ventana de Alux en otras páginas web (pedido por el Founder 2026-11-22).
+- [ ] Fase 4 · pendiente: comparar las mismas preguntas con el Alux de Zazil (sin créditos de IA) y publicar con el visto bueno del Founder; el código para otras páginas funciona solo tras publicar.
 - [ ] Fase 3 · pendiente: control de gobernanza con tres archivos generados compartidos por autorizaciones anteriores (types, inventario de rutas, árbol de rutas) — requiere decisión del Founder.
 
 ## Monitor de visitantes y registro de viajeros · 2026-11-20

@@ -776,6 +776,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const settingsPromise = import("./settings.functions")
       .then((m) => m.resolveAluxSettingsServer(supabaseAdmin))
       .catch(() => null);
+    // Fase 4 · interruptor «Alux en Valladolid.mx» (si falla la lectura, sigue encendido).
+    const channelsPromise = import("./channels.server").then((m) =>
+      m.readAluxChannelsServer(supabaseAdmin),
+    );
     const retrieved = await retrieval.retrieveConverseCandidates(sb, {
       destinationSlug,
       declaredDestinationIds: selectedRoute?.declaredDestinationIds,
@@ -899,10 +903,37 @@ export const aluxConverse = createServerFn({ method: "POST" })
             .eq("id", session.id),
         ]);
       }
+      // Fase 4 · preguntas sin respuesta para entrenar a Alux (sin datos personales).
+      if (!channelOff && !injectionFlagged && !rateLimited) {
+        const gaps = await import("./knowledge-gaps");
+        const reason = gaps.detectKnowledgeGap({
+          question: message,
+          reply: response.text,
+          candidateCount: candidates.length,
+        });
+        if (reason) {
+          const { recordKnowledgeGapServer } = await import("./knowledge-gaps.server");
+          await recordKnowledgeGapServer(supabaseAdmin, {
+            channel: "web",
+            destinationSlug: ctx.destinationSlug,
+            question: message,
+            reason,
+          });
+        }
+      }
       return response;
     };
 
     // ── 6. Cortocircuitos determinísticos ───────────────────────────────
+    const channelOff = !(await channelsPromise).web;
+    if (channelOff) {
+      return settle(
+        composeDeterministicResponse(candidates, ctx, "unavailable", {
+          model: null,
+          latencyMs: Date.now() - startedAt,
+        }),
+      );
+    }
     if (injectionFlagged) {
       return settle(
         composeDeterministicResponse(candidates, ctx, "blocked", {
@@ -969,11 +1000,15 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const modelCandidates = [...selectedForModel, ...rankedCandidates];
 
     // ── 8. Modelo IA (proveedor y ajustes ya configurados) ──────────────
-    const [{ generateText }, { createLovableAiGatewayProvider }, settings] = await Promise.all([
-      import("ai"),
-      import("@/lib/ai-gateway.server"),
-      settingsPromise,
-    ]);
+    const [{ generateText }, { createLovableAiGatewayProvider }, settings, destinationBrief] =
+      await Promise.all([
+        import("ai"),
+        import("@/lib/ai-gateway.server"),
+        settingsPromise,
+        import("./knowledge-gaps.server").then((m) =>
+          m.loadDestinationBriefServer(supabaseAdmin, ctx.destinationSlug),
+        ),
+      ]);
     const model =
       settings?.capability_overrides?.["converse"]?.model ??
       settings?.default_model ??
@@ -981,7 +1016,12 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const persona =
       settings?.capability_overrides?.["converse"]?.persona ?? settings?.persona ?? null;
     const guardrails = settings?.guardrails ?? null;
-    const system = [persona, SYSTEM_RULES, guardrails ? `GUARDRAILS DEL CMS\n${guardrails}` : null]
+    const system = [
+      persona,
+      SYSTEM_RULES,
+      guardrails ? `GUARDRAILS DEL CMS\n${guardrails}` : null,
+      destinationBrief,
+    ]
       .filter(Boolean)
       .join("\n\n");
 

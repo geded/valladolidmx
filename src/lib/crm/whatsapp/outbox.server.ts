@@ -46,6 +46,9 @@ export async function processWhatsAppOutbox(
 ): Promise<{ sent: number; skipped: number; waiting: number }> {
   const out = { sent: 0, skipped: 0, waiting: 0 };
   if (!isDaytimeInMerida(opts.now)) return out;
+  // Fase 4 · con «Alux en WhatsApp» apagado los recontactos esperan; no se pierden.
+  const { readAluxChannelsServer } = await import("@/lib/alux/channels.server");
+  if (!(await readAluxChannelsServer(admin)).whatsapp) return out;
   const { data } = await admin
     .from("crm_whatsapp_outbox")
     .select("id, prospect_id, kind, attempts")

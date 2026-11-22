@@ -19,6 +19,8 @@ import {
   type AluxConverseCandidate,
 } from "@/lib/alux/converse-contract";
 import { formatForWhatsApp, toChatLanguage, type ChatLanguage, type HandoffReason } from "./rules";
+import { detectKnowledgeGap, type GapReason } from "@/lib/alux/knowledge-gaps";
+import { loadDestinationBriefServer } from "@/lib/alux/knowledge-gaps.server";
 
 const FALLBACK_MODEL = "google/gemini-3-flash-preview";
 const PUBLIC_ORIGIN = `https://www.${DEFAULT_PUBLIC_DOMAIN}`;
@@ -57,6 +59,8 @@ export interface ComposeResult {
   readonly addToTrip: readonly WhatsAppTripItem[];
   readonly model: string;
   readonly knowledgeIds: readonly string[];
+  /** Fase 4 · pregunta que Alux no pudo contestar (para Entrenamiento). */
+  readonly gap?: { readonly reason: GapReason; readonly destinationSlug: string | null } | null;
 }
 
 /** Reglas de plática heredadas de Zazil (R-23, R-28, R-57, R-64, R-75, R-76, R-88, R-102). */
@@ -182,7 +186,7 @@ export async function composeWhatsAppReply(input: ComposeInput): Promise<Compose
   const primary =
     mentioned[0] ?? (knownSlugs.includes("valladolid") ? "valladolid" : (knownSlugs[0] ?? null));
 
-  const [retrieved, matches, settings] = await Promise.all([
+  const [retrieved, matches, settings, destinationBrief] = await Promise.all([
     retrieval
       .retrieveConverseCandidates(sb, {
         destinationSlug: primary,
@@ -196,6 +200,7 @@ export async function composeWhatsAppReply(input: ComposeInput): Promise<Compose
       })
       .catch(() => []),
     aluxSettings.resolveAluxSettingsServer(supabaseAdmin).catch(() => null),
+    loadDestinationBriefServer(supabaseAdmin, primary),
   ]);
   const candidates = rank(
     query,
@@ -246,6 +251,7 @@ export async function composeWhatsAppReply(input: ComposeInput): Promise<Compose
   );
   const kb = knowledge.knowledgeToPromptBlock(matches, { locale: input.language ?? "es" });
   if (kb) context.push(kb);
+  if (destinationBrief) context.push(destinationBrief);
 
   const persona =
     settings?.persona ?? "Eres Alux, la inteligencia turística de Valladolid y el Oriente Maya.";
@@ -295,6 +301,16 @@ export async function composeWhatsAppReply(input: ComposeInput): Promise<Compose
     addToTrip,
     model,
     knowledgeIds: matches.map((m) => m.id),
+    gap: (() => {
+      if (!parsed || input.mediaOnly) return null;
+      const reason = detectKnowledgeGap({
+        question: pendingText,
+        reply: text,
+        candidateCount: candidates.length,
+        knowledgeMatches: matches.length,
+      });
+      return reason ? { reason, destinationSlug: primary } : null;
+    })(),
   };
 }
 

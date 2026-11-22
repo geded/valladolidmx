@@ -12,6 +12,15 @@ import { useState } from "react";
 import { CalendarClock, Check, MessageCircle, Phone } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { markRecontactDone } from "@/lib/crm/closure.functions";
+import { getProspectFunnel } from "@/lib/crm/funnel.functions";
+import {
+  FUNNEL_CHANNEL_LABEL,
+  FUNNEL_PERIODS,
+  FUNNEL_PERIOD_LABEL,
+  funnelToCsv,
+  type FunnelPeriod,
+  type FunnelRow,
+} from "@/lib/crm/funnel-rules";
 import { translateTranscriptToSpanish } from "@/lib/crm/whatsapp.functions";
 import { WhatsAppConversationPanel } from "@/components/crm/WhatsAppConversationPanel";
 import { meridaDateTime } from "@/lib/time/merida";
@@ -648,6 +657,8 @@ function StatsTab() {
       : 0;
   return (
     <div className="space-y-4">
+      <ChannelFunnel />
+      <h2 className="pt-2 text-sm font-semibold">Contactos que dejó Alux</h2>
       <div className="flex gap-2">
         {[7, 30, 90].map((n) => (
           <button
@@ -708,6 +719,136 @@ function Stat({ label, value, suffix }: { label: string; value: number; suffix?:
         {value}
         {suffix ?? ""}
       </span>
+      <span className="mt-0.5 block text-[11px] leading-tight text-muted-foreground">{label}</span>
+    </div>
+  );
+}
+
+const mxn = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+  maximumFractionDigits: 0,
+});
+const money = (cents: number) => mxn.format(cents / 100);
+
+/** Fase 4 · embudo y rentabilidad por canal, con exportación a Excel. */
+function ChannelFunnel() {
+  const fn = useServerFn(getProspectFunnel);
+  const [period, setPeriod] = useState<FunnelPeriod>("30d");
+  const q = useQuery({
+    queryKey: ["crm-prospect-funnel", period],
+    queryFn: () => fn({ data: { period } }),
+  });
+  const d = q.data;
+  const download = () => {
+    if (!d) return;
+    const csv = funnelToCsv(d, FUNNEL_PERIOD_LABEL[period]);
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ventas-por-canal-${period}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const rows: FunnelRow[] = d ? [...d.rows, d.total] : [];
+  return (
+    <section className="space-y-3 rounded-lg border border-border bg-card p-4" aria-label="Ventas por canal">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold">Ventas por canal</h2>
+        <button
+          type="button"
+          onClick={download}
+          disabled={!d}
+          className="inline-flex min-h-9 items-center rounded-full border border-border bg-background px-3 text-xs font-medium disabled:opacity-50"
+        >
+          Descargar para Excel
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Periodo">
+        {FUNNEL_PERIODS.map((p) => (
+          <button
+            key={p}
+            type="button"
+            aria-pressed={period === p}
+            onClick={() => setPeriod(p)}
+            className={[
+              "inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-medium",
+              period === p ? "border-primary bg-primary/10 text-primary" : "border-border bg-background",
+            ].join(" ")}
+          >
+            {FUNNEL_PERIOD_LABEL[p]}
+          </button>
+        ))}
+      </div>
+      {q.isError ? (
+        <p className="text-sm text-destructive">No se pudieron calcular las ventas. Intenta de nuevo.</p>
+      ) : q.isLoading || !d ? (
+        <p className="text-sm text-muted-foreground">Calculando…</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <Money label="Ventas" cents={d.total.soldCents} />
+            <Money label="Cobrado" cents={d.total.collectedCents} />
+            <Money label="Con ayuda del concierge" cents={d.total.withConciergeCents} />
+            <Money label="Solo con Alux" cents={d.total.aluxOnlyCents} />
+          </div>
+          <div className="-mx-4 overflow-x-auto px-4">
+            <table className="w-full min-w-[34rem] text-sm">
+              <thead>
+                <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <th className="py-1.5 pr-2 font-semibold">Canal</th>
+                  <th className="py-1.5 pr-2 text-right font-semibold">Pláticas</th>
+                  <th className="py-1.5 pr-2 text-right font-semibold">Dejaron datos</th>
+                  <th className="py-1.5 pr-2 text-right font-semibold">Compraron</th>
+                  <th className="py-1.5 pr-2 text-right font-semibold">De cada 100</th>
+                  <th className="py-1.5 text-right font-semibold">Ventas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr
+                    key={r.channel}
+                    className={r.channel === "total" ? "border-t border-border font-semibold" : ""}
+                  >
+                    <td className="py-1.5 pr-2">
+                      {r.channel === "total" ? "Total" : FUNNEL_CHANNEL_LABEL[r.channel]}
+                    </td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums">{r.conversations}</td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums">{r.prospects}</td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums">{r.buyers}</td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums">{r.conversionPct}%</td>
+                    <td className="py-1.5 text-right tabular-nums">{money(r.soldCents)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3 className="text-xs font-semibold">Enlaces de pago</h3>
+            <div className="mt-2 grid grid-cols-3 gap-2 md:grid-cols-5">
+              <Stat label="Generados" value={d.links.generated} />
+              <Stat label="Pagados" value={d.links.paid} />
+              <Stat label="Vigentes" value={d.links.active} />
+              <Stat label="Vencidos" value={d.links.expired} />
+              <Stat label="Cancelados" value={d.links.cancelled} />
+            </div>
+          </div>
+          <p className="text-[11px] leading-snug text-muted-foreground">
+            Una venta cuenta para un canal solo si se sabe con certeza de qué prospecto vino (por su
+            enlace de pago o por la cuenta que creó). Los reembolsos cuentan como venta, pero no como
+            cobrado.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
+function Money({ label, cents }: { label: string; cents: number }) {
+  return (
+    <div className="rounded-md border border-border bg-background p-3 shadow-soft">
+      <span className="block text-xl font-semibold tabular-nums">{money(cents)}</span>
       <span className="mt-0.5 block text-[11px] leading-tight text-muted-foreground">{label}</span>
     </div>
   );

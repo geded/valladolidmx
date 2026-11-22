@@ -122,6 +122,17 @@ export const updateAluxSettings = createServerFn({ method: "POST" })
     if (!isAdmin && !isSuper) throw new Error("Forbidden");
 
     const c = context.supabase as unknown as SupabaseLike;
+    // Conserva las claves que esta consola no edita (p. ej. interruptores de canales).
+    const current = await c
+      .from("alux_settings")
+      .select("flags")
+      .eq("singleton", true)
+      .maybeSingle();
+    const currentFlags =
+      ((current.data as { flags?: Record<string, unknown> } | null)?.flags as Record<
+        string,
+        unknown
+      > | null) ?? {};
     const { error } = await c
       .from("alux_settings")
       .update({
@@ -130,7 +141,7 @@ export const updateAluxSettings = createServerFn({ method: "POST" })
         default_model: data.default_model,
         temperature: data.temperature,
         max_tokens: data.max_tokens,
-        flags: data.flags,
+        flags: { ...currentFlags, ...data.flags },
       })
       .eq("singleton", true);
     if (error) throw new Error(error.message);

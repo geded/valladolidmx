@@ -53,6 +53,7 @@ import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-imag
 import { Route as ContinuarTokenRouteImport } from './routes/continuar.$token'
 import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
+import { Route as InsertarAluxRouteImport } from './routes/insertar.alux'
 import { Route as LSlugRouteImport } from './routes/l.$slug'
 import { Route as LovableBusinessMotherTemplatePreviewRouteImport } from './routes/lovable/business-mother-template-preview'
 import { Route as LovableContextEnginePreviewRouteImport } from './routes/lovable/context-engine-preview'
@@ -191,7 +192,9 @@ import { Route as ResenarNegocioSlugRouteImport } from './routes/resenar.negocio
 import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_authenticated/admin/sistema.index'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as AuthenticatedCmsAluxCalidadRouteImport } from './routes/_authenticated/cms/alux.calidad'
+import { Route as AuthenticatedCmsAluxCanalesRouteImport } from './routes/_authenticated/cms/alux.canales'
 import { Route as AuthenticatedCmsAluxConocimientoRouteImport } from './routes/_authenticated/cms/alux.conocimiento'
+import { Route as AuthenticatedCmsAluxEntrenamientoRouteImport } from './routes/_authenticated/cms/alux.entrenamiento'
 import { Route as AuthenticatedCmsAluxFeedbackRouteImport } from './routes/_authenticated/cms/alux.feedback'
 import { Route as AuthenticatedCmsCategoriasIndexRouteImport } from './routes/_authenticated/cms/categorias.index'
 import { Route as AuthenticatedCmsCategoriasNuevaRouteImport } from './routes/_authenticated/cms/categorias.nueva'
@@ -239,6 +242,7 @@ import { Route as AuthenticatedPortalResenasIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedPortalVentasEnLineaOrdenesRouteImport } from './routes/_authenticated/portal/ventas-en-linea.ordenes'
 import { Route as ApiCmsStudioMediaPreviewMediaIdRouteImport } from './routes/api/cms/studio-media-preview.$mediaId'
 import { Route as ApiPublicAluxChatRouteImport } from './routes/api/public/alux/chat'
+import { Route as ApiPublicAluxEmbedStatusRouteImport } from './routes/api/public/alux/embed-status'
 import { Route as ApiPublicAluxSignalRouteImport } from './routes/api/public/alux/signal'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
 import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
@@ -504,6 +508,11 @@ const EventosSlugRoute = EventosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => EventosRoute,
+} as any)
+const InsertarAluxRoute = InsertarAluxRouteImport.update({
+  id: '/insertar/alux',
+  path: '/insertar/alux',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LSlugRoute = LSlugRouteImport.update({
   id: '/l/$slug',
@@ -1301,10 +1310,22 @@ const AuthenticatedCmsAluxCalidadRoute =
     path: '/calidad',
     getParentRoute: () => AuthenticatedCmsAluxRoute,
   } as any)
+const AuthenticatedCmsAluxCanalesRoute =
+  AuthenticatedCmsAluxCanalesRouteImport.update({
+    id: '/canales',
+    path: '/canales',
+    getParentRoute: () => AuthenticatedCmsAluxRoute,
+  } as any)
 const AuthenticatedCmsAluxConocimientoRoute =
   AuthenticatedCmsAluxConocimientoRouteImport.update({
     id: '/conocimiento',
     path: '/conocimiento',
+    getParentRoute: () => AuthenticatedCmsAluxRoute,
+  } as any)
+const AuthenticatedCmsAluxEntrenamientoRoute =
+  AuthenticatedCmsAluxEntrenamientoRouteImport.update({
+    id: '/entrenamiento',
+    path: '/entrenamiento',
     getParentRoute: () => AuthenticatedCmsAluxRoute,
   } as any)
 const AuthenticatedCmsAluxFeedbackRoute =
@@ -1588,6 +1609,12 @@ const ApiPublicAluxChatRoute = ApiPublicAluxChatRouteImport.update({
   path: '/api/public/alux/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAluxEmbedStatusRoute =
+  ApiPublicAluxEmbedStatusRouteImport.update({
+    id: '/api/public/alux/embed-status',
+    path: '/api/public/alux/embed-status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAluxSignalRoute = ApiPublicAluxSignalRouteImport.update({
   id: '/api/public/alux/signal',
   path: '/api/public/alux/signal',
@@ -1873,6 +1900,7 @@ export interface FileRoutesByFullPath {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
+  '/insertar/alux': typeof InsertarAluxRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
@@ -2011,7 +2039,9 @@ export interface FileRoutesByFullPath {
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/alux/calidad': typeof AuthenticatedCmsAluxCalidadRoute
+  '/cms/alux/canales': typeof AuthenticatedCmsAluxCanalesRoute
   '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
+  '/cms/alux/entrenamiento': typeof AuthenticatedCmsAluxEntrenamientoRoute
   '/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
@@ -2043,6 +2073,7 @@ export interface FileRoutesByFullPath {
   '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
   '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
+  '/api/public/alux/embed-status': typeof ApiPublicAluxEmbedStatusRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
@@ -2138,6 +2169,7 @@ export interface FileRoutesByTo {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
+  '/insertar/alux': typeof InsertarAluxRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
@@ -2273,7 +2305,9 @@ export interface FileRoutesByTo {
   '/oriente-maya/$destino': typeof OrienteMayaDestinoIndexRoute
   '/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/cms/alux/calidad': typeof AuthenticatedCmsAluxCalidadRoute
+  '/cms/alux/canales': typeof AuthenticatedCmsAluxCanalesRoute
   '/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
+  '/cms/alux/entrenamiento': typeof AuthenticatedCmsAluxEntrenamientoRoute
   '/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
@@ -2304,6 +2338,7 @@ export interface FileRoutesByTo {
   '/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
   '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
+  '/api/public/alux/embed-status': typeof ApiPublicAluxEmbedStatusRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
@@ -2407,6 +2442,7 @@ export interface FileRoutesById {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
+  '/insertar/alux': typeof InsertarAluxRoute
   '/l/$slug': typeof LSlugRoute
   '/lovable/business-mother-template-preview': typeof LovableBusinessMotherTemplatePreviewRoute
   '/lovable/context-engine-preview': typeof LovableContextEnginePreviewRoute
@@ -2545,7 +2581,9 @@ export interface FileRoutesById {
   '/oriente-maya/$destino/': typeof OrienteMayaDestinoIndexRoute
   '/_authenticated/admin/sistema/usuarios': typeof AuthenticatedAdminSistemaUsuariosRoute
   '/_authenticated/cms/alux/calidad': typeof AuthenticatedCmsAluxCalidadRoute
+  '/_authenticated/cms/alux/canales': typeof AuthenticatedCmsAluxCanalesRoute
   '/_authenticated/cms/alux/conocimiento': typeof AuthenticatedCmsAluxConocimientoRoute
+  '/_authenticated/cms/alux/entrenamiento': typeof AuthenticatedCmsAluxEntrenamientoRoute
   '/_authenticated/cms/alux/feedback': typeof AuthenticatedCmsAluxFeedbackRoute
   '/_authenticated/cms/categorias/nueva': typeof AuthenticatedCmsCategoriasNuevaRoute
   '/_authenticated/cms/destinos/nueva': typeof AuthenticatedCmsDestinosNuevaRoute
@@ -2577,6 +2615,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/ventas-en-linea/ordenes': typeof AuthenticatedPortalVentasEnLineaOrdenesRoute
   '/api/cms/studio-media-preview/$mediaId': typeof ApiCmsStudioMediaPreviewMediaIdRoute
   '/api/public/alux/chat': typeof ApiPublicAluxChatRoute
+  '/api/public/alux/embed-status': typeof ApiPublicAluxEmbedStatusRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
@@ -2681,6 +2720,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/continuar/$token'
     | '/eventos/$slug'
+    | '/insertar/alux'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
     | '/lovable/context-engine-preview'
@@ -2819,7 +2859,9 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino/'
     | '/admin/sistema/usuarios'
     | '/cms/alux/calidad'
+    | '/cms/alux/canales'
     | '/cms/alux/conocimiento'
+    | '/cms/alux/entrenamiento'
     | '/cms/alux/feedback'
     | '/cms/categorias/nueva'
     | '/cms/destinos/nueva'
@@ -2851,6 +2893,7 @@ export interface FileRouteTypes {
     | '/portal/ventas-en-linea/ordenes'
     | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
+    | '/api/public/alux/embed-status'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
@@ -2946,6 +2989,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/continuar/$token'
     | '/eventos/$slug'
+    | '/insertar/alux'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
     | '/lovable/context-engine-preview'
@@ -3081,7 +3125,9 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino'
     | '/admin/sistema/usuarios'
     | '/cms/alux/calidad'
+    | '/cms/alux/canales'
     | '/cms/alux/conocimiento'
+    | '/cms/alux/entrenamiento'
     | '/cms/alux/feedback'
     | '/cms/categorias/nueva'
     | '/cms/destinos/nueva'
@@ -3112,6 +3158,7 @@ export interface FileRouteTypes {
     | '/portal/ventas-en-linea/ordenes'
     | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
+    | '/api/public/alux/embed-status'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
@@ -3214,6 +3261,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/continuar/$token'
     | '/eventos/$slug'
+    | '/insertar/alux'
     | '/l/$slug'
     | '/lovable/business-mother-template-preview'
     | '/lovable/context-engine-preview'
@@ -3352,7 +3400,9 @@ export interface FileRouteTypes {
     | '/oriente-maya/$destino/'
     | '/_authenticated/admin/sistema/usuarios'
     | '/_authenticated/cms/alux/calidad'
+    | '/_authenticated/cms/alux/canales'
     | '/_authenticated/cms/alux/conocimiento'
+    | '/_authenticated/cms/alux/entrenamiento'
     | '/_authenticated/cms/alux/feedback'
     | '/_authenticated/cms/categorias/nueva'
     | '/_authenticated/cms/destinos/nueva'
@@ -3384,6 +3434,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/ventas-en-linea/ordenes'
     | '/api/cms/studio-media-preview/$mediaId'
     | '/api/public/alux/chat'
+    | '/api/public/alux/embed-status'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
     | '/api/public/hooks/coupon-review-reminders'
@@ -3479,6 +3530,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
   ContinuarTokenRoute: typeof ContinuarTokenRoute
+  InsertarAluxRoute: typeof InsertarAluxRoute
   LSlugRoute: typeof LSlugRoute
   LovableBusinessMotherTemplatePreviewRoute: typeof LovableBusinessMotherTemplatePreviewRoute
   LovableContextEnginePreviewRoute: typeof LovableContextEnginePreviewRoute
@@ -3549,6 +3601,7 @@ export interface RootRouteChildren {
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
   ApiCmsStudioMediaPreviewMediaIdRoute: typeof ApiCmsStudioMediaPreviewMediaIdRoute
   ApiPublicAluxChatRoute: typeof ApiPublicAluxChatRoute
+  ApiPublicAluxEmbedStatusRoute: typeof ApiPublicAluxEmbedStatusRoute
   ApiPublicAluxSignalRoute: typeof ApiPublicAluxSignalRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
   ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
@@ -3878,6 +3931,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/eventos/$slug'
       preLoaderRoute: typeof EventosSlugRouteImport
       parentRoute: typeof EventosRoute
+    }
+    '/insertar/alux': {
+      id: '/insertar/alux'
+      path: '/insertar/alux'
+      fullPath: '/insertar/alux'
+      preLoaderRoute: typeof InsertarAluxRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/l/$slug': {
       id: '/l/$slug'
@@ -4845,11 +4905,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsAluxCalidadRouteImport
       parentRoute: typeof AuthenticatedCmsAluxRoute
     }
+    '/_authenticated/cms/alux/canales': {
+      id: '/_authenticated/cms/alux/canales'
+      path: '/canales'
+      fullPath: '/cms/alux/canales'
+      preLoaderRoute: typeof AuthenticatedCmsAluxCanalesRouteImport
+      parentRoute: typeof AuthenticatedCmsAluxRoute
+    }
     '/_authenticated/cms/alux/conocimiento': {
       id: '/_authenticated/cms/alux/conocimiento'
       path: '/conocimiento'
       fullPath: '/cms/alux/conocimiento'
       preLoaderRoute: typeof AuthenticatedCmsAluxConocimientoRouteImport
+      parentRoute: typeof AuthenticatedCmsAluxRoute
+    }
+    '/_authenticated/cms/alux/entrenamiento': {
+      id: '/_authenticated/cms/alux/entrenamiento'
+      path: '/entrenamiento'
+      fullPath: '/cms/alux/entrenamiento'
+      preLoaderRoute: typeof AuthenticatedCmsAluxEntrenamientoRouteImport
       parentRoute: typeof AuthenticatedCmsAluxRoute
     }
     '/_authenticated/cms/alux/feedback': {
@@ -5179,6 +5253,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/alux/chat'
       fullPath: '/api/public/alux/chat'
       preLoaderRoute: typeof ApiPublicAluxChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/alux/embed-status': {
+      id: '/api/public/alux/embed-status'
+      path: '/api/public/alux/embed-status'
+      fullPath: '/api/public/alux/embed-status'
+      preLoaderRoute: typeof ApiPublicAluxEmbedStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/alux/signal': {
@@ -5750,13 +5831,18 @@ const AuthenticatedPortalRouteRouteWithChildren =
 
 interface AuthenticatedCmsAluxRouteChildren {
   AuthenticatedCmsAluxCalidadRoute: typeof AuthenticatedCmsAluxCalidadRoute
+  AuthenticatedCmsAluxCanalesRoute: typeof AuthenticatedCmsAluxCanalesRoute
   AuthenticatedCmsAluxConocimientoRoute: typeof AuthenticatedCmsAluxConocimientoRoute
+  AuthenticatedCmsAluxEntrenamientoRoute: typeof AuthenticatedCmsAluxEntrenamientoRoute
   AuthenticatedCmsAluxFeedbackRoute: typeof AuthenticatedCmsAluxFeedbackRoute
 }
 
 const AuthenticatedCmsAluxRouteChildren: AuthenticatedCmsAluxRouteChildren = {
   AuthenticatedCmsAluxCalidadRoute: AuthenticatedCmsAluxCalidadRoute,
+  AuthenticatedCmsAluxCanalesRoute: AuthenticatedCmsAluxCanalesRoute,
   AuthenticatedCmsAluxConocimientoRoute: AuthenticatedCmsAluxConocimientoRoute,
+  AuthenticatedCmsAluxEntrenamientoRoute:
+    AuthenticatedCmsAluxEntrenamientoRoute,
   AuthenticatedCmsAluxFeedbackRoute: AuthenticatedCmsAluxFeedbackRoute,
 }
 
@@ -6100,6 +6186,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
   ContinuarTokenRoute: ContinuarTokenRoute,
+  InsertarAluxRoute: InsertarAluxRoute,
   LSlugRoute: LSlugRoute,
   LovableBusinessMotherTemplatePreviewRoute:
     LovableBusinessMotherTemplatePreviewRoute,
@@ -6190,6 +6277,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
   ApiCmsStudioMediaPreviewMediaIdRoute: ApiCmsStudioMediaPreviewMediaIdRoute,
   ApiPublicAluxChatRoute: ApiPublicAluxChatRoute,
+  ApiPublicAluxEmbedStatusRoute: ApiPublicAluxEmbedStatusRoute,
   ApiPublicAluxSignalRoute: ApiPublicAluxSignalRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
   ApiPublicHooksCouponReviewRemindersRoute:

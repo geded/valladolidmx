@@ -393,6 +393,8 @@ function RootComponent() {
     pathname.startsWith("/cuenta") ||
     pathname.startsWith("/concierge") ||
     pathname.startsWith("/empresa") ||
+    // Fase 4 CRM · ventana de Alux insertada en páginas de aliados (sin chrome del sitio).
+    pathname.startsWith("/insertar/") ||
     (pathname.startsWith("/lovable/founder-") &&
       pathname !== "/lovable/founder-home-premium-preview" &&
       pathname !== "/lovable/founder-zazil-premium-preview");
@@ -482,9 +484,11 @@ function RootComponent() {
                 <AluxFloatingTrigger />
               </React.Suspense>
             ) : null}
-            <React.Suspense fallback={null}>
-              <FloatingTravelPlanDock />
-            </React.Suspense>
+            {!pathname.startsWith("/insertar/") ? (
+              <React.Suspense fallback={null}>
+                <FloatingTravelPlanDock />
+              </React.Suspense>
+            ) : null}
             <React.Suspense fallback={null}>
               <AluxMemorySyncRunner />
             </React.Suspense>

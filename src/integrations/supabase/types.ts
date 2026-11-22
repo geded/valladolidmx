@@ -209,6 +209,62 @@ export type Database = {
         }
         Relationships: []
       }
+      alux_knowledge_gaps: {
+        Row: {
+          channel: string
+          created_at: string
+          destination_slug: string | null
+          id: string
+          knowledge_entry_id: string | null
+          last_seen_at: string
+          occurrences: number
+          question: string
+          question_key: string
+          reason: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          destination_slug?: string | null
+          id?: string
+          knowledge_entry_id?: string | null
+          last_seen_at?: string
+          occurrences?: number
+          question: string
+          question_key: string
+          reason?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          destination_slug?: string | null
+          id?: string
+          knowledge_entry_id?: string | null
+          last_seen_at?: string
+          occurrences?: number
+          question?: string
+          question_key?: string
+          reason?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alux_knowledge_gaps_knowledge_entry_id_fkey"
+            columns: ["knowledge_entry_id"]
+            isOneToOne: false
+            referencedRelation: "alux_knowledge_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alux_knowledge_translations: {
         Row: {
           body: string
@@ -8726,6 +8782,16 @@ export type Database = {
           hour_limit: number
         }[]
       }
+      alux_record_knowledge_gap: {
+        Args: {
+          _channel: string
+          _destination_slug: string
+          _question: string
+          _question_key: string
+          _reason: string
+        }
+        Returns: string
+      }
       alux_traveler_log_suggestion: {
         Args: { _capability: string; _meta: Json; _plan_id: string }
         Returns: string
@@ -11000,6 +11066,7 @@ export type Database = {
         | "eventos"
         | "pueblos_magicos"
         | "otros"
+        | "destinos"
       alux_knowledge_status: "draft" | "published" | "archived"
       app_role:
         | "traveler"
@@ -11294,6 +11361,7 @@ export const Constants = {
         "eventos",
         "pueblos_magicos",
         "otros",
+        "destinos",
       ],
       alux_knowledge_status: ["draft", "published", "archived"],
       app_role: [

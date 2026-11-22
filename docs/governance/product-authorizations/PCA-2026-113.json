@@ -1,0 +1,292 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-113",
+  "title": "CRM Prospectos · Fase 4: ventas por canal con exportación, entrenamiento de Alux por destino, preguntas sin respuesta, interruptores de canales y ventana de Alux para otras páginas",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.48-CRM-ALUX-PROSPECTOS-PROPOSAL-v1.0.md",
+  "founder_authority": "Mensaje Founder del 2026-11-21 «Pasemos a la siguiente fase» (Fase 4 del plan aprobado: embudo/rentabilidad por canal, entrenamiento y configuración de canales) y respuesta del 2026-11-22 «Sí, inclúyelo» al código para poner la ventana de Alux en otras páginas. Delta acotado: Estadísticas de CRM Prospectos gana «Ventas por canal» y descarga para Excel; Consola de Alux gana «Entrenamiento por destino» y «Dónde atiende Alux»; la ventana insertada reutiliza la plática pública de Alux. Instagram y Messenger se muestran sin conectar. Sin cambiar plantillas públicas, cobro, checkout, reservaciones ni publicación.",
+  "permissions": [
+    {
+      "operation": "modify",
+      "path": "src/components/alux/PublicAluxChat.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/AluxFloatingTrigger.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/channels.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/channels.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/channels.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/knowledge-gaps.server.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/knowledge-gaps.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/knowledge.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/settings.functions.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/training.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/AGENTS.md"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/funnel-rules.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/funnel.functions.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/alux-reply.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/outbox.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/alux.canales.tsx"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/alux.entrenamiento.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/api/public/alux/chat.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/AGENTS.md"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/alux/embed-status.ts"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/insertar.alux.tsx"
+    }
+  ],
+  "acknowledged_revisions": [
+    {
+      "operation": "modify",
+      "path": "src/components/alux/PublicAluxChat.tsx",
+      "sha256": "6040c8666abd8e189c269ed2357aa86b694688e19c7c2f4729862d912b791651",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/components/layout/AluxFloatingTrigger.tsx",
+      "sha256": "b6a9b0db5463c3856732aebc18f3036604aa3db6064c3f261ad92db611b89d62",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/channels.functions.ts",
+      "sha256": "cda39e10e6a978482c4fa3c57b2ef1b5b48e08bf27b0eeaea1f9a8cba1a529b0",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/channels.server.ts",
+      "sha256": "4d3f8cfc1ecf924b6c7919b0a3b06acbc5007a92c3cb7b08bcad7974bcaf0998",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/channels.ts",
+      "sha256": "a61646c3f39491cd049302f57e9e0e2c30d14e7487f515c2c7d69c4823c67bc2",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/converse.functions.ts",
+      "sha256": "17a9b454baa8133934ae39a098f470e1384e764edd205e05d60be40895571f94",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/knowledge-gaps.server.ts",
+      "sha256": "2b31186df80ea5f13da9248d6f862e9b9b8bc23ba30a89226cea5b7a293fd76b",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/knowledge-gaps.ts",
+      "sha256": "f0ca9c4464a40b692e5e29b5815cc3b6265d3358997051b05783eeabcc5d1332",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/knowledge.functions.ts",
+      "sha256": "d8b4700f874965c70d824549c36915679460e02850589ee9385648b42b86a9dc",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/alux/settings.functions.ts",
+      "sha256": "566757eedf905f3c8a7114274c08567d3298a32547d0110ae43b01570f2234e5",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/training.functions.ts",
+      "sha256": "9b4994fad7e740a4959bff0288ce6c97f4ceba9986784f2e7a58d39ca2b380e6",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/AGENTS.md",
+      "sha256": "a66690d118f22b9c202e804ed0028bbf318914396f5e22973bbcd3a559209d00",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/funnel-rules.ts",
+      "sha256": "6afb1c2740a77bd74cc995886659a0af3163bb5d1f5214bff18011aa7d970be9",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/crm/funnel.functions.ts",
+      "sha256": "f586a799efb3cbb37dbe10f4387883caddc21533371334683969d112014f97e3",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/alux-reply.server.ts",
+      "sha256": "2ce63a178677c59f03bae5ecb31b922a5b61888c21b3ba24009cc9a1a33424da",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/outbox.server.ts",
+      "sha256": "0c5be7892f2ceba00b0b4cc580c9c1febfa68fc2d7dc4b72f6b04fc718d64b7d",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/crm/whatsapp/process.server.ts",
+      "sha256": "0004c3bf83e3516977a47679f6344d98fa35d656eaee13248a3e167a7a45f7e1",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/lib/experience-builder/route-inventory.ts",
+      "sha256": "6bd9a3a7144656b4a5f4b615d92c43fe06d680f5caf7ee3450cff8b06e045a46",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/__root.tsx",
+      "sha256": "8eb758d716a088e97689fdc17bb619f86bc03ca71bdf4c5a6b63fb8435c33e0a",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/alux.canales.tsx",
+      "sha256": "157dc522dbbbf25247dfbfc3c9bfabac5593e37b887b5edc473663879d054cad",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/_authenticated/cms/alux.entrenamiento.tsx",
+      "sha256": "05898cca6e1b713bae5104eeb4a3b0613d5a08d352bb5399c832feacca1be9eb",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/cms/alux.tsx",
+      "sha256": "8ab82106eb3f52e5bf764130e70a9f5c750f4861cbd219df53689d25ba92d6eb",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/_authenticated/concierge/prospectos.index.tsx",
+      "sha256": "9f339040b55e022c2441727b71e2423a6d6e9031979632f1b171e35d3fc2c084",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "modify",
+      "path": "src/routes/api/public/alux/chat.ts",
+      "sha256": "bd3aa079ef130e71277b4ce62dd1839ea0d08fa92312a8144e69a80b1e600f10",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/lib/alux/AGENTS.md",
+      "sha256": "b8fe141f690870063eaf6b42ff06843bc5dce4b62cb4fb3b8c81e4b670d870d4",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/api/public/alux/embed-status.ts",
+      "sha256": "91a8714c1f2427403547decd41a081246ca6c6f507c834ee92310e4ff1318b3a",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    },
+    {
+      "operation": "create",
+      "path": "src/routes/insertar.alux.tsx",
+      "sha256": "73df6b1df9c11aa4537c9baba7ad042b0199e25619fedeeb211e1d199bb30902",
+      "authority": "Founder · CRM Fase 4 (embudo por canal, entrenamiento por destino, canales y código para otras páginas) · 2026-11-22"
+    }
+  ],
+  "public_routes": [
+    "/insertar/alux"
+  ],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bun test scripts/omxds/crm/funnel-rules.contract.test.ts",
+    "bun test scripts/omxds/crm/alux-training-channels.contract.test.ts",
+    "bun run typecheck"
+  ]
+}

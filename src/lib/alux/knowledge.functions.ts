@@ -43,6 +43,7 @@ export const ALUX_KNOWLEDGE_CATEGORIES = [
   "eventos",
   "pueblos_magicos",
   "otros",
+  "destinos",
 ] as const;
 
 export type AluxKnowledgeCategory = (typeof ALUX_KNOWLEDGE_CATEGORIES)[number];
