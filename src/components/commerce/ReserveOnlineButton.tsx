@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { listAvailableDepartures, startBooking } from "@/lib/commerce/booking.functions";
+import { getProductSaleInfo, storeOrderErrorMessage } from "@/lib/commerce/store-orders.functions";
+import { maxPurchasable } from "@/lib/commerce/store-catalog";
 import {
   calendarDayKey,
   defaultDepartureId,
@@ -60,6 +62,7 @@ export function ReserveOnlineButton({
   const navigate = useNavigate();
   const fetchDepartures = useServerFn(listAvailableDepartures);
   const reserve = useServerFn(startBooking);
+  const fetchSaleInfo = useServerFn(getProductSaleInfo);
 
   const [open, setOpen] = useState(false);
   const [day, setDay] = useState<string | null>(null);
@@ -75,6 +78,18 @@ export function ReserveOnlineButton({
   });
 
   const departures = useMemo(() => departuresQ.data ?? [], [departuresQ.data]);
+
+  // Tienda y pedidos para recoger: se compran por piezas, sin fecha.
+  const saleInfoQ = useQuery({
+    queryKey: ["commerce", "product-sale-info", productId],
+    queryFn: () => fetchSaleInfo({ data: { productId } }),
+    enabled: open,
+    staleTime: 30_000,
+  });
+  const byPieces = saleInfoQ.data?.mode === "tienda" || saleInfoQ.data?.mode === "pedidos";
+  const maxPieces = byPieces
+    ? maxPurchasable(saleInfoQ.data?.stock ?? null, saleInfoQ.data?.maxQuantity ?? null)
+    : 0;
 
   const days = useMemo(() => groupDeparturesByDay(departures), [departures]);
   const daysByKey = useMemo(() => new Map(days.map((item) => [item.key, item])), [days]);
@@ -130,15 +145,20 @@ export function ReserveOnlineButton({
       const res = await reserve({
         data: {
           productId,
-          departureId: departureId ?? null,
-          quantity: people,
+          departureId: byPieces ? null : (departureId ?? null),
+          quantity: byPieces ? Math.min(people, maxPieces) : people,
           clientRequestId: genId(),
         },
       });
       setOpen(false);
       navigate({ to: "/cuenta/checkout/$orderId", params: { orderId: res.order_id } });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "No pudimos apartar tus lugares");
+      const message = err instanceof Error ? err.message : "";
+      toast.error(
+        byPieces
+          ? storeOrderErrorMessage(message)
+          : message || "No pudimos apartar tus lugares",
+      );
     } finally {
       setBusy(false);
     }
@@ -153,13 +173,47 @@ export function ReserveOnlineButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[92dvh] w-[calc(100%-1rem)] overflow-y-auto p-4 sm:max-w-md sm:p-6">
           <DialogHeader>
-            <DialogTitle>Elige tu fecha</DialogTitle>
+            <DialogTitle>{byPieces ? "¿Cuántas quieres?" : "Elige tu fecha"}</DialogTitle>
             <DialogDescription>
-              Apartamos tus lugares mientras confirmas tu reservación.
+              {byPieces
+                ? "Revisa tu compra y confírmala en el siguiente paso."
+                : "Apartamos tus lugares mientras confirmas tu reservación."}
             </DialogDescription>
           </DialogHeader>
 
-          {departuresQ.isLoading ? (
+          {saleInfoQ.isLoading ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">Buscando…</p>
+          ) : byPieces ? (
+            maxPieces < 1 ? (
+              <div className="space-y-2 py-4 text-sm">
+                <p className="font-medium">Agotado por ahora.</p>
+                <p className="text-xs text-muted-foreground">
+                  Puedes pedir ayuda a tu concierge para saber cuándo vuelve a haber.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs font-medium uppercase text-muted-foreground">Cantidad</p>
+                <div className="flex items-center gap-3">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setPeople((p) => Math.max(1, p - 1))}>
+                    −
+                  </Button>
+                  <span className="min-w-8 text-center text-sm font-medium">{Math.min(people, maxPieces)}</span>
+                  <Button type="button" variant="outline" size="sm" onClick={() => setPeople((p) => Math.min(maxPieces, p + 1))}>
+                    +
+                  </Button>
+                  {saleInfoQ.data?.stock !== null && saleInfoQ.data?.stock !== undefined ? (
+                    <span className="text-xs text-muted-foreground">
+                      {saleInfoQ.data.stock === 1 ? "Queda 1 pieza" : `Quedan ${saleInfoQ.data.stock} piezas`}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Pagas en línea y lo recoges en el local. Muestra tu folio al llegar.
+                </p>
+              </div>
+            )
+          ) : departuresQ.isLoading ? (
             <p className="py-6 text-center text-sm text-muted-foreground">Buscando horarios…</p>
           ) : departures.length === 0 ? (
             <div className="space-y-2 py-4 text-sm">
@@ -258,8 +312,11 @@ export function ReserveOnlineButton({
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleReserve} disabled={busy || !departureId}>
-              {busy ? "Apartando lugares…" : "Continuar"}
+            <Button
+              onClick={handleReserve}
+              disabled={busy || (byPieces ? maxPieces < 1 : !departureId)}
+            >
+              {busy ? (byPieces ? "Preparando…" : "Apartando lugares…") : "Continuar"}
             </Button>
           </DialogFooter>
         </DialogContent>

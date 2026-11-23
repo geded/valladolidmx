@@ -150,10 +150,14 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
    * publicada), en el orden del editor. Precio sólo de referencia.
    */
   menu?: MarketplaceMenuItem[];
+  /** Fase 2 · la empresa tiene «Pedidos para recoger» activado en su página. */
+  menu_ordering?: boolean;
 }
 
 /** Platillo o bebida de la carta pública. */
 export interface MarketplaceMenuItem {
+  /** Identidad del platillo (sólo se usa para pedir en línea). */
+  id?: string;
   section: string;
   name: string;
   description: string | null;
@@ -170,13 +174,14 @@ export async function readPublishedMenu(
   try {
     const { data } = await supabase
       .from("business_menu_items")
-      .select("section, name, description, price_amount, price_currency, tags")
+      .select("id, section, name, description, price_amount, price_currency, tags")
       .eq("business_id", businessId)
       .eq("is_available", true)
       .order("section_order", { ascending: true })
       .order("sort_order", { ascending: true })
       .limit(400);
     return ((data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+      ...(typeof r["id"] === "string" ? { id: r["id"] } : {}),
       section: String(r["section"] ?? "Carta"),
       name: String(r["name"] ?? ""),
       description: typeof r["description"] === "string" ? r["description"] : null,
@@ -1554,10 +1559,18 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     if (await vb.shouldServePublicVariants())
       Object.assign(productCoverAssets, await vb.attachReadyVariants(productVariantBases));
     const menu = await readPublishedMenu(supabase as never, String(biz.id));
+    const menuOrdering =
+      menu.length > 0 &&
+      businessAllowsOnlineSale(
+        (await fetchPublicOnlineSales(supabase, [String(biz.id)])).get(String(biz.id)) ?? null,
+        "restaurante",
+        "pagina",
+      );
     return {
       id: String(biz.id),
       media: detailMedia,
       menu,
+      menu_ordering: menuOrdering,
       slug: String(biz.slug),
       display_name: String(biz.display_name),
       tagline: typeof biz.tagline === "string" ? biz.tagline : "",

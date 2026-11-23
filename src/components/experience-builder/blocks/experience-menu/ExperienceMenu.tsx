@@ -3,18 +3,25 @@
  * Secciones como pastillas desplazables, lista nombre/precio y la carta
  * completa sólo al pedirla. Sin JSX de datos: todo llega en el DTO.
  */
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import type { ExperienceMenuDTO } from "@/lib/experience-builder/blocks/experience-menu/contract";
+import type {
+  ExperienceMenuDTO,
+  ExperienceMenuItem,
+} from "@/lib/experience-builder/blocks/experience-menu/contract";
 
 export interface ExperienceMenuProps {
   dto: ExperienceMenuDTO;
   className?: string;
+  /** 1.1.0 · acción por platillo (pedir en línea); sin ella la carta no cambia. */
+  renderItemAction?: (item: ExperienceMenuItem) => ReactNode;
+  /** 1.1.0 · contenido al pie de la carta (resumen del pedido). */
+  footer?: ReactNode;
 }
 
 const ALL = "__toda__";
 
-export function ExperienceMenu({ dto, className }: ExperienceMenuProps) {
+export function ExperienceMenu({ dto, className, renderItemAction, footer }: ExperienceMenuProps) {
   const [active, setActive] = useState<string>(ALL);
   const [expanded, setExpanded] = useState(false);
   const total = dto.sections.reduce((sum, s) => sum + s.items.length, 0);
@@ -74,7 +81,14 @@ export function ExperienceMenu({ dto, className }: ExperienceMenuProps) {
                     <li key={`${section.id}-${i}`} className="py-2.5">
                       <div className="flex items-baseline justify-between gap-3">
                         <span className="min-w-0 font-medium text-foreground">{item.name}</span>
-                        {item.priceLabel ? (
+                        {renderItemAction ? (
+                          <span className="flex shrink-0 items-center gap-2">
+                            {item.priceLabel ? (
+                              <span className="tabular-nums text-foreground">{item.priceLabel}</span>
+                            ) : null}
+                            {renderItemAction(item)}
+                          </span>
+                        ) : item.priceLabel ? (
                           <span className="shrink-0 tabular-nums text-foreground">{item.priceLabel}</span>
                         ) : null}
                       </div>
@@ -113,6 +127,7 @@ export function ExperienceMenu({ dto, className }: ExperienceMenuProps) {
 
         <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">{dto.footnote}</p>
       </div>
+      {footer}
     </section>
   );
 }

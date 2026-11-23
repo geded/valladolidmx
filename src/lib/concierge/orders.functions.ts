@@ -54,6 +54,8 @@ export interface ConciergeOrderView {
   cancelled_at: string | null;
   created_at: string;
   items: ConciergeOrderItemView[];
+  /** Ventas en línea · fase 2: pedido de tienda o carta que se recoge en el local. */
+  pickup?: boolean;
 }
 
 // ---------- crear orden desde propuesta ----------
@@ -118,15 +120,20 @@ export const getConciergeOrder = createServerFn({ method: "GET" })
     const { data: items, error: iErr } = await context.supabase
       .from("concierge_order_items")
       .select(
-        "id, title, description, quantity, unit_amount, currency, subtotal_amount, business_id, entity_kind, entity_id",
+        "id, title, description, quantity, unit_amount, currency, subtotal_amount, business_id, entity_kind, entity_id, metadata",
       )
       .eq("order_id", data.orderId)
       .order("created_at", { ascending: true });
     if (iErr) throw new Error(iErr.message);
 
+    const rows = (items ?? []) as unknown as Array<ConciergeOrderItemView & { metadata?: unknown }>;
+    const pickup =
+      rows.length > 0 &&
+      rows.every((r) => (r.metadata as { fulfillment?: unknown } | null)?.fulfillment === "recoger");
     return {
       ...(order as unknown as Omit<ConciergeOrderView, "items">),
-      items: (items ?? []) as unknown as ConciergeOrderItemView[],
+      items: rows.map(({ metadata: _m, ...item }) => item),
+      pickup,
     };
   });
 

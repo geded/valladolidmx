@@ -36,6 +36,7 @@ import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experie
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
 import { ExperienceMenu } from "@/components/experience-builder/blocks/experience-menu/ExperienceMenu";
+import { MenuOrderCart } from "@/components/commerce/MenuOrderCart";
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
@@ -958,7 +959,7 @@ export function BusinessSurface({
 
       {menuDto ? (
         <section id="menu" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
-          <ExperienceMenu dto={menuDto} />
+          {menuDto.capabilities.ordering ? <MenuOrderCart dto={menuDto} /> : <ExperienceMenu dto={menuDto} />}
         </section>
       ) : null}
 

@@ -134,6 +134,20 @@
       "when": 1795458001920,
       "tag": "0018_business_online_sales_public_read",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795459752160,
+      "tag": "0019_online_sales_store_stock",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1795459889933,
+      "tag": "0020_online_sales_menu_orders_and_store_products",
+      "breakpoints": true
     }
   ]
 }

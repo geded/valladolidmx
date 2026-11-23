@@ -92,6 +92,8 @@ function CheckoutPage() {
   }
 
   const order: ConciergeOrderView = orderQ.data;
+  // Tienda y pedidos para recoger: mismo flujo, palabras de pedido.
+  const pickup = order.pickup === true;
 
   const isFinal =
     order.status === "paid" ||
@@ -207,7 +209,7 @@ function CheckoutPage() {
       )}
 
       <section className="mt-8 rounded-lg border border-border bg-card p-5">
-        <h2 className="font-serif text-xl">Tu itinerario</h2>
+        <h2 className="font-serif text-xl">{pickup ? "Tu pedido" : "Tu itinerario"}</h2>
         <ul className="mt-4 divide-y divide-border">
           {order.items.map((it) => (
             <li key={it.id} className="flex items-start justify-between gap-4 py-3">
@@ -228,7 +230,9 @@ function CheckoutPage() {
         </ul>
 
         <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-          <span className="text-sm text-muted-foreground">Total del viaje</span>
+          <span className="text-sm text-muted-foreground">
+            {pickup ? "Total del pedido" : "Total del viaje"}
+          </span>
           <span className="font-serif text-2xl">{money(order.total_amount, order.currency)}</span>
         </div>
       </section>
@@ -295,10 +299,11 @@ function CheckoutPage() {
         </section>
       ) : (
         <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
-          <h3 className="font-serif text-lg">Confirmemos tu viaje</h3>
+          <h3 className="font-serif text-lg">{pickup ? "Confirma tu pedido" : "Confirmemos tu viaje"}</h3>
           <p className="mt-2 text-sm text-foreground/80">
-            Al confirmar reservamos tu experiencia con los anfitriones seleccionados y activamos el
-            acompañamiento de tu concierge para los siguientes pasos.
+            {pickup
+              ? "Al confirmar avisamos a la empresa para que lo prepare. Lo recoges en el local mostrando tu folio."
+              : "Al confirmar reservamos tu experiencia con los anfitriones seleccionados y activamos el acompañamiento de tu concierge para los siguientes pasos."}
           </p>
           <div className="mt-4 space-y-3">
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -306,14 +311,17 @@ function CheckoutPage() {
             </p>
             <div className="rounded-md border border-primary/40 bg-background px-4 py-3">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-medium">Efectivo con tu concierge</span>
+                <span className="text-sm font-medium">
+                  {pickup ? "Efectivo al recoger" : "Efectivo con tu concierge"}
+                </span>
                 <Badge variant="outline" className="text-[10px] uppercase">
                   Disponible
                 </Badge>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Al confirmar queda registrado el pago de tu viaje y se abre tu itinerario con el
-                acompañamiento de Alux.
+                {pickup
+                  ? "Pagas en el local cuando pases por tu pedido."
+                  : "Al confirmar queda registrado el pago de tu viaje y se abre tu itinerario con el acompañamiento de Alux."}
               </p>
             </div>
             <div className="rounded-md border border-border bg-background px-4 py-3">
@@ -339,7 +347,11 @@ function CheckoutPage() {
               {busy ? "Abriendo pago…" : "Pagar en línea"}
             </Button>
             <Button onClick={handleConfirm} disabled={busy} size="lg">
-              {busy ? "Confirmando…" : "Confirmar mi viaje (pago en efectivo)"}
+              {busy
+                ? "Confirmando…"
+                : pickup
+                  ? "Confirmar pedido (pago al recoger)"
+                  : "Confirmar mi viaje (pago en efectivo)"}
             </Button>
             <Button type="button" variant="ghost" onClick={handleCancel} disabled={busy}>
               Cancelar

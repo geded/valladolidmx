@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { StoreProductsPanel } from "@/components/commerce/StoreProductsPanel";
 import {
   getBusinessOnlineSales,
   onlineSalesErrorMessage,
@@ -216,6 +217,18 @@ export function BusinessOnlineSalesPanel({
           {save.isPending ? "Guardando…" : "Guardar ventas en línea"}
         </Button>
       </div>
+
+      {state.enabled && state.modes.includes("pedidos") ? (
+        <p className="mt-4 rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">Pedidos para recoger:</span> toda la carta con precio se
+          puede pedir y pagar en su página. Para que algo no se venda, márcalo como no disponible en la carta.
+        </p>
+      ) : null}
+      {state.enabled && state.modes.includes("tienda") ? (
+        <div className="mt-4">
+          <StoreProductsPanel businessId={businessId} />
+        </div>
+      ) : null}
     </section>
   );
 }

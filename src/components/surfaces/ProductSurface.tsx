@@ -14,6 +14,8 @@ import type { MarketplaceProductDetail } from "@/lib/catalog/marketplace-reads.f
 import type { ProductRelatedDTO } from "@/lib/catalog/product-related.functions";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
 import { AddToTravelPlanButton } from "@/components/traveler/AddToTravelPlanButton";
+import { ReserveOnlineButton } from "@/components/commerce/ReserveOnlineButton";
+import { onlineSaleModeFor } from "@/lib/commerce/online-sales-rules";
 import { evaluateTripEligibility } from "@/lib/traveler/trip-eligibility";
 import { PremiumHero } from "@/components/premium";
 import {
@@ -201,6 +203,26 @@ export function ProductSurface({
 
       {p.description ? (
         <p className="max-w-3xl text-sm text-foreground/80">{p.description}</p>
+      ) : null}
+
+      {/* Ventas en línea · fase 2: tienda con la venta activada en su página. */}
+      {p.direct_sale?.enabled &&
+      p.accepts_online_payment &&
+      p.direct_sale.price_amount &&
+      onlineSaleModeFor(p.product_type) === "tienda" ? (
+        <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4 sm:p-5">
+          <div className="min-w-0">
+            <p className="font-serif text-2xl">
+              {new Intl.NumberFormat("es-MX", {
+                style: "currency",
+                currency: p.direct_sale.price_currency ?? "MXN",
+                maximumFractionDigits: 2,
+              }).format(p.direct_sale.price_amount / 100)}
+            </p>
+            <p className="text-xs text-muted-foreground">Pagas en línea y lo recoges en la tienda.</p>
+          </div>
+          <ReserveOnlineButton productId={p.id} label="Comprar" className="ml-auto min-h-11 px-6" />
+        </div>
       ) : null}
 
       {dominantAction && tripEligibility.eligible && tripEligibility.identity ? (

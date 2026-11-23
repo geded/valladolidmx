@@ -43,7 +43,7 @@ const toItems = (rows: readonly Row[]): MenuItem[] =>
   normalizeMenuItems(rows.map(({ key: _k, fresh: _f, ...item }) => item));
 
 /** Reduce fotos grandes del celular antes de enviarlas (máx. 2000 px, JPEG). */
-async function fileToPayload(file: File): Promise<{ name: string; mimeType: string; base64: string }> {
+export async function fileToPayload(file: File): Promise<{ name: string; mimeType: string; base64: string }> {
   const toBase64 = (blob: Blob) =>
     new Promise<string>((resolve, reject) => {
       const reader = new FileReader();

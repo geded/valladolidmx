@@ -7026,6 +7026,7 @@ export type Database = {
           direct_sale_max_quantity: number | null
           direct_sale_min_lead_hours: number | null
           direct_sale_price_amount: number | null
+          direct_sale_stock: number | null
           direct_sale_terms: string | null
           duration_minutes: number | null
           eligible_for_ems_campaigns: boolean
@@ -7071,6 +7072,7 @@ export type Database = {
           direct_sale_max_quantity?: number | null
           direct_sale_min_lead_hours?: number | null
           direct_sale_price_amount?: number | null
+          direct_sale_stock?: number | null
           direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
@@ -7116,6 +7118,7 @@ export type Database = {
           direct_sale_max_quantity?: number | null
           direct_sale_min_lead_hours?: number | null
           direct_sale_price_amount?: number | null
+          direct_sale_stock?: number | null
           direct_sale_terms?: string | null
           duration_minutes?: number | null
           eligible_for_ems_campaigns?: boolean
@@ -8856,6 +8859,10 @@ export type Database = {
         }
         Returns: string
       }
+      admin_create_store_products: {
+        Args: { _business_id: string; _items: Json }
+        Returns: number
+      }
       admin_evaluate_functional_alerts: {
         Args: { p_window_minutes?: number }
         Returns: Json
@@ -9307,6 +9314,10 @@ export type Database = {
       commerce_can_view_product_inventory: {
         Args: { _product_id: string; _user_id: string }
         Returns: boolean
+      }
+      commerce_create_menu_order: {
+        Args: { _business_id: string; _channel?: string; _items: Json }
+        Returns: string
       }
       commerce_departure_adjust: {
         Args: { _delta: number; _departure_id: string; _reason: string }
@@ -10536,6 +10547,7 @@ export type Database = {
         Args: { _type: Database["public"]["Enums"]["product_type"] }
         Returns: string
       }
+      online_sales_commission_bps: { Args: { _mode: string }; Returns: number }
       order_cancel: { Args: { p_order_id: string }; Returns: undefined }
       order_confirm: {
         Args: { p_client_request_id?: string; p_notes?: string }

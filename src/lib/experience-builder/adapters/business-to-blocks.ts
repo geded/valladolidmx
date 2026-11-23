@@ -99,6 +99,7 @@ export function businessToMenuDTO(b: MarketplaceBusinessDetail): ExperienceMenuD
       name: item.name,
       description: item.description,
       priceLabel,
+      ...(b.menu_ordering && item.id ? { id: item.id, price: amount } : {}),
       tags: item.tags
         .filter((t): t is MenuTag => t in MENU_TAGS)
         .map((t) => MENU_TAGS[t]),
@@ -110,8 +111,13 @@ export function businessToMenuDTO(b: MarketplaceBusinessDetail): ExperienceMenuD
     heading: "Menú",
     ariaLabel: `Menú de ${b.display_name}`,
     sections,
-    footnote: `Precios de referencia publicados por ${b.display_name}. No se cobra en línea.`,
-    capabilities: { previewPerSection: 4 },
+    footnote: b.menu_ordering
+      ? `Pide en línea y recoge en ${b.display_name}. Precios publicados por la empresa.`
+      : `Precios de referencia publicados por ${b.display_name}. No se cobra en línea.`,
+    capabilities: {
+      previewPerSection: 4,
+      ...(b.menu_ordering && b.id ? { ordering: { businessId: b.id } } : {}),
+    },
   };
 }
 
