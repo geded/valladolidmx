@@ -65,6 +65,13 @@ La reserva inmediata, la que se paga al momento, se deja para el futuro y solo s
 
 Mientras el hotel no tenga la venta activada, sigue como hoy: el concierge cotiza.
 
+## Un solo sistema, tres formas de contar lo disponible
+No son tres sistemas. Es **uno solo**: el mismo pedido, el mismo pago, la misma comisión, el mismo aviso a la empresa, la misma lista de pedidos en el Portal y el mismo Alux vendiendo. Lo único que cambia es cómo se cuenta lo disponible:
+
+- **Productos** (artesanías, café, bebidas de Copalli): por piezas. Se descuenta al vender.
+- **Tours y experiencias**: por lugares en una fecha y hora. Ya funciona hoy y se reutiliza tal cual.
+- **Hoteles y casas**: por noches en un rango de fechas. Es lo único nuevo de fondo.
+
 ## Preparado para crecer sin rehacer
 - **Es un solo sistema** dentro de las plantillas oficiales de cada familia (tienda, restaurante, hotel). Activarlo en 1 empresa o en 100 es lo mismo: el administrador solo prende el interruptor.
 - **Lo que hoy queda fuera se suma después** sin cambiar lo construido:
