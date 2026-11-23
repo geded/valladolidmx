@@ -39,6 +39,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as CategoriaEmpresaRouteImport } from './routes/$categoria.$empresa'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -434,6 +435,11 @@ const TerminosRoute = TerminosRouteImport.update({
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriaEmpresaRoute = CategoriaEmpresaRouteImport.update({
+  id: '/$categoria/$empresa',
+  path: '/$categoria/$empresa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotmcpChar93ListToolsRoute =
@@ -1905,6 +1911,7 @@ export interface FileRoutesByFullPath {
   '/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/portal': typeof AuthenticatedPortalRouteRouteWithChildren
+  '/$categoria/$empresa': typeof CategoriaEmpresaRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/cms': typeof AuthenticatedCmsRouteWithChildren
@@ -2177,6 +2184,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/$categoria/$empresa': typeof CategoriaEmpresaRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/empresa': typeof AuthenticatedEmpresaRoute
@@ -2451,6 +2459,7 @@ export interface FileRoutesById {
   '/_authenticated/concierge': typeof AuthenticatedConciergeRouteRouteWithChildren
   '/_authenticated/cuenta': typeof AuthenticatedCuentaRouteRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRouteRouteWithChildren
+  '/$categoria/$empresa': typeof CategoriaEmpresaRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/cms': typeof AuthenticatedCmsRouteWithChildren
@@ -2731,6 +2740,7 @@ export interface FileRouteTypes {
     | '/concierge'
     | '/cuenta'
     | '/portal'
+    | '/$categoria/$empresa'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/cms'
@@ -3003,6 +3013,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminos'
     | '/unsubscribe'
+    | '/$categoria/$empresa'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/empresa'
@@ -3276,6 +3287,7 @@ export interface FileRouteTypes {
     | '/_authenticated/concierge'
     | '/_authenticated/cuenta'
     | '/_authenticated/portal'
+    | '/$categoria/$empresa'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/cms'
@@ -3552,6 +3564,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerminosRoute: typeof TerminosRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  CategoriaEmpresaRoute: typeof CategoriaEmpresaRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
@@ -3859,6 +3872,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$categoria/$empresa': {
+      id: '/$categoria/$empresa'
+      path: '/$categoria/$empresa'
+      fullPath: '/$categoria/$empresa'
+      preLoaderRoute: typeof CategoriaEmpresaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/list-tools': {
@@ -6224,6 +6244,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerminosRoute: TerminosRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  CategoriaEmpresaRoute: CategoriaEmpresaRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,

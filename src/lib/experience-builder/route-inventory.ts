@@ -157,6 +157,16 @@ type Override = Partial<
 > & { notes?: string };
 
 const OVERRIDES: Readonly<Record<string, Override>> = {
+  "src/routes/$categoria.$empresa.tsx": {
+    category: "technical",
+    businessPriority: "high",
+    maturity: "L3",
+    migrationStatus: "technical-exception",
+    functionalOwner: "Product",
+    dependencies: ["businesses", "business_categories", "resolveCanonicalPath"],
+    notes:
+      "Enlace corto de promoción /<categoría>/<empresa>: 301 a la ficha canónica territorial; no renderiza superficie propia.",
+  },
   "src/routes/index.tsx": {
     category: "studio",
     businessPriority: "critical",
@@ -479,6 +489,7 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
  * ------------------------------------------------------------------ */
 
 export const SCANNED_ROUTE_FILES: readonly string[] = [
+  "src/routes/$categoria.$empresa.tsx",
   "src/routes/[.]lovable.oauth.consent.tsx",
   "src/routes/[.mcp]/invoke-tool/$tool.ts",
   "src/routes/[.mcp]/list-tools.ts",
