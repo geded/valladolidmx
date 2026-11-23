@@ -65,6 +65,14 @@ La reserva inmediata, la que se paga al momento, se deja para el futuro y solo s
 
 Mientras el hotel no tenga la venta activada, sigue como hoy: el concierge cotiza.
 
+## Preparado para crecer sin rehacer
+- **Es un solo sistema** dentro de las plantillas oficiales de cada familia (tienda, restaurante, hotel). Activarlo en 1 empresa o en 100 es lo mismo: el administrador solo prende el interruptor.
+- **Lo que hoy queda fuera se suma después** sin cambiar lo construido:
+  - **Calendario de Booking y Airbnb**: los dos dan un enlace de calendario. Pegarlo en la ficha del hotel bloquea solas las noches ocupadas. Se agrega al calendario del hotel.
+  - **Reserva inmediata**: es otra opción del mismo interruptor, para hoteles con calendario al día.
+  - **Envío a domicilio**: es otra forma de entrega junto a «recoger en el local».
+- Desde el inicio se dejan esos espacios previstos, apagados, para no tener que rehacer nada.
+
 ## Fases (cada una se aprueba por separado y nada se publica sin tu autorización)
 1. **Interruptor por empresa + regla nueva**: sección «Ventas en línea» del administrador, canales y comisión. Lo ya vendido no cambia.
 2. **Piloto de tienda + recoger en el local**: carga por fotos, PDF u hoja; existencias; pago; pedidos en el Portal. Solo en las empresas piloto.
@@ -90,6 +98,7 @@ Después de cada fase revisamos juntos el piloto y afinamos antes de pasar a la 
   - Existencias y variantes en los productos de tienda.
   - Tipos de habitación, tarifas por noche y bloqueos por fecha, con retención de noches igual que el cupo de experiencias.
 - El interruptor por empresa nace apagado en todas; los canales y modos solo se habilitan en las empresas marcadas.
+- Modos de reserva (`confirmacion`, `inmediata`), formas de entrega (`recoger`, `envio`) y fuentes de bloqueo de calendario (`manual`, `ical`) se modelan como listas desde la fase 1, con solo los valores del piloto habilitados.
 - `canSellDirect` (CRM y WhatsApp) y la vista del administrador se alinean para usar una sola regla: venta activada en la empresa y en el producto.
 - Hoy la base de datos no limita qué tipos de producto se pueden activar. La fase 1 lo limita a los modos activados en la empresa.
 - Se respetan la plantilla aprobada de la ficha, el bloque oficial del menú, Mi Viaje y la separación de perfiles de staff, empresa y concierge.
