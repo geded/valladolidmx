@@ -1,5 +1,11 @@
 # Roadmap
 
+## Alta de Copalli Café · 2026-11-23
+- [x] Ficha con datos de Google, horario, contacto y carta de bebidas (74 opciones).
+- [x] Logo, portada y 9 fotos de su Facebook subidos desde el CMS.
+- [x] Facebook agregado y ficha publicada (Founder autorizó «Publicar ya»).
+- [ ] Confirmar con el dueño la hora de cierre (Google 18:00; Facebook menciona 15:00) y si quiere agregar su carta de comida.
+
 ## Menú de restaurantes y cafeterías · 2026-11-23
 - [x] Guardar la carta por secciones dentro de la ficha de la empresa.
 - [x] Cargar foto o PDF de la carta: Alux la lee y el editor revisa antes de guardar.
