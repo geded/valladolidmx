@@ -27,7 +27,7 @@ import { listAvailableDepartures, startBooking } from "@/lib/commerce/booking.fu
 import { getProductSaleInfo, storeOrderErrorMessage } from "@/lib/commerce/store-orders.functions";
 import { maxPurchasable } from "@/lib/commerce/store-catalog";
 import { getStayCalendar, requestStay } from "@/lib/commerce/stay-requests.functions";
-import { dayKey, stayFits } from "@/lib/commerce/stay-calendar";
+import { dayKey, shortPrice, stayFits } from "@/lib/commerce/stay-calendar";
 import { StayDatesPicker } from "@/components/commerce/StayDatesPicker";
 import type { DateRange } from "react-day-picker";
 import {
@@ -139,13 +139,20 @@ export function ReserveOnlineButton({
   }
 
   function AvailabilityDayButton(props: React.ComponentProps<typeof CalendarDayButton>) {
-    const availability = daysByKey.get(calendarDayKey(props.day.date))?.available;
+    const dayInfo = daysByKey.get(calendarDayKey(props.day.date));
+    const availability = dayInfo?.available;
     const label = availability ? availabilityLabel(availability) : null;
+    // Precio por persona de ese día, como en el calendario del hotel.
+    const dayPrice = dayInfo?.departures.find((d) => d.price_cents)?.price_cents ?? null;
 
     return (
       <CalendarDayButton
         {...props}
-        aria-label={label ? `${props.day.date.getDate()}, ${label} disponibles` : undefined}
+        aria-label={
+          label
+            ? `${props.day.date.getDate()}, ${label} disponibles${dayPrice ? `, ${shortPrice(dayPrice)} por persona` : ""}`
+            : undefined
+        }
         className={
           availability
             ? "min-h-11 rounded-md bg-success/15 text-success hover:bg-success/25 data-[selected-single=true]:bg-success data-[selected-single=true]:text-success-foreground"
@@ -153,7 +160,9 @@ export function ReserveOnlineButton({
         }
       >
         <span className="text-sm font-semibold">{props.day.date.getDate()}</span>
-        {availability ? <span className="text-[0.6rem] font-medium">{availability}</span> : null}
+        {availability ? (
+          <span className="text-[0.6rem] font-medium leading-none">{dayPrice ? shortPrice(dayPrice) : availability}</span>
+        ) : null}
       </CalendarDayButton>
     );
   }
@@ -290,7 +299,7 @@ export function ReserveOnlineButton({
                   <p className="text-xs font-medium uppercase text-muted-foreground">Fecha</p>
                   <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span className="size-2.5 rounded-sm bg-success/20 ring-1 ring-success/40" />
-                    Días disponibles · número de lugares
+                    Días disponibles · {departures.some((d) => d.price_cents) ? "precio por persona" : "número de lugares"}
                   </span>
                 </div>
                 <Calendar
@@ -364,6 +373,12 @@ export function ReserveOnlineButton({
                       Máximo {maxPeople} en este horario
                     </span>
                   </div>
+                  {selected?.price_cents ? (
+                    <p className="mt-2 text-sm">
+                      {people} × {shortPrice(selected.price_cents)} ={" "}
+                      <span className="font-semibold">{shortPrice(selected.price_cents * people)}</span>
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
             </div>

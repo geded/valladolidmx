@@ -2398,6 +2398,38 @@ export type Database = {
           },
         ]
       }
+      commerce_stay_night_rates: {
+        Row: {
+          night: string
+          price_cents: number
+          product_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          night: string
+          price_cents: number
+          product_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          night?: string
+          price_cents?: number
+          product_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_stay_night_rates_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       composition_preview_tokens: {
         Row: {
           composition_id: string
@@ -8743,6 +8775,10 @@ export type Database = {
         Args: { _business_id: string; _night: string; _product_id: string }
         Returns: boolean
       }
+      _commerce_stay_night_price: {
+        Args: { _night: string; _product_id: string }
+        Returns: number
+      }
       _commerce_stay_rooms_taken: {
         Args: { _night: string; _product_id: string }
         Returns: number
@@ -9315,6 +9351,10 @@ export type Database = {
         }
         Returns: Json
       }
+      commerce_calendar_set_rooms: {
+        Args: { _product_id: string; _rooms: number }
+        Returns: number
+      }
       commerce_can_manage_order_holds: {
         Args: { _order_id: string }
         Returns: boolean
@@ -9326,6 +9366,29 @@ export type Database = {
       commerce_create_menu_order: {
         Args: { _business_id: string; _channel?: string; _items: Json }
         Returns: string
+      }
+      commerce_day_calendar_manage: {
+        Args: { _days?: number; _from?: string; _product_id: string }
+        Returns: {
+          blocked: boolean
+          business_closed: boolean
+          custom_price: boolean
+          day: string
+          departures: number
+          price_cents: number
+          rooms: number
+          seats_left: number
+          taken: number
+        }[]
+      }
+      commerce_day_calendar_set: {
+        Args: {
+          _action: string
+          _days: string[]
+          _price_cents?: number
+          _product_id: string
+        }
+        Returns: number
       }
       commerce_decide_stay: {
         Args: { _accept: boolean; _note?: string; _order_id: string }
@@ -9431,6 +9494,7 @@ export type Database = {
           available: number
           ends_at: string
           id: string
+          price_cents: number
           starts_at: string
           timezone: string
         }[]
@@ -9440,6 +9504,7 @@ export type Database = {
         Returns: {
           available: number
           night: string
+          price_cents: number
         }[]
       }
       commerce_request_stay: {

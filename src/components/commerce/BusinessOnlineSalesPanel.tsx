@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { StoreProductsPanel } from "@/components/commerce/StoreProductsPanel";
+import { BusinessRatesCalendar } from "@/components/commerce/RatesCalendar";
 import {
   getBusinessOnlineSales,
   onlineSalesErrorMessage,
@@ -97,6 +98,11 @@ export function BusinessOnlineSalesPanel({
             <p className="mt-1 text-sm text-muted-foreground">
               Por: {state.channels.map((c) => ONLINE_SALES_CHANNEL_LABEL[c]).join(" · ")}.
             </p>
+            {state.modes.includes("reservas") ? (
+              <div className="mt-4">
+                <BusinessRatesCalendar businessId={businessId} kind="noches" />
+              </div>
+            ) : null}
           </>
         ) : (
           <>
@@ -227,6 +233,11 @@ export function BusinessOnlineSalesPanel({
       {state.enabled && state.modes.includes("tienda") ? (
         <div className="mt-4">
           <StoreProductsPanel businessId={businessId} />
+        </div>
+      ) : null}
+      {state.enabled && state.modes.includes("reservas") ? (
+        <div className="mt-4">
+          <BusinessRatesCalendar businessId={businessId} kind="noches" />
         </div>
       ) : null}
     </section>

@@ -15,6 +15,7 @@ import {
   listDirectSaleRequests,
 } from "@/lib/commerce/direct-sale-authorizations.functions";
 import { ExperienceInventoryPanel } from "@/components/cms/commerce/ExperienceInventoryPanel";
+import { ProductRatesCalendar } from "@/components/commerce/RatesCalendar";
 
 const money = (amount: number | null | undefined, currency: string) =>
   amount == null
@@ -210,6 +211,8 @@ function ExperienciaFichaPage() {
           </dl>
         </Card>
       </div>
+
+      <ProductRatesCalendar productId={productId} />
 
       <ExperienceInventoryPanel productId={productId} />
 

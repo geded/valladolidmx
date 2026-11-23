@@ -7,6 +7,7 @@
  */
 import { BusinessOnlineSalesPanel } from "@/components/commerce/BusinessOnlineSalesPanel";
 import { StayRequestsPanel } from "@/components/commerce/StayRequestsPanel";
+import { BusinessRatesCalendar } from "@/components/commerce/RatesCalendar";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -133,6 +134,8 @@ function DirectSalesPage() {
       <BusinessOnlineSalesPanel businessId={businessId} variant="portal" />
 
       <StayRequestsPanel businessId={businessId} />
+
+      <BusinessRatesCalendar businessId={businessId} kind="dias" />
 
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando experiencias…</p>

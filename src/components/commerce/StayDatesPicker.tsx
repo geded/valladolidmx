@@ -7,13 +7,15 @@ import { useMemo } from "react";
 import { es } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import {
   STAY_CONFIRM_HOURS,
+  addDays,
   dayKey,
   nightsBetween,
+  shortPrice,
   stayFits,
-  stayTotalCents,
+  stayTotalFromPrices,
   type StayNight,
 } from "@/lib/commerce/stay-calendar";
 
@@ -46,6 +48,7 @@ export function StayDatesPicker({
   onGuestsChange: (guests: number) => void;
 }) {
   const calendar = useMemo(() => new Map(nights.map((n) => [n.night, n.available])), [nights]);
+  const prices = useMemo(() => new Map(nights.map((n) => [n.night, n.priceCents])), [nights]);
   const first = nights[0]?.night;
   const last = nights[nights.length - 1]?.night;
   const maxGuests = capacity ?? 6;
@@ -66,6 +69,30 @@ export function StayDatesPicker({
     return !(checkIn && !checkOut && key > checkIn && stayFits(calendar, checkIn, key));
   }
 
+  const total = complete && fits ? stayTotalFromPrices(prices, priceCents, checkIn, checkOut) : 0;
+  const nightCount = complete ? nightsBetween(checkIn, checkOut) : 0;
+  const samePrice = Array.from({ length: nightCount }, (_, i) =>
+    checkIn ? (prices.get(addDays(checkIn, i)) ?? priceCents) : priceCents,
+  ).every((c) => c === priceCents);
+
+  /* Cada día muestra su precio por noche, como en el calendario del hotel. */
+  function PriceDayButton(props: React.ComponentProps<typeof CalendarDayButton>) {
+    const key = dayKey(props.day.date);
+    const free = (calendar.get(key) ?? 0) > 0;
+    const price = prices.get(key);
+    return (
+      <CalendarDayButton
+        {...props}
+        aria-label={
+          free && price ? `${props.day.date.getDate()}, ${shortPrice(price)} por noche` : undefined
+        }
+      >
+        <span className="text-sm font-semibold">{props.day.date.getDate()}</span>
+        {free && price ? <span className="text-[0.6rem] font-medium leading-none">{shortPrice(price)}</span> : null}
+      </CalendarDayButton>
+    );
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -73,7 +100,7 @@ export function StayDatesPicker({
           <p className="text-xs font-medium uppercase text-muted-foreground">Llegada y salida</p>
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="size-2.5 rounded-sm bg-success/20 ring-1 ring-success/40" />
-            Noches libres
+            Libres · precio por noche
           </span>
         </div>
         <Calendar
@@ -85,9 +112,10 @@ export function StayDatesPicker({
           startMonth={first ? fromKey(first) : undefined}
           endMonth={last ? fromKey(last) : undefined}
           disabled={isDisabled}
+          components={{ DayButton: PriceDayButton }}
           modifiers={{ libre: (date) => (calendar.get(dayKey(date)) ?? 0) > 0 }}
           modifiersClassNames={{ libre: "[&>button]:bg-success/15 [&>button]:text-success" }}
-          className="pointer-events-auto mx-auto mt-2 w-full p-0 [--cell-size:clamp(2.5rem,11vw,3rem)]"
+          className="pointer-events-auto mx-auto mt-2 w-full p-0 [--cell-size:clamp(2.6rem,11.5vw,3.25rem)]"
           classNames={{ root: "w-full", month: "w-full", month_grid: "w-full" }}
         />
         <p className="mt-2 text-xs text-muted-foreground">
@@ -122,10 +150,10 @@ export function StayDatesPicker({
         <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
           <p className="flex items-center justify-between gap-3">
             <span>
-              {nightsBetween(checkIn, checkOut)} {nightsBetween(checkIn, checkOut) === 1 ? "noche" : "noches"} ×{" "}
-              {money(priceCents)}
+              {nightCount} {nightCount === 1 ? "noche" : "noches"}
+              {samePrice ? ` × ${money(priceCents)}` : " · precio según cada noche"}
             </span>
-            <span className="font-semibold">{money(stayTotalCents(priceCents, checkIn, checkOut))}</span>
+            <span className="font-semibold">{money(total)}</span>
           </p>
         </div>
       ) : null}

@@ -602,6 +602,9 @@
 - [x] Fase 2 (2026-11-23): tienda con piezas (Coqui Coqui), pedidos para recoger con toda la carta de Copalli, carga de productos por PDF/foto u hoja, botón «Comprar» en la página del producto de tienda; probado en vista previa (pedidos de prueba cancelados).
 - [x] Probada la reserva por fecha de una experiencia (Cena Romántica en Cenote, fecha de prueba cerrada al terminar).
 - [x] Fase 4 piloto: Casa Tía Micha con reserva por noches y confirmación del hotel en 12 h (Colonial $1,850, Suite Patio $2,650, Familiar $2,300; 1 de cada una); probado solicitar, confirmar, rechazar y cancelar en vista previa.
+- [x] Calendario tipo Airbnb para hoteles (2026-11-23): precio por noche dentro del calendario y bloqueo de días ahí mismo; lo editan el hotel (su panel) y el administrador; el viajero ve el precio de cada noche al elegir fechas.
+- [x] Mismo calendario para experiencias y tours que se reservan por fecha (precio por día y bloqueo de días), sin un segundo sistema — autorizado en esta entrega (2026-11-23).
+- [x] Habitaciones iguales: el hotel y el administrador fijan en el calendario cuántas hay de cada tipo; cada noche muestra cuántas quedan libres y se cierra al llenarse.
 - [ ] Fase 3: el WhatsApp de la empresa usa el canal «WhatsApp de Alux» para cobrar (hoy sigue cobrando solo experiencias) — espera visto bueno.
 - [x] Tienda de artesanías piloto: Coqui Coqui.
 - [x] Comisión distinta por tipo (tienda, pedidos, hoteles), 15 % inicial, editable por el administrador.

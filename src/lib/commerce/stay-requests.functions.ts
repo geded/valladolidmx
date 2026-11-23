@@ -13,7 +13,13 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
-import { STAY_MAX_NIGHTS, stayErrorMessage, type StayNight } from "@/lib/commerce/stay-calendar";
+import {
+  STAY_MAX_NIGHTS,
+  stayErrorMessage,
+  type CalendarKind,
+  type CalendarManageDay,
+  type StayNight,
+} from "@/lib/commerce/stay-calendar";
 
 type AnyRpc = {
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
@@ -32,9 +38,10 @@ export const getStayCalendar = createServerFn({ method: "POST" })
       _days: 150,
     });
     if (error) throw new Error(stayErrorMessage(error.message));
-    return ((rows ?? []) as Array<{ night: string; available: number }>).map((r) => ({
+    return ((rows ?? []) as Array<{ night: string; available: number; price_cents: number | null }>).map((r) => ({
       night: String(r.night).slice(0, 10),
       available: Number(r.available) || 0,
+      priceCents: r.price_cents === null || r.price_cents === undefined ? null : Number(r.price_cents),
     }));
   });
 
@@ -157,6 +164,153 @@ export const decideStay = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(stayErrorMessage(error.message));
     return { result: String(result) };
+  });
+
+/* ───────────── Calendario de precios y bloqueos (empresa y administrador) ───────────── */
+
+export interface CalendarProduct {
+  id: string;
+  name: string;
+  basePriceCents: number | null;
+  kind: CalendarKind;
+  /** Hoteles: habitaciones de ese tipo. */
+  rooms: number;
+}
+
+const DATED_TYPES = ["hotel", "experiencia", "tour", "evento", "transporte", "servicio"] as const;
+
+function toCalendarProduct(r: {
+  id: string;
+  name: string;
+  product_type: string;
+  direct_sale_price_amount: number | null;
+  direct_sale_stock: number | null;
+}): CalendarProduct {
+  return {
+    id: r.id,
+    name: r.name,
+    basePriceCents: r.direct_sale_price_amount ?? null,
+    kind: r.product_type === "hotel" ? "noches" : "dias",
+    rooms: r.direct_sale_stock ?? 1,
+  };
+}
+
+async function assertEditor(context: { supabase: unknown; userId: string }, businessId: string) {
+  const { data: allowed } = await (context.supabase as unknown as AnyRpc).rpc("has_business_access", {
+    _user_id: context.userId,
+    _business_id: businessId,
+    _min_role: "editor",
+  });
+  if (allowed !== true) throw new Error(stayErrorMessage("forbidden"));
+}
+
+/** Productos con venta en línea por fecha de una empresa: habitaciones o experiencias. */
+export const listCalendarProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ businessId: z.string().uuid(), kind: z.enum(["noches", "dias"]) }).parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<CalendarProduct[]> => {
+    await assertEditor(context, data.businessId);
+    const types = data.kind === "noches" ? ["hotel"] : DATED_TYPES.filter((t) => t !== "hotel");
+    const { data: rows, error } = await context.supabase
+      .from("products")
+      .select("id, name, product_type, direct_sale_price_amount, direct_sale_stock, direct_sale_enabled")
+      .eq("business_id", data.businessId)
+      .in("product_type", types as Array<(typeof DATED_TYPES)[number]>)
+      .is("deleted_at", null)
+      .order("name");
+    if (error) throw new Error(error.message);
+    return (rows ?? []).filter((r) => r.direct_sale_enabled).map(toCalendarProduct);
+  });
+
+/** Un solo producto (ficha comercial de una experiencia en el CMS). */
+export const getCalendarProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ productId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }): Promise<CalendarProduct | null> => {
+    const { data: row, error } = await context.supabase
+      .from("products")
+      .select("id, name, product_type, business_id, direct_sale_price_amount, direct_sale_stock")
+      .eq("id", data.productId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row || !(DATED_TYPES as readonly string[]).includes(row.product_type)) return null;
+    await assertEditor(context, row.business_id);
+    return toCalendarProduct(row);
+  });
+
+export const getManageCalendar = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ productId: z.string().uuid(), from: DAY }).parse(raw))
+  .handler(async ({ data, context }): Promise<CalendarManageDay[]> => {
+    const { data: rows, error } = await (context.supabase as unknown as AnyRpc).rpc("commerce_day_calendar_manage", {
+      _product_id: data.productId,
+      _from: data.from,
+      _days: 42,
+    });
+    if (error) throw new Error(stayErrorMessage(error.message));
+    return (
+      (rows ?? []) as Array<{
+        day: string;
+        price_cents: number | null;
+        custom_price: boolean;
+        blocked: boolean;
+        business_closed: boolean;
+        rooms: number;
+        taken: number;
+        departures: number;
+        seats_left: number;
+      }>
+    ).map((r) => ({
+      day: String(r.day).slice(0, 10),
+      priceCents: r.price_cents === null ? null : Number(r.price_cents),
+      customPrice: Boolean(r.custom_price),
+      blocked: Boolean(r.blocked),
+      businessClosed: Boolean(r.business_closed),
+      rooms: Number(r.rooms) || 0,
+      taken: Number(r.taken) || 0,
+      departures: Number(r.departures) || 0,
+      seatsLeft: Number(r.seats_left) || 0,
+    }));
+  });
+
+export const setCalendarDays = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        productId: z.string().uuid(),
+        days: z.array(DAY).min(1).max(400),
+        action: z.enum(["price", "base_price", "block", "unblock"]),
+        priceCents: z.number().int().positive().max(100_000_000).optional(),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<{ changed: number }> => {
+    const { data: n, error } = await (context.supabase as unknown as AnyRpc).rpc("commerce_day_calendar_set", {
+      _product_id: data.productId,
+      _days: data.days,
+      _action: data.action,
+      _price_cents: data.priceCents ?? null,
+    });
+    if (error) throw new Error(stayErrorMessage(error.message));
+    return { changed: Number(n) || 0 };
+  });
+
+/** Hoteles: cuántas habitaciones iguales hay de ese tipo. */
+export const setRoomCount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ productId: z.string().uuid(), rooms: z.number().int().min(1).max(200) }).parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<{ rooms: number }> => {
+    const { data: n, error } = await (context.supabase as unknown as AnyRpc).rpc("commerce_calendar_set_rooms", {
+      _product_id: data.productId,
+      _rooms: data.rooms,
+    });
+    if (error) throw new Error(stayErrorMessage(error.message));
+    return { rooms: Number(n) || data.rooms };
   });
 
 export { STAY_MAX_NIGHTS };

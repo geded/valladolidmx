@@ -20,6 +20,8 @@ export interface PublicDeparture {
   ends_at: string;
   timezone: string;
   available: number;
+  /** Precio por persona de ese día (precio especial o base). */
+  price_cents?: number | null;
 }
 
 export interface OrderBookingRow {
