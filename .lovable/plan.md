@@ -17,6 +17,17 @@ Cada fase se aprueba y se prueba por separado. Nada se publica sin tu visto buen
 
 ---
 
+## Fase 0 · Valladolid listo para 200 empresas
+
+Meta de arranque de Valladolid: unas 200 empresas (50 hoteles, 50 restaurantes, además de casas de vacaciones, experiencias, sitios y lugares de interés). Hoy hay 65, y varias pantallas dejarían fuera a muchas:
+
+1. **Página del destino:** hoy solo lee 60 empresas. Leerá todas y mostrará los primeros espacios de cada categoría, con «Ver todos».
+2. **Listados de hoteles, restaurantes y casas:** hoy se cortan en 120 antes de filtrar por destino. Cada listado tendrá todas las de su categoría, con carga por páginas y filtros (barrio, precio, servicios).
+3. **Mapa:** hoy muestra 80 puntos. Agrupará los puntos cercanos para que quepan las 200 y los lugares de interés.
+4. **Alux:** hoy lee hasta 500 empresas por destino, así que alcanza. Se revisa que siga contestando rápido con 200 empresas y sus productos.
+5. **Carga en el CMS:** con las listas de búsqueda que ya hicimos y el medidor de ficha (Fase A), el equipo verá qué le falta a cada una de las 200.
+6. **Prueba de carga:** se ensaya con 200 empresas de prueba marcadas como temporales, y después se borran con tu autorización.
+
 ## Fase A · El plan gratis vale la pena
 
 1. **Medidor «Tu ficha para Alux»** en el Portal de la empresa: porcentaje de avance y qué falta (fotos, descripción, horario, ubicación, WhatsApp, Google, preguntas y respuestas, experiencia publicada), con el beneficio de cada punto: «Agrega tu horario y Alux podrá recomendarte cuando pregunten qué está abierto».
@@ -64,9 +75,11 @@ Una sola vista por empresa y por destino: vistas → recomendaciones de Alux →
 
 ## Orden sugerido
 
-A → B → C → D → E → F. Las fases A y B traen empresas sin costo para ellas; C y D convierten esas fichas en expedientes; E y F hacen que el pago valga la pena y se pueda medir.
+0 → A → B → C → D → E → F. La Fase 0 va primero para que las 200 empresas quepan desde el arranque. Las fases A y B traen empresas sin costo para ellas; C y D convierten esas fichas en expedientes; E y F hacen que el pago valga la pena y se pueda medir.
 
 ## Detalles técnicos
+
+- **0:** quitar los límites duros (`public-reads.functions.ts` 60 y 80, `listMarketplaceBusinesses` 120 antes de filtrar, relacionadas 120/200) y filtrar por destino y categoría en la consulta; paginar los listados manteniendo `arrangeListing` por página; agrupar puntos en el mapa existente; medir el tiempo de respuesta de Alux con 200 empresas.
 
 - **A:** puntaje de completitud en `src/lib/visibility/` (función pura y probada), usado en `converse-priority.ts`/`converse-grounding.ts` como factor de calidad junto a relevancia y `alux_weight`. Rotación diaria determinista entre empates, y quitar los cortes alfabéticos (60, 120, 500) antes de filtrar. Reporte mensual con las plantillas de correo y WhatsApp existentes, a partir de `business_view_events` y `concierge_quotes`.
 - **B:** enlaces de invitación firmados con token hasheado (mismo patrón que `/continuar/$token`), que reutilizan `BecomeHostFlow` y `ClaimAffordanceLink`; sin nuevas afordancias públicas. SLA de revisión en la bandeja existente del CMS.

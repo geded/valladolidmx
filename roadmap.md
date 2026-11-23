@@ -566,3 +566,8 @@
 - [x] Listados de empresas y experiencias usan la fórmula aprobada (1 de cada 4, rotación diaria, «Recomendado» solo en el espacio contratado).
 - [x] Alux: «Recomendado» solo para paquetes con menciones proactivas y hasta su tope diario; Destacado solo se lee primero.
 - [x] Explicar al Founder al final cómo funciona la configuración.
+
+## Empresas, Alux concierge y embudo de expedientes · 2026-11-23
+
+- [ ] Plan de 6 fases (A–F) — espera aprobación del Founder.
+- [ ] Preparar Valladolid para unas 200 empresas al arrancar (50 hoteles, 50 restaurantes, casas de vacaciones, experiencias, sitios y lugares de interés) — incluido en el plan como Fase 0.
