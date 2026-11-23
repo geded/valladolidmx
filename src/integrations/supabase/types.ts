@@ -1491,6 +1491,63 @@ export type Database = {
           },
         ]
       }
+      business_online_sales: {
+        Row: {
+          booking_modes: string[]
+          business_id: string
+          calendar_sources: string[]
+          channels: string[]
+          created_at: string
+          delivery_modes: string[]
+          enabled: boolean
+          modes: string[]
+          note: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          booking_modes?: string[]
+          business_id: string
+          calendar_sources?: string[]
+          channels?: string[]
+          created_at?: string
+          delivery_modes?: string[]
+          enabled?: boolean
+          modes?: string[]
+          note?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          booking_modes?: string[]
+          business_id?: string
+          calendar_sources?: string[]
+          channels?: string[]
+          created_at?: string
+          delivery_modes?: string[]
+          enabled?: boolean
+          modes?: string[]
+          note?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_online_sales_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_online_sales_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_ownership_transfers: {
         Row: {
           business_id: string
@@ -8899,6 +8956,16 @@ export type Database = {
         Returns: undefined
       }
       admin_search_metrics_summary: { Args: { p_days?: number }; Returns: Json }
+      admin_set_business_online_sales: {
+        Args: {
+          _business_id: string
+          _channels: string[]
+          _enabled: boolean
+          _modes: string[]
+          _note?: string
+        }
+        Returns: undefined
+      }
       admin_set_place_categories: {
         Args: { _category_ids: string[]; _place_id: string }
         Returns: undefined
@@ -8993,6 +9060,22 @@ export type Database = {
           _user_id: string
         }
         Returns: string
+      }
+      business_online_sale_allows: {
+        Args: {
+          _business_id: string
+          _channel?: string
+          _product_type: Database["public"]["Enums"]["product_type"]
+        }
+        Returns: boolean
+      }
+      business_online_sales_public: {
+        Args: { _business_ids: string[] }
+        Returns: {
+          business_id: string
+          channels: string[]
+          modes: string[]
+        }[]
       }
       business_profile_signals: {
         Args: { _business_ids: string[] }
@@ -10448,6 +10531,10 @@ export type Database = {
           current_count: number
           retry_after_seconds: number
         }[]
+      }
+      online_sale_mode_for: {
+        Args: { _type: Database["public"]["Enums"]["product_type"] }
+        Returns: string
       }
       order_cancel: { Args: { p_order_id: string }; Returns: undefined }
       order_confirm: {

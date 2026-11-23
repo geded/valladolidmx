@@ -120,6 +120,20 @@
       "when": 1795447229884,
       "tag": "0016_audit_role_revoke_on_user_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795457943576,
+      "tag": "0017_business_online_sales_switch",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795458001920,
+      "tag": "0018_business_online_sales_public_read",
+      "breakpoints": true
     }
   ]
 }

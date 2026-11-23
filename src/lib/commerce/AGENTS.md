@@ -1,0 +1,4 @@
+# Commerce rules
+
+- Online sales per business: `business_online_sales` (one row per business, written only by the admin RPC `admin_set_business_online_sales`) gates every non-experience online sale; `online-sales-rules.ts` (`businessAllowsOnlineSale`) and the SQL `business_online_sale_allows` apply the same rule to the product page button (`pagina`), Alux (`alux_pagina`), the product-enable trigger and `concierge_create_direct_sale_order`. Experiences never depend on the switch. Delivery, booking and calendar lists exist with only pilot values active. Why: one switch per business, the same answer in every channel, and room to grow without rework.
+- Online sales commission: per sale type (store, pickup orders, hotels) in `platform_settings` key `commerce.online_sales.commission_bps`, suggested when approving a product; experiences and dated services keep their per-product commission. Why: the values change often and must stay admin-editable.

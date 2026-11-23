@@ -597,4 +597,9 @@
 - [x] Propuesta reducida a piloto: solo empresas activadas, sin Booking/Airbnb, hoteles con confirmación.
 - [x] Dejar en la propuesta cómo crecer después sin rehacer (un solo sistema en las plantillas; calendario de Booking/Airbnb, reserva inmediata y envíos como agregados).
 - [x] Aclarar en la propuesta que es un solo sistema con tres formas de disponibilidad (piezas, lugares por salida, noches).
-- [ ] Aprobación del Founder de la propuesta y de las empresas piloto.
+- [x] Aprobación del Founder de la propuesta y de las empresas piloto (Copalli + una tienda de artesanías).
+- [x] Fase 1: interruptor «Ventas en línea» por empresa (solo administrador), canales, comisión por tipo (15 %), regla única en la página, Alux y el cobro; lo ya vendido no cambia.
+- [ ] Fase 2 (piloto de tienda y pedidos para recoger con Copalli y una tienda de artesanías) — espera visto bueno del Founder.
+- [ ] Fase 3: el WhatsApp de la empresa usa el canal «WhatsApp de Alux» para cobrar (hoy sigue cobrando solo experiencias) — espera visto bueno.
+- [ ] Confirmar qué tienda de artesanías será la piloto (fase 2).
+- [x] Comisión distinta por tipo (tienda, pedidos, hoteles), 15 % inicial, editable por el administrador.

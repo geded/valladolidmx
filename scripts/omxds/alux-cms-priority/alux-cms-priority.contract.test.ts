@@ -98,7 +98,19 @@ describe("Precios: sólo experiencias y artesanías autorizadas se venden en lí
     expect(offer.facts[0]).toBe("Se vende en línea en Valladolid.mx: 2,450 MXN");
   });
 
-  it("artesanía autorizada por el administrador también se vende en línea", () => {
+  it("artesanía autorizada se vende en línea si la empresa tiene la tienda activada con Alux", () => {
+    expect(
+      productSellsOnline({
+        ...published,
+        product_type: "artesanal",
+        direct_sale_enabled: true,
+        direct_sale_price_amount: 89000,
+        online_sales: { enabled: true, modes: ["tienda"], channels: ["pagina", "alux_pagina"] },
+      }),
+    ).toBe(true);
+  });
+
+  it("artesanía autorizada sin «Ventas en línea» en la empresa no la vende Alux", () => {
     expect(
       productSellsOnline({
         ...published,
@@ -106,7 +118,7 @@ describe("Precios: sólo experiencias y artesanías autorizadas se venden en lí
         direct_sale_enabled: true,
         direct_sale_price_amount: 89000,
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("artesanía sin autorización sólo muestra precio de referencia", () => {

@@ -9,6 +9,8 @@
  *  - Sólo proyecta columnas seguras necesarias para el render público.
  *  - Sin escrituras, sin RPCs; sin cambios al modelo de dominio.
  */
+import { businessAllowsOnlineSale } from "@/lib/commerce/online-sales-rules";
+import { fetchPublicOnlineSales } from "@/lib/commerce/online-sales-public.server";
 import { selectInChunks } from "@/lib/catalog/chunk-ids";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
@@ -469,6 +471,13 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     if (!prod) return null;
 
     const businessId = prod.business_id as string;
+    const pageSaleAllowed = businessAllowsOnlineSale(
+      (await fetchPublicOnlineSales(supabase, prod.product_type === "experiencia" ? [] : [businessId])).get(
+        businessId,
+      ) ?? null,
+      String(prod.product_type),
+      "pagina",
+    );
     const attributeFamily = PRODUCT_TYPE_ATTRIBUTE_FAMILY[String(prod.product_type)] ?? null;
 
     const [
@@ -846,7 +855,9 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           ? Number((prod as Record<string, unknown>).capacity)
           : null,
       direct_sale: {
-        enabled: Boolean((prod as Record<string, unknown>).direct_sale_enabled),
+        // Botón de compra sólo si la empresa tiene ese tipo de venta activado en su página.
+        enabled:
+          Boolean((prod as Record<string, unknown>).direct_sale_enabled) && pageSaleAllowed,
         price_amount:
           (prod as Record<string, unknown>).direct_sale_price_amount != null
             ? Number((prod as Record<string, unknown>).direct_sale_price_amount)

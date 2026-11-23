@@ -17,6 +17,7 @@
  * Cada candidato lleva HECHOS confirmados (con id citable) y la lista de
  * datos NO disponibles. El modelo nunca ve tablas: sólo este contrato.
  */
+import { fetchPublicOnlineSales } from "@/lib/commerce/online-sales-public.server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
@@ -638,10 +639,18 @@ async function enrichCatalog(
     });
     placeHoursBy.set(pid, arr);
   }
+  // Interruptor «Ventas en línea» de cada empresa (sólo fuera de experiencias).
+  const productRows = (productRes.data ?? []) as Array<Record<string, unknown>>;
+  const onlineSales = await fetchPublicOnlineSales(
+    sb,
+    productRows
+      .filter((r) => r["product_type"] !== "experiencia")
+      .map((r) => String(r["business_id"] ?? "")),
+  );
   const productBy = new Map(
-    (productRes.data ?? []).map((r) => [
-      String((r as Record<string, unknown>)["id"]),
-      r as Record<string, unknown>,
+    productRows.map((r) => [
+      String(r["id"]),
+      { ...r, online_sales: onlineSales.get(String(r["business_id"] ?? "")) ?? null } as Record<string, unknown>,
     ]),
   );
   const eventBy = new Map(
@@ -733,7 +742,7 @@ async function enrichCatalog(
               .join(" — "),
             260,
           ) || summaryText;
-        // Precio: venta en línea sólo experiencias; lo demás es referencia.
+        // Precio: venta en línea según el interruptor de la empresa; lo demás es referencia.
         const offer = productOfferFacts(p);
         const priceFact = offer.hasPrice ? (offer.facts[0] ?? null) : null;
         const offerDetails = offer.hasPrice ? offer.facts.slice(1) : offer.facts;

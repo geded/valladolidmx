@@ -5,7 +5,7 @@
  * Lista las solicitudes de las empresas, permite autorizar (fijando comisión),
  * rechazar con motivo y retirar una autorización vigente. Historial visible.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
@@ -20,6 +20,11 @@ import {
   type DirectSaleRequestRow,
   type DirectSaleRequestStatus,
 } from "@/lib/commerce/direct-sale-authorizations.functions";
+import {
+  getOnlineSalesCommission,
+  onlineSalesErrorMessage,
+} from "@/lib/commerce/business-online-sales.functions";
+import { commissionBpsForProduct } from "@/lib/commerce/online-sales-rules";
 
 const FILTERS: Array<{ value: "all" | DirectSaleRequestStatus; label: string }> = [
   { value: "pending", label: "En revisión" },
@@ -126,13 +131,35 @@ export function DirectSaleRequestsPanel() {
 function RequestRow({ request, onDone }: { request: DirectSaleRequestRow; onDone: () => void }) {
   const decide = useServerFn(decideDirectSaleRequest);
   const revoke = useServerFn(revokeDirectSaleAuthorization);
+  // Comisión distinta por tipo (tienda, pedidos, hoteles); experiencias, 12 %.
+  const commissionFn = useServerFn(getOnlineSalesCommission);
+  const commissionQ = useQuery({
+    queryKey: ["online-sales-commission"],
+    queryFn: () => commissionFn(),
+    staleTime: 60_000,
+  });
+  const typeBps = commissionQ.data
+    ? commissionBpsForProduct(request.product_type, commissionQ.data.commission)
+    : null;
   const [commission, setCommission] = useState<string>(
     request.commission_bps != null ? String(request.commission_bps / 100) : "12",
   );
+  const [touched, setTouched] = useState(false);
+  useEffect(() => {
+    if (!touched && request.commission_bps == null && typeBps != null) {
+      setCommission(String(typeBps / 100));
+    }
+  }, [touched, typeBps, request.commission_bps]);
   const [note, setNote] = useState<string>("");
 
-  const fail = (e: unknown) =>
-    toast.error(e instanceof Error ? e.message : "No se pudo registrar la decisión.");
+  const fail = (e: unknown) => {
+    const message = e instanceof Error ? e.message : "";
+    toast.error(
+      message.includes("online_sales_not_enabled_for_business")
+        ? onlineSalesErrorMessage(message)
+        : message || "No se pudo registrar la decisión.",
+    );
+  };
 
   const approve = useMutation({
     mutationFn: () =>
@@ -232,7 +259,10 @@ function RequestRow({ request, onDone }: { request: DirectSaleRequestRow; onDone
               max="100"
               step="0.5"
               value={commission}
-              onChange={(e) => setCommission(e.target.value)}
+              onChange={(e) => {
+                setTouched(true);
+                setCommission(e.target.value);
+              }}
               className="mt-1"
             />
           </div>

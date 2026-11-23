@@ -18,6 +18,10 @@
  * cotiza el concierge.
  */
 import { canSellDirect } from "@/lib/crm/closure-rules";
+import {
+  businessAllowsOnlineSale,
+  type BusinessOnlineSales,
+} from "@/lib/commerce/online-sales-rules";
 import { normalizeText } from "./converse-contract";
 import { meridaIsoDay } from "@/lib/visibility/commercial-slots";
 import {
@@ -174,24 +178,21 @@ export interface ProductOfferRow {
   readonly direct_sale_min_lead_hours?: unknown;
   readonly direct_sale_cancellation_policy?: unknown;
   readonly capacity?: unknown;
+  /** Interruptor «Ventas en línea» de la empresa (sólo si está activado). */
+  readonly online_sales?: BusinessOnlineSales | null;
 }
 
 /**
- * Tipos que pueden venderse en línea cuando el administrador autoriza la
- * venta directa (`direct_sale_enabled`): experiencias y artesanías.
- */
-export const ALUX_ONLINE_SALE_TYPES = ["experiencia", "artesanal"] as const;
-
-/**
- * `true` sólo para experiencias o artesanías publicadas con venta en línea
- * autorizada por el administrador y precio de venta.
+ * `true` sólo para productos publicados con venta en línea autorizada y precio
+ * de venta. Experiencias, como siempre; tienda, pedidos, reservas y salidas
+ * sólo si la empresa tiene «Ventas en línea» activada con Alux como canal.
  */
 export function productSellsOnline(p: ProductOfferRow): boolean {
   const cents = Number(p.direct_sale_price_amount);
   const type = typeof p.product_type === "string" ? p.product_type : null;
-  if (!type || !(ALUX_ONLINE_SALE_TYPES as readonly string[]).includes(type)) return false;
+  if (!type || !businessAllowsOnlineSale(p.online_sales ?? null, type, "alux_pagina")) return false;
   return canSellDirect({
-    // Misma regla del CRM (publicado, autorizado, precio > 0) para ambos tipos.
+    // Misma regla del CRM (publicado, autorizado, precio > 0) para todos los tipos.
     product_type: "experiencia",
     status: typeof p.status === "string" ? p.status : null,
     deleted_at: typeof p.deleted_at === "string" ? p.deleted_at : null,

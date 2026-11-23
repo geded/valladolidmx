@@ -12,6 +12,7 @@ import { RelatedOverridesPanel } from "@/components/cms/RelatedOverridesPanel";
 import { BusinessLocationPanel } from "@/components/cms/BusinessLocationPanel";
 import { BusinessAttributesPanel } from "@/components/cms/BusinessAttributesPanel";
 import { BusinessMenuPanel } from "@/components/cms/BusinessMenuPanel";
+import { BusinessOnlineSalesPanel } from "@/components/commerce/BusinessOnlineSalesPanel";
 import { BusinessZoneSelect } from "@/components/cms/BusinessZoneSelect";
 import { ExistingBusinessMatches } from "@/components/cms/ExistingBusinessMatches";
 import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
@@ -112,6 +113,7 @@ export function BusinessEditor({ id }: Props) {
             <BusinessLocationPanel businessId={entityId} />
             <BusinessAttributesPanel businessId={entityId} />
             <BusinessMenuPanel businessId={entityId} />
+            <BusinessOnlineSalesPanel businessId={entityId} variant="admin" />
             <BusinessMediaPanels businessId={entityId} />
             <RelatedOverridesPanel entityType="business" entityId={entityId} />
             <SeoLandingAction entityType="business" entityId={entityId} />

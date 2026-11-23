@@ -50,6 +50,7 @@ import { PILOT_NON_DEMO_FILTER } from "@/lib/omxds/pilot-allowlist";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { isValidPoint, type AccreditedCoords, type CoordsSource } from "@/lib/alux/proximity";
 import { prioritizeRows, productSellsOnline } from "@/lib/alux/converse-priority";
+import { fetchPublicOnlineSales } from "@/lib/commerce/online-sales-public.server";
 import {
   nextEventOccurrence,
   normalizeExceptionDates,
@@ -350,8 +351,18 @@ export async function loadAluxCanonicalCandidates(
       }),
     );
     const error = results.find((r) => r.error)?.error ?? null;
-    const loadedRows = results
-      .flatMap((r) => (r.data ?? []) as Array<Record<string, unknown>>)
+    const rawRows = results.flatMap((r) => (r.data ?? []) as Array<Record<string, unknown>>);
+    const onlineSales = await fetchPublicOnlineSales(
+      sb,
+      rawRows.filter((r) => r.product_type !== "experiencia").map((r) => clean(r.business_id)),
+    );
+    const loadedRows = rawRows
+      .map(
+        (r): Record<string, unknown> => ({
+          ...r,
+          online_sales: onlineSales.get(clean(r.business_id)) ?? null,
+        }),
+      )
       .sort((a, b) => clean(a.name).localeCompare(clean(b.name), "es"));
     const weights = input.businessWeights;
     const rows = prioritized

@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Download, RefreshCw } from "lucide-react";
 import { DirectSaleRequestsPanel } from "@/components/commerce/DirectSaleRequestsPanel";
 import { HostSettlementsPanel } from "@/components/commerce/HostSettlementsPanel";
+import { OnlineSalesCommissionPanel } from "@/components/commerce/OnlineSalesCommissionPanel";
 
 export const Route = createFileRoute("/_authenticated/cms/ventas-en-linea")({
   head: () => ({
@@ -174,6 +175,8 @@ function DirectSalesAdminPage() {
           convertidos a {currency}.
         </p>
       </header>
+
+      <OnlineSalesCommissionPanel />
 
       <DirectSaleRequestsPanel />
 
