@@ -126,7 +126,7 @@ export const inviteUser = createServerFn({ method: "POST" })
 
 async function auditAdminAction(params: {
   actorId: string;
-  targetId: string;
+  targetId: string | null;
   action: string;
   metadata?: Record<string, string | number | boolean | null>;
 }) {
@@ -236,10 +236,13 @@ export const deleteUser = createServerFn({ method: "POST" })
     if (isTargetSuper) throw new Error("No se puede eliminar una cuenta super_admin.");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
     if (error) throw new Error(error.message);
+    // The account no longer exists: keep its id in metadata so the audit row
+    // does not point at a missing user.
     await auditAdminAction({
       actorId: context.userId,
-      targetId: data.userId,
+      targetId: null,
       action: "user.delete",
+      metadata: { surface: "/admin/sistema/usuarios", deleted_user_id: data.userId },
     });
     return { ok: true as const };
   });

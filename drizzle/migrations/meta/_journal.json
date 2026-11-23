@@ -113,6 +113,13 @@
       "when": 1795402847800,
       "tag": "0015_business_menu_items",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1795447229884,
+      "tag": "0016_audit_role_revoke_on_user_delete",
+      "breakpoints": true
     }
   ]
 }

@@ -71,7 +71,26 @@ export interface AddToTravelPlanButtonProps {
  */
 type Phase = "idle" | "adding" | "error";
 
-export function AddToTravelPlanButton({
+export function AddToTravelPlanButton(props: AddToTravelPlanButtonProps) {
+  // TP1.1 · Política central de elegibilidad. Superficies existentes que
+  // integran `destination` deben pasar `eligibilityMode="legacy"` para
+  // preservar comportamiento.
+  const eligibility = evaluateTripEligibility({
+    kind: props.kind,
+    targetId: props.targetId,
+    title: props.title,
+    mode: props.eligibilityMode ?? "universal",
+  });
+  // Staff mode has no traveler panel: hide the personal trip action.
+  // Decided here, before the inner hooks run, because the profile mode
+  // resolves after the first render and an early return between hooks
+  // would change the hook order.
+  const hideForStaff = useHidesTravelerSurfaces();
+  if (!eligibility.eligible || hideForStaff) return null;
+  return <AddToTravelPlanButtonInner {...props} />;
+}
+
+function AddToTravelPlanButtonInner({
   kind,
   targetId,
   title,
@@ -81,21 +100,7 @@ export function AddToTravelPlanButton({
   notes,
   variant = "compact",
   className,
-  eligibilityMode = "universal",
 }: AddToTravelPlanButtonProps) {
-  // TP1.1 · Política central de elegibilidad. Superficies existentes que
-  // integran `destination` deben pasar `eligibilityMode="legacy"` para
-  // preservar comportamiento.
-  const eligibility = evaluateTripEligibility({
-    kind,
-    targetId,
-    title,
-    mode: eligibilityMode,
-  });
-  // Staff mode has no traveler panel: hide the personal trip action.
-  const hideForStaff = useHidesTravelerSurfaces();
-  if (!eligibility.eligible || hideForStaff) return null;
-
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const fetchActive = useServerFn(getMyActivePlan);
