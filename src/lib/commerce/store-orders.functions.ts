@@ -13,7 +13,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { onlineSaleModeFor } from "@/lib/commerce/online-sales-rules";
-import { MENU_ORDER_MAX_LINES, MENU_ORDER_MAX_PER_ITEM } from "@/lib/commerce/store-catalog";
+import { MENU_ORDER_MAX_LINES, MENU_ORDER_MAX_PER_ITEM, MENU_ORDER_NOTE_MAX } from "@/lib/commerce/store-catalog";
 
 type AnyRpc = {
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
@@ -33,6 +33,10 @@ export function storeOrderErrorMessage(message: string): string {
   if (message.includes("menu_item_unavailable")) return "Una bebida o platillo ya no está disponible. Revisa tu pedido.";
   if (message.includes("menu_item_without_price")) return "Uno de los productos no tiene precio publicado.";
   if (message.includes("menu_order_empty")) return "Agrega al menos un producto a tu pedido.";
+  if (message.includes("menu_order_extra_invalid"))
+    return "Un extra quedó sin su bebida. Revisa tu pedido.";
+  if (message.includes("menu_order_extras_need_item"))
+    return "Los extras acompañan una bebida o platillo. Agrega primero una bebida a tu pedido.";
   if (message.includes("online_sales_not_enabled_for_business"))
     return "Esta empresa no tiene la venta en línea activada para este tipo de producto.";
   if (message.includes("forbidden")) return "Solo el administrador puede hacer este cambio.";
@@ -54,6 +58,8 @@ export const startMenuOrder = createServerFn({ method: "POST" })
             z.object({
               menuItemId: z.string().uuid(),
               quantity: z.number().int().min(1).max(MENU_ORDER_MAX_PER_ITEM),
+              note: z.string().trim().max(MENU_ORDER_NOTE_MAX).optional(),
+              forItemId: z.string().uuid().optional(),
             }),
           )
           .min(1)
@@ -66,12 +72,32 @@ export const startMenuOrder = createServerFn({ method: "POST" })
       "commerce_create_menu_order",
       {
         _business_id: data.businessId,
-        _items: data.items.map((i) => ({ menu_item_id: i.menuItemId, quantity: i.quantity })),
+        _items: data.items.map((i) => ({
+          menu_item_id: i.menuItemId,
+          quantity: i.quantity,
+          ...(i.note ? { note: i.note } : {}),
+          ...(i.forItemId ? { for_item: i.forItemId } : {}),
+        })),
         _channel: "pagina",
       },
     );
     if (error) throw new Error(storeOrderErrorMessage(error.message));
     return { orderId: String(orderId) };
+  });
+
+/** Tienda: nota del comprador («para regalo») mientras la compra no está pagada. */
+export const setStoreOrderNote = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ orderId: z.string().uuid(), note: z.string().trim().max(MENU_ORDER_NOTE_MAX) }).parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await (context.supabase as unknown as AnyRpc).rpc("commerce_set_store_note", {
+      _order_id: data.orderId,
+      _note: data.note,
+    });
+    if (error) throw new Error("No pudimos guardar tu nota.");
+    return { ok: true };
   });
 
 /* ───────────────────────────── Botón de compra (público) ───────────────────────────── */

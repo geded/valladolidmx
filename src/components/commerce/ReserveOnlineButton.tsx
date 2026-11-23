@@ -24,11 +24,18 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { listAvailableDepartures, startBooking } from "@/lib/commerce/booking.functions";
-import { getProductSaleInfo, storeOrderErrorMessage } from "@/lib/commerce/store-orders.functions";
-import { maxPurchasable } from "@/lib/commerce/store-catalog";
+import { getProductSaleInfo, setStoreOrderNote, storeOrderErrorMessage } from "@/lib/commerce/store-orders.functions";
+import { MENU_ORDER_NOTE_MAX, cleanMenuNote, maxPurchasable } from "@/lib/commerce/store-catalog";
+import { Textarea } from "@/components/ui/textarea";
 import { getStayCalendar, requestStay } from "@/lib/commerce/stay-requests.functions";
 import { dayKey, shortPrice, stayFits } from "@/lib/commerce/stay-calendar";
 import { StayDatesPicker } from "@/components/commerce/StayDatesPicker";
+import {
+  currentPageLabel,
+  currentReturnPath,
+  rememberAuthReturnPath,
+  rememberCheckoutOrigin,
+} from "@/lib/navigation/session-context";
 import type { DateRange } from "react-day-picker";
 import {
   calendarDayKey,
@@ -66,6 +73,7 @@ export function ReserveOnlineButton({
   const navigate = useNavigate();
   const fetchDepartures = useServerFn(listAvailableDepartures);
   const reserve = useServerFn(startBooking);
+  const saveStoreNote = useServerFn(setStoreOrderNote);
   const fetchSaleInfo = useServerFn(getProductSaleInfo);
   const fetchStayCalendar = useServerFn(getStayCalendar);
   const askStay = useServerFn(requestStay);
@@ -74,6 +82,8 @@ export function ReserveOnlineButton({
   const [day, setDay] = useState<string | null>(null);
   const [departureId, setDepartureId] = useState<string | null>(null);
   const [people, setPeople] = useState(1);
+  // Tienda: nota del comprador para la empresa («para regalo»).
+  const [storeNote, setStoreNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [stayRange, setStayRange] = useState<DateRange | undefined>(undefined);
 
@@ -168,10 +178,16 @@ export function ReserveOnlineButton({
   }
 
   async function handleReserve() {
+    const back = currentReturnPath();
+    const pageName = currentPageLabel();
     if (!user) {
+      // Al abrir la cuenta vuelve a esta misma ficha.
+      rememberAuthReturnPath(back, pageName ?? undefined);
       navigate({ to: "/auth" });
       return;
     }
+    const keepOrigin = (orderId: string) =>
+      rememberCheckoutOrigin(orderId, { path: back, label: pageName ? `Volver a ${pageName}` : "Volver a la ficha" });
     setBusy(true);
     if (byNights) {
       try {
@@ -180,6 +196,7 @@ export function ReserveOnlineButton({
           data: { productId, checkIn: stayCheckIn, checkOut: stayCheckOut, guests: people },
         });
         setOpen(false);
+        keepOrigin(res.orderId);
         navigate({ to: "/cuenta/checkout/$orderId", params: { orderId: res.orderId } });
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "No pudimos enviar tu solicitud");
@@ -197,7 +214,16 @@ export function ReserveOnlineButton({
           clientRequestId: genId(),
         },
       });
+      const note = byPieces ? cleanMenuNote(storeNote) : "";
+      if (note) {
+        try {
+          await saveStoreNote({ data: { orderId: res.order_id, note } });
+        } catch {
+          toast.message("Tu compra quedó lista, pero no pudimos guardar la nota.");
+        }
+      }
       setOpen(false);
+      keepOrigin(res.order_id);
       navigate({ to: "/cuenta/checkout/$orderId", params: { orderId: res.order_id } });
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
@@ -277,6 +303,19 @@ export function ReserveOnlineButton({
                       {saleInfoQ.data.stock === 1 ? "Queda 1 pieza" : `Quedan ${saleInfoQ.data.stock} piezas`}
                     </span>
                   ) : null}
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor={`store-note-${productId}`} className="text-xs font-medium uppercase text-muted-foreground">
+                    Nota para la tienda (opcional)
+                  </label>
+                  <Textarea
+                    id={`store-note-${productId}`}
+                    value={storeNote}
+                    maxLength={MENU_ORDER_NOTE_MAX}
+                    onChange={(e) => setStoreNote(e.target.value)}
+                    placeholder="Ej. es para regalo, color preferido"
+                    rows={2}
+                  />
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Pagas en línea y lo recoges en el local. Muestra tu folio al llegar.

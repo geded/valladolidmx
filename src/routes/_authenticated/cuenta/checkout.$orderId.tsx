@@ -9,7 +9,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import {
+  readCheckoutOrigin,
+  settleCheckoutOrigin,
+  type CheckoutOrigin,
+} from "@/lib/navigation/session-context";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -68,6 +74,22 @@ function CheckoutPage() {
   });
 
   const [busy, setBusy] = useState(false);
+  // Página de la empresa o ficha desde la que se abrió (Copalli, hotel…).
+  const [origin, setOrigin] = useState<CheckoutOrigin | null>(null);
+  useEffect(() => setOrigin(readCheckoutOrigin(orderId)), [orderId]);
+  const orderStatus = orderQ.data?.status;
+  useEffect(() => {
+    if (orderStatus === "paid" || orderStatus === "fulfilled") settleCheckoutOrigin(orderId);
+  }, [orderStatus, orderId]);
+  const originLink = origin ? (
+    <Link
+      to={origin.path}
+      className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+    >
+      <ArrowLeft className="size-4" aria-hidden />
+      {origin.label}
+    </Link>
+  ) : null;
 
   if (orderQ.isLoading) {
     return (
@@ -144,6 +166,7 @@ function CheckoutPage() {
     try {
       // Modalidad vigente: pago en efectivo con el concierge.
       await payCash({ data: { orderId, note: null } });
+      settleCheckoutOrigin(orderId);
       await notifyConfirmed(order);
       try {
         await notifyAdmin({ data: { orderId } });
@@ -199,6 +222,7 @@ function CheckoutPage() {
 
   return (
     <div className="max-w-3xl">
+      {originLink}
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
         Oriente Maya de Yucatán
       </p>

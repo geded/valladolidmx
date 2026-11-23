@@ -176,6 +176,34 @@
       "when": 1795462864478,
       "tag": "0024_calendar_set_room_count",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1795472410519,
+      "tag": "0025_menu_order_extras_need_drink",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1795472753306,
+      "tag": "0026_menu_order_line_notes_and_extras",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1795472990217,
+      "tag": "0027_store_order_note",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1795473078722,
+      "tag": "0028_store_order_note_fix_type",
+      "breakpoints": true
     }
   ]
 }

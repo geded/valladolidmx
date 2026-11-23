@@ -12,8 +12,10 @@ import { resolveRoleHome } from "@/types/auth";
 import { useTranslation } from "@/i18n/context";
 import { useNavigationSession } from "@/lib/navigation";
 import {
+  authReturnPathname,
   consumeAuthReturnPath,
   describeJourneyStep,
+  readAuthReturnLabel,
   readAuthReturnPath,
   readJourneyPrefix,
   readPreviousRoute,
@@ -49,6 +51,7 @@ function AuthRoute() {
   const [googleMode, setGoogleMode] = useState<"popup" | "redirect">("popup");
   const [welcomeName, setWelcomeName] = useState<string | null>(null);
   const [returnTarget, setReturnTarget] = useState<string | null>(null);
+  const [returnName, setReturnName] = useState<string | null>(null);
   const [journey, setJourney] = useState<JourneyStep[]>([]);
   const session = useNavigationSession();
 
@@ -56,15 +59,19 @@ function AuthRoute() {
     // El retorno explícito tiene prioridad. El rastro público cubre cualquier
     // otro llamado existente a /auth sin exigir lógica duplicada por enlace.
     const storedTrail = readJourneyPrefix("/auth");
-    const target = readAuthReturnPath() ?? readPreviousRoute() ?? storedTrail.at(-1)?.path ?? null;
+    const explicit = readAuthReturnPath();
+    const target = explicit ?? readPreviousRoute() ?? storedTrail.at(-1)?.path ?? null;
+    // Nombre de la página de origen («Copalli Café») sólo si es el retorno explícito.
+    const name = explicit && target === explicit ? readAuthReturnLabel() : null;
     const targetStep = target ? describeJourneyStep(target) : null;
     // La ruta guardada por el enlace del header es la autoridad del origen.
     // No mezclarla con pasos viejos de la misma pestaña: al abrir Acceso desde
     // Home, el breadcrumb debe ser Inicio → Cuenta aunque antes se hayan
     // visitado destinos, Mapa o Arma tu Viaje.
     const trail = targetStep ? [...readJourneyPrefix(targetStep.path), targetStep] : [];
-    if (target) rememberAuthReturnPath(target);
+    if (target) rememberAuthReturnPath(target, name ?? undefined);
     setReturnTarget(target);
+    setReturnName(name);
     setJourney(trail);
     // Enlace personal del concierge (/continuar): llega con modo, nombre y correo escritos.
     const params = new URLSearchParams(window.location.search);
@@ -116,7 +123,8 @@ function AuthRoute() {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            // Con una página pendiente, el enlace del correo vuelve a Acceso y de ahí a esa página.
+            emailRedirectTo: returnTarget ? `${window.location.origin}/auth` : window.location.origin,
             data: { full_name: name },
           },
         });
@@ -175,8 +183,9 @@ function AuthRoute() {
 
   // Home no forma parte del recorrido territorial, pero sí es un origen válido:
   // sin este caso el enlace mostraba el texto genérico "la página anterior".
-  const normalizedReturn = returnTarget?.split("?")[0].replace(/\/+$/, "") || "/";
+  const normalizedReturn = returnTarget ? authReturnPathname(returnTarget) : "/";
   const returnLabel =
+    returnName ??
     (returnTarget
       ? normalizedReturn === "/"
         ? "Inicio"
@@ -207,6 +216,10 @@ function AuthRoute() {
   const crumbs = [
     ...(territorialOrigin ? [{ label: "Oriente Maya", to: "/oriente-maya" }] : []),
     ...destinationCrumb,
+    // Página de la empresa (o ficha) desde la que se pidió entrar.
+    ...(territorialOrigin && returnName && normalizedReturn !== "/oriente-maya"
+      ? [{ label: returnName, to: normalizedReturn }]
+      : []),
     // Recorrido real del explorador (Arma tu Viaje, Alux, Mapa…) antes del acceso.
     ...journey.map((step) => ({ label: step.label, to: step.path })),
     { label: t("auth.eyebrow") },

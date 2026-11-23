@@ -608,6 +608,9 @@
 - [ ] Fase 3: el WhatsApp de la empresa usa el canal «WhatsApp de Alux» para cobrar (hoy sigue cobrando solo experiencias) — espera visto bueno.
 - [x] Tienda de artesanías piloto: Coqui Coqui.
 - [x] Comisión distinta por tipo (tienda, pedidos, hoteles), 15 % inicial, editable por el administrador.
+- [x] Pedido de Copalli (2026-11-23): los extras solo se piden con una bebida; al ir a abrir la cuenta o a pagar, siempre se puede volver a la empresa con el pedido intacto.
+- [x] Pedido de Copalli: a cada bebida se le pueden elegir extras y escribir una nota (por ejemplo «sin azúcar»), y la empresa la ve en el pedido.
+- [x] Tienda (Coqui Coqui y demás artesanías): al comprar se puede escribir una nota («para regalo»…) y la empresa la ve en el pedido.
 - [ ] Sincronización con Airbnb / Booking (futura, sin empezar):
   - Opción 1 · Compartir calendarios (iCal): el hotel pega el enlace de Airbnb/Booking en su panel y viceversa; solo pasa «ocupado/libre», no precios ni datos del huésped; actualización cada pocas horas; el hotel sigue confirmando cada reserva.
   - Opción 2 · Gestor de canales (Cloudbeds, SiteMinder): conexión completa con precios, cupos y reservas al instante; requiere que el hotel contrate el servicio; conviene a hoteles con más habitaciones.

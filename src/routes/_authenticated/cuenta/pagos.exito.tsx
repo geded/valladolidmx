@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getConciergeOrder, getMyConfirmedTravel } from "@/lib/concierge/orders.functions";
+import { useEffect } from "react";
+import { settleCheckoutOrigin } from "@/lib/navigation/session-context";
 import { CalendarCheck, Compass, LifeBuoy, MessageCircle, Sparkles, MapPin } from "lucide-react";
 
 interface S {
@@ -30,6 +32,11 @@ function ExitoPage() {
   });
 
   const orderData = orderQ.data;
+  const paidStatus = orderData?.status;
+  useEffect(() => {
+    // Pedido pagado: el carrito guardado de esa empresa ya no hace falta.
+    if (order && (paidStatus === "paid" || paidStatus === "fulfilled")) settleCheckoutOrigin(order);
+  }, [order, paidStatus]);
   const confirmed = confirmedQ.data;
   const folio = orderData?.folio ?? confirmed?.folio;
   const title =

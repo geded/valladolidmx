@@ -57,13 +57,58 @@ export function isSafeAuthReturnPath(path: string | null | undefined): path is s
   return !/^\/(?:auth|~oauth|api)(?:\/|$|\?)/.test(path);
 }
 
-/** Registra la superficie que invocó el acceso para volver tras autenticar. */
-export function rememberAuthReturnPath(path: string): void {
+const AUTH_RETURN_LABEL_KEY = "vmx.auth.next.label";
+/** Copia en el dispositivo: sobrevive a confirmar el correo en otra pestaña. */
+const AUTH_RETURN_DEVICE_KEY = "vmx.auth.next.device";
+const AUTH_RETURN_DEVICE_TTL_MS = 2 * 60 * 60_000;
+
+function hasLocal(): boolean {
+  return typeof window !== "undefined" && typeof localStorage !== "undefined";
+}
+
+/** Quita el ancla (#menu) para comparar o describir la ruta. */
+export function authReturnPathname(path: string): string {
+  return path.split("#")[0]?.split("?")[0]?.replace(/\/+$/, "") || "/";
+}
+
+/**
+ * Registra la superficie que invocó el acceso para volver tras autenticar.
+ * `label` es el nombre visible («Copalli Café») para «Volver a …».
+ */
+export function rememberAuthReturnPath(path: string, label?: string): void {
   if (!hasWindow() || !isSafeAuthReturnPath(path)) return;
+  const cleanLabel = label?.trim().slice(0, 80) || null;
   try {
+    const previous = sessionStorage.getItem(AUTH_RETURN_KEY);
     sessionStorage.setItem(AUTH_RETURN_KEY, path);
+    if (cleanLabel) sessionStorage.setItem(AUTH_RETURN_LABEL_KEY, cleanLabel);
+    else if (previous !== path) sessionStorage.removeItem(AUTH_RETURN_LABEL_KEY);
   } catch {
     // storage bloqueado → silencioso
+  }
+  if (!hasLocal()) return;
+  try {
+    const keepLabel = cleanLabel ?? (readDeviceReturn()?.path === path ? readDeviceReturn()?.label ?? null : null);
+    localStorage.setItem(AUTH_RETURN_DEVICE_KEY, JSON.stringify({ path, label: keepLabel, at: Date.now() }));
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+function readDeviceReturn(): { path: string; label: string | null } | null {
+  if (!hasLocal()) return null;
+  try {
+    const raw = localStorage.getItem(AUTH_RETURN_DEVICE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { path?: unknown; label?: unknown; at?: unknown };
+    if (typeof parsed.at !== "number" || Date.now() - parsed.at > AUTH_RETURN_DEVICE_TTL_MS) {
+      localStorage.removeItem(AUTH_RETURN_DEVICE_KEY);
+      return null;
+    }
+    if (typeof parsed.path !== "string" || !isSafeAuthReturnPath(parsed.path)) return null;
+    return { path: parsed.path, label: typeof parsed.label === "string" ? parsed.label : null };
+  } catch {
+    return null;
   }
 }
 
@@ -72,10 +117,23 @@ export function readAuthReturnPath(): string | null {
   if (!hasWindow()) return null;
   try {
     const path = sessionStorage.getItem(AUTH_RETURN_KEY);
-    return isSafeAuthReturnPath(path) ? path : null;
+    if (isSafeAuthReturnPath(path)) return path;
   } catch {
-    return null;
+    // storage bloqueado → se intenta la copia del dispositivo
   }
+  return readDeviceReturn()?.path ?? null;
+}
+
+/** Nombre visible del retorno guardado («Copalli Café»), si se conoce. */
+export function readAuthReturnLabel(): string | null {
+  if (!hasWindow()) return null;
+  try {
+    const path = sessionStorage.getItem(AUTH_RETURN_KEY);
+    if (isSafeAuthReturnPath(path)) return sessionStorage.getItem(AUTH_RETURN_LABEL_KEY);
+  } catch {
+    // storage bloqueado
+  }
+  return readDeviceReturn()?.label ?? null;
 }
 
 /** Consume el retorno únicamente cuando la sesión ya fue autenticada. */
@@ -84,10 +142,90 @@ export function consumeAuthReturnPath(): string | null {
   if (!hasWindow()) return path;
   try {
     sessionStorage.removeItem(AUTH_RETURN_KEY);
+    sessionStorage.removeItem(AUTH_RETURN_LABEL_KEY);
+  } catch {
+    // storage bloqueado → silencioso
+  }
+  try {
+    if (hasLocal()) localStorage.removeItem(AUTH_RETURN_DEVICE_KEY);
   } catch {
     // storage bloqueado → silencioso
   }
   return path;
+}
+
+/* ───────────── Origen de la confirmación (volver a la empresa) ───────────── */
+
+const CHECKOUT_ORIGIN_KEY = "vmx.checkout.origins.v1";
+const CHECKOUT_ORIGIN_TTL_MS = 7 * 24 * 60 * 60_000;
+const CHECKOUT_ORIGIN_MAX = 12;
+
+export interface CheckoutOrigin {
+  readonly path: string;
+  readonly label: string;
+  /** Llave del pedido guardado en el dispositivo; se borra al quedar pagado. */
+  readonly cartKey?: string;
+}
+
+type StoredOrigins = Record<string, CheckoutOrigin & { at: number }>;
+
+function readOrigins(): StoredOrigins {
+  if (!hasLocal()) return {};
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CHECKOUT_ORIGIN_KEY) ?? "{}") as StoredOrigins;
+    const now = Date.now();
+    return Object.fromEntries(
+      Object.entries(parsed).filter(
+        ([, o]) => o && typeof o.at === "number" && now - o.at <= CHECKOUT_ORIGIN_TTL_MS && isSafeAuthReturnPath(o.path),
+      ),
+    );
+  } catch {
+    return {};
+  }
+}
+
+/** La página desde la que se abrió la confirmación de un pedido o reserva. */
+export function rememberCheckoutOrigin(orderId: string, origin: CheckoutOrigin): void {
+  if (!hasLocal() || !isSafeAuthReturnPath(origin.path)) return;
+  try {
+    const all = readOrigins();
+    all[orderId] = { ...origin, label: origin.label.slice(0, 80), at: Date.now() };
+    const kept = Object.entries(all)
+      .sort(([, a], [, b]) => b.at - a.at)
+      .slice(0, CHECKOUT_ORIGIN_MAX);
+    localStorage.setItem(CHECKOUT_ORIGIN_KEY, JSON.stringify(Object.fromEntries(kept)));
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+export function readCheckoutOrigin(orderId: string): CheckoutOrigin | null {
+  const o = readOrigins()[orderId];
+  return o ? { path: o.path, label: o.label, ...(o.cartKey ? { cartKey: o.cartKey } : {}) } : null;
+}
+
+/** Pedido pagado o confirmado: el carrito guardado de esa empresa ya no hace falta. */
+export function settleCheckoutOrigin(orderId: string): void {
+  const origin = readCheckoutOrigin(orderId);
+  if (!origin?.cartKey || !hasLocal()) return;
+  try {
+    localStorage.removeItem(origin.cartKey);
+  } catch {
+    // storage bloqueado → silencioso
+  }
+}
+
+/** Nombre visible de la página actual, tomado del título («Casa Tía Micha · …»). */
+export function currentPageLabel(): string | null {
+  if (typeof document === "undefined") return null;
+  const first = document.title.split(/\s[·|—–-]\s/)[0]?.trim();
+  return first ? first.slice(0, 80) : null;
+}
+
+/** Ruta actual completa (con búsqueda y ancla) para volver a ella. */
+export function currentReturnPath(hash?: string): string {
+  if (typeof window === "undefined") return "/";
+  return `${window.location.pathname}${window.location.search}${hash ?? ""}`;
 }
 
 function toSlot(node: ContextNode | undefined): NavigationSessionSlot | undefined {
@@ -364,7 +502,7 @@ export interface JourneyStep {
 
 /** Describe una ruta transversal conocida; `null` si no forma parte del vocabulario. */
 export function describeJourneyStep(path: string): JourneyStep | null {
-  const clean = path.split("?")[0].replace(/\/+$/, "") || "/";
+  const clean = authReturnPathname(path);
   const match = JOURNEY_STEPS.find((s) => clean === s.path || clean.startsWith(`${s.path}/`));
   return match ? { path: match.path, label: match.label } : null;
 }

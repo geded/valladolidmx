@@ -23,6 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 import { createDirectSaleOrder } from "@/lib/concierge/orders.functions";
+import { currentPageLabel, currentReturnPath, rememberCheckoutOrigin } from "@/lib/navigation/session-context";
 
 export function DirectSaleBuyButton({
   productId,
@@ -69,6 +70,11 @@ export function DirectSaleBuyButton({
         });
         setOpen(false);
         setStep("review");
+        const pageName = productName ?? currentPageLabel();
+        rememberCheckoutOrigin(orderId, {
+          path: currentReturnPath(),
+          label: pageName ? `Volver a ${pageName}` : "Volver a la ficha",
+        });
         navigate({ to: "/cuenta/checkout/$orderId", params: { orderId } });
       } catch (err) {
         setStep("review");

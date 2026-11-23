@@ -9517,6 +9517,10 @@ export type Database = {
         }
         Returns: string
       }
+      commerce_set_store_note: {
+        Args: { _note: string; _order_id: string }
+        Returns: undefined
+      }
       commerce_setting_int: {
         Args: { _default: number; _key: string }
         Returns: number
@@ -10637,6 +10641,7 @@ export type Database = {
           retry_after_seconds: number
         }[]
       }
+      menu_section_is_extra: { Args: { _section: string }; Returns: boolean }
       online_sale_mode_for: {
         Args: { _type: Database["public"]["Enums"]["product_type"] }
         Returns: string

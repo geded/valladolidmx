@@ -91,6 +91,56 @@ export interface MenuOrderable {
   name: string;
   /** Precio en pesos; sin precio no se puede pedir. */
   price: number | null;
+  /** Pertenece a una sección de extras (leches, toppings…): nunca va sola. */
+  extra?: boolean;
+}
+
+/**
+ * Secciones de extras de la carta: «Extras», «Adicionales», «Complementos»,
+ * «Toppings», «Agregados», «Add-ons». Misma regla que la función SQL
+ * `menu_section_is_extra`.
+ */
+export function isMenuExtraSection(section: string | null | undefined): boolean {
+  if (!section) return false;
+  const clean = section
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  return /^(extras?|adicionales?|complementos?|toppings?|agregados?|add-?ons?)([^a-z]|$)/.test(clean);
+}
+
+/** ¿El pedido ya tiene al menos una bebida o platillo que no sea extra? */
+export function menuOrderHasMainItem(
+  cart: Readonly<Record<string, number>>,
+  items: readonly MenuOrderable[],
+): boolean {
+  const byId = new Map(items.map((i) => [i.id, i]));
+  return Object.entries(cart).some(([id, q]) => {
+    const item = byId.get(id);
+    return q > 0 && !!item && !item.extra && isMenuItemOrderable(item);
+  });
+}
+
+/**
+ * Cambia la cantidad aplicando la regla de extras: un extra sólo se agrega
+ * con una bebida o platillo en el pedido, y al quitar la última bebida los
+ * extras se quitan con ella.
+ */
+export function updateMenuOrder(
+  cart: Readonly<Record<string, number>>,
+  items: readonly MenuOrderable[],
+  itemId: string,
+  quantity: number,
+): Record<string, number> {
+  const item = items.find((i) => i.id === itemId);
+  const current = cart[itemId] ?? 0;
+  if (item?.extra && quantity > current && !menuOrderHasMainItem(cart, items)) return { ...cart };
+  const next = setMenuOrderQuantity(cart, itemId, quantity);
+  if (menuOrderHasMainItem(next, items)) return next;
+  const extras = new Set(items.filter((i) => i.extra).map((i) => i.id));
+  for (const id of Object.keys(next)) if (extras.has(id)) delete next[id];
+  return next;
 }
 
 /** Sólo se pide lo que tiene identidad y precio publicado. */
@@ -137,6 +187,81 @@ export function summarizeMenuOrder(
     lines,
     pieces: lines.reduce((s, l) => s + l.quantity, 0),
     total: Math.round(lines.reduce((s, l) => s + l.subtotal, 0) * 100) / 100,
+  };
+}
+
+/** Extras y nota elegidos para una bebida o platillo (aplican a cada unidad). */
+export interface MenuLineCustom {
+  extras: string[];
+  note: string;
+}
+
+export const MENU_ORDER_NOTE_MAX = 140;
+
+export interface MenuOrderLine {
+  menuItemId: string;
+  quantity: number;
+  name: string;
+  subtotal: number;
+  note?: string;
+  /** Extra ligado: la bebida o platillo al que acompaña. */
+  forItemId?: string;
+  forName?: string;
+}
+
+export function cleanMenuNote(note: string | null | undefined): string {
+  return (note ?? "").replace(/\s+/g, " ").trim().slice(0, MENU_ORDER_NOTE_MAX);
+}
+
+/**
+ * Líneas finales del pedido: cada bebida con su nota, sus extras ligados
+ * (una unidad del extra por cada bebida) y los extras sueltos. Si no queda
+ * ninguna bebida o platillo, no hay pedido.
+ */
+export function buildMenuOrderLines(
+  cart: Readonly<Record<string, number>>,
+  custom: Readonly<Record<string, MenuLineCustom>>,
+  items: readonly MenuOrderable[],
+): { lines: MenuOrderLine[]; pieces: number; total: number } {
+  const byId = new Map(items.map((i) => [i.id, i]));
+  const lines: MenuOrderLine[] = [];
+  const money = (n: number) => Math.round(n * 100) / 100;
+  for (const [id, quantity] of Object.entries(cart)) {
+    const item = byId.get(id);
+    if (!item || !isMenuItemOrderable(item) || quantity < 1) continue;
+    const price = item.price as number;
+    if (item.extra) {
+      lines.push({ menuItemId: id, quantity, name: item.name, subtotal: money(price * quantity) });
+      continue;
+    }
+    const c = custom[id];
+    const note = cleanMenuNote(c?.note);
+    lines.push({
+      menuItemId: id,
+      quantity,
+      name: item.name,
+      subtotal: money(price * quantity),
+      ...(note ? { note } : {}),
+    });
+    for (const extraId of new Set(c?.extras ?? [])) {
+      const extra = byId.get(extraId);
+      if (!extra?.extra || !isMenuItemOrderable(extra)) continue;
+      lines.push({
+        menuItemId: extraId,
+        quantity,
+        name: extra.name,
+        subtotal: money((extra.price as number) * quantity),
+        forItemId: id,
+        forName: item.name,
+      });
+    }
+  }
+  if (!lines.some((l) => !byId.get(l.menuItemId)?.extra)) return { lines: [], pieces: 0, total: 0 };
+  return {
+    lines: lines.slice(0, MENU_ORDER_MAX_LINES),
+    // «productos» cuenta bebidas y platillos; los extras van dentro del total.
+    pieces: lines.filter((l) => !byId.get(l.menuItemId)?.extra).reduce((s, l) => s + l.quantity, 0),
+    total: money(lines.reduce((s, l) => s + l.subtotal, 0)),
   };
 }
 

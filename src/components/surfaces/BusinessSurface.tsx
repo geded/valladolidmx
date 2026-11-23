@@ -968,7 +968,7 @@ export function BusinessSurface({
 
       {menuDto ? (
         <section id="menu" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
-          {menuDto.capabilities.ordering ? <MenuOrderCart dto={menuDto} /> : <ExperienceMenu dto={menuDto} />}
+          {menuDto.capabilities.ordering ? <MenuOrderCart dto={menuDto} businessName={b.display_name} /> : <ExperienceMenu dto={menuDto} />}
         </section>
       ) : null}
 
