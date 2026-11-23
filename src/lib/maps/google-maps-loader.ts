@@ -26,7 +26,11 @@ export interface GMapInstance {
   ) => void;
   setZoom: (zoom: number) => void;
   setCenter: (position: LatLng) => void;
-  addListener: (event: string, handler: (e: never) => void) => void;
+  addListener: (event: string, handler: (e: never) => void) => { remove: () => void };
+  getZoom: () => number | undefined;
+  getBounds: () =>
+    | { toJSON: () => { north: number; south: number; east: number; west: number } }
+    | undefined;
 }
 export interface GMap {
   new (el: HTMLElement, opts: Record<string, unknown>): GMapInstance;

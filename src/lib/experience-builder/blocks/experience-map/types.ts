@@ -9,7 +9,7 @@
  * estos tipos (enforced por `satisfies z.ZodType<T>` en contract.ts).
  */
 
-export const EXPERIENCE_MAP_CONTRACT_VERSION = "1.0.0" as const;
+export const EXPERIENCE_MAP_CONTRACT_VERSION = "1.1.0" as const;
 
 export type ExperienceMapVariant = "single" | "multi" | "list-sync" | "cluster";
 
@@ -18,7 +18,18 @@ export type ExperienceMapEntityKind =
   | "product"
   | "destination"
   | "event"
-  | "promotion";
+  | "promotion"
+  /** 1.1.0 · Lugares y sitios de interés (`points_of_interest`). */
+  | "place";
+
+/** 1.1.0 · Familia visible del pin: ícono y filtro encima del mapa. */
+export type ExperienceMapPinCategory =
+  | "hotel"
+  | "restaurante"
+  | "casa"
+  | "experiencia"
+  | "lugar"
+  | "otro";
 
 export interface ExperienceMapPoint {
   id: string;
@@ -31,6 +42,10 @@ export interface ExperienceMapPoint {
   thumbUrl?: string | null;
   badge?: string | null;
   priceLabel?: string | null;
+  /** 1.1.0 · Familia del lugar (ícono y filtro). */
+  category?: ExperienceMapPinCategory | null;
+  /** 1.1.0 · Pin dorado del paquete; nunca se agrupa. */
+  featured?: boolean;
 }
 
 export interface ExperienceMapCapabilities {

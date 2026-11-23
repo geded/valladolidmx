@@ -23,6 +23,11 @@ import {
   loadGoogleMaps,
   subscribeGoogleMapsAuthFailure,
 } from "@/lib/maps/google-maps-loader";
+import {
+  CLUSTER_MIN_MARKERS,
+  clusterMarkers,
+  type MapPinCategory,
+} from "@/lib/maps/marker-clusters";
 import { MapUnavailableFallback } from "./MapUnavailableFallback";
 import { StaticMap } from "./StaticMap";
 
@@ -197,6 +202,18 @@ export interface InteractiveMapMarker {
   key?: string;
   /** Posición 1..n dentro del recorrido seleccionado. */
   order?: number | null;
+  /** Familia del lugar: el pin muestra su ícono en lugar de una letra. */
+  category?: MapPinCategory | null;
+  /** Pin dorado de los paquetes con esa ventaja: más visible y nunca agrupado. */
+  featured?: boolean;
+}
+
+/** Área visible del mapa, para sincronizar la lista con lo que se ve. */
+export interface MapViewportBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
 }
 
 export interface InteractiveMapProps {
@@ -235,6 +252,14 @@ export interface InteractiveMapProps {
   minZoom?: number;
   /** Muestra el nombre de cada parada junto a su pin. */
   showMarkerNames?: boolean;
+  /**
+   * Junta en burbujas con número los pines cercanos cuando hay muchos
+   * (desde CLUSTER_MIN_MARKERS); al acercarse se separan. Opt-in: los mapas
+   * de rutas y paradas no cambian.
+   */
+  cluster?: boolean;
+  /** Avisa el área visible cada vez que el mapa termina de moverse. */
+  onViewportChange?: (bounds: MapViewportBounds) => void;
 }
 
 /* Tamaño del pin en pantalla (px CSS). */
@@ -299,6 +324,57 @@ function markerIconDataUri(letter: string, selected = false): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+/* Íconos por familia, trazados dentro del círculo del pin (centro 14,13). */
+const CATEGORY_GLYPHS: Record<MapPinCategory, string> = {
+  hotel:
+    '<path d="M9 16.5v-6M9 13.5h10v3M19 16.5v-3M11.2 12.2a1.1 1.1 0 1 0 0-.01" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+  restaurante:
+    '<path d="M11 8.5v8M9.6 8.5v2.6a1.4 1.4 0 0 0 2.8 0V8.5M16.6 16.5V8.5c-1.3.6-2 1.9-2 3.4v1.4h2" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+  casa: '<path d="M9.3 12.6 14 8.8l4.7 3.8M10.6 11.6v5h6.8v-5M13 16.6v-2.4h2v2.4" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+  experiencia:
+    '<path d="M10.5 16.8V8.6M10.5 9h6.2l-1.3 1.9 1.3 1.9h-6.2" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+  lugar:
+    '<path d="M9 16.6h10M10.2 16.6v-2h7.6v2M11.4 14.6v-2h5.2v2M12.6 12.6v-2h2.8v2M13.4 10.6V9h1.2v1.6" fill="none" stroke-width="1.2" stroke-linejoin="round"/>',
+  otro: '<circle cx="14" cy="13" r="2.2" stroke="none"/>',
+};
+
+/**
+ * Pin con ícono de familia. Normal: cuerpo selva y círculo crema. Destacado
+ * (pin dorado del paquete): cuerpo oro, estrella y un poco más grande.
+ */
+function categoryPinDataUri(category: MapPinCategory, featured: boolean): string {
+  const { bg, stroke } = getMarkerColors();
+  const cream = themeColor("--background", "#fbf7ee");
+  const body = featured ? bg : stroke;
+  const glyph = CATEGORY_GLYPHS[category] ?? CATEGORY_GLYPHS.otro;
+  const star = featured
+    ? `<path d="M22.4 1.2l1.1 2.3 2.5.4-1.8 1.8.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.8 2.5-.4Z" fill="${stroke}" stroke="${cream}" stroke-width=".8"/>`
+    : "";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${MARKER_W}" height="${MARKER_H}" viewBox="0 0 28 36">
+    <ellipse cx="14" cy="34.2" rx="4.2" ry="1.3" fill="${stroke}" opacity=".22"/>
+    <path d="M14 1.5C7.4 1.5 2.2 6.6 2.2 13.1c0 8.6 11.8 19.9 11.8 19.9s11.8-11.3 11.8-19.9C25.8 6.6 20.6 1.5 14 1.5Z" fill="${body}" stroke="${featured ? stroke : cream}" stroke-width="1.4"/>
+    <circle cx="14" cy="13" r="7.2" fill="${cream}"/>
+    <g stroke="${stroke}" fill="${stroke}">${glyph}</g>
+    ${star}
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+/** Burbuja con el número de lugares agrupados. */
+function clusterBubbleDataUri(count: number): { url: string; size: number } {
+  const { bg, stroke } = getMarkerColors();
+  const cream = themeColor("--background", "#fbf7ee");
+  const size = count >= 50 ? 52 : count >= 20 ? 46 : count >= 10 ? 40 : 34;
+  const r = size / 2;
+  const text = count > 999 ? "999+" : String(count);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${r}" cy="${r}" r="${r - 1}" fill="${bg}" opacity=".35"/>
+    <circle cx="${r}" cy="${r}" r="${r - 5}" fill="${stroke}" stroke="${cream}" stroke-width="1.6"/>
+    <text x="${r}" y="${r + 4.2}" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="${size >= 46 ? 13 : 12}" font-weight="700" fill="${cream}">${text}</text>
+  </svg>`;
+  return { url: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`, size };
+}
+
 /** Etiqueta con el nombre de la parada, anclada bajo el pin. */
 function markerNameIconDataUri(text: string): { url: string; width: number; height: number } {
   const { bg, fg, stroke } = getMarkerColors();
@@ -332,14 +408,18 @@ export function InteractiveMap({
   restriction,
   minZoom,
   showMarkerNames = false,
+  cluster = false,
+  onViewportChange,
 }: InteractiveMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
   const routeStatusRef = useRef(onRouteStatus);
   const markerSelectRef = useRef(onMarkerSelect);
+  const viewportRef = useRef(onViewportChange);
   routeStatusRef.current = onRouteStatus;
   markerSelectRef.current = onMarkerSelect;
+  viewportRef.current = onViewportChange;
 
   /* Sólo se descarga el SDK cuando el panel está visible y con tamaño real. */
   const shouldMount = useVisibleWithSize(ref);
@@ -438,21 +518,32 @@ export function InteractiveMap({
         const dense = list.length > 12;
         const pinW = dense ? 22 : MARKER_W;
         const pinH = dense ? 28 : MARKER_H;
-        list.forEach((m, i) => {
+        /* Pines y burbujas se redibujan al agrupar; viven aparte de las
+           líneas de ruta para poder quitarlos sin tocar el recorrido. */
+        const pinOverlays: unknown[] = [];
+        const drawPin = (m: InteractiveMapMarker, i: number) => {
           const selected = typeof m.order === "number" && m.order > 0;
           const label = selected ? String(m.order) : labelForIndex(i);
+          const featured = m.featured === true;
+          const fw = featured ? MARKER_W + 4 : pinW;
+          const fh = featured ? MARKER_H + 5 : pinH;
           const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map,
-            title: `${label} · ${m.title ?? markerTitle ?? "Ubicación"}`,
-            zIndex: selected ? 20 : 10,
+            title: m.category
+              ? (m.title ?? markerTitle ?? "Ubicación")
+              : `${label} · ${m.title ?? markerTitle ?? "Ubicación"}`,
+            zIndex: featured ? 30 : selected ? 20 : 10,
             icon: {
-              url: markerIconDataUri(label, selected),
-              scaledSize: new google.maps.Size(pinW, pinH),
-              anchor: new google.maps.Point(pinW / 2, pinH - 2),
+              url:
+                m.category && !selected
+                  ? categoryPinDataUri(m.category, featured)
+                  : markerIconDataUri(label, selected),
+              scaledSize: new google.maps.Size(fw, fh),
+              anchor: new google.maps.Point(fw / 2, fh - 2),
             },
           });
-          overlays.push(marker);
+          pinOverlays.push(marker);
           if (m.key) {
             marker.addListener("click", () => markerSelectRef.current?.(m.key as string));
           }
@@ -470,12 +561,73 @@ export function InteractiveMap({
                 anchor: new google.maps.Point(chip.width / 2, -4),
               },
             });
-            overlays.push(nameMarker);
+            pinOverlays.push(nameMarker);
             if (m.key) {
               nameMarker.addListener("click", () => markerSelectRef.current?.(m.key as string));
             }
           }
-          bounds.extend({ lat: m.lat, lng: m.lng });
+        };
+        list.forEach((m) => bounds.extend({ lat: m.lat, lng: m.lng }));
+        const clearPins = () => {
+          for (const pin of pinOverlays.splice(0)) {
+            releaseListeners?.(pin);
+            (pin as { setMap?: (map: null) => void }).setMap?.(null);
+          }
+        };
+        const drawAll = () => list.forEach((m, i) => drawPin(m, i));
+        const clustered = cluster && list.length >= CLUSTER_MIN_MARKERS;
+        if (!clustered) drawAll();
+        const redraw = () => {
+          clearPins();
+          const result = clusterMarkers(list, map.getZoom() ?? zoom);
+          result.singles.forEach((i) => drawPin(list[i]!, i));
+          for (const group of result.clusters) {
+            const bubble = clusterBubbleDataUri(group.members.length);
+            const bubbleMarker = new google.maps.Marker({
+              position: { lat: group.lat, lng: group.lng },
+              map,
+              title: `${group.members.length} lugares · acércate para verlos`,
+              zIndex: 15,
+              icon: {
+                url: bubble.url,
+                scaledSize: new google.maps.Size(bubble.size, bubble.size),
+                anchor: new google.maps.Point(bubble.size / 2, bubble.size / 2),
+              },
+            });
+            bubbleMarker.addListener("click", () => {
+              const b = new google.maps.LatLngBounds();
+              b.extend({ lat: group.bounds.south, lng: group.bounds.west });
+              b.extend({ lat: group.bounds.north, lng: group.bounds.east });
+              const tight =
+                group.bounds.north - group.bounds.south < 0.0004 &&
+                group.bounds.east - group.bounds.west < 0.0004;
+              if (tight) {
+                map.setCenter({ lat: group.lat, lng: group.lng });
+                map.setZoom(Math.max((map.getZoom() ?? zoom) + 2, 18));
+              } else {
+                map.fitBounds(b, 48);
+              }
+            });
+            pinOverlays.push(bubbleMarker);
+          }
+        };
+        let lastZoom: number | null = null;
+        const idleListener = map.addListener("idle", () => {
+          if (clustered) {
+            const z = map.getZoom() ?? zoom;
+            if (z !== lastZoom) {
+              lastZoom = z;
+              redraw();
+            }
+          }
+          const vb = map.getBounds();
+          if (vb && viewportRef.current) viewportRef.current(vb.toJSON());
+        });
+        overlays.push({
+          setMap: () => {
+            idleListener.remove();
+            clearPins();
+          },
         });
         const focus = fitPoints && fitPoints.length > 1 ? fitPoints : null;
         if (focus) {
@@ -643,6 +795,7 @@ export function InteractiveMap({
     fitPadding,
     minZoom,
     showMarkerNames,
+    cluster,
   ]);
 
   if (failed) {

@@ -22,6 +22,7 @@ import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { cn } from "@/lib/utils";
+import type { MapPinCategory } from "@/lib/maps/marker-clusters";
 import { resolveMediaSource, type MediaAssetInput } from "@/lib/media/resolve-source";
 import { openAluxFloating } from "@/lib/alux/floating-bus";
 import {
@@ -823,6 +824,16 @@ function TerritorialListingBody({
   const mappedItems = filteredItems.filter(
     (item) => item.source?.coordinates?.lat != null && item.source?.coordinates?.lng != null,
   );
+  /* Valladolid arranca con ~200 empresas: la lista muestra bloques de
+     LISTING_PAGE_SIZE (múltiplo de 4, así cada espacio comercial conserva su
+     lugar) y «Ver más» agrega el siguiente; el mapa sigue mostrando todo lo
+     filtrado. Cambiar un filtro vuelve al primer bloque. */
+  const [visibleCount, setVisibleCount] = useState(LISTING_PAGE_SIZE);
+  useEffect(() => {
+    setVisibleCount(LISTING_PAGE_SIZE);
+  }, [activeFacets, primary, query, secondary, zone]);
+  const visibleItems = filteredItems.slice(0, visibleCount);
+  const remainingItems = filteredItems.length - visibleItems.length;
   return (
     <div className="bg-[var(--background)] pb-4 text-[var(--foreground)] sm:pb-6">
       <div className="w-full">
@@ -878,7 +889,7 @@ function TerritorialListingBody({
             </div>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {filteredItems.map((item) =>
+              {visibleItems.map((item) =>
                 compactDiscovery ? (
                   <QueHacerDiscoveryCard key={item.source?.id ?? item.name} item={item} />
                 ) : (
@@ -897,6 +908,18 @@ function TerritorialListingBody({
               ) : null}
             </div>
 
+            {remainingItems > 0 ? (
+              <div className="mt-5 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((n) => n + LISTING_PAGE_SIZE)}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--selva)] px-5 text-sm font-semibold text-[var(--selva)] transition hover:bg-[var(--selva)]/10"
+                >
+                  Ver más opciones ({remainingItems})
+                </button>
+              </div>
+            ) : null}
+
             {!dto ? <NearbySection profile={profile} /> : null}
           </div>
 
@@ -914,6 +937,19 @@ function TerritorialListingBody({
     </div>
   );
 }
+
+/** Ícono de los pines del listado según su familia. */
+function listingPinCategory(family: string): MapPinCategory {
+  if (family === "hoteles") return "hotel";
+  if (family === "restaurantes") return "restaurante";
+  if (family === "casas-de-vacaciones") return "casa";
+  if (family === "que-hacer" || family === "experiencias") return "experiencia";
+  if (family === "lugares") return "lugar";
+  return "otro";
+}
+
+/** Tarjetas por bloque en listados largos; múltiplo de 4 por los espacios comerciales. */
+const LISTING_PAGE_SIZE = 24;
 
 function normalize(value: string): string {
   return value
@@ -1588,7 +1624,10 @@ function MapPanel({
               lng,
               title: item.name,
               href: item.href,
+              category: listingPinCategory(profile.family),
+              featured: item.source?.goldenPin === true,
             }))}
+            cluster
             className={`h-64 sm:h-80 ${compact ? "lg:h-[26rem]" : "lg:h-[31rem]"}`}
           />
         </Suspense>
@@ -2031,7 +2070,9 @@ function EventMapPanel({
               lng,
               title: item.name,
               href: item.href,
+              ...(profile.family === "lugares" ? { category: "lugar" as const } : {}),
             }))}
+            cluster
             className="h-64 sm:h-80 lg:h-[31rem]"
           />
         </Suspense>

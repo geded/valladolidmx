@@ -10,12 +10,12 @@
  * Founder Discovery Principle: responde "dónde está", "qué hay cerca",
  * "cómo llegar" y "qué puedo descubrir alrededor" con un único bloque.
  *
- * Nota: las variantes `list-sync` y `cluster` renderizan hoy la lista
- * como puntos + mapa multi básico; la sincronización avanzada y el
- * clustering territorial se completan en Fase V4.3 sobre este mismo
- * bloque (sin duplicar componentes).
+ * 1.1.0 · Con muchos lugares (desde CLUSTER_MIN_MARKERS) el mapa
+ * interactivo junta pines cercanos en burbujas con número, ofrece un filtro
+ * por familia encima del mapa (cuando hay 2 o más) y la lista muestra sólo
+ * lo que se ve en pantalla. El pin dorado del paquete nunca se agrupa.
  */
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation, Map as MapIcon } from "lucide-react";
 import { StaticMap } from "@/components/maps/StaticMap";
@@ -26,6 +26,14 @@ import type {
   ExperienceMapPoint,
 } from "@/lib/experience-builder/blocks/experience-map/types";
 import { applyExperienceMapDefaults } from "@/lib/experience-builder/blocks/experience-map/defaults";
+import {
+  CLUSTER_MIN_MARKERS,
+  MAP_PIN_CATEGORY_LABELS,
+  MAP_PIN_CATEGORY_ORDER,
+  pointInBounds,
+  type MapPinCategory,
+} from "@/lib/maps/marker-clusters";
+import type { MapViewportBounds } from "@/components/maps/InteractiveMap";
 
 const InteractiveMap = lazy(() =>
   import("@/components/maps/InteractiveMap").then((m) => ({
@@ -74,6 +82,34 @@ export function ExperienceMapBlock({
   const [interactive, setInteractive] = useState(interactiveOnly);
   const [activeId, setActiveId] = useState<string | null>(dto.points[0]?.id ?? null);
   const [listPage, setListPage] = useState(1);
+  /* 1.1.0 · Muchos lugares: filtro por familia encima del mapa, burbujas con
+     número y lista sincronizada con lo que se ve en el mapa interactivo. */
+  const [category, setCategory] = useState<MapPinCategory | "">("");
+  const [viewport, setViewport] = useState<MapViewportBounds | null>(null);
+  const categories = useMemo(() => {
+    const present = new Set(
+      dto.points.flatMap((p) => (p.category ? [p.category as MapPinCategory] : [])),
+    );
+    return MAP_PIN_CATEGORY_ORDER.filter((c) => present.has(c));
+  }, [dto.points]);
+  const shownPoints = useMemo(
+    () => (category ? dto.points.filter((p) => p.category === category) : dto.points),
+    [category, dto.points],
+  );
+  const listPoints = useMemo(
+    () =>
+      interactive &&
+      viewport &&
+      !connectByRoad &&
+      dto.variant !== "single" &&
+      shownPoints.length >= CLUSTER_MIN_MARKERS
+        ? shownPoints.filter((p) => pointInBounds(p, viewport))
+        : shownPoints,
+    [connectByRoad, dto.variant, interactive, shownPoints, viewport],
+  );
+  useEffect(() => {
+    setListPage(1);
+  }, [category, viewport]);
 
   const center = useMemo(() => {
     if (dto.center) return dto.center;
@@ -94,18 +130,21 @@ export function ExperienceMapBlock({
     );
   }
 
-  const primary = dto.points.find((p) => p.id === activeId) ?? dto.points[0];
+  const primary =
+    shownPoints.find((p) => p.id === activeId) ?? shownPoints[0] ?? dto.points[0]!;
   const isMulti = dto.variant !== "single";
   const labelOf = (idx: number) => String.fromCharCode(65 + (idx % 26));
+  // Las rutas por carretera nunca agrupan: cada parada debe verse.
+  const clustered = isMulti && !connectByRoad && shownPoints.length >= CLUSTER_MIN_MARKERS;
   // Lista paginada: evita una columna interminable en celular y tableta.
-  const totalPages = Math.max(1, Math.ceil(dto.points.length / LIST_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(listPoints.length / LIST_PAGE_SIZE));
   const safePage = Math.min(listPage, totalPages);
   const pageStart = (safePage - 1) * LIST_PAGE_SIZE;
-  const pagePoints = dto.points.slice(pageStart, pageStart + LIST_PAGE_SIZE);
+  const pagePoints = listPoints.slice(pageStart, pageStart + LIST_PAGE_SIZE);
   const goToPage = (next: number) => {
     const n = Math.max(1, Math.min(totalPages, next));
     setListPage(n);
-    const first = dto.points[(n - 1) * LIST_PAGE_SIZE];
+    const first = listPoints[(n - 1) * LIST_PAGE_SIZE];
     if (first) setActiveId(first.id);
   };
 
@@ -113,6 +152,36 @@ export function ExperienceMapBlock({
     <section className={cn("space-y-4", immersive && "space-y-5", className)}>
       {dto.heading ? (
         <h2 className="text-xl font-semibold text-foreground">{dto.heading}</h2>
+      ) : null}
+
+      {isMulti && categories.length > 1 ? (
+        <div
+          role="group"
+          aria-label="Filtrar el mapa por tipo de lugar"
+          className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
+        >
+          {(["", ...categories] as const).map((c) => {
+            const active = category === c;
+            const count = c ? dto.points.filter((p) => p.category === c).length : dto.points.length;
+            return (
+              <button
+                key={c || "todos"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setCategory(c)}
+                className={cn(
+                  "min-h-10 shrink-0 rounded-full border px-4 text-sm font-semibold transition",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground hover:border-primary/50",
+                )}
+              >
+                {c ? MAP_PIN_CATEGORY_LABELS[c] : "Todo"}{" "}
+                <span className="font-normal opacity-80">{count}</span>
+              </button>
+            );
+          })}
+        </div>
       ) : null}
 
       <div
@@ -134,12 +203,16 @@ export function ExperienceMapBlock({
                 zoom={center.zoom ?? 14}
                 markerTitle={primary.title}
                 connectByRoad={connectByRoad}
-                markers={dto.points.map((p) => ({
+                markers={shownPoints.map((p) => ({
                   lat: p.lat,
                   lng: p.lng,
                   title: p.title,
                   href: p.href ?? null,
+                  ...(p.category ? { category: p.category as MapPinCategory } : {}),
+                  ...(p.featured ? { featured: true } : {}),
                 }))}
+                cluster={clustered}
+                onViewportChange={setViewport}
                 className={cn(
                   "w-full rounded-2xl border border-border",
                   immersive ? "h-[32rem] shadow-elevated sm:h-[38rem]" : "h-[420px]",
@@ -155,7 +228,7 @@ export function ExperienceMapBlock({
               width={640}
               height={420}
               alt={dto.heading ?? primary.title}
-              markers={dto.points.map((p, i) => ({
+              markers={shownPoints.map((p, i) => ({
                 lat: p.lat,
                 lng: p.lng,
                 kind: p.kind,
@@ -194,6 +267,11 @@ export function ExperienceMapBlock({
             )}
             aria-label="Puntos en el mapa"
           >
+            {pagePoints.length === 0 ? (
+              <li className="rounded-2xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+                No hay lugares en esta parte del mapa. Aléjate o muévelo para ver más.
+              </li>
+            ) : null}
             {pagePoints.map((p, j) => {
               const i = pageStart + j;
               const isActive = p.id === primary.id;
@@ -215,7 +293,7 @@ export function ExperienceMapBlock({
                       className="block w-full text-left"
                     >
                       <div className="flex items-start gap-3">
-                        {isMulti ? (
+                        {isMulti && (!p.category || !interactive) ? (
                           <span
                             aria-hidden
                             className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
@@ -283,7 +361,7 @@ export function ExperienceMapBlock({
                 ← Anterior
               </Button>
               <span className="text-xs text-muted-foreground">
-                {pageStart + 1}–{pageStart + pagePoints.length} de {dto.points.length}
+                {pageStart + 1}–{pageStart + pagePoints.length} de {listPoints.length}
               </span>
               <Button
                 type="button"

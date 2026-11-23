@@ -86,6 +86,8 @@ export interface TourismCardVM {
    * indicación discreta «Recomendado». Ausente = orgánico.
    */
   commercialPlacement?: "contratado" | "fijado" | null;
+  /** Pin dorado en el mapa del listado (paquete con esa ventaja). Sólo mapa. */
+  goldenPin?: boolean;
   entityKind: TourismEntityKind | null;
   /** Override manual del eyebrow (ej. tipo de producto o categoría). */
   eyebrow?: string | null;

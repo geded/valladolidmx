@@ -15,6 +15,7 @@
  *  - Sin escrituras, sin RPCs, sin acceso a datos privados del viajero.
  *  - Reutiliza el shape `MarketplaceBusinessCard`.
  */
+import { MARKETPLACE_BUSINESS_SCAN_LIMIT } from "@/lib/catalog/marketplace-reads.functions";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
@@ -60,7 +61,7 @@ export const getCategoryRelated = createServerFn({ method: "GET" })
       // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
       .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
-      .limit(200);
+      .limit(MARKETPLACE_BUSINESS_SCAN_LIMIT);
     if (error) throw new Error(`category_related_failed: ${error.message}`);
 
     const all: MarketplaceBusinessCard[] = (rows ?? []).map((row) => {

@@ -353,7 +353,8 @@ export function arrangeBusinessListing(
     seed,
   );
   return arranged.map(({ item, origin }) => {
-    const vm = toCard(item);
+    const base = toCard(item);
+    const vm = item.golden_pin ? { ...base, goldenPin: true } : base;
     if (origin === "sponsored") return { ...vm, commercialPlacement: "contratado" };
     if (origin === "pinned") return { ...vm, commercialPlacement: "fijado" };
     const planLabel = item.visibility_plan_name;

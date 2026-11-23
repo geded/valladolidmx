@@ -16,6 +16,7 @@ import type {
   ExperienceMapPoint,
   ExperienceMapVariant,
   ExperienceMapEntityKind,
+  ExperienceMapPinCategory,
 } from "./types";
 
 export const EXPERIENCE_MAP_DEFAULT_CAPABILITIES: ExperienceMapCapabilities = {
@@ -37,12 +38,22 @@ const VALID_VARIANTS: ReadonlySet<ExperienceMapVariant> = new Set([
   "cluster",
 ]);
 
+const VALID_PIN_CATEGORIES: ReadonlySet<string> = new Set([
+  "hotel",
+  "restaurante",
+  "casa",
+  "experiencia",
+  "lugar",
+  "otro",
+]);
+
 const VALID_KINDS: ReadonlySet<ExperienceMapEntityKind> = new Set([
   "business",
   "product",
   "destination",
   "event",
   "promotion",
+  "place",
 ]);
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -102,6 +113,11 @@ function coercePoint(input: unknown): ExperienceMapPoint | null {
   if (badge !== undefined) point.badge = badge;
   const priceLabel = coerceNullableString(input.priceLabel);
   if (priceLabel !== undefined) point.priceLabel = priceLabel;
+  // 1.1.0 · Familia del pin y pin dorado.
+  if (input.category === null) point.category = null;
+  else if (typeof input.category === "string" && VALID_PIN_CATEGORIES.has(input.category))
+    point.category = input.category as ExperienceMapPinCategory;
+  if (input.featured === true) point.featured = true;
   return point;
 }
 

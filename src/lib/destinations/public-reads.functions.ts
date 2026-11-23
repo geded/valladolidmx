@@ -4,6 +4,8 @@
  * after passing the G8-M1 public accreditation policy; otherwise the
  * caller receives no image and renders the neutral Editorial marker.
  */
+import type { MapPinCategory } from "@/lib/maps/marker-clusters";
+import { selectInChunks } from "@/lib/catalog/chunk-ids";
 import { createServerFn } from "@tanstack/react-start";
 import type {
   MarketplaceBusinessCard,
@@ -164,9 +166,15 @@ export interface DestinationRelatedDTO {
  * territoriales. Compatibilidad Evolutiva: función nueva, no modifica
  * `getDestinationRelated`.
  * ------------------------------------------------------------------ */
+/**
+ * Tope de empresas leídas por destino (página, mapa). Valladolid arranca con
+ * ~200; 1,000 es el máximo de una consulta del backend.
+ */
+export const DESTINATION_BUSINESS_SCAN_LIMIT = 1000;
+
 export interface DestinationMapPointDTO {
   id: string;
-  kind: "business";
+  kind: "business" | "place";
   lat: number;
   lng: number;
   title: string;
@@ -175,6 +183,19 @@ export interface DestinationMapPointDTO {
   thumbUrl: string | null;
   badge: string | null;
   priceLabel: string | null;
+  /** Familia visible del pin (ícono y filtro encima del mapa). */
+  category: MapPinCategory;
+  /** Pin dorado (palanca `golden_pin` del paquete vigente). */
+  featured: boolean;
+}
+
+/** Familia visible del pin según la categoría principal de la empresa. */
+export function mapPinCategoryForBusiness(categorySlug: string): MapPinCategory {
+  if (HOTEL_CATS.has(categorySlug)) return "hotel";
+  if (RESTO_CATS.has(categorySlug)) return "restaurante";
+  if (CASA_CATS.has(categorySlug)) return "casa";
+  if (EXP_CATS.has(categorySlug)) return "experiencia";
+  return "otro";
 }
 
 export const getDestinationMapPoints = createServerFn({ method: "GET" })
@@ -194,15 +215,29 @@ export const getDestinationMapPoints = createServerFn({ method: "GET" })
     const { data: rows, error } = await sb
       .from("businesses")
       .select(
-        "id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary), destinations!inner(slug)",
+        "id, slug, display_name, tagline, status, deleted_at, business_locations!inner(latitude, longitude, address_line1, is_primary), destinations!inner(id, slug), business_categories!businesses_primary_category_id_fkey ( slug )",
       )
       .eq("destinations.slug", data.slug)
       .eq("status", "published")
       .is("deleted_at", null)
       // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
       .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
-      .limit(80);
+      .limit(DESTINATION_BUSINESS_SCAN_LIMIT);
     if (error || !rows) return [];
+    /* Pin dorado: sólo paquetes vigentes con la palanca `golden_pin`. */
+    const goldenIds = new Set<string>();
+    const vizRows = await selectInChunks<Record<string, unknown>>(
+      rows.map((r) => r.id as string),
+      (chunk) =>
+        sb
+          .from("business_effective_visibility")
+          .select("business_id, levers, is_default")
+          .in("business_id", chunk),
+    );
+    for (const v of vizRows) {
+      const levers = (v.levers as Record<string, unknown> | null) ?? {};
+      if (v.is_default !== true && levers.golden_pin === true) goldenIds.add(String(v.business_id));
+    }
     const points: DestinationMapPointDTO[] = [];
     for (const row of rows) {
       const locs = (row.business_locations ?? []) as Array<{
@@ -224,7 +259,49 @@ export const getDestinationMapPoints = createServerFn({ method: "GET" })
         thumbUrl: null,
         badge: null,
         priceLabel: null,
+        category: mapPinCategoryForBusiness(
+          ((row as { business_categories?: { slug?: unknown } | null }).business_categories
+            ?.slug as string | undefined) ?? "",
+        ),
+        featured: goldenIds.has(row.id as string),
       });
+    }
+    /* Lugares y sitios de interés publicados del mismo destino. */
+    const destId = (rows[0] as { destinations?: { id?: unknown } | null } | undefined)?.destinations
+      ?.id;
+    const destinationId =
+      typeof destId === "string"
+        ? destId
+        : ((
+            await sb.from("destinations").select("id").eq("slug", data.slug).maybeSingle()
+          ).data?.id ?? null);
+    if (destinationId) {
+      const { data: places } = await sb
+        .from("points_of_interest")
+        .select("id, slug, name, short_description, latitude, longitude")
+        .eq("destination_id", destinationId)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .not("latitude", "is", null)
+        .not("longitude", "is", null)
+        .order("name", { ascending: true })
+        .limit(DESTINATION_BUSINESS_SCAN_LIMIT);
+      for (const p of places ?? []) {
+        points.push({
+          id: p.id as string,
+          kind: "place",
+          lat: Number(p.latitude),
+          lng: Number(p.longitude),
+          title: (p.name as string) ?? "",
+          subtitle: (p.short_description as string | null) ?? null,
+          href: `/oriente-maya/${data.slug}/lugares/${p.slug as string}`,
+          thumbUrl: null,
+          badge: null,
+          priceLabel: null,
+          category: "lugar",
+          featured: false,
+        });
+      }
     }
     return points;
   });
@@ -388,6 +465,14 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
   });
 
 const HOTEL_CATS = new Set(["hoteles", "hospedaje"]);
+const CASA_CATS = new Set([
+  "casas-de-vacaciones",
+  "casas-vacacionales",
+  "villas",
+  "rentas-vacacionales",
+  "airbnb",
+  "casas",
+]);
 const RESTO_CATS = new Set(["restaurantes", "gastronomia"]);
 const EXP_CATS = new Set(["experiencias", "experiencias-tours", "tours"]);
 
@@ -445,7 +530,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
         // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
         .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
         .order("display_name", { ascending: true })
-        .limit(60),
+        .limit(DESTINATION_BUSINESS_SCAN_LIMIT),
       sb
         .from("events")
         .select(
@@ -543,37 +628,48 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
     let pErr: unknown = null;
     /* eslint-enable @typescript-eslint/no-explicit-any */
     if (bizIds.length > 0) {
-      const [bmediaRes, prodsRes] = await Promise.all([
-        sb
-          .from("business_media")
-          .select(
-            "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status )",
-          )
-          .in("business_id", bizIds)
-          .eq("role", "cover")
-          .order("sort_order", { ascending: true }),
-        sb
-          .from("products")
-          .select(
-            "id, slug, name, tagline, product_type, price_amount, price_currency, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, status, deleted_at",
-          )
-          .in("business_id", bizIds)
-          .eq("status", "published")
-          .is("deleted_at", null)
-          .order("name", { ascending: true })
-          .limit(24),
+      /* Lotes de ids: con cientos de empresas por destino un solo `.in()`
+         alarga demasiado la consulta. Cada empresa cae completa en un lote,
+         así que el orden de sus portadas se conserva. */
+      let prodsFailed = false;
+      const [bmediaRows, prodRows] = await Promise.all([
+        selectInChunks<Record<string, unknown>>(bizIds, (chunk) =>
+          sb
+            .from("business_media")
+            .select(
+              "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status )",
+            )
+            .in("business_id", chunk)
+            .eq("role", "cover")
+            .order("sort_order", { ascending: true }),
+        ),
+        selectInChunks<Record<string, unknown>>(bizIds, async (chunk) => {
+          const res = await sb
+            .from("products")
+            .select(
+              "id, slug, name, tagline, product_type, price_amount, price_currency, business_id, conversion_mode, primary_action_label, secondary_action_mode, secondary_action_label, accepts_online_payment, requires_availability, visibility_level, status, deleted_at",
+            )
+            .in("business_id", chunk)
+            .eq("status", "published")
+            .is("deleted_at", null)
+            .order("name", { ascending: true })
+            .limit(24);
+          if (res.error) prodsFailed = true;
+          return res;
+        }),
       ]);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      bmedia = (bmediaRes.data ?? null) as any[] | null;
+      bmedia = bmediaRows as any[];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      prods = (prodsRes.data ?? null) as any[] | null;
-      pErr = prodsRes.error;
+      prods = (prodRows as any[])
+        .sort((a, b) => String(a.name).localeCompare(String(b.name), "es"))
+        .slice(0, 24);
+      pErr = prodsFailed && prodRows.length === 0 ? new Error("products_failed") : null;
     }
 
     if (bizIds.length > 0 && bmedia && bmedia.length > 0) {
       {
         try {
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const seen = new Set<string>();
           const first = bmedia.filter((r) => {
             const bid = r.business_id as string;
@@ -583,37 +679,43 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
           });
           const bases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
           const idByBusiness = new Map<string, string>();
-          const signed = await Promise.all(
-            first.map(async (r) => {
-              const a = (
-                r as unknown as {
-                  media_assets?: {
-                    id: string;
-                    storage_bucket: string;
-                    storage_path: string;
-                    width: number | null;
-                    height: number | null;
-                    pipeline_status: string | null;
-                  } | null;
-                }
-              ).media_assets;
-              if (!a) return { id: r.business_id as string, url: null as string | null };
-              const { data: s } = await supabaseAdmin.storage
-                .from(a.storage_bucket)
-                .createSignedUrl(a.storage_path, 3600);
-              if (s?.signedUrl) {
-                idByBusiness.set(String(r.business_id), a.id);
-                bases.push({
-                  id: a.id,
-                  file_url: s.signedUrl,
-                  width: a.width,
-                  height: a.height,
-                  pipeline_status: a.pipeline_status,
-                });
-              }
-              return { id: r.business_id as string, url: s?.signedUrl ?? null };
+          type CoverAsset = {
+            id: string;
+            storage_bucket: string;
+            storage_path: string;
+            width: number | null;
+            height: number | null;
+            pipeline_status: string | null;
+          } | null;
+          const assetOf = (r: unknown) =>
+            (r as { media_assets?: CoverAsset }).media_assets ?? null;
+          // Una sola firma por bucket en lugar de una petición por foto.
+          const signer = await import("@/lib/media/batch-sign.server");
+          const signedByKey = await signer.signStorageObjects(
+            first.flatMap((r) => {
+              const a = assetOf(r);
+              return a ? [{ bucket: a.storage_bucket, path: a.storage_path }] : [];
             }),
           );
+          const signed = first.map((r) => {
+            const a = assetOf(r);
+            if (!a) return { id: r.business_id as string, url: null as string | null };
+            const url =
+              signedByKey.get(
+                signer.storageObjectKey({ bucket: a.storage_bucket, path: a.storage_path }),
+              ) ?? null;
+            if (url) {
+              idByBusiness.set(String(r.business_id), a.id);
+              bases.push({
+                id: a.id,
+                file_url: url,
+                width: a.width,
+                height: a.height,
+                pipeline_status: a.pipeline_status,
+              });
+            }
+            return { id: r.business_id as string, url };
+          });
           const byBiz = new Map(signed.map((x) => [x.id, x.url] as const));
           const vb = await import("@/lib/media/variant-bundles.server");
           const bundles = (await vb.shouldServePublicVariants())

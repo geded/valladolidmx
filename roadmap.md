@@ -569,6 +569,8 @@
 
 ## Empresas, Alux concierge y embudo de expedientes · 2026-11-23
 
-- [ ] Plan de 6 fases (A–F) — espera aprobación del Founder.
-- [ ] Preparar Valladolid para unas 200 empresas al arrancar (50 hoteles, 50 restaurantes, casas de vacaciones, experiencias, sitios y lugares de interés) — incluido en el plan como Fase 0.
-- [ ] Mapas sin saturar con 200 empresas: burbujas con número, filtro por categoría, lista sincronizada, pin dorado — incluido en Fase 0.
+- [x] Plan de 7 fases (0, A–F) aprobado; cada fase se aprueba por separado.
+- [x] Fase 0: Valladolid listo para unas 200 empresas (sin cortes en destino, listados con «Ver más», relacionadas, fotos firmadas por lote).
+- [x] Mapas sin saturar: burbujas con número, filtro por tipo, íconos, lista sincronizada, pin dorado, lugares de interés en el mapa del destino.
+- [ ] Ver las burbujas del mapa interactivo en el sitio publicado (el mapa de Google no abre en la vista de pruebas).
+- [ ] Fase A (plan gratis que vale la pena) — espera visto bueno del Founder.

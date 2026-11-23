@@ -9,6 +9,7 @@
  *  - Sólo proyecta columnas seguras necesarias para el render público.
  *  - Sin escrituras, sin RPCs; sin cambios al modelo de dominio.
  */
+import { selectInChunks } from "@/lib/catalog/chunk-ids";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
@@ -50,6 +51,8 @@ export interface MarketplaceBusinessCard {
   visibility_plan_name?: string | null;
   visibility_badge_variant?: string | null;
   visibility_boost?: number;
+  /** Pin dorado en mapas (palanca `golden_pin` del paquete vigente). */
+  golden_pin?: boolean;
   /** Ola 7.8 · Spotlight manual del Founder. */
   spotlight_headline?: string | null;
   spotlight_boost?: number;
@@ -898,6 +901,13 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
     };
   });
 
+/**
+ * Tope de lectura del listado público de empresas (todos los destinos).
+ * Valladolid arranca con ~200 empresas y el Oriente Maya crece; 1,000 es el
+ * máximo que devuelve una sola consulta del backend.
+ */
+export const MARKETPLACE_BUSINESS_SCAN_LIMIT = 1000;
+
 export interface MarketplaceSearchInput {
   q?: string | null;
   destination_slug?: string | null;
@@ -937,7 +947,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       // G8-R1-F1I-R1 · DEF-F1I-001 — elegibilidad pública (autoridad única).
       .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
       .order("display_name", { ascending: true })
-      .limit(120);
+      .limit(MARKETPLACE_BUSINESS_SCAN_LIMIT);
     let data: unknown[] | null = primaryResult.data;
     let error = primaryResult.error;
     if (error && /filter_attributes|column .* does not exist/i.test(error.message)) {
@@ -948,7 +958,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         .is("deleted_at", null)
         .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
         .order("display_name", { ascending: true })
-        .limit(120);
+        .limit(MARKETPLACE_BUSINESS_SCAN_LIMIT);
       data = legacyResult.data;
       error = legacyResult.error;
     }
@@ -987,15 +997,17 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
     // Ola 7.4.a · Enriquecer con plan de visibilidad efectivo
     if (rows.length > 0) {
       const ids = rows.map((r) => r.id);
-      const { data: viz } = await supabase
-        .from("business_effective_visibility")
-        .select(
-          "business_id, plan_slug, plan_name, badge_variant, levers, base_price_mxn, is_default",
-        )
-        .in("business_id", ids);
+      const viz = await selectInChunks<Record<string, unknown>>(ids, (chunk) =>
+        supabase
+          .from("business_effective_visibility")
+          .select(
+            "business_id, plan_slug, plan_name, badge_variant, levers, base_price_mxn, is_default",
+          )
+          .in("business_id", chunk),
+      );
       const byId = new Map<string, Record<string, unknown>>();
-      for (const r of viz ?? []) {
-        byId.set(String((r as { business_id: string }).business_id), r as Record<string, unknown>);
+      for (const r of viz) {
+        byId.set(String((r as { business_id: string }).business_id), r);
       }
       for (const row of rows) {
         const v = byId.get(row.id);
@@ -1013,6 +1025,7 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
         row.visibility_plan_name = (v.plan_name as string | null) ?? null;
         row.visibility_badge_variant = (v.badge_variant as string | null) ?? null;
         row.visibility_boost = Number.isFinite(boost) ? boost : 0;
+        row.golden_pin = levers.golden_pin === true;
       }
       // Ordenar: boost DESC primero, luego alfabético
     }
@@ -1020,13 +1033,15 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
     // Ola 7.8 · Enriquecer con Founder Spotlight activo
     if (rows.length > 0) {
       const ids = rows.map((r) => r.id);
-      const { data: spots } = await supabase
-        .from("active_founder_spotlights")
-        .select("business_id, headline, boost")
-        .in("business_id", ids);
+      const spots = await selectInChunks<Record<string, unknown>>(ids, (chunk) =>
+        supabase
+          .from("active_founder_spotlights")
+          .select("business_id, headline, boost")
+          .in("business_id", chunk),
+      );
       const spotById = new Map<string, { headline: string | null; boost: number }>();
-      for (const s of spots ?? []) {
-        const r = s as { business_id: string; headline: string | null; boost: number };
+      for (const s of spots) {
+        const r = s as unknown as { business_id: string; headline: string | null; boost: number };
         spotById.set(String(r.business_id), {
           headline: r.headline,
           boost: Number(r.boost ?? 0),
@@ -1047,21 +1062,22 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
        la tarjeta usa su fallback editorial aprobado. */
     if (rows.length > 0) {
       try {
-        const { data: bmedia } = await supabase
-          .from("business_media")
-          .select(
-            "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text )",
-          )
-          .in(
-            "business_id",
-            rows.map((r) => r.id),
-          )
-          .eq("role", "cover")
-          .order("sort_order", { ascending: true });
+        const bmedia = await selectInChunks<Record<string, unknown>>(
+          rows.map((r) => r.id),
+          (chunk) =>
+            supabase
+              .from("business_media")
+              .select(
+                "business_id, role, sort_order, media_assets:media_assets ( id, storage_bucket, storage_path, width, height, pipeline_status, alt_text )",
+              )
+              .in("business_id", chunk)
+              .eq("role", "cover")
+              .order("sort_order", { ascending: true }),
+        );
         if (bmedia && bmedia.length > 0) {
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          // Cada empresa cae completa en un solo lote, así que su orden de portada se conserva.
           const seen = new Set<string>();
-          const firstPerBusiness = (bmedia as Array<Record<string, unknown>>).filter((r) => {
+          const firstPerBusiness = bmedia.filter((r) => {
             const bid = String(r.business_id);
             if (seen.has(bid)) return false;
             seen.add(bid);
@@ -1070,34 +1086,43 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
           const variantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] =
             [];
           const assetByBusiness = new Map<string, string>();
-          const signed = await Promise.all(
-            firstPerBusiness.map(async (r) => {
-              const asset = r.media_assets as {
-                id: string;
-                width: number | null;
-                height: number | null;
-                pipeline_status: string | null;
-                storage_bucket?: string;
-                storage_path?: string;
-              } | null;
-              if (!asset?.storage_bucket || !asset?.storage_path)
-                return [String(r.business_id), null] as const;
-              const { data: s } = await supabaseAdmin.storage
-                .from(asset.storage_bucket)
-                .createSignedUrl(asset.storage_path, 3600);
-              if (s?.signedUrl && asset.id) {
-                assetByBusiness.set(String(r.business_id), asset.id);
-                variantBases.push({
-                  id: asset.id,
-                  file_url: s.signedUrl,
-                  width: asset.width,
-                  height: asset.height,
-                  pipeline_status: asset.pipeline_status,
-                });
-              }
-              return [String(r.business_id), s?.signedUrl ?? null] as const;
+          type CoverAsset = {
+            id: string;
+            width: number | null;
+            height: number | null;
+            pipeline_status: string | null;
+            storage_bucket?: string;
+            storage_path?: string;
+          } | null;
+          const signer = await import("@/lib/media/batch-sign.server");
+          const signedByKey = await signer.signStorageObjects(
+            firstPerBusiness.flatMap((r) => {
+              const a = r.media_assets as CoverAsset;
+              return a?.storage_bucket && a?.storage_path
+                ? [{ bucket: a.storage_bucket, path: a.storage_path }]
+                : [];
             }),
           );
+          const signed = firstPerBusiness.map((r) => {
+            const asset = r.media_assets as CoverAsset;
+            if (!asset?.storage_bucket || !asset?.storage_path)
+              return [String(r.business_id), null] as const;
+            const url =
+              signedByKey.get(
+                signer.storageObjectKey({ bucket: asset.storage_bucket, path: asset.storage_path }),
+              ) ?? null;
+            if (url && asset.id) {
+              assetByBusiness.set(String(r.business_id), asset.id);
+              variantBases.push({
+                id: asset.id,
+                file_url: url,
+                width: asset.width,
+                height: asset.height,
+                pipeline_status: asset.pipeline_status,
+              });
+            }
+            return [String(r.business_id), url] as const;
+          });
           const byBiz = new Map(signed);
           const vb = await import("@/lib/media/variant-bundles.server");
           const bundles = (await vb.shouldServePublicVariants())

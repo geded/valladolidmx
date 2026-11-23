@@ -42,7 +42,7 @@ export interface DestinationPremiumNearby {
 
 export interface DestinationPremiumMapPoint {
   id: string;
-  kind: "destination" | "business";
+  kind: "destination" | "business" | "place";
   lat: number;
   lng: number;
   title: string;
@@ -50,6 +50,10 @@ export interface DestinationPremiumMapPoint {
   badge: string | null;
   /** Ruta canónica del punto cuando existe una ficha pública resoluble. */
   href?: string | null;
+  /** Familia del pin (ícono y filtro encima del mapa). */
+  category?: "hotel" | "restaurante" | "casa" | "experiencia" | "lugar" | "otro" | null;
+  /** Pin dorado del paquete vigente. */
+  featured?: boolean;
 }
 
 export interface DestinationPremiumContent {

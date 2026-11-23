@@ -153,6 +153,8 @@ export function DestinationPremiumSurface({
         thumbUrl: null,
         badge: p.badge,
         priceLabel: null,
+        category: p.category ?? null,
+        featured: p.featured === true,
       })),
       capabilities: {
         showDistance: true,

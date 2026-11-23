@@ -60,6 +60,7 @@ export const experienceMapEntityKindSchema = z.enum([
   "destination",
   "event",
   "promotion",
+  "place",
 ]) satisfies z.ZodType<ExperienceMapEntityKind>;
 
 export const experienceMapPointSchema = z.object({
@@ -73,6 +74,11 @@ export const experienceMapPointSchema = z.object({
   thumbUrl: z.string().url().nullable().optional(),
   badge: z.string().nullable().optional(),
   priceLabel: z.string().nullable().optional(),
+  category: z
+    .enum(["hotel", "restaurante", "casa", "experiencia", "lugar", "otro"])
+    .nullable()
+    .optional(),
+  featured: z.boolean().optional(),
 }) satisfies z.ZodType<ExperienceMapPoint>;
 
 export const experienceMapCapabilitiesSchema = z.object({

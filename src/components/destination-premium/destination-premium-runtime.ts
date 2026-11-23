@@ -77,12 +77,14 @@ export function buildDestinationPremiumRuntime(input: {
       : []),
     ...mapPoints.map((point) => ({
       id: point.id,
-      kind: "business" as const,
+      kind: point.kind === "place" ? ("place" as const) : ("business" as const),
       lat: point.lat,
       lng: point.lng,
       title: point.title,
       subtitle: point.subtitle ?? null,
       badge: point.badge ?? null,
+      category: point.category ?? null,
+      featured: point.featured === true,
     })),
   ];
 

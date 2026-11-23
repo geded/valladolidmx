@@ -19,6 +19,9 @@ export interface StaticMapProps {
   markers?: Array<{ lat: number; lng: number; kind?: string; label?: string | null }>;
 }
 
+/** Mismo tope que `/api/public/maps/static`. */
+const STATIC_MAP_MAX_MARKERS = 40;
+
 export function StaticMap({
   lat,
   lng,
@@ -37,7 +40,8 @@ export function StaticMap({
     width: String(width),
     height: String(height),
   });
-  const list = markers ?? [];
+  /* El servidor del mapa fijo dibuja hasta 40 pines; no se manda más. */
+  const list = (markers ?? []).slice(0, STATIC_MAP_MAX_MARKERS);
   list.forEach((m, i) => {
     // Etiqueta A-Z automática si no viene explícita, para que cada pin
     // se pueda leer y correlacionar con la lista lateral.
