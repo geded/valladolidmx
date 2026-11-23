@@ -5,6 +5,12 @@ Hoy solo las experiencias, y las artesanías que autoriza el administrador, se v
 
 Con esta propuesta, **el administrador activa la venta en línea empresa por empresa**. Si no la activa, todo sigue igual que hoy: el precio se queda como «solo mostrar» y lo cotiza el concierge. La regla guardada se actualizará solo cuando apruebes esta propuesta.
 
+## Cómo empezamos: piloto pequeño
+- **Solo funciona donde tú lo actives.** Las demás empresas no ven ningún cambio: ni botones nuevos ni precios distintos.
+- **Se prueba con una o dos empresas**, por ejemplo Copalli y una tienda de artesanías. Ajustamos los detalles con lo que veamos y después se abre a más empresas.
+- **Se apaga en cualquier momento.** Al desactivar la venta, la empresa vuelve a cotizar con el concierge y lo ya vendido se conserva.
+- **Sin conexión con Booking ni Airbnb.** Queda fuera de esta propuesta.
+
 ## 1. El interruptor del administrador (por empresa)
 En la ficha de cada empresa, dentro del CMS, habrá una sección **«Ventas en línea»** que solo ve el administrador:
 
@@ -49,23 +55,26 @@ Un hotel no vende piezas: vende **noches disponibles**. Por eso lleva su propio 
 - **Calendario**: el hotel cierra fechas y marca mínimo de noches.
 - **El huésped elige** llegada, salida y personas, y ve solo lo disponible con el total.
 
-Se propone en dos pasos, porque muchos hoteles también venden por Booking o Airbnb y no queremos vender una noche dos veces:
+Sin conexión con Booking ni Airbnb, solo usamos **reserva con confirmación**. Así no vendemos una noche que el hotel ya vendió por otro lado:
 
-- **Paso A · Reserva con confirmación** (recomendado para empezar): el huésped solicita, el hotel confirma en un plazo (por ejemplo, 12 horas) y entonces se manda el enlace de pago. No hay riesgo de sobreventa.
-- **Paso B · Reserva inmediata**: se paga al momento. Solo para hoteles que mantengan su calendario al día o lo conecten con Booking o Airbnb, para que las fechas ocupadas se bloqueen solas.
+- El huésped solicita sus fechas.
+- El hotel revisa si tiene lugar y confirma en un plazo (por ejemplo, 12 horas) desde su Portal o por WhatsApp.
+- Al confirmar, se manda el enlace de pago. Si no confirma a tiempo, la solicitud pasa al concierge.
+
+La reserva inmediata, la que se paga al momento, se deja para el futuro y solo si algún día hace falta.
 
 Mientras el hotel no tenga la venta activada, sigue como hoy: el concierge cotiza.
 
 ## Fases (cada una se aprueba por separado y nada se publica sin tu autorización)
 1. **Interruptor por empresa + regla nueva**: sección «Ventas en línea» del administrador, canales y comisión. Lo ya vendido no cambia.
-2. **Tienda + recoger en el local**: carga por fotos, PDF u hoja; existencias; pago; pedidos en el Portal. Prueba con una tienda de artesanías y con Copalli.
-3. **Alux vende**: botón de Alux en la página y WhatsApp de la empresa con enlace de pago para productos activados.
-4. **Hoteles · reserva con confirmación**: tipos de habitación, precio por noche, calendario y solicitud.
-5. **Hoteles · reserva inmediata y conexión con Booking o Airbnb**, y envíos a domicilio para tiendas.
+2. **Piloto de tienda + recoger en el local**: carga por fotos, PDF u hoja; existencias; pago; pedidos en el Portal. Solo en las empresas piloto.
+3. **Alux vende en el piloto**: botón de Alux en la página y WhatsApp de la empresa con enlace de pago para productos activados.
+4. **Hoteles · reserva con confirmación**: tipos de habitación, precio por noche, calendario y solicitud. Primero con un solo hotel piloto.
+
+Después de cada fase revisamos juntos el piloto y afinamos antes de pasar a la siguiente o de abrirlo a más empresas. Los envíos a domicilio quedan para después del piloto.
 
 ## Decisiones que necesito de ti
-- **Envíos**: ¿empezamos solo con «recoger en el local» o necesitas envío desde el inicio?
-- **Hoteles**: ¿empezamos por la reserva con confirmación (Paso A)?
+- **Empresas piloto**: ¿con cuáles probamos primero? Por ejemplo Copalli y una tienda de artesanías.
 - **Comisión**: ¿una comisión general con ajuste por empresa, o una distinta por cada tipo (tienda, pedidos, hotel)?
 
 ## Detalles técnicos
@@ -80,6 +89,7 @@ Mientras el hotel no tenga la venta activada, sigue como hoy: el concierge cotiz
   - Un ajuste de venta por empresa (modo, canales, comisión, entrega).
   - Existencias y variantes en los productos de tienda.
   - Tipos de habitación, tarifas por noche y bloqueos por fecha, con retención de noches igual que el cupo de experiencias.
+- El interruptor por empresa nace apagado en todas; los canales y modos solo se habilitan en las empresas marcadas.
 - `canSellDirect` (CRM y WhatsApp) y la vista del administrador se alinean para usar una sola regla: venta activada en la empresa y en el producto.
 - Hoy la base de datos no limita qué tipos de producto se pueden activar. La fase 1 lo limita a los modos activados en la empresa.
 - Se respetan la plantilla aprobada de la ficha, el bloque oficial del menú, Mi Viaje y la separación de perfiles de staff, empresa y concierge.
