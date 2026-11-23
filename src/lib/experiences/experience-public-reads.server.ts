@@ -43,6 +43,7 @@ import {
   type AssetBaseForVariants,
 } from "@/lib/media/variant-bundles.server";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
+import { arrangeListing, dailySeed, meridaIsoDay } from "@/lib/visibility/commercial-slots";
 
 /**
  * Tarjeta del listado de Experiencias: el contrato turístico compartido más
@@ -348,13 +349,15 @@ export async function listExperiencesListing(
     }
   }
   const boostByProductId = new Map<string, number>();
+  const businessIdByProductId = new Map<string, string>();
 
-  const items: TourismCardVM[] = products
+  let items: TourismCardVM[] = products
     .map((product) => {
       boostByProductId.set(
         String(product.id),
         boostByBusinessId.get(String(product.business_id)) ?? 0,
       );
+      businessIdByProductId.set(String(product.id), String(product.business_id));
       const business = (product.businesses as Row | null) ?? null;
       const destination = (business?.destinations as Row | null) ?? null;
       const cover = coverByProduct.get(product.id) ?? null;
@@ -412,14 +415,24 @@ export async function listExperiencesListing(
     })
     .filter((item) => !destino || (item as ExperienceListingItem).destinationSlug === destino);
 
-  // Mismo criterio que los listados de empresas: peso de visibilidad DESC,
-  // luego alfabético. Sin pesos configurados el orden queda alfabético.
-  items.sort((a, b) => {
-    const scoreA = boostByProductId.get(a.id) ?? 0;
-    const scoreB = boostByProductId.get(b.id) ?? 0;
-    if (scoreB !== scoreA) return scoreB - scoreA;
-    return a.name.localeCompare(b.name, "es");
-  });
+  // Misma fórmula que los listados de empresas (`arrangeListing`, plan
+  // aprobado 2026-09-18): orden orgánico alfabético y el primer lugar de cada
+  // bloque de 4 para una experiencia de empresa con paquete vigente, marcada
+  // «Recomendado». Nunca se oculta una experiencia sin paquete.
+  items.sort((a, b) => a.name.localeCompare(b.name, "es"));
+  const arranged = arrangeListing(
+    items.map((item) => ({
+      item,
+      businessId: businessIdByProductId.get(item.id) ?? null,
+      weight: boostByProductId.get(item.id) ?? 0,
+    })),
+    dailySeed(`listado:experiencias:${destino ?? "region"}`, meridaIsoDay()),
+  );
+  items = arranged.map(({ item, origin }) =>
+    origin === "sponsored"
+      ? ({ ...item, commercialPlacement: "contratado" } as ExperienceListingItem)
+      : item,
+  );
 
   const destinationLabel = destino
     ? (destinationName ??

@@ -18,6 +18,8 @@
  *    respecto al derecho que otorga su paquete.
  *  - Los fijados vigentes (Founder Spotlight / destacados programados)
  *    tienen prioridad sobre la rotación por paquetes.
+ *  - Listados completos (`arrangeListing`): mismo bloque de 4 y prioridad,
+ *    sin ocultar ninguna ficha.
  */
 
 /** Tamaño del bloque: 1 espacio comercial por cada 4 tarjetas visibles. */
@@ -78,6 +80,20 @@ export function stableHash(value: string): number {
     hash = Math.imul(hash, 0x01000193) >>> 0;
   }
   return hash >>> 0;
+}
+
+/**
+ * Clave de sorteo ponderado (Efraimidis-Spirakis): menor = antes. Un paquete
+ * con más derecho de exposición sale primero más días, sin quedarse fijo; la
+ * semilla diaria la mantiene estable durante el día.
+ */
+function weightedTiebreak(key: string, weight: number): number {
+  let h = stableHash(key);
+  h = Math.imul(h ^ (h >>> 16), 0x85ebca6b) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
+  h = (h ^ (h >>> 16)) >>> 0;
+  const u = (h + 1) / 4294967297;
+  return -Math.log(u) / (weight > 0 ? weight : 1);
 }
 
 function isEligible(candidate: SlotCandidate): boolean {
@@ -178,4 +194,94 @@ export function allocateSlots(options: AllocateOptions): AllocatedSlot[] {
 /** Semilla estable del día en el destino para una superficie dada. */
 export function dailySeed(surface: string, isoDay: string): string {
   return `${isoDay}:${surface}`;
+}
+
+/** Día calendario en el destino (`America/Merida`) en formato `YYYY-MM-DD`. */
+export function meridaIsoDay(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Merida",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}
+
+/* ------------------------------------------------------------------ */
+/* Listados completos (plan aprobado 2026-09-18 · «Superficies       */
+/* alcanzadas»): Hoteles, Restaurantes, Casas de vacaciones,          */
+/* Experiencias y listados territoriales/por categoría.               */
+/* ------------------------------------------------------------------ */
+
+export interface ListingEntry<T> {
+  item: T;
+  /** Empresa propietaria; sin empresa nunca ocupa un espacio comercial. */
+  businessId: string | null;
+  /** Derecho de exposición del paquete vigente (0 = sin paquete). */
+  weight: number;
+  /** Destacado fijado vigente (Founder Spotlight): entra antes que los paquetes. */
+  pinned?: boolean;
+}
+
+export interface ArrangedListingEntry<T> {
+  item: T;
+  origin: SlotOrigin;
+  /** `true` sólo para el espacio contratado: muestra la indicación `Recomendado`. */
+  labeled: boolean;
+}
+
+/**
+ * Ordena un listado completo con la misma fórmula de los carriles, pero sin
+ * ocultar nada: el primer lugar de cada bloque de 4 es comercial; cada
+ * empresa ocupa como máximo un espacio comercial por listado; el resto
+ * conserva el orden orgánico recibido. Si hay más contratos que espacios,
+ * los que no entran aparecen en su lugar orgánico, sin etiqueta.
+ */
+export function arrangeListing<T>(
+  entries: readonly ListingEntry<T>[],
+  seed: string,
+): ArrangedListingEntry<T>[] {
+  // Una candidatura comercial por empresa: su primera ficha del listado.
+  const firstByBusiness = new Map<string, number>();
+  entries.forEach((entry, index) => {
+    if (!entry.businessId || firstByBusiness.has(entry.businessId)) return;
+    if (entry.pinned === true || entry.weight > 0) firstByBusiness.set(entry.businessId, index);
+  });
+  const ranked = [...firstByBusiness.entries()]
+    .map(([businessId, index]) => {
+      const entry = entries[index] as ListingEntry<T>;
+      return {
+        index,
+        pinned: entry.pinned === true,
+        key: weightedTiebreak(`${seed}:${businessId}`, entry.weight),
+      };
+    })
+    .sort((a, b) => Number(b.pinned) - Number(a.pinned) || a.key - b.key);
+
+  // Espacios comerciales disponibles: uno por cada bloque de 4.
+  const commercialSlots = Math.ceil(entries.length / COMMERCIAL_BLOCK_SIZE);
+  const reserved = ranked.slice(0, commercialSlots);
+  const reservedIndexes = new Set(reserved.map((r) => r.index));
+  const organic = entries.map((_, index) => index).filter((index) => !reservedIndexes.has(index));
+
+  const out: ArrangedListingEntry<T>[] = [];
+  let r = 0;
+  let o = 0;
+  while (out.length < entries.length) {
+    const commercial = out.length % COMMERCIAL_BLOCK_SIZE === 0 ? reserved[r] : undefined;
+    if (commercial) {
+      r += 1;
+      const origin: SlotOrigin = commercial.pinned ? "pinned" : "sponsored";
+      out.push({
+        item: (entries[commercial.index] as ListingEntry<T>).item,
+        origin,
+        labeled: origin === "sponsored",
+      });
+      continue;
+    }
+    const index = organic[o];
+    if (index === undefined) break;
+    o += 1;
+    out.push({ item: (entries[index] as ListingEntry<T>).item, origin: "organic", labeled: false });
+  }
+  return out;
 }

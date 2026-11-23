@@ -789,8 +789,10 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const destinationBrief = await loadDestinationBriefServer(supabaseAdmin, activeDestination);
         // Catálogo publicado (empresas, experiencias, lugares, eventos) con la
         // misma prioridad del Alux conversacional; si falla, sigue sin él.
-        const { loadPublicCatalogBlock } = await import("@/lib/alux/catalog-prompt.server");
-        const catalogBlock = await loadPublicCatalogBlock({
+        const { loadPublicCatalogBlock, recordPromotedMentions } = await import(
+          "@/lib/alux/catalog-prompt.server"
+        );
+        const catalog = await loadPublicCatalogBlock({
           query: [
             message,
             ...history
@@ -802,6 +804,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
             .slice(0, 600),
           destinationSlug: activeDestination,
         });
+        const catalogBlock = catalog.text;
 
         // 4e) Clima real (Ola A10 · Open-Meteo, sin API key).
         // Fuente: GPS del visitante si compartió ubicación; si no,
@@ -933,6 +936,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
               tokens_out: tokensOut,
             });
             const newMessageCount = (sessionRow.message_count ?? 0) + 1;
+            // Tope diario del paquete: cuenta los aliados recomendados que nombró.
+            await recordPromotedMentions(catalog.promoted, text, "alux-publico");
 
             // Fase 4 · si Alux admitió no tener el dato, queda para entrenarlo.
             {

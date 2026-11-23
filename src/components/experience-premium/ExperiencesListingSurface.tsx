@@ -859,7 +859,9 @@ function ExperienceStoreCard({
           </a>
         </h3>
         <p className="mt-1 truncate text-xs text-muted-foreground">
-          {[duration, vm.businessName].filter(Boolean).join(" · ") || "Experiencia publicada"}
+          {[duration, vm.businessName, vm.commercialPlacement === "contratado" ? "Recomendado" : null]
+            .filter(Boolean)
+            .join(" · ") || "Experiencia publicada"}
         </p>
         <p className="mt-2 text-sm">
           {commerce.priceLabel ? (

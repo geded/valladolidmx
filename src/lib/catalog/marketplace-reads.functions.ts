@@ -1114,13 +1114,11 @@ export const listMarketplaceBusinesses = createServerFn({ method: "GET" }).handl
       }
     }
 
-    // Ordenar por (spotlight + visibility) DESC, luego alfabético
-    rows.sort((a, b) => {
-      const scoreA = (a.spotlight_boost ?? 0) + (a.visibility_boost ?? 0);
-      const scoreB = (b.spotlight_boost ?? 0) + (b.visibility_boost ?? 0);
-      if (scoreB !== scoreA) return scoreB - scoreA;
-      return a.display_name.localeCompare(b.display_name, "es");
-    });
+    // Orden orgánico alfabético. La presencia contratada (`visibility_boost`)
+    // y los destacados (`spotlight_boost`) NO se suman aquí: cada listado ya
+    // filtrado los reparte con `arrangeListing` (1 espacio de cada 4,
+    // plan aprobado 2026-09-18), en `buildPublicListing`.
+    rows.sort((a, b) => a.display_name.localeCompare(b.display_name, "es"));
 
     return rows;
   },

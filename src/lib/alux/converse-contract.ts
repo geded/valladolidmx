@@ -504,6 +504,8 @@ export interface AluxConverseCandidate {
    * empresa que opera el producto). Ausente = sin visibilidad contratada.
    */
   readonly aluxWeight?: number;
+  /** Empresa con paquete a la que se acredita la mención «Recomendado». */
+  readonly sponsorBusinessId?: string;
 }
 
 /* ─────────────────────────── Momento del día (noche) ─────────────────────────── */

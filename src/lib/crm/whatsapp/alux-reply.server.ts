@@ -328,6 +328,15 @@ export async function composeWhatsAppReply(input: ComposeInput): Promise<Compose
     return c && c.planKind ? [{ kind: c.planKind, targetId: c.entityId, title: c.title }] : [];
   });
   const firstNameRaw = typeof parsed?.["firstName"] === "string" ? parsed["firstName"] : null;
+  // Tope diario del paquete: cuenta los aliados recomendados que nombró.
+  if (parsed && !input.mediaOnly) {
+    const catalogPrompt = await import("@/lib/alux/catalog-prompt.server");
+    await catalogPrompt.recordPromotedMentions(
+      catalogPrompt.promotedOf(candidates),
+      text,
+      "alux-whatsapp",
+    );
+  }
   return {
     text,
     language,

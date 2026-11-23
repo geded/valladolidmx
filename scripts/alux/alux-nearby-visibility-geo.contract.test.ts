@@ -38,12 +38,12 @@ describe("chat público · búsqueda de cercanía", () => {
 });
 
 describe("listado de experiencias · peso de visibilidad", () => {
-  test("lee business_effective_visibility y ordena peso DESC, luego alfabético", () => {
+  test("lee business_effective_visibility y reparte con la fórmula oficial (1 de cada 4)", () => {
     const src = read("src/lib/experiences/experience-public-reads.server.ts");
     expect(src).toContain('.from("business_effective_visibility")');
     expect(src).toContain("discovery_boost");
     expect(src).toContain("search_weight");
-    expect(src).toContain("if (scoreB !== scoreA) return scoreB - scoreA;");
+    expect(src).toContain("arrangeListing(");
     expect(src).toContain('localeCompare(b.name, "es")');
   });
 });

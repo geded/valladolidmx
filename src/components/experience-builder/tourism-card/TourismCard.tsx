@@ -80,6 +80,12 @@ export interface TourismCardVM {
    * la presentación aprobada. Nunca se infiere.
    */
   operatorId?: string | null;
+  /**
+   * Espacio que ocupa en un listado según `arrangeListing`
+   * (`src/lib/visibility/commercial-slots.ts`): `contratado` muestra la
+   * indicación discreta «Recomendado». Ausente = orgánico.
+   */
+  commercialPlacement?: "contratado" | "fijado" | null;
   entityKind: TourismEntityKind | null;
   /** Override manual del eyebrow (ej. tipo de producto o categoría). */
   eyebrow?: string | null;

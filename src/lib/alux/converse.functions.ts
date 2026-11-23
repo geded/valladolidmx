@@ -923,6 +923,18 @@ export const aluxConverse = createServerFn({ method: "POST" })
           });
         }
       }
+      // Tope diario del paquete: cada «Recomendado» mostrado cuenta una mención.
+      const sponsorIds = response.recommendations
+        .filter((rec) => rec.sponsored === true)
+        .map(
+          (rec) =>
+            retrievedByKey.get(candidateKey(rec.entityType, rec.entityId))?.sponsorBusinessId ?? "",
+        )
+        .filter(Boolean);
+      if (sponsorIds.length > 0) {
+        const { recordAluxMentions } = await import("./paid-mentions.server");
+        await recordAluxMentions(sponsorIds, "alux-conversacional");
+      }
       return response;
     };
 

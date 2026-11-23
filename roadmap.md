@@ -560,3 +560,9 @@
 - [x] Ficha completa de experiencias (cupo, anticipación, cancelación, descripción).
 - [x] Artesanías: se venden en línea si el administrador autorizó su venta al subirlas.
 - [x] El chat sin cuenta (y el insertado en sitios aliados) ya recibe el catálogo publicado; antes no veía empresas ni experiencias.
+
+## Fórmula de visibilidad en listados y tope de Alux · 2026-11-23
+
+- [x] Listados de empresas y experiencias usan la fórmula aprobada (1 de cada 4, rotación diaria, «Recomendado» solo en el espacio contratado).
+- [x] Alux: «Recomendado» solo para paquetes con menciones proactivas y hasta su tope diario; Destacado solo se lee primero.
+- [x] Explicar al Founder al final cómo funciona la configuración.

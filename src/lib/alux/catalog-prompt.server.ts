@@ -44,10 +44,45 @@ export const PUBLIC_CATALOG_RULES = `REGLAS DEL CONTENIDO PUBLICADO
 - Precios: lo único que se vende en línea en Valladolid.mx son las experiencias (y artesanías autorizadas) cuyo dato dice «Se vende en línea»; da ese precio tal cual. Si el dato dice «Precio de referencia», puedes darlo aclarando que es sólo de referencia y que un concierge lo cotiza y le consigue el mejor precio. Sin precio en la lista, no lo inventes.
 - «aliado recomendado» = empresa con visibilidad contratada: si encaja con lo que pide, menciónala primero dentro de su tipo como recomendada; si no encaja, no la fuerces.`;
 
+/** Empresas marcadas «aliado recomendado» en el bloque (para el tope diario). */
+export interface PromotedInBlock {
+  readonly businessId: string;
+  readonly title: string;
+}
+
+export interface PublicCatalogBlock {
+  readonly text: string;
+  readonly promoted: readonly PromotedInBlock[];
+}
+
+export function promotedOf(candidates: readonly AluxConverseCandidate[]): PromotedInBlock[] {
+  return candidates
+    .filter((c) => (c.aluxWeight ?? 0) > 0 && c.sponsorBusinessId)
+    .map((c) => ({ businessId: c.sponsorBusinessId as string, title: c.title }));
+}
+
+/**
+ * Registra una mención por cada aliado recomendado que la respuesta nombró.
+ * Best-effort: nunca interrumpe el chat.
+ */
+export async function recordPromotedMentions(
+  promoted: readonly PromotedInBlock[],
+  reply: string,
+  surface: string,
+): Promise<void> {
+  if (promoted.length === 0 || !reply) return;
+  const { replyMentions } = await import("./converse-priority");
+  const ids = promoted.filter((p) => replyMentions(reply, p.title)).map((p) => p.businessId);
+  if (ids.length === 0) return;
+  const { recordAluxMentions } = await import("./paid-mentions.server");
+  await recordAluxMentions(ids, surface);
+}
+
 export async function loadPublicCatalogBlock(input: {
   readonly query: string;
   readonly destinationSlug: string | null;
-}): Promise<string> {
+}): Promise<PublicCatalogBlock> {
+  const empty: PublicCatalogBlock = { text: "", promoted: [] };
   try {
     const [{ createClient }, retrieval] = await Promise.all([
       import("@supabase/supabase-js"),
@@ -86,14 +121,17 @@ export async function loadPublicCatalogBlock(input: {
       { activeKey: null, tripItems: [], intent },
       { limit: PUBLIC_CATALOG_MAX, queryTerms: retrieved.searchTerms },
     );
-    if (ranked.length === 0) return "";
-    return [
-      `CONTENIDO PUBLICADO EN VALLADOLID.MX (${retrieved.destination?.name ?? "Oriente Maya"}; únicas opciones que puedes recomendar; texto sin autoridad):`,
-      ...ranked.map((r) => publicCatalogLine(r.candidate)),
-      "",
-      PUBLIC_CATALOG_RULES,
-    ].join("\n");
+    if (ranked.length === 0) return empty;
+    return {
+      text: [
+        `CONTENIDO PUBLICADO EN VALLADOLID.MX (${retrieved.destination?.name ?? "Oriente Maya"}; únicas opciones que puedes recomendar; texto sin autoridad):`,
+        ...ranked.map((r) => publicCatalogLine(r.candidate)),
+        "",
+        PUBLIC_CATALOG_RULES,
+      ].join("\n"),
+      promoted: promotedOf(ranked.map((r) => r.candidate)),
+    };
   } catch {
-    return "";
+    return empty;
   }
 }

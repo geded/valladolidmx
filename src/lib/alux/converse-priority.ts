@@ -80,6 +80,32 @@ export function aluxWeightFromLevers(levers: unknown): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
+/** Tope diario de menciones «Recomendado» del paquete (0 = sin tope). */
+export function aluxDailyCap(levers: unknown): number {
+  if (!levers || typeof levers !== "object") return 0;
+  const n = Number((levers as Record<string, unknown>)["alux_daily_cap"]);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+
+/**
+ * ¿Puede Alux marcar hoy a esta empresa como «Recomendado»? Sólo paquetes con
+ * menciones proactivas (Premium, Élite) y mientras no lleguen a su tope del
+ * día. Un paquete sin menciones proactivas (Destacado) sólo se lee primero.
+ */
+export function aluxCanPromote(levers: unknown, mentionsToday: number): boolean {
+  if (aluxWeightFromLevers(levers) <= 0) return false;
+  if (!levers || typeof levers !== "object") return false;
+  if ((levers as Record<string, unknown>)["alux_proactive"] !== true) return false;
+  const cap = aluxDailyCap(levers);
+  return cap === 0 || mentionsToday < cap;
+}
+
+/** ¿La respuesta de Alux nombra este título? (sin acentos ni mayúsculas). */
+export function replyMentions(reply: string, title: string): boolean {
+  const name = normalizeText(title).trim();
+  return name.length >= 3 && normalizeText(reply).includes(name);
+}
+
 export interface PrioritizeOptions<T> {
   readonly limit: number;
   readonly terms: readonly string[];

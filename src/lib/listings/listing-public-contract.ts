@@ -10,7 +10,8 @@
  *  - Studio, preview y ruta pública consumen este mismo DTO y la misma
  *    superficie reusable (`TourismListingSurface`).
  *
- * Módulo PURO: sin red, sin base de datos, sin React, sin flags.
+ * Módulo PURO: sin red, sin base de datos, sin React, sin flags (la fecha
+ * de rotación se puede inyectar con `isoDay`).
  */
 import type { MarketplaceBusinessCard } from "@/lib/catalog/marketplace-reads.functions";
 import type { PublicEventCard } from "@/lib/events/public-reads.functions";
@@ -24,6 +25,7 @@ import {
   destinationToTourismCard,
 } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 import { ORIENTE_MAYA } from "@/config/regions";
+import { arrangeListing, dailySeed, meridaIsoDay } from "@/lib/visibility/commercial-slots";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
 /* v1.1.0 · G4-PLACES — se incorpora la familia `lugares` (fuente real
@@ -324,6 +326,41 @@ export interface BuildPublicListingInput extends ListingFeedInput {
    * lista declarada en el contrato (que queda como fallback fail-safe).
    */
   readonly categorySlugs?: readonly string[];
+  /** Día en el destino (`YYYY-MM-DD`) para la rotación diaria; por omisión, hoy. */
+  readonly isoDay?: string;
+}
+
+/**
+ * Reparte un listado de empresas ya filtrado con la fórmula oficial de
+ * visibilidad (`arrangeListing`): primer lugar de cada bloque de 4 para
+ * paquetes vigentes o destacados fijados; el resto alfabético. Sólo el
+ * espacio contratado conserva la etiqueta del paquete y se marca
+ * `contratado` (indicación «Recomendado»).
+ */
+export function arrangeBusinessListing(
+  businesses: readonly MarketplaceBusinessCard[],
+  seed: string,
+  toCard: (business: MarketplaceBusinessCard) => TourismCardVM,
+): TourismCardVM[] {
+  const arranged = arrangeListing(
+    businesses.map((business) => ({
+      item: business,
+      businessId: business.id,
+      weight: business.visibility_boost ?? 0,
+      pinned:
+        (business.spotlight_boost ?? 0) > 0 || Boolean(business.spotlight_headline),
+    })),
+    seed,
+  );
+  return arranged.map(({ item, origin }) => {
+    const vm = toCard(item);
+    if (origin === "sponsored") return { ...vm, commercialPlacement: "contratado" };
+    if (origin === "pinned") return { ...vm, commercialPlacement: "fijado" };
+    const planLabel = item.visibility_plan_name;
+    return planLabel
+      ? { ...vm, badges: vm.badges.filter((badge) => badge.label !== planLabel) }
+      : vm;
+  });
 }
 
 function humanize(slug: string): string {
@@ -347,15 +384,21 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
   let items: TourismCardVM[] = [];
 
   if (contract.source === "businesses") {
-    items = (input.businesses ?? [])
+    const visible = (input.businesses ?? [])
       .filter((b) => allowed.has(b.category_slug.trim().toLowerCase()))
-      .filter((b) => !destino || b.destination_slug === destino)
-      .map((b) =>
+      .filter((b) => !destino || b.destination_slug === destino);
+    items = arrangeBusinessListing(
+      visible,
+      dailySeed(
+        `listado:${contract.id}:${destino ?? "region"}:${[...allowed].sort().join(",")}`,
+        input.isoDay ?? meridaIsoDay(),
+      ),
+      (b) =>
         businessToTourismCard(b, {
           destinationLabel: labelOf(b.destination_slug),
           regionLabel: ORIENTE_MAYA.name,
         }),
-      );
+    );
   } else if (contract.source === "events") {
     items = (input.events ?? [])
       .filter((e) => !destino || e.destination_slug === destino)

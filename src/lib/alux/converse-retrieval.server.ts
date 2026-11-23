@@ -38,6 +38,7 @@ import {
   type AluxUnavailableFactKind,
 } from "./converse-contract";
 import {
+  aluxCanPromote,
   aluxWeightFromLevers,
   extractSearchTerms,
   prioritizeRows,
@@ -79,11 +80,16 @@ export interface ConverseRetrievalInput {
 /** Prioridad compartida por todas las cargas de una misma pregunta. */
 interface RetrievalPriority {
   readonly terms: readonly string[];
-  /** businessId → alux_weight del plan de visibilidad vigente. */
+  /** businessId → alux_weight del plan de visibilidad vigente (orden de lectura). */
   readonly weights: ReadonlyMap<string, number>;
+  /**
+   * Empresas que hoy pueden salir marcadas «Recomendado»: paquete con
+   * menciones proactivas y bajo su tope diario (`aluxCanPromote`).
+   */
+  readonly promoted: ReadonlySet<string>;
 }
 
-const NO_PRIORITY: RetrievalPriority = { terms: [], weights: new Map() };
+const NO_PRIORITY: RetrievalPriority = { terms: [], weights: new Map(), promoted: new Set() };
 
 /** Tope de empresas leídas por destino antes de elegir (no es el tope del modelo). */
 const BUSINESS_SCAN_LIMIT = 500;
@@ -92,22 +98,39 @@ const BUSINESS_SCAN_LIMIT = 500;
  * Empresas con visibilidad contratada vigente (vista pública
  * `business_effective_visibility`). Si falla, Alux sigue sin prioridad pagada.
  */
-async function loadPaidWeights(sb: SupabaseClient): Promise<Map<string, number>> {
-  const out = new Map<string, number>();
+async function loadPaidWeights(
+  sb: SupabaseClient,
+): Promise<{ weights: Map<string, number>; promoted: Set<string> }> {
+  const weights = new Map<string, number>();
+  const promoted = new Set<string>();
   try {
     const { data } = await sb
       .from("business_effective_visibility")
       .select("business_id, levers, is_default")
       .eq("is_default", false)
       .limit(1000);
+    const leversBy = new Map<string, unknown>();
     for (const row of (data ?? []) as Array<Record<string, unknown>>) {
       const weight = aluxWeightFromLevers(row["levers"]);
-      if (weight > 0 && typeof row["business_id"] === "string") out.set(row["business_id"], weight);
+      if (weight > 0 && typeof row["business_id"] === "string") {
+        weights.set(row["business_id"], weight);
+        leversBy.set(row["business_id"], row["levers"]);
+      }
+    }
+    const proactive = [...leversBy.entries()]
+      .filter(([, levers]) => aluxCanPromote(levers, 0))
+      .map(([id]) => id);
+    if (proactive.length > 0) {
+      const { countAluxMentionsToday } = await import("./paid-mentions.server");
+      const today = await countAluxMentionsToday(proactive);
+      for (const id of proactive) {
+        if (aluxCanPromote(leversBy.get(id), today.get(id) ?? 0)) promoted.add(id);
+      }
     }
   } catch {
     /* sin prioridad pagada */
   }
-  return out;
+  return { weights, promoted };
 }
 
 export interface ConverseRetrievalResult {
@@ -414,7 +437,7 @@ async function loadBusinessesFor(
   for (const r of rows) {
     const href = hrefBy.get(r.id);
     if (!href) continue;
-    const aluxWeight = priority.weights.get(r.id) ?? 0;
+    const aluxWeight = priority.promoted.has(r.id) ? (priority.weights.get(r.id) ?? 0) : 0;
     const family = familyFromCategory(r.categorySlug);
     const facts: AluxConverseFact[] = [];
     const unavailable: AluxUnavailableFactKind[] = [];
@@ -448,7 +471,7 @@ async function loadBusinessesFor(
       coords: coordsBy.get(r.id) ?? null,
       openState: open.state,
       nightFit: nightFitFromHours(hoursBy.get(r.id)),
-      ...(aluxWeight > 0 ? { aluxWeight } : {}),
+      ...(aluxWeight > 0 ? { aluxWeight, sponsorBusinessId: r.id } : {}),
     });
   }
   return { candidates, ids: Array.from(index.keys()), index };
@@ -537,6 +560,7 @@ async function enrichCatalog(
     let subtitle: string | null = c.categoryName;
     let summaryText: string | null = sanitizeCmsText(c.summary, 140) || null;
     let aluxWeight = 0;
+    let sponsorBusinessId: string | null = null;
 
     if (c.entityKind === "place") {
       family = "lugar";
@@ -593,7 +617,11 @@ async function enrichCatalog(
         subtitle = operator;
       }
       if (p) {
-        aluxWeight = priority.weights.get(String(p["business_id"])) ?? 0;
+        const operatorId = String(p["business_id"]);
+        aluxWeight = priority.promoted.has(operatorId)
+          ? (priority.weights.get(operatorId) ?? 0)
+          : 0;
+        if (aluxWeight > 0) sponsorBusinessId = operatorId;
         // Ficha completa: frase corta + descripción (antes sólo una de las dos).
         summaryText =
           sanitizeCmsText(
@@ -680,7 +708,7 @@ async function enrichCatalog(
       coords: c.coords ? { lat: c.coords.lat, lng: c.coords.lng } : null,
       openState,
       nightFit,
-      ...(aluxWeight > 0 ? { aluxWeight } : {}),
+      ...(aluxWeight > 0 && sponsorBusinessId ? { aluxWeight, sponsorBusinessId } : {}),
     });
   }
   return out;
@@ -901,7 +929,7 @@ export async function retrieveConverseCandidates(
   sb: SupabaseClient,
   input: ConverseRetrievalInput,
 ): Promise<ConverseRetrievalResult> {
-  const [{ data: destRows }, weights] = await Promise.all([
+  const [{ data: destRows }, paid] = await Promise.all([
     sb
       .from("destinations")
       .select("id, slug, name")
@@ -948,7 +976,11 @@ export async function retrieveConverseCandidates(
     input.searchText,
     knownDestinations.flatMap((d) => [d.name, d.slug]),
   );
-  const priority: RetrievalPriority = { terms: searchTerms, weights };
+  const priority: RetrievalPriority = {
+    terms: searchTerms,
+    weights: paid.weights,
+    promoted: paid.promoted,
+  };
   const destination =
     (input.destinationSlug ? bySlug.get(input.destinationSlug) : undefined) ??
     knownDestinations.find((d) => selectedDestinationIds.has(d.id)) ??
