@@ -23,7 +23,12 @@ Meta de arranque de Valladolid: unas 200 empresas (50 hoteles, 50 restaurantes, 
 
 1. **Página del destino:** hoy solo lee 60 empresas. Leerá todas y mostrará los primeros espacios de cada categoría, con «Ver todos».
 2. **Listados de hoteles, restaurantes y casas:** hoy se cortan en 120 antes de filtrar por destino. Cada listado tendrá todas las de su categoría, con carga por páginas y filtros (barrio, precio, servicios).
-3. **Mapa:** hoy muestra 80 puntos. Agrupará los puntos cercanos para que quepan las 200 y los lugares de interés.
+3. **Mapa sin saturar:** hoy muestra hasta 80 pines y solo los hace más chicos cuando hay muchos. Con 200 empresas y los lugares de interés se aplicará:
+   - **Burbujas con número:** de lejos, los pines cercanos se juntan en un círculo («24 en el Centro»). Al acercarse o tocarlo se abren en pines individuales.
+   - **Filtro por categoría encima del mapa:** Hoteles, Restaurantes, Casas, Experiencias, Lugares de interés. Por omisión se ve la categoría de la página donde estás; en el mapa general se ven todas en burbujas.
+   - **Pines por tipo:** cada categoría con su ícono, en los colores de la marca.
+   - **Lista sincronizada:** al mover el mapa, la lista de abajo muestra solo lo que se ve en pantalla.
+   - **Pagadas:** un pin dorado para Premium y Élite (como prometen sus paquetes), sin tapar a las demás; nunca dentro de una burbuja que lo esconda.
 4. **Alux:** hoy lee hasta 500 empresas por destino, así que alcanza. Se revisa que siga contestando rápido con 200 empresas y sus productos.
 5. **Carga en el CMS:** con las listas de búsqueda que ya hicimos y el medidor de ficha (Fase A), el equipo verá qué le falta a cada una de las 200.
 6. **Prueba de carga:** se ensaya con 200 empresas de prueba marcadas como temporales, y después se borran con tu autorización.
@@ -79,7 +84,7 @@ Una sola vista por empresa y por destino: vistas → recomendaciones de Alux →
 
 ## Detalles técnicos
 
-- **0:** quitar los límites duros (`public-reads.functions.ts` 60 y 80, `listMarketplaceBusinesses` 120 antes de filtrar, relacionadas 120/200) y filtrar por destino y categoría en la consulta; paginar los listados manteniendo `arrangeListing` por página; agrupar puntos en el mapa existente; medir el tiempo de respuesta de Alux con 200 empresas.
+- **0:** quitar los límites duros (`public-reads.functions.ts` 60 y 80, `listMarketplaceBusinesses` 120 antes de filtrar, relacionadas 120/200) y filtrar por destino y categoría en la consulta; paginar los listados manteniendo `arrangeListing` por página; agrupación con `@googlemaps/markerclusterer` dentro de `InteractiveMap` (activa la capacidad `clustering` que ya declara el bloque de mapa, sin otro componente), filtro por categoría, sincronización con la lista por los límites visibles y pin dorado según `golden_pin`; medir el tiempo de respuesta de Alux con 200 empresas.
 
 - **A:** puntaje de completitud en `src/lib/visibility/` (función pura y probada), usado en `converse-priority.ts`/`converse-grounding.ts` como factor de calidad junto a relevancia y `alux_weight`. Rotación diaria determinista entre empates, y quitar los cortes alfabéticos (60, 120, 500) antes de filtrar. Reporte mensual con las plantillas de correo y WhatsApp existentes, a partir de `business_view_events` y `concierge_quotes`.
 - **B:** enlaces de invitación firmados con token hasheado (mismo patrón que `/continuar/$token`), que reutilizan `BecomeHostFlow` y `ClaimAffordanceLink`; sin nuevas afordancias públicas. SLA de revisión en la bandeja existente del CMS.

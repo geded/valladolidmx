@@ -571,3 +571,4 @@
 
 - [ ] Plan de 6 fases (A–F) — espera aprobación del Founder.
 - [ ] Preparar Valladolid para unas 200 empresas al arrancar (50 hoteles, 50 restaurantes, casas de vacaciones, experiencias, sitios y lugares de interés) — incluido en el plan como Fase 0.
+- [ ] Mapas sin saturar con 200 empresas: burbujas con número, filtro por categoría, lista sincronizada, pin dorado — incluido en Fase 0.
