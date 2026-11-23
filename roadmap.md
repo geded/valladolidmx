@@ -591,3 +591,9 @@
 - [ ] Confirmar día del reporte y a quién llega (preguntas abiertas; se usa «día 1» y «solo las que administran»).
 - [ ] Reporte por WhatsApp: necesita la línea de Valladolid.mx conectada con QR real.
 - [ ] Fase B (traer a las empresas que faltan) — espera visto bueno del Founder.
+
+## Ventas en línea por empresa · 2026-11-23
+
+- [x] Propuesta reducida a piloto: solo empresas activadas, sin Booking/Airbnb, hoteles con confirmación.
+- [x] Dejar en la propuesta cómo crecer después sin rehacer (un solo sistema en las plantillas; calendario de Booking/Airbnb, reserva inmediata y envíos como agregados).
+- [ ] Aprobación del Founder de la propuesta y de las empresas piloto.
