@@ -42,7 +42,7 @@ export interface RelatedOverridesDTO {
   hides: RelatedOverrideRow[];
 }
 
-const MAX_PINS_PER_SURFACE = 6;
+export const MAX_PINS_PER_SURFACE = 6;
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -223,6 +223,109 @@ export const deleteOverride = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("related_overrides").delete().eq("id", data.id);
     if (error) throw new Error(`related_overrides_delete_failed: ${error.message}`);
     return { ok: true as const };
+  });
+
+/* ------------------------------------------------------------------ *
+ * ADMIN · Nombres de los relacionados (para que el editor no lea uuids)
+ * ------------------------------------------------------------------ */
+export interface ResolveRelatedNamesInput {
+  refs: Array<{ kind: RelatedEntityKind; id: string }>;
+}
+
+export interface RelatedEntityName {
+  name: string;
+  status: string;
+}
+
+/**
+ * Traduce (tipo, uuid) a un nombre legible. Sólo columnas de identificación:
+ * no expone contenido editorial ni claves ajenas.
+ */
+export const resolveRelatedEntityNames = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: ResolveRelatedNamesInput | undefined) => {
+    const raw = Array.isArray(data?.refs) ? data.refs : [];
+    const seen = new Set<string>();
+    const refs: Array<{ kind: RelatedEntityKind; id: string }> = [];
+    for (const ref of raw.slice(0, 200)) {
+      if (!ref || typeof ref.id !== "string" || !ref.id.trim()) continue;
+      let kind: RelatedEntityKind;
+      try {
+        kind = normalizeKind(ref.kind);
+      } catch {
+        continue;
+      }
+      const key = `${kind}:${ref.id.trim()}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      refs.push({ kind, id: ref.id.trim() });
+    }
+    return { refs };
+  })
+  .handler(async ({ data, context }) => {
+    await assertEditorial(context);
+    const names: Record<string, RelatedEntityName> = {};
+    const sb = context.supabase;
+
+    const idsFor = (kind: RelatedEntityKind) =>
+      data.refs.filter((r) => r.kind === kind).map((r) => r.id);
+
+    const collect = (
+      kind: RelatedEntityKind,
+      rows: unknown,
+      nameColumn: string,
+    ) => {
+      for (const row of (rows ?? []) as Array<Record<string, unknown>>) {
+        const name = row[nameColumn];
+        if (typeof name !== "string" || typeof row.id !== "string") continue;
+        names[`${kind}:${row.id}`] = {
+          name,
+          status: typeof row.status === "string" ? row.status : "",
+        };
+      }
+    };
+
+    const businessIds = idsFor("business");
+    if (businessIds.length) {
+      const { data: rows, error } = await sb
+        .from("businesses")
+        .select("id, display_name, status")
+        .in("id", businessIds);
+      if (error) throw new Error(`related_names_read_failed: ${error.message}`);
+      collect("business", rows, "display_name");
+    }
+
+    const productIds = idsFor("product");
+    if (productIds.length) {
+      const { data: rows, error } = await sb
+        .from("products")
+        .select("id, name, status")
+        .in("id", productIds);
+      if (error) throw new Error(`related_names_read_failed: ${error.message}`);
+      collect("product", rows, "name");
+    }
+
+    const destinationIds = idsFor("destination");
+    if (destinationIds.length) {
+      const { data: rows, error } = await sb
+        .from("destinations")
+        .select("id, name, status")
+        .in("id", destinationIds);
+      if (error) throw new Error(`related_names_read_failed: ${error.message}`);
+      collect("destination", rows, "name");
+    }
+
+    const eventIds = idsFor("event");
+    if (eventIds.length) {
+      const { data: rows, error } = await sb
+        .from("events")
+        .select("id, title, status")
+        .in("id", eventIds);
+      if (error) throw new Error(`related_names_read_failed: ${error.message}`);
+      collect("event", rows, "title");
+    }
+
+    return { names };
   });
 
 /* ------------------------------------------------------------------ *
