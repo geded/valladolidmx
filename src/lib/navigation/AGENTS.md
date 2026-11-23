@@ -1,0 +1,1 @@
+- Business short links: `/<categoría>/<empresa>` (`src/routes/$categoria.$empresa.tsx` over `short-links*`) only 301-redirects published businesses to their canonical territorial page, accepting the category slug in plural or Spanish singular; unknown pairs return 404. Why: promotional addresses without a second public identity or changing the Navigation Blueprint.
