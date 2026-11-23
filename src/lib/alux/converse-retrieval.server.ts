@@ -44,6 +44,10 @@ import {
   prioritizeRows,
   productOfferFacts,
 } from "./converse-priority";
+import {
+  aluxQualityScore,
+  type BusinessProfileSignals,
+} from "@/lib/visibility/profile-completeness";
 
 const TZ = "America/Merida";
 /** Ruta pública canónica de rutas editoriales (`src/routes/rutas.$slug.tsx`). */
@@ -131,6 +135,30 @@ async function loadPaidWeights(
     /* sin prioridad pagada */
   }
   return { weights, promoted };
+}
+
+/**
+ * Calidad de ficha por empresa (`business_profile_signals`, una sola
+ * llamada). Si falla, Alux sigue sin este factor.
+ */
+async function loadQualityScores(
+  sb: SupabaseClient,
+  ids: readonly string[],
+): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  if (ids.length === 0) return out;
+  try {
+    const { data, error } = await sb.rpc("business_profile_signals" as never, {
+      _business_ids: ids.slice(0, 1000),
+    } as never);
+    if (error || !Array.isArray(data)) return out;
+    for (const row of data as BusinessProfileSignals[]) {
+      if (typeof row?.business_id === "string") out.set(row.business_id, aluxQualityScore(row));
+    }
+  } catch {
+    /* sin factor de calidad */
+  }
+  return out;
 }
 
 export interface ConverseRetrievalResult {
@@ -382,6 +410,10 @@ async function loadBusinessesFor(
     hrefBy.set(r.id, href);
     index.set(r.id, { slug: r.slug, categorySlug: r.categorySlug, name: r.name });
   }
+  const quality = await loadQualityScores(
+    sb,
+    allRows.filter((r) => hrefBy.has(r.id)).map((r) => r.id),
+  );
   const rows = requiredIds
     ? allRows
     : prioritizeRows(
@@ -393,6 +425,7 @@ async function loadBusinessesFor(
           nameOf: (r) => r.name,
           textOf: (r) => [r.name, r.tagline ?? "", r.description ?? "", r.categoryName].join(" "),
           weightOf: (r) => priority.weights.get(r.id) ?? 0,
+          qualityOf: (r) => quality.get(r.id) ?? 0,
         },
       );
   const ids = rows.map((r) => r.id);
@@ -472,6 +505,7 @@ async function loadBusinessesFor(
       openState: open.state,
       nightFit: nightFitFromHours(hoursBy.get(r.id)),
       ...(aluxWeight > 0 ? { aluxWeight, sponsorBusinessId: r.id } : {}),
+      ...(quality.has(r.id) ? { qualityScore: quality.get(r.id) } : {}),
     });
   }
   return { candidates, ids: Array.from(index.keys()), index };

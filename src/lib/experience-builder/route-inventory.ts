@@ -631,6 +631,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/api/public/alux/signal.ts",
   "src/routes/api/public/alux/embed-status.ts",
   "src/routes/api/public/health/maps.ts",
+  "src/routes/api/public/hooks/business-monthly-report.ts",
   "src/routes/api/public/hooks/coupon-review-reminders.ts",
   "src/routes/api/public/hooks/crm-whatsapp.ts",
   "src/routes/api/public/hooks/eb-process-scheduled-publish.ts",

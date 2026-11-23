@@ -506,6 +506,11 @@ export interface AluxConverseCandidate {
   readonly aluxWeight?: number;
   /** Empresa con paquete a la que se acredita la mención «Recomendado». */
   readonly sponsorBusinessId?: string;
+  /**
+   * Calidad 0–100 de la ficha de la empresa (`aluxQualityScore`): ficha
+   * completa, verificada, rapidez con cotizaciones y venta en línea.
+   */
+  readonly qualityScore?: number;
 }
 
 /* ─────────────────────────── Momento del día (noche) ─────────────────────────── */

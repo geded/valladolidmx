@@ -6,6 +6,7 @@ import { template as visibilityRequestReceivedTemplate } from "./visibility-requ
 import { template as visibilityActivatedTemplate } from "./visibility-activated";
 import { template as visibilityRejectedTemplate } from "./visibility-rejected";
 import { template as visibilityExpiringTemplate } from "./visibility-expiring";
+import { template as businessMonthlyReportTemplate } from "./business-monthly-report";
 import { template as visibilityExpiredTemplate } from "./visibility-expired";
 import { template as tripT14Template } from "./trip-t14";
 import { template as tripT3Template } from "./trip-t3";
@@ -50,6 +51,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "visibility-rejected": visibilityRejectedTemplate,
   "visibility-expiring": visibilityExpiringTemplate,
   "visibility-expired": visibilityExpiredTemplate,
+  "business-monthly-report": businessMonthlyReportTemplate,
   "trip-t14": tripT14Template,
   "trip-t3": tripT3Template,
   "trip-welcome": tripWelcomeTemplate,

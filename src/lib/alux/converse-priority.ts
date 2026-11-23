@@ -9,7 +9,8 @@
  *  2. Coincidencia con lo que pregunta la persona (sin acentos, por palabras).
  *  3. Empresas con visibilidad contratada vigente (`alux_weight` del plan).
  *  4. Experiencias que se venden en línea.
- *  5. Resto en orden alfabético.
+ *  5. Calidad de la ficha (completa, verificada, responde rápido).
+ *  6. Empates: turno justo del día (nunca orden alfabético).
  *
  * Precios: sólo experiencias y artesanías con venta en línea autorizada por
  * el administrador se venden en línea (misma regla de `canSellDirect`).
@@ -18,6 +19,12 @@
  */
 import { canSellDirect } from "@/lib/crm/closure-rules";
 import { normalizeText } from "./converse-contract";
+import { meridaIsoDay } from "@/lib/visibility/commercial-slots";
+import {
+  ALUX_READING_QUALITY_MAX,
+  fairTurnKey,
+  qualityPoints,
+} from "@/lib/visibility/profile-completeness";
 
 /** Palabras sin tema (es/en) que no sirven para buscar en el CMS. */
 const STOPWORDS = new Set(
@@ -116,26 +123,40 @@ export interface PrioritizeOptions<T> {
   readonly weightOf?: (row: T) => number;
   /** Puntos extra propios de la familia (p. ej. venta en línea). */
   readonly bonusOf?: (row: T) => number;
+  /** Calidad 0–100 de la ficha (`aluxQualityScore`). */
+  readonly qualityOf?: (row: T) => number;
   readonly requiredIds?: ReadonlySet<string>;
+  /** Semilla del turno justo; por omisión, el día en Mérida. */
+  readonly seed?: string;
 }
 
 /**
  * Elige hasta `limit` filas: obligatorias primero; después coincidencia con
- * la pregunta, visibilidad contratada y bono de familia; empate alfabético.
+ * la pregunta, visibilidad contratada, bono de familia y calidad de ficha;
+ * los empates se turnan cada día.
  */
 export function prioritizeRows<T>(rows: readonly T[], opts: PrioritizeOptions<T>): T[] {
+  const seed = opts.seed ?? `alux:${meridaIsoDay()}`;
   const scored = rows.map((row) => {
     const weight = opts.weightOf?.(row) ?? 0;
     const score =
       termHits(opts.terms, opts.textOf(row)) * 100 +
       (weight > 0 ? 50 + Math.min(weight, 100) / 10 : 0) +
-      (opts.bonusOf?.(row) ?? 0);
-    return { row, score, required: opts.requiredIds?.has(opts.idOf(row)) === true };
+      (opts.bonusOf?.(row) ?? 0) +
+      qualityPoints(opts.qualityOf?.(row), ALUX_READING_QUALITY_MAX);
+    const id = opts.idOf(row);
+    return {
+      row,
+      score,
+      required: opts.requiredIds?.has(id) === true,
+      turn: fairTurnKey(seed, id),
+    };
   });
   scored.sort(
     (a, b) =>
       Number(b.required) - Number(a.required) ||
       b.score - a.score ||
+      a.turn - b.turn ||
       opts.nameOf(a.row).localeCompare(opts.nameOf(b.row), "es"),
   );
   return scored.slice(0, Math.max(0, opts.limit)).map((s) => s.row);

@@ -246,6 +246,7 @@ import { Route as ApiPublicAluxChatRouteImport } from './routes/api/public/alux/
 import { Route as ApiPublicAluxEmbedStatusRouteImport } from './routes/api/public/alux/embed-status'
 import { Route as ApiPublicAluxSignalRouteImport } from './routes/api/public/alux/signal'
 import { Route as ApiPublicHealthMapsRouteImport } from './routes/api/public/health/maps'
+import { Route as ApiPublicHooksBusinessMonthlyReportRouteImport } from './routes/api/public/hooks/business-monthly-report'
 import { Route as ApiPublicHooksCouponReviewRemindersRouteImport } from './routes/api/public/hooks/coupon-review-reminders'
 import { Route as ApiPublicHooksCrmWhatsappRouteImport } from './routes/api/public/hooks/crm-whatsapp'
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
@@ -1632,6 +1633,12 @@ const ApiPublicHealthMapsRoute = ApiPublicHealthMapsRouteImport.update({
   path: '/api/public/health/maps',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksBusinessMonthlyReportRoute =
+  ApiPublicHooksBusinessMonthlyReportRouteImport.update({
+    id: '/api/public/hooks/business-monthly-report',
+    path: '/api/public/hooks/business-monthly-report',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksCouponReviewRemindersRoute =
   ApiPublicHooksCouponReviewRemindersRouteImport.update({
     id: '/api/public/hooks/coupon-review-reminders',
@@ -2084,6 +2091,7 @@ export interface FileRoutesByFullPath {
   '/api/public/alux/embed-status': typeof ApiPublicAluxEmbedStatusRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
+  '/api/public/hooks/business-monthly-report': typeof ApiPublicHooksBusinessMonthlyReportRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/crm-whatsapp': typeof ApiPublicHooksCrmWhatsappRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -2350,6 +2358,7 @@ export interface FileRoutesByTo {
   '/api/public/alux/embed-status': typeof ApiPublicAluxEmbedStatusRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
+  '/api/public/hooks/business-monthly-report': typeof ApiPublicHooksBusinessMonthlyReportRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/crm-whatsapp': typeof ApiPublicHooksCrmWhatsappRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -2628,6 +2637,7 @@ export interface FileRoutesById {
   '/api/public/alux/embed-status': typeof ApiPublicAluxEmbedStatusRoute
   '/api/public/alux/signal': typeof ApiPublicAluxSignalRoute
   '/api/public/health/maps': typeof ApiPublicHealthMapsRoute
+  '/api/public/hooks/business-monthly-report': typeof ApiPublicHooksBusinessMonthlyReportRoute
   '/api/public/hooks/coupon-review-reminders': typeof ApiPublicHooksCouponReviewRemindersRoute
   '/api/public/hooks/crm-whatsapp': typeof ApiPublicHooksCrmWhatsappRoute
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -2907,6 +2917,7 @@ export interface FileRouteTypes {
     | '/api/public/alux/embed-status'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
+    | '/api/public/hooks/business-monthly-report'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/crm-whatsapp'
     | '/api/public/hooks/eb-process-scheduled-publish'
@@ -3173,6 +3184,7 @@ export interface FileRouteTypes {
     | '/api/public/alux/embed-status'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
+    | '/api/public/hooks/business-monthly-report'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/crm-whatsapp'
     | '/api/public/hooks/eb-process-scheduled-publish'
@@ -3450,6 +3462,7 @@ export interface FileRouteTypes {
     | '/api/public/alux/embed-status'
     | '/api/public/alux/signal'
     | '/api/public/health/maps'
+    | '/api/public/hooks/business-monthly-report'
     | '/api/public/hooks/coupon-review-reminders'
     | '/api/public/hooks/crm-whatsapp'
     | '/api/public/hooks/eb-process-scheduled-publish'
@@ -3617,6 +3630,7 @@ export interface RootRouteChildren {
   ApiPublicAluxEmbedStatusRoute: typeof ApiPublicAluxEmbedStatusRoute
   ApiPublicAluxSignalRoute: typeof ApiPublicAluxSignalRoute
   ApiPublicHealthMapsRoute: typeof ApiPublicHealthMapsRoute
+  ApiPublicHooksBusinessMonthlyReportRoute: typeof ApiPublicHooksBusinessMonthlyReportRoute
   ApiPublicHooksCouponReviewRemindersRoute: typeof ApiPublicHooksCouponReviewRemindersRoute
   ApiPublicHooksCrmWhatsappRoute: typeof ApiPublicHooksCrmWhatsappRoute
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
@@ -5296,6 +5310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthMapsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/business-monthly-report': {
+      id: '/api/public/hooks/business-monthly-report'
+      path: '/api/public/hooks/business-monthly-report'
+      fullPath: '/api/public/hooks/business-monthly-report'
+      preLoaderRoute: typeof ApiPublicHooksBusinessMonthlyReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/coupon-review-reminders': {
       id: '/api/public/hooks/coupon-review-reminders'
       path: '/api/public/hooks/coupon-review-reminders'
@@ -6302,6 +6323,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAluxEmbedStatusRoute: ApiPublicAluxEmbedStatusRoute,
   ApiPublicAluxSignalRoute: ApiPublicAluxSignalRoute,
   ApiPublicHealthMapsRoute: ApiPublicHealthMapsRoute,
+  ApiPublicHooksBusinessMonthlyReportRoute:
+    ApiPublicHooksBusinessMonthlyReportRoute,
   ApiPublicHooksCouponReviewRemindersRoute:
     ApiPublicHooksCouponReviewRemindersRoute,
   ApiPublicHooksCrmWhatsappRoute: ApiPublicHooksCrmWhatsappRoute,

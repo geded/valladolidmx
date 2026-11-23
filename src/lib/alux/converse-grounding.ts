@@ -39,6 +39,12 @@ import {
   type AluxUnavailableFactKind,
 } from "./converse-contract";
 import { termHits } from "./converse-priority";
+import { meridaIsoDay } from "@/lib/visibility/commercial-slots";
+import {
+  ALUX_RANKING_QUALITY_MAX,
+  fairTurnKey,
+  qualityPoints,
+} from "@/lib/visibility/profile-completeness";
 
 export interface GroundingContext {
   /** Clave `entityType:entityId` de la entidad activa (no se repite). */
@@ -147,6 +153,7 @@ export interface RankedCandidate {
  *     alcance territorial (destino > cercanía > región) y datos disponibles;
  *  3. diversifica por familia (round-robin) para que Alux proponga un plan
  *     equilibrado, no seis hoteles;
+ *     más la calidad de la ficha; los empates se turnan cada día;
  *  4. como Google: dentro de cada familia, UNA empresa con visibilidad
  *     contratada sube al primer lugar sólo si encaja con lo pedido; la
  *     tarjeta la declara «Recomendado».
@@ -154,9 +161,16 @@ export interface RankedCandidate {
 export function rankConverseCandidates(
   candidates: readonly AluxConverseCandidate[],
   ctx: Pick<GroundingContext, "activeKey" | "tripItems" | "intent">,
-  opts: { limit?: number; keepSaved?: boolean; queryTerms?: readonly string[] } = {},
+  opts: {
+    limit?: number;
+    keepSaved?: boolean;
+    queryTerms?: readonly string[];
+    /** Semilla del turno justo entre empates; por omisión, el día en Mérida. */
+    seed?: string;
+  } = {},
 ): RankedCandidate[] {
   const queryTerms = opts.queryTerms ?? [];
+  const seed = opts.seed ?? `alux-rank:${meridaIsoDay()}`;
   const limit = opts.limit ?? ALUX_CONVERSE_LIMITS.maxCandidatesForModel;
   const saved = tripKeySet(ctx.tripItems);
   const intent = ctx.intent;
@@ -224,11 +238,20 @@ export function rankConverseCandidates(
     if (c.openState === "open") score += 3;
     score += Math.min(5, c.facts.length);
     if (c.imageUrl) score += 1;
+    // Ficha completa, verificada y que responde rápido: suma, sin ganarle al tema.
+    score += qualityPoints(c.qualityScore, ALUX_RANKING_QUALITY_MAX);
     scored.push({ candidate: c, score, reasons, relevant, hits });
   }
 
+  // Empates: turno justo del día, nunca orden alfabético.
+  const turn = new Map(
+    scored.map((r) => [r, fairTurnKey(seed, candidateKey(r.candidate.entityType, r.candidate.entityId))]),
+  );
   scored.sort(
-    (a, b) => b.score - a.score || a.candidate.title.localeCompare(b.candidate.title, "es"),
+    (a, b) =>
+      b.score - a.score ||
+      (turn.get(a) ?? 0) - (turn.get(b) ?? 0) ||
+      a.candidate.title.localeCompare(b.candidate.title, "es"),
   );
 
   // Diversificación por familia (round-robin sobre familias con candidatos).

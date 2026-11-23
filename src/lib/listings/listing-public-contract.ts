@@ -26,6 +26,7 @@ import {
 } from "@/lib/experience-builder/adapters/tourism-listing-adapters";
 import { ORIENTE_MAYA } from "@/config/regions";
 import { arrangeListing, dailySeed, meridaIsoDay } from "@/lib/visibility/commercial-slots";
+import { fairTurnKey } from "@/lib/visibility/profile-completeness";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 
 /* v1.1.0 · G4-PLACES — se incorpora la familia `lugares` (fuente real
@@ -342,8 +343,15 @@ export function arrangeBusinessListing(
   seed: string,
   toCard: (business: MarketplaceBusinessCard) => TourismCardVM,
 ): TourismCardVM[] {
+  // Turno justo entre gratuitas: con foto primero y, entre ellas, un orden
+  // que cambia cada día (nunca por la letra con la que empieza el nombre).
+  const organic = [...businesses].sort(
+    (a, b) =>
+      Number(Boolean(b.cover_url)) - Number(Boolean(a.cover_url)) ||
+      fairTurnKey(seed, a.id) - fairTurnKey(seed, b.id),
+  );
   const arranged = arrangeListing(
-    businesses.map((business) => ({
+    organic.map((business) => ({
       item: business,
       businessId: business.id,
       weight: business.visibility_boost ?? 0,

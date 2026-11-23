@@ -11,6 +11,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "@tanstack/react-router";
+import { getMyBusinessesCompleteness } from "@/lib/portal/profile-completeness.functions";
+import { ProfileCompletenessMeter } from "@/components/portal/ProfileCompletenessMeter";
 
 export const Route = createFileRoute("/_authenticated/portal/")({
   component: PortalIndex,
@@ -37,6 +39,15 @@ function PortalIndex() {
     enabled: Boolean(user?.id),
     staleTime: 60_000,
   });
+  const fetchCompleteness = useServerFn(getMyBusinessesCompleteness);
+  const businessIds = businesses.map((b) => b.business_id);
+  const { data: completeness = [] } = useQuery({
+    queryKey: ["portal", "profile-completeness", businessIds],
+    queryFn: () => fetchCompleteness({ data: { businessIds } }),
+    enabled: businessIds.length > 0,
+    staleTime: 60_000,
+  });
+  const completenessBy = new Map(completeness.map((c) => [c.businessId, c]));
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -67,6 +78,15 @@ function PortalIndex() {
                   <p>{b.status}</p>
                 </div>
               </div>
+              {completenessBy.get(b.business_id) && (
+                <ProfileCompletenessMeter
+                  businessId={b.business_id}
+                  completeness={completenessBy.get(b.business_id)!}
+                  defaultOpen={
+                    businesses.length <= 3 && completenessBy.get(b.business_id)!.percent < 100
+                  }
+                />
+              )}
             </li>
           ))}
           {businesses.length === 0 && (

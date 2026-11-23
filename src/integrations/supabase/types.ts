@@ -1377,6 +1377,54 @@ export type Database = {
           },
         ]
       }
+      business_monthly_reports: {
+        Row: {
+          business_id: string
+          created_at: string
+          email_status: string
+          id: string
+          period_month: string
+          stats: Json
+          updated_at: string
+          whatsapp_status: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          email_status?: string
+          id?: string
+          period_month: string
+          stats?: Json
+          updated_at?: string
+          whatsapp_status?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          email_status?: string
+          id?: string
+          period_month?: string
+          stats?: Json
+          updated_at?: string
+          whatsapp_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_monthly_reports_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_monthly_reports_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_ownership_transfers: {
         Row: {
           business_id: string
@@ -8880,6 +8928,25 @@ export type Database = {
         }
         Returns: string
       }
+      business_profile_signals: {
+        Args: { _business_ids: string[] }
+        Returns: {
+          business_id: string
+          description_length: number
+          faq_count: number
+          gallery_count: number
+          has_cover: boolean
+          has_google: boolean
+          has_location: boolean
+          has_whatsapp: boolean
+          hours_days: number
+          published_products: number
+          quotes_90d: number
+          quotes_fast_90d: number
+          sellable_experiences: number
+          verified: boolean
+        }[]
+      }
       business_public_source_summary: {
         Args: { _business_id: string }
         Returns: Json
@@ -10140,6 +10207,23 @@ export type Database = {
       is_reserved_traveler_handle: {
         Args: { _handle: string }
         Returns: boolean
+      }
+      list_business_monthly_report_rows: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          alux_mentions: number
+          business_id: string
+          business_name: string
+          business_slug: string
+          contacts: number
+          map_opens: number
+          quote_requests: number
+          quotes_sent: number
+          recipient_email: string
+          recipient_name: string
+          views: number
+          whatsapp: string
+        }[]
       }
       list_pending_business_requests: {
         Args: never

@@ -573,4 +573,7 @@
 - [x] Fase 0: Valladolid listo para unas 200 empresas (sin cortes en destino, listados con «Ver más», relacionadas, fotos firmadas por lote).
 - [x] Mapas sin saturar: burbujas con número, filtro por tipo, íconos, lista sincronizada, pin dorado, lugares de interés en el mapa del destino.
 - [ ] Ver las burbujas del mapa interactivo en el sitio publicado (el mapa de Google no abre en la vista de pruebas).
-- [ ] Fase A (plan gratis que vale la pena) — espera visto bueno del Founder.
+- [x] Fase A: medidor «Tu ficha para Alux» en el Portal, Alux premia fichas completas, turno justo entre gratuitas, reporte mensual gratis (correo y WhatsApp).
+- [ ] Confirmar día del reporte y a quién llega (preguntas abiertas; se usa «día 1» y «solo las que administran»).
+- [ ] Reporte por WhatsApp: necesita la línea de Valladolid.mx conectada con QR real.
+- [ ] Fase B (traer a las empresas que faltan) — espera visto bueno del Founder.

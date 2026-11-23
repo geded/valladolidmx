@@ -26,7 +26,8 @@ export interface VisibilityEmailInput {
     | "visibility-activated"
     | "visibility-rejected"
     | "visibility-expiring"
-    | "visibility-expired";
+    | "visibility-expired"
+    | "business-monthly-report";
   recipientEmail: string;
   recipientName?: string | null;
   businessName?: string | null;
