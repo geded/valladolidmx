@@ -148,6 +148,13 @@
       "when": 1795459889933,
       "tag": "0020_online_sales_menu_orders_and_store_products",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795461129347,
+      "tag": "0021_online_sales_hotel_stay_requests",
+      "breakpoints": true
     }
   ]
 }

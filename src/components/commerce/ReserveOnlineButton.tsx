@@ -26,6 +26,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { listAvailableDepartures, startBooking } from "@/lib/commerce/booking.functions";
 import { getProductSaleInfo, storeOrderErrorMessage } from "@/lib/commerce/store-orders.functions";
 import { maxPurchasable } from "@/lib/commerce/store-catalog";
+import { getStayCalendar, requestStay } from "@/lib/commerce/stay-requests.functions";
+import { dayKey, stayFits } from "@/lib/commerce/stay-calendar";
+import { StayDatesPicker } from "@/components/commerce/StayDatesPicker";
+import type { DateRange } from "react-day-picker";
 import {
   calendarDayKey,
   defaultDepartureId,
@@ -63,12 +67,15 @@ export function ReserveOnlineButton({
   const fetchDepartures = useServerFn(listAvailableDepartures);
   const reserve = useServerFn(startBooking);
   const fetchSaleInfo = useServerFn(getProductSaleInfo);
+  const fetchStayCalendar = useServerFn(getStayCalendar);
+  const askStay = useServerFn(requestStay);
 
   const [open, setOpen] = useState(false);
   const [day, setDay] = useState<string | null>(null);
   const [departureId, setDepartureId] = useState<string | null>(null);
   const [people, setPeople] = useState(1);
   const [busy, setBusy] = useState(false);
+  const [stayRange, setStayRange] = useState<DateRange | undefined>(undefined);
 
   const departuresQ = useQuery({
     queryKey: ["commerce", "public-departures", productId],
@@ -87,6 +94,22 @@ export function ReserveOnlineButton({
     staleTime: 30_000,
   });
   const byPieces = saleInfoQ.data?.mode === "tienda" || saleInfoQ.data?.mode === "pedidos";
+  // Hoteles: noches con confirmación del hotel.
+  const byNights = saleInfoQ.data?.mode === "reservas";
+  const stayQ = useQuery({
+    queryKey: ["commerce", "stay-calendar", productId],
+    queryFn: () => fetchStayCalendar({ data: { productId } }),
+    enabled: open && byNights,
+    staleTime: 30_000,
+  });
+  const stayNights = useMemo(() => stayQ.data ?? [], [stayQ.data]);
+  const stayCheckIn = stayRange?.from ? dayKey(stayRange.from) : null;
+  const stayCheckOut = stayRange?.to ? dayKey(stayRange.to) : null;
+  const stayReady = Boolean(
+    stayCheckIn &&
+      stayCheckOut &&
+      stayFits(new Map(stayNights.map((n) => [n.night, n.available])), stayCheckIn, stayCheckOut),
+  );
   const maxPieces = byPieces
     ? maxPurchasable(saleInfoQ.data?.stock ?? null, saleInfoQ.data?.maxQuantity ?? null)
     : 0;
@@ -141,6 +164,21 @@ export function ReserveOnlineButton({
       return;
     }
     setBusy(true);
+    if (byNights) {
+      try {
+        if (!stayCheckIn || !stayCheckOut) return;
+        const res = await askStay({
+          data: { productId, checkIn: stayCheckIn, checkOut: stayCheckOut, guests: people },
+        });
+        setOpen(false);
+        navigate({ to: "/cuenta/checkout/$orderId", params: { orderId: res.orderId } });
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "No pudimos enviar tu solicitud");
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     try {
       const res = await reserve({
         data: {
@@ -173,16 +211,39 @@ export function ReserveOnlineButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[92dvh] w-[calc(100%-1rem)] overflow-y-auto p-4 sm:max-w-md sm:p-6">
           <DialogHeader>
-            <DialogTitle>{byPieces ? "¿Cuántas quieres?" : "Elige tu fecha"}</DialogTitle>
+            <DialogTitle>{byNights ? "Elige tus noches" : byPieces ? "¿Cuántas quieres?" : "Elige tu fecha"}</DialogTitle>
             <DialogDescription>
-              {byPieces
-                ? "Revisa tu compra y confírmala en el siguiente paso."
-                : "Apartamos tus lugares mientras confirmas tu reservación."}
+              {byNights
+                ? "Envía tu solicitud y el hotel la confirma."
+                : byPieces
+                  ? "Revisa tu compra y confírmala en el siguiente paso."
+                  : "Apartamos tus lugares mientras confirmas tu reservación."}
             </DialogDescription>
           </DialogHeader>
 
           {saleInfoQ.isLoading ? (
             <p className="py-6 text-center text-sm text-muted-foreground">Buscando…</p>
+          ) : byNights ? (
+            stayQ.isLoading ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">Buscando noches libres…</p>
+            ) : stayNights.length === 0 || !saleInfoQ.data?.priceCents ? (
+              <div className="space-y-2 py-4 text-sm">
+                <p>Esta habitación aún no recibe reservas en línea.</p>
+                <p className="text-xs text-muted-foreground">
+                  Puedes agregarla a Mi Viaje y tu concierge la coordina contigo.
+                </p>
+              </div>
+            ) : (
+              <StayDatesPicker
+                nights={stayNights}
+                priceCents={saleInfoQ.data.priceCents}
+                capacity={saleInfoQ.data.capacity}
+                range={stayRange}
+                onRangeChange={setStayRange}
+                guests={people}
+                onGuestsChange={setPeople}
+              />
+            )
           ) : byPieces ? (
             maxPieces < 1 ? (
               <div className="space-y-2 py-4 text-sm">
@@ -314,9 +375,17 @@ export function ReserveOnlineButton({
             </Button>
             <Button
               onClick={handleReserve}
-              disabled={busy || (byPieces ? maxPieces < 1 : !departureId)}
+              disabled={busy || (byNights ? !stayReady : byPieces ? maxPieces < 1 : !departureId)}
             >
-              {busy ? (byPieces ? "Preparando…" : "Apartando lugares…") : "Continuar"}
+              {busy
+                ? byNights
+                  ? "Enviando solicitud…"
+                  : byPieces
+                    ? "Preparando…"
+                    : "Apartando lugares…"
+                : byNights
+                  ? "Solicitar reserva"
+                  : "Continuar"}
             </Button>
           </DialogFooter>
         </DialogContent>

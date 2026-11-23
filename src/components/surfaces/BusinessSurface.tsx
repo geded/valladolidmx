@@ -521,6 +521,13 @@ export function BusinessSurface({
   /* Familias con composición editorial de ficha completa. */
   const isImmersive = isLodging || isDining;
   const priceUnitLabel = isLodging ? "por noche" : "por platillo";
+  /* Ventas en línea (piloto): habitaciones que el administrador abrió a
+     reservas por noche con confirmación del hotel. */
+  const hasOnlineStay =
+    isLodging &&
+    b.products.some(
+      (p) => p.product_type === "hotel" && p.conversion_mode === "reservar_en_linea" && p.accepts_online_payment,
+    );
   const priceOwnerLabel = isVacationRental
     ? "el anfitrión"
     : isDining
@@ -885,7 +892,9 @@ export function BusinessSurface({
               </div>
             </div>
             <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-              Tarifa orientativa publicada por {priceOwnerLabel}. Sin cobro ni reservación en línea.
+              {hasOnlineStay
+                ? `Tarifa publicada por ${priceOwnerLabel}. Reserva en línea con confirmación del hotel.`
+                : `Tarifa orientativa publicada por ${priceOwnerLabel}. Sin cobro ni reservación en línea.`}
             </p>
           </div>
         </section>
@@ -905,7 +914,7 @@ export function BusinessSurface({
                   {stayFromPriceLabel}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {priceUnitLabel} · sin cobro en línea
+                  {priceUnitLabel} · {hasOnlineStay ? "reserva en línea" : "sin cobro en línea"}
                 </p>
               </div>
               <div className="shrink-0">

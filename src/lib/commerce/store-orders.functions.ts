@@ -83,6 +83,8 @@ export interface ProductSaleInfo {
   maxQuantity: number | null;
   priceCents: number | null;
   currency: string;
+  /** Huéspedes por habitación (hoteles). */
+  capacity: number | null;
 }
 
 export const getProductSaleInfo = createServerFn({ method: "POST" })
@@ -93,7 +95,7 @@ export const getProductSaleInfo = createServerFn({ method: "POST" })
     });
     const { data: row } = await supabase
       .from("products")
-      .select("product_type, direct_sale_stock, direct_sale_max_quantity, direct_sale_price_amount, direct_sale_currency")
+      .select("product_type, direct_sale_stock, direct_sale_max_quantity, direct_sale_price_amount, direct_sale_currency, capacity")
       .eq("id", data.productId)
       .maybeSingle();
     if (!row) return null;
@@ -103,6 +105,7 @@ export const getProductSaleInfo = createServerFn({ method: "POST" })
       maxQuantity: row.direct_sale_max_quantity ?? null,
       priceCents: row.direct_sale_price_amount ?? null,
       currency: row.direct_sale_currency ?? "MXN",
+      capacity: row.capacity ?? null,
     };
   });
 

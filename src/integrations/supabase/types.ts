@@ -8739,6 +8739,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      _commerce_stay_night_blocked: {
+        Args: { _business_id: string; _night: string; _product_id: string }
+        Returns: boolean
+      }
+      _commerce_stay_rooms_taken: {
+        Args: { _night: string; _product_id: string }
+        Returns: number
+      }
       _concierge_first_response_at: {
         Args: { _case_id: string }
         Returns: string
@@ -9319,6 +9327,10 @@ export type Database = {
         Args: { _business_id: string; _channel?: string; _items: Json }
         Returns: string
       }
+      commerce_decide_stay: {
+        Args: { _accept: boolean; _note?: string; _order_id: string }
+        Returns: string
+      }
       commerce_departure_adjust: {
         Args: { _delta: number; _departure_id: string; _reason: string }
         Returns: string
@@ -9422,6 +9434,23 @@ export type Database = {
           starts_at: string
           timezone: string
         }[]
+      }
+      commerce_public_stay_calendar: {
+        Args: { _days?: number; _from?: string; _product_id: string }
+        Returns: {
+          available: number
+          night: string
+        }[]
+      }
+      commerce_request_stay: {
+        Args: {
+          _channel?: string
+          _check_in: string
+          _check_out: string
+          _guests: number
+          _product_id: string
+        }
+        Returns: string
       }
       commerce_setting_int: {
         Args: { _default: number; _key: string }

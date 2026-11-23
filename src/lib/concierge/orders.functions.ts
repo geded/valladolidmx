@@ -56,6 +56,16 @@ export interface ConciergeOrderView {
   items: ConciergeOrderItemView[];
   /** Ventas en línea · fase 2: pedido de tienda o carta que se recoge en el local. */
   pickup?: boolean;
+  /** Reserva de hotel por noches, con confirmación del hotel. */
+  stay?: {
+    status: "pending_host" | "confirmed" | "declined";
+    checkIn: string;
+    checkOut: string;
+    nights: number;
+    guests: number;
+    confirmBy: string | null;
+    hostNote: string | null;
+  } | null;
 }
 
 // ---------- crear orden desde propuesta ----------
@@ -110,7 +120,7 @@ export const getConciergeOrder = createServerFn({ method: "GET" })
     const { data: order, error } = await context.supabase
       .from("concierge_orders")
       .select(
-        "id, folio, status, source_kind, source_proposal_id, source_case_id, currency, subtotal_amount, discount_amount, tax_amount, total_amount, editorial_title, editorial_summary, destination_name, paid_at, payment_provider, payment_provider_intent_id, traveler_name, traveler_email, traveler_phone, cancelled_at, created_at",
+        "id, folio, status, source_kind, source_proposal_id, source_case_id, currency, subtotal_amount, discount_amount, tax_amount, total_amount, editorial_title, editorial_summary, destination_name, paid_at, payment_provider, payment_provider_intent_id, traveler_name, traveler_email, traveler_phone, cancelled_at, created_at, metadata",
       )
       .eq("id", data.orderId)
       .maybeSingle();
@@ -130,10 +140,29 @@ export const getConciergeOrder = createServerFn({ method: "GET" })
     const pickup =
       rows.length > 0 &&
       rows.every((r) => (r.metadata as { fulfillment?: unknown } | null)?.fulfillment === "recoger");
+    const { metadata: orderMeta, ...orderRest } = order as unknown as Omit<ConciergeOrderView, "items"> & {
+      metadata?: Record<string, unknown> | null;
+    };
+    const meta = orderMeta ?? {};
+    const stayStatus = meta["stay_status"];
+    const stay =
+      meta["sale_mode"] === "reservas" &&
+      (stayStatus === "pending_host" || stayStatus === "confirmed" || stayStatus === "declined")
+        ? {
+            status: stayStatus as "pending_host" | "confirmed" | "declined",
+            checkIn: String(meta["check_in"] ?? ""),
+            checkOut: String(meta["check_out"] ?? ""),
+            nights: Number(meta["nights"] ?? 0) || 0,
+            guests: Number(meta["guests"] ?? 1) || 1,
+            confirmBy: (meta["confirm_by"] as string | undefined) ?? null,
+            hostNote: (meta["host_note"] as string | undefined) ?? null,
+          }
+        : null;
     return {
-      ...(order as unknown as Omit<ConciergeOrderView, "items">),
+      ...orderRest,
       items: rows.map(({ metadata: _m, ...item }) => item),
       pickup,
+      stay,
     };
   });
 

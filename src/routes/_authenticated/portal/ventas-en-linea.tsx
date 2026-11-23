@@ -6,6 +6,7 @@
  * mínima y cupo máximo. Autorización server-side vía `has_business_access`.
  */
 import { BusinessOnlineSalesPanel } from "@/components/commerce/BusinessOnlineSalesPanel";
+import { StayRequestsPanel } from "@/components/commerce/StayRequestsPanel";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -130,6 +131,8 @@ function DirectSalesPage() {
       <PaymentsStatusBanner ready={payStatusQ.data?.ready ?? false} />
 
       <BusinessOnlineSalesPanel businessId={businessId} variant="portal" />
+
+      <StayRequestsPanel businessId={businessId} />
 
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando experiencias…</p>

@@ -601,7 +601,7 @@
 - [x] Fase 1: interruptor «Ventas en línea» por empresa (solo administrador), canales, comisión por tipo (15 %), regla única en la página, Alux y el cobro; lo ya vendido no cambia.
 - [x] Fase 2 (2026-11-23): tienda con piezas (Coqui Coqui), pedidos para recoger con toda la carta de Copalli, carga de productos por PDF/foto u hoja, botón «Comprar» en la página del producto de tienda; probado en vista previa (pedidos de prueba cancelados).
 - [x] Probada la reserva por fecha de una experiencia (Cena Romántica en Cenote, fecha de prueba cerrada al terminar).
-- [ ] Fase 4 piloto: Casa Tía Micha con reserva por noches y confirmación del hotel (Colonial $1,850, Suite Patio $2,650, Familiar $2,300; 1 de cada una).
+- [x] Fase 4 piloto: Casa Tía Micha con reserva por noches y confirmación del hotel en 12 h (Colonial $1,850, Suite Patio $2,650, Familiar $2,300; 1 de cada una); probado solicitar, confirmar, rechazar y cancelar en vista previa.
 - [ ] Fase 3: el WhatsApp de la empresa usa el canal «WhatsApp de Alux» para cobrar (hoy sigue cobrando solo experiencias) — espera visto bueno.
 - [x] Tienda de artesanías piloto: Coqui Coqui.
 - [x] Comisión distinta por tipo (tienda, pedidos, hoteles), 15 % inicial, editable por el administrador.

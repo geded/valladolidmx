@@ -30,6 +30,13 @@ export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")
   component: CheckoutPage,
 });
 
+function stayDay(day: string) {
+  const [y, m, d] = day.split("-").map(Number);
+  return new Intl.DateTimeFormat("es-MX", { weekday: "short", day: "numeric", month: "short" }).format(
+    new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1),
+  );
+}
+
 function money(cents: number, currency = "MXN") {
   return new Intl.NumberFormat("es-MX", {
     style: "currency",
@@ -94,6 +101,11 @@ function CheckoutPage() {
   const order: ConciergeOrderView = orderQ.data;
   // Tienda y pedidos para recoger: mismo flujo, palabras de pedido.
   const pickup = order.pickup === true;
+  // Hoteles: el viajero paga solo cuando el hotel confirma.
+  const stay = order.stay ?? null;
+  const stayWaiting = stay?.status === "pending_host" && order.status === "draft";
+  const stayExpired =
+    stayWaiting && stay?.confirmBy ? new Date(stay.confirmBy).getTime() <= Date.now() : false;
 
   const isFinal =
     order.status === "paid" ||
@@ -209,7 +221,13 @@ function CheckoutPage() {
       )}
 
       <section className="mt-8 rounded-lg border border-border bg-card p-5">
-        <h2 className="font-serif text-xl">{pickup ? "Tu pedido" : "Tu itinerario"}</h2>
+        <h2 className="font-serif text-xl">{stay ? "Tu estancia" : pickup ? "Tu pedido" : "Tu itinerario"}</h2>
+        {stay ? (
+          <p className="mt-2 text-sm text-foreground/80">
+            Llegada {stayDay(stay.checkIn)} · Salida {stayDay(stay.checkOut)} · {stay.nights}{" "}
+            {stay.nights === 1 ? "noche" : "noches"} · {stay.guests} {stay.guests === 1 ? "huésped" : "huéspedes"}
+          </p>
+        ) : null}
         <ul className="mt-4 divide-y divide-border">
           {order.items.map((it) => (
             <li key={it.id} className="flex items-start justify-between gap-4 py-3">
@@ -219,7 +237,9 @@ function CheckoutPage() {
                   <p className="mt-1 text-sm text-muted-foreground">{it.description}</p>
                 ) : null}
                 {it.quantity > 1 ? (
-                  <p className="mt-1 text-xs text-muted-foreground">Cantidad: {it.quantity}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {stay ? `Noches: ${it.quantity}` : `Cantidad: ${it.quantity}`}
+                  </p>
                 ) : null}
               </div>
               <div className="text-right">
@@ -231,7 +251,7 @@ function CheckoutPage() {
 
         <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
           <span className="text-sm text-muted-foreground">
-            {pickup ? "Total del pedido" : "Total del viaje"}
+            {stay ? "Total de la estancia" : pickup ? "Total del pedido" : "Total del viaje"}
           </span>
           <span className="font-serif text-2xl">{money(order.total_amount, order.currency)}</span>
         </div>
@@ -277,6 +297,13 @@ function CheckoutPage() {
               {order.status}
             </Badge>
           </p>
+          {stay?.status === "declined" ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              El hotel no pudo confirmar esas fechas
+              {stay.hostNote ? `: «${stay.hostNote}»` : "."} Las noches quedaron libres; tu concierge te ayuda
+              a encontrar otra opción.
+            </p>
+          ) : null}
           {order.status === "paid" || order.status === "fulfilled" ? (
             <p className="mt-2 text-sm text-muted-foreground">
               Tu viaje está confirmado. Puedes ver los detalles y comprobante en tu historial.
@@ -297,11 +324,43 @@ function CheckoutPage() {
             </Link>
           </div>
         </section>
+      ) : stayWaiting ? (
+        <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
+          <h3 className="font-serif text-lg">
+            {stayExpired ? "El hotel no respondió a tiempo" : "Esperando la confirmación del hotel"}
+          </h3>
+          <p className="mt-2 text-sm text-foreground/80">
+            {stayExpired
+              ? "Las noches ya no están apartadas. Tu concierge te ayuda a buscar otra opción, o puedes intentarlo con otras fechas."
+              : `Te apartamos las noches hasta el ${
+                  stay?.confirmBy
+                    ? new Intl.DateTimeFormat("es-MX", {
+                        timeZone: "America/Merida",
+                        weekday: "long",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      }).format(new Date(stay.confirmBy))
+                    : ""
+                } (hora de Valladolid). En cuanto el hotel confirme te avisamos y aquí mismo podrás pagar.`}
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Button type="button" variant="outline" onClick={() => void orderQ.refetch()} disabled={busy}>
+              Revisar de nuevo
+            </Button>
+            <Button type="button" variant="ghost" onClick={handleCancel} disabled={busy}>
+              Cancelar solicitud
+            </Button>
+          </div>
+        </section>
       ) : (
         <section className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
-          <h3 className="font-serif text-lg">{pickup ? "Confirma tu pedido" : "Confirmemos tu viaje"}</h3>
+          <h3 className="font-serif text-lg">
+            {stay ? "El hotel confirmó tu reserva" : pickup ? "Confirma tu pedido" : "Confirmemos tu viaje"}
+          </h3>
           <p className="mt-2 text-sm text-foreground/80">
-            {pickup
+            {stay
+              ? "Elige cómo pagar para dejar tu estancia lista. Muestra tu folio al llegar al hotel."
+              : pickup
               ? "Al confirmar avisamos a la empresa para que lo prepare. Lo recoges en el local mostrando tu folio."
               : "Al confirmar reservamos tu experiencia con los anfitriones seleccionados y activamos el acompañamiento de tu concierge para los siguientes pasos."}
           </p>
@@ -312,14 +371,16 @@ function CheckoutPage() {
             <div className="rounded-md border border-primary/40 bg-background px-4 py-3">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-medium">
-                  {pickup ? "Efectivo al recoger" : "Efectivo con tu concierge"}
+                  {stay ? "Efectivo al llegar" : pickup ? "Efectivo al recoger" : "Efectivo con tu concierge"}
                 </span>
                 <Badge variant="outline" className="text-[10px] uppercase">
                   Disponible
                 </Badge>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                {pickup
+                {stay
+                  ? "Pagas en el hotel al llegar."
+                  : pickup
                   ? "Pagas en el local cuando pases por tu pedido."
                   : "Al confirmar queda registrado el pago de tu viaje y se abre tu itinerario con el acompañamiento de Alux."}
               </p>
@@ -349,7 +410,9 @@ function CheckoutPage() {
             <Button onClick={handleConfirm} disabled={busy} size="lg">
               {busy
                 ? "Confirmando…"
-                : pickup
+                : stay
+                  ? "Confirmar reserva (pago al llegar)"
+                  : pickup
                   ? "Confirmar pedido (pago al recoger)"
                   : "Confirmar mi viaje (pago en efectivo)"}
             </Button>
