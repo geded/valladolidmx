@@ -608,3 +608,7 @@
 - [ ] Fase 3: el WhatsApp de la empresa usa el canal «WhatsApp de Alux» para cobrar (hoy sigue cobrando solo experiencias) — espera visto bueno.
 - [x] Tienda de artesanías piloto: Coqui Coqui.
 - [x] Comisión distinta por tipo (tienda, pedidos, hoteles), 15 % inicial, editable por el administrador.
+- [ ] Sincronización con Airbnb / Booking (futura, sin empezar):
+  - Opción 1 · Compartir calendarios (iCal): el hotel pega el enlace de Airbnb/Booking en su panel y viceversa; solo pasa «ocupado/libre», no precios ni datos del huésped; actualización cada pocas horas; el hotel sigue confirmando cada reserva.
+  - Opción 2 · Gestor de canales (Cloudbeds, SiteMinder): conexión completa con precios, cupos y reservas al instante; requiere que el hotel contrate el servicio; conviene a hoteles con más habitaciones.
+  - El calendario actual (noches, stock por habitación, precio por día, bloqueos) ya tiene la estructura que ambas opciones necesitan; se agrega como opción aditiva sin rehacer nada.
