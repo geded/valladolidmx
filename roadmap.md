@@ -596,4 +596,5 @@
 
 - [x] Propuesta reducida a piloto: solo empresas activadas, sin Booking/Airbnb, hoteles con confirmación.
 - [x] Dejar en la propuesta cómo crecer después sin rehacer (un solo sistema en las plantillas; calendario de Booking/Airbnb, reserva inmediata y envíos como agregados).
+- [x] Aclarar en la propuesta que es un solo sistema con tres formas de disponibilidad (piezas, lugares por salida, noches).
 - [ ] Aprobación del Founder de la propuesta y de las empresas piloto.
