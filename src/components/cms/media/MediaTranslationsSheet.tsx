@@ -73,9 +73,9 @@ export function MediaTranslationsSheet({
     try {
       const r = await suggest({ data: { mediaId, locale } });
       if ("skipped" in r && r.skipped) {
-        toast.info("ALT humano preservado.");
+        toast.info("Esta foto ya tiene una descripción escrita por una persona; no se cambió.");
       } else {
-        toast.success(`Propuesta IA generada en ${locale.toUpperCase()}.`);
+        toast.success(`Alux propuso una descripción en ${locale.toUpperCase()}.`);
       }
       await refresh();
     } catch (e) {
@@ -90,7 +90,7 @@ export function MediaTranslationsSheet({
     try {
       const draft = drafts[locale];
       await approve({ data: { mediaId, locale, altText: draft } });
-      toast.success(`ALT aprobado (${locale.toUpperCase()}).`);
+      toast.success(`Descripción aprobada (${locale.toUpperCase()}).`);
       setDrafts((d) => ({ ...d, [locale]: undefined }));
       await refresh();
     } catch (e) {
@@ -128,7 +128,7 @@ export function MediaTranslationsSheet({
         onClick={(e) => e.stopPropagation()}
       >
         <header className="border-b border-border px-4 py-3">
-          <h2 className="text-sm font-semibold">Traducciones · Media Intelligence</h2>
+          <h2 className="text-sm font-semibold">Descripción de la foto en otros idiomas</h2>
           <p className="text-[11px] text-muted-foreground">
             IA propone · Humano decide. Un idioma por fila. El humano siempre gana.
           </p>
@@ -170,7 +170,7 @@ export function MediaTranslationsSheet({
                 <textarea
                   className="w-full resize-y rounded border border-border bg-background px-2 py-1 text-sm"
                   rows={2}
-                  placeholder={`ALT en ${label}`}
+                  placeholder={`Descripción en ${label}`}
                   value={draft}
                   onChange={(e) => setDrafts((d) => ({ ...d, [code]: e.target.value }))}
                 />

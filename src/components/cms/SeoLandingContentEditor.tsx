@@ -191,7 +191,7 @@ function MediaField({
 }) {
   const selected = options.find((m) => m.url === url) ?? null;
   const selectOptions = [
-    { value: "", label: "Sin activo seleccionado" },
+    { value: "", label: "Sin foto elegida" },
     ...options.map((m) => ({
       value: m.url,
       label: `${m.source} · ${m.role} · ${m.alt.slice(0, 40)}${m.demo ? " · demo" : ""}`,
@@ -218,7 +218,7 @@ function MediaField({
           <p className="mt-1 text-[11px] text-muted-foreground">
             {selected
               ? `${selected.accreditation}${selected.credit ? ` · ${selected.credit}` : ""}`
-              : "Sin activo acreditado"}
+              : "Sin foto con derechos registrados"}
           </p>
           {selected?.demo ? (
             <span className="mt-1 inline-flex rounded-pill border border-warning/40 bg-warning/10 px-2 py-0.5 text-[11px] text-warning-foreground">
@@ -238,7 +238,7 @@ function MediaField({
       </div>
       <div className="mt-2 grid gap-2 sm:grid-cols-3">
         <Select
-          label="Cambiar activo"
+          label="Cambiar foto"
           value={url}
           options={selectOptions}
           onChange={(v) => {
@@ -252,7 +252,7 @@ function MediaField({
           onChange={(v) => onChange({ url, alt: v, focal })}
         />
         <Text
-          label="Punto focal (ej. 50% 40%)"
+          label="Parte de la foto que no se debe recortar (ej. 50% 40%: centro, un poco arriba)"
           value={focal}
           onChange={(v) => onChange({ url, alt, focal: v })}
         />
@@ -525,7 +525,7 @@ export function SeoLandingContentEditor({
           <div className="grid gap-3 sm:col-span-2">
             <MediaField
               label="Fotografía de portada"
-              hint="Imagen protagonista del hero."
+              hint="La foto grande con la que abre la página."
               options={mediaOptions}
               url={str(hero["mediaUrl"])}
               alt={str(hero["mediaAlt"])}
@@ -550,8 +550,8 @@ export function SeoLandingContentEditor({
               }
             />
             <MediaField
-              label="Imagen social (OG)"
-              hint="Se usa al compartir la landing en redes y mensajería."
+              label="Foto al compartir en redes"
+              hint="Se ve cuando alguien comparte la página por WhatsApp o redes."
               options={mediaOptions}
               url={str(hero["ogImageUrl"])}
               alt={str(hero["ogImageAlt"])}
@@ -688,7 +688,7 @@ export function SeoLandingContentEditor({
       >
         <div className="grid gap-3">
           <Select
-            label="Posición en el cuerpo editorial"
+            label="Lugar en la página"
             value={String(orderOf("intro"))}
             options={ORDER_OPTIONS}
             onChange={(v) => setSlot("intro", { order: Number(v) })}
@@ -800,7 +800,7 @@ export function SeoLandingContentEditor({
 
       <Group
         title="Experiencias destacadas"
-        hint="Relaciones canónicas por identificador real; sin imagen no se inventa una."
+        hint="Experiencias reales de la ficha. Si una no tiene foto, no se inventa una."
         hidden={offers["hidden"] === true}
         onToggleHidden={() => toggleHidden("offers")}
       >
@@ -810,7 +810,7 @@ export function SeoLandingContentEditor({
           onChange={(v) => setSlot("offers", { heading: v })}
         />
         <Select
-          label="Posición en el cuerpo editorial"
+          label="Lugar en la página"
           value={String(orderOf("offers"))}
           options={ORDER_OPTIONS}
           onChange={(v) => setSlot("offers", { order: Number(v) })}
@@ -821,7 +821,7 @@ export function SeoLandingContentEditor({
             <li key={i} className="flex items-start gap-2 rounded-xl border border-border p-3">
               <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
                 <Text
-                  label="Identificador canónico"
+                  label="Código interno (no lo cambies)"
                   value={str(row["id"])}
                   onChange={(v) =>
                     setRows(
@@ -854,7 +854,7 @@ export function SeoLandingContentEditor({
                   }
                 />
                 <Text
-                  label="Enlace canónico"
+                  label="Enlace a su página"
                   value={str(row["href"])}
                   onChange={(v) =>
                     setRows(
@@ -959,7 +959,7 @@ export function SeoLandingContentEditor({
           onChange={(v) => setSlot("infoGrid", { heading: v })}
         />
         <Select
-          label="Posición en el cuerpo editorial"
+          label="Lugar en la página"
           value={String(orderOf("infoGrid"))}
           options={ORDER_OPTIONS}
           onChange={(v) => setSlot("infoGrid", { order: Number(v) })}
@@ -1057,7 +1057,7 @@ export function SeoLandingContentEditor({
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <Select
-            label="Posición en el cuerpo editorial"
+            label="Lugar en la página"
             value={String(orderOf("map"))}
             options={ORDER_OPTIONS}
             onChange={(v) => setSlot("map", { order: Number(v) })}
@@ -1186,7 +1186,7 @@ export function SeoLandingContentEditor({
             onChange={(v) => setCta("navigate", { label: v, emphasis: "primary" })}
           />
           <Text
-            label="Acción principal · enlace canónico"
+            label="Acción principal · enlace"
             value={str(ctaOf("navigate")["href"])}
             onChange={(v) => setCta("navigate", { href: v, emphasis: "primary" })}
           />
@@ -1224,32 +1224,32 @@ export function SeoLandingContentEditor({
         </div>
       </Group>
 
-      <Group title="SEO y publicación" hint="El piloto permanece en borrador y no indexable.">
+      <Group title="Cómo aparece en Google" hint="Mientras sea borrador, Google no la muestra.">
         <div className="grid gap-3 sm:grid-cols-2">
           <Text
-            label="Título SEO"
+            label="Título en Google"
             value={seo?.title ?? ""}
             onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), title: v }))}
           />
           <Text
-            label="URL canónica"
+            label="Dirección principal de la página"
             value={seo?.canonical ?? ""}
             onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), canonical: v }))}
           />
           <div className="sm:col-span-2">
             <Text
-              label="Descripción SEO"
+              label="Descripción en Google"
               multiline
               value={seo?.description ?? ""}
               onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), description: v }))}
             />
           </div>
           <Select
-            label="Indexación (robots)"
+            label="¿Google la puede mostrar?"
             value={seo?.robots ?? "noindex,nofollow"}
             options={[
-              { value: "noindex,nofollow", label: "No indexar (borrador)" },
-              { value: "index,follow", label: "Indexar" },
+              { value: "noindex,nofollow", label: "Todavía no (borrador)" },
+              { value: "index,follow", label: "Sí, mostrar en Google" },
             ]}
             onChange={(v) => setSeo((p) => ({ ...(p ?? EMPTY_SEO), robots: v }))}
           />

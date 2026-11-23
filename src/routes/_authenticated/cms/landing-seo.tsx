@@ -29,7 +29,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/cms/landing-seo")({
   head: () => ({
-    meta: [{ title: "Landing SEO · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
+    meta: [{ title: "Páginas para Google · CMS Studio" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: LandingSeoPage,
 });
@@ -79,14 +79,14 @@ function LandingSeoPage() {
       createFn({ data: input }),
     onSuccess: (res) => {
       void queryClient.invalidateQueries({ queryKey: ["cms", "seo-landings"] });
-      toast.success(res.created ? "Landing SEO creada como borrador." : "Ya existía; se abre.");
+      toast.success(res.created ? "Página para Google creada como borrador." : "Ya existía; la abrimos.");
       setPickerOpen(false);
       void navigate({
         to: "/cms/experience-builder",
         search: { page: res.id, mode: undefined, block: undefined },
       });
     },
-    onError: () => toast.error("No fue posible crear la Landing SEO."),
+    onError: () => toast.error("No fue posible crear la página para Google."),
   });
 
   const rows = useMemo(() => list.data?.rows ?? [], [list.data]);
@@ -128,11 +128,11 @@ function LandingSeoPage() {
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
             Experience Builder
           </p>
-          <h1 className="mt-1 font-serif text-2xl">Landing SEO</h1>
+          <h1 className="mt-1 font-serif text-2xl">Páginas para Google</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Landings editoriales premium creadas desde entidades canónicas reales. Nacen como
-            borrador <code className="text-xs">noindex,nofollow</code> y se editan en el Experience
-            Builder único.
+            Páginas extra de una empresa, producto o lugar, pensadas para aparecer en Google y para
+            anuncios. Se arman solas con los datos reales de la ficha, empiezan como borrador (Google
+            no las ve) y se terminan de editar en el constructor.
           </p>
         </div>
         <button
@@ -141,13 +141,13 @@ function LandingSeoPage() {
           className="inline-flex items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-focus"
         >
           <Sparkles className="h-4 w-4" aria-hidden />
-          Crear Landing SEO
+          Crear página para Google
         </button>
       </header>
 
       {pickerOpen && (
         <section className="rounded-2xl border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold">Selecciona la entidad canónica de origen</h2>
+          <h2 className="text-sm font-semibold">¿De qué ficha quieres crear la página?</h2>
           <div className="mt-3 grid gap-2 sm:grid-cols-[160px_1fr]">
             <select
               className={fieldClass}
@@ -206,7 +206,7 @@ function LandingSeoPage() {
       <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
         <input
           className={fieldClass}
-          placeholder="Buscar landing o entidad…"
+          placeholder="Buscar por nombre de la página o de la ficha…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -224,9 +224,9 @@ function LandingSeoPage() {
           className={fieldClass}
           value={entityType}
           onChange={(e) => setEntityType(e.target.value)}
-          aria-label="Tipo de entidad"
+          aria-label="Tipo de ficha"
         >
-          <option value="">Todo tipo de entidad</option>
+          <option value="">Todo tipo de ficha</option>
           {SEO_LANDING_ENTITY_TYPES.map((t) => (
             <option key={t} value={t}>
               {ENTITY_LABEL[t]}
@@ -250,11 +250,11 @@ function LandingSeoPage() {
           className={fieldClass}
           value={robots}
           onChange={(e) => setRobots(e.target.value)}
-          aria-label="Directiva de indexación"
+          aria-label="¿Google la puede ver?"
         >
-          <option value="">Toda directiva</option>
-          <option value="noindex">noindex</option>
-          <option value="index,follow">index,follow</option>
+          <option value="">Visibles y ocultas para Google</option>
+          <option value="noindex">Oculta para Google</option>
+          <option value="index,follow">Visible en Google</option>
         </select>
       </section>
 
@@ -345,19 +345,19 @@ function LandingCard({ row }: { row: SeoLandingAdminRow }) {
 
       <dl className="mt-3 grid gap-x-4 gap-y-1.5 text-xs sm:grid-cols-2">
         <Row
-          label="Entidad de origen"
+          label="Ficha de origen"
           value={
             row.entityName
               ? `${row.entityName} · ${ENTITY_LABEL[row.entityType ?? "business"]}`
               : row.legacy
-                ? "Landing legacy (sin entidad vinculada)"
+                ? "Página antigua (sin ficha vinculada)"
                 : "—"
           }
         />
         <Row label="Destino" value={row.destinationSlug ?? "—"} />
         <Row label="Plantilla" value={row.template ? `${row.template} · ${row.variant}` : "—"} />
-        <Row label="Canonical" value={row.canonical ?? "—"} />
-        <Row label="Robots" value={row.robots} />
+        <Row label="Dirección principal" value={row.canonical ?? "—"} />
+        <Row label="Google" value={row.robots.includes("noindex") ? "Oculta para Google" : "Visible en Google"} />
         <Row label="Actualizada" value={new Date(row.updatedAt).toLocaleString("es-MX")} />
       </dl>
 

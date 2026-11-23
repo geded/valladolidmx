@@ -207,7 +207,7 @@ function PlanEditor({ plan, onDone }: { plan: Partial<VisibilityPlan>; onDone: (
       <div className="mt-6 space-y-8">
         <Section title="Identidad">
           <Grid>
-            <Field label="Slug único">
+            <Field label="Clave del paquete (única, sin espacios)">
               <Input
                 value={form.slug ?? ""}
                 onChange={(e) =>

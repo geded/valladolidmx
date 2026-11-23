@@ -96,7 +96,7 @@ function EventosCmsPage() {
         },
         {
           key: "slug",
-          header: "Slug",
+          header: "Dirección web",
           render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
         },
         {

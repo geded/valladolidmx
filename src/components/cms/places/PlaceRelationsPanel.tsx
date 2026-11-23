@@ -4,8 +4,8 @@
  * Productos, eventos y autoridad/operador. Regla vinculante: ninguna de estas
  * relaciones convierte a la empresa en propietaria ni gestora del atractivo.
  */
-import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/lib/toast";
 import {
@@ -15,8 +15,12 @@ import {
 } from "@/lib/places/places-cms.functions";
 import {
   PLACE_EVENT_RELATION_KINDS,
+  PLACE_EVENT_RELATION_LABELS,
   PLACE_PRODUCT_RELATION_KINDS,
+  PLACE_PRODUCT_RELATION_LABELS,
 } from "@/lib/places/place-taxonomy";
+import { resolveRelatedEntityNames } from "@/lib/related/overrides.functions";
+import { CmsEntitySearchPicker, type CmsPickOption } from "@/components/cms/CmsEntitySearchPicker";
 import { PlaceSection, buttonClass, inputClass, primaryButtonClass } from "./PlaceSection";
 
 export interface ProductRelation {
@@ -54,6 +58,36 @@ export function PlaceRelationsPanel(props: Props) {
   useEffect(() => setProducts(props.products), [props.products]);
   useEffect(() => setEvents(props.events), [props.events]);
   useEffect(() => setAuthorities(props.authorities), [props.authorities]);
+
+  const namesFn = useServerFn(resolveRelatedEntityNames);
+  const savedRefs = useMemo(
+    () => [
+      ...props.products.map((r) => ({ kind: "product" as const, id: r.product_id })),
+      ...props.events.map((r) => ({ kind: "event" as const, id: r.event_id })),
+    ],
+    [props.products, props.events],
+  );
+  const namesQuery = useQuery({
+    queryKey: ["cms", "place-relation-names", savedRefs.map((r) => `${r.kind}:${r.id}`).join(",")],
+    enabled: savedRefs.length > 0,
+    queryFn: () => namesFn({ data: { refs: savedRefs } }),
+  });
+  const savedNames = namesQuery.data?.names ?? {};
+  const [pickedNames, setPickedNames] = useState<Record<string, CmsPickOption>>({});
+  const remember = (kind: "product" | "event", option: CmsPickOption | null) => {
+    if (option) setPickedNames((m) => ({ ...m, [`${kind}:${option.id}`]: option }));
+  };
+  const initialFor = (kind: "product" | "event", id: string): CmsPickOption | null => {
+    if (!id) return null;
+    const justPicked = pickedNames[`${kind}:${id}`];
+    if (justPicked) return justPicked;
+    const entry = savedNames[`${kind}:${id}`];
+    return {
+      id,
+      name: entry?.name ?? (namesQuery.isLoading ? "Cargando nombre…" : "Sin nombre"),
+      status: entry?.status ?? "",
+    };
+  };
 
   const saveProductsFn = useServerFn(setPlaceProductsCms);
   const saveEventsFn = useServerFn(setPlaceEventsCms);
@@ -159,30 +193,31 @@ export function PlaceRelationsPanel(props: Props) {
           </div>
           <ul className="mt-3 space-y-2">
             {products.length === 0 && (
-              <li className="text-xs text-muted-foreground">Sin productos relacionados.</li>
+              <li className="text-xs text-muted-foreground">
+                Sin productos relacionados. Pulsa «+ Añadir», escribe 2 letras del nombre y elígelo.
+              </li>
             )}
             {products.map((row, index) => (
-              <li key={index} className="flex flex-col gap-2 sm:flex-row">
-                <label className="sr-only" htmlFor={`product-${index}`}>
-                  Identificador del producto
-                </label>
-                <input
-                  id={`product-${index}`}
-                  className={inputClass}
-                  placeholder="UUID del producto"
-                  value={row.product_id}
-                  onChange={(e) =>
+              <li key={index} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                <CmsEntitySearchPicker
+                  kind="product"
+                  compact
+                  label="Producto o tour"
+                  initial={initialFor("product", row.product_id)}
+                  excludeIds={products.filter((_, i) => i !== index).map((r) => r.product_id)}
+                  onPick={(option) => {
+                    remember("product", option);
                     setProducts((p) =>
-                      p.map((r, i) => (i === index ? { ...r, product_id: e.target.value } : r)),
-                    )
-                  }
+                      p.map((r, i) => (i === index ? { ...r, product_id: option?.id ?? "" } : r)),
+                    );
+                  }}
                 />
                 <label className="sr-only" htmlFor={`product-kind-${index}`}>
                   Tipo de relación
                 </label>
                 <select
                   id={`product-kind-${index}`}
-                  className={`${inputClass} sm:max-w-[12rem]`}
+                  className={`${inputClass} sm:max-w-[15rem]`}
                   value={row.relation_kind}
                   onChange={(e) =>
                     setProducts((p) =>
@@ -192,7 +227,7 @@ export function PlaceRelationsPanel(props: Props) {
                 >
                   {PLACE_PRODUCT_RELATION_KINDS.map((k) => (
                     <option key={k} value={k}>
-                      {k}
+                      {PLACE_PRODUCT_RELATION_LABELS[k]}
                     </option>
                   ))}
                 </select>
@@ -239,30 +274,31 @@ export function PlaceRelationsPanel(props: Props) {
           </div>
           <ul className="mt-3 space-y-2">
             {events.length === 0 && (
-              <li className="text-xs text-muted-foreground">Sin eventos relacionados.</li>
+              <li className="text-xs text-muted-foreground">
+                Sin eventos relacionados. Pulsa «+ Añadir», escribe 2 letras del nombre y elígelo.
+              </li>
             )}
             {events.map((row, index) => (
-              <li key={index} className="flex flex-col gap-2 sm:flex-row">
-                <label className="sr-only" htmlFor={`event-${index}`}>
-                  Identificador del evento
-                </label>
-                <input
-                  id={`event-${index}`}
-                  className={inputClass}
-                  placeholder="UUID del evento"
-                  value={row.event_id}
-                  onChange={(e) =>
+              <li key={index} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                <CmsEntitySearchPicker
+                  kind="event"
+                  compact
+                  label="Evento"
+                  initial={initialFor("event", row.event_id)}
+                  excludeIds={events.filter((_, i) => i !== index).map((r) => r.event_id)}
+                  onPick={(option) => {
+                    remember("event", option);
                     setEvents((p) =>
-                      p.map((r, i) => (i === index ? { ...r, event_id: e.target.value } : r)),
-                    )
-                  }
+                      p.map((r, i) => (i === index ? { ...r, event_id: option?.id ?? "" } : r)),
+                    );
+                  }}
                 />
                 <label className="sr-only" htmlFor={`event-kind-${index}`}>
                   Tipo de relación
                 </label>
                 <select
                   id={`event-kind-${index}`}
-                  className={`${inputClass} sm:max-w-[12rem]`}
+                  className={`${inputClass} sm:max-w-[15rem]`}
                   value={row.relation_kind}
                   onChange={(e) =>
                     setEvents((p) =>
@@ -272,7 +308,7 @@ export function PlaceRelationsPanel(props: Props) {
                 >
                   {PLACE_EVENT_RELATION_KINDS.map((k) => (
                     <option key={k} value={k}>
-                      {k}
+                      {PLACE_EVENT_RELATION_LABELS[k]}
                     </option>
                   ))}
                 </select>
@@ -328,7 +364,7 @@ export function PlaceRelationsPanel(props: Props) {
               <li className="text-xs text-muted-foreground">Sin autoridad registrada.</li>
             )}
             {authorities.map((row, index) => (
-              <li key={index} className="flex flex-col gap-2 sm:flex-row">
+              <li key={index} className="flex flex-col gap-2 sm:flex-row sm:items-start">
                 <label className="sr-only" htmlFor={`authority-kind-${index}`}>
                   Tipo de autoridad
                 </label>

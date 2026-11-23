@@ -158,7 +158,7 @@ function SpotlightPage() {
                 />
                 <Input
                   className="pl-8"
-                  placeholder="Busca por nombre o slug…"
+                  placeholder="Busca por nombre…"
                   value={businessQuery}
                   onChange={(e) => setBusinessQuery(e.target.value)}
                 />

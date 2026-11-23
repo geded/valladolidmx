@@ -140,6 +140,21 @@ export const PLACE_EVENT_RELATION_KINDS = ["sede", "organizado", "asociado"] as 
 
 export type PlaceEventRelationKind = (typeof PLACE_EVENT_RELATION_KINDS)[number];
 
+/** Cómo se llama cada relación lugar↔producto en el CMS (lenguaje de editor). */
+export const PLACE_PRODUCT_RELATION_LABELS: Record<PlaceProductRelationKind, string> = {
+  oficial: "Oficial del lugar",
+  operado: "Se realiza en el lugar",
+  ofrecido: "Una empresa lo ofrece aquí",
+  recomendado: "Sugerido para la visita",
+};
+
+/** Cómo se llama cada relación lugar↔evento en el CMS (lenguaje de editor). */
+export const PLACE_EVENT_RELATION_LABELS: Record<PlaceEventRelationKind, string> = {
+  sede: "Se realiza aquí",
+  organizado: "Lo organiza el lugar",
+  asociado: "Relacionado con el lugar",
+};
+
 export function isPlaceAdmissionKind(value: string): value is PlaceAdmissionKind {
   return (PLACE_ADMISSION_KINDS as readonly string[]).includes(value);
 }

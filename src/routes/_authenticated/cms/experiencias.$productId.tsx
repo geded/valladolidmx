@@ -26,6 +26,17 @@ const date = (value: string | null) =>
     ? new Date(value).toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" })
     : "—";
 
+/** Cómo compra el visitante, en el lenguaje del editor. */
+const CONVERSION_MODE_LABELS: Record<string, string> = {
+  informacion: "Sólo información",
+  arma_tu_viaje: "Se agrega a Arma tu viaje",
+  solicitar_cotizacion: "Cotiza el concierge",
+  reservar_en_linea: "Reserva y pago en línea",
+  whatsapp: "Contacto por WhatsApp",
+  telefono: "Contacto por teléfono",
+  sitio_externo: "En el sitio de la empresa",
+};
+
 export const Route = createFileRoute("/_authenticated/cms/experiencias/$productId")({
   head: () => ({
     meta: [
@@ -127,7 +138,7 @@ function ExperienciaFichaPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Resumen">
           <dl className="grid grid-cols-2 gap-3">
-            <Field label="Modalidad" value={d.conversion_mode} />
+            <Field label="Cómo se compra" value={CONVERSION_MODE_LABELS[d.conversion_mode] ?? d.conversion_mode} />
             <Field
               label="Venta en línea"
               value={d.direct_sale_enabled ? "Autorizada" : "No autorizada"}
@@ -135,7 +146,7 @@ function ExperienciaFichaPage() {
             <Field label="Publicada" value={date(d.published_at)} />
             <Field label="Actualizada" value={date(d.updated_at)} />
             <Field label="Resumen" value={d.tagline ?? "—"} />
-            <Field label="Slug" value={<code className="text-xs">{d.slug}</code>} />
+            <Field label="Dirección web" value={<code className="text-xs">{d.slug}</code>} />
           </dl>
         </Card>
 

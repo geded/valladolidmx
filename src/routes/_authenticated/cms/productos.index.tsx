@@ -131,7 +131,7 @@ function ProductosPage() {
         },
         {
           key: "slug",
-          header: "Slug",
+          header: "Dirección web",
           render: (r) => <code className="text-xs text-muted-foreground">{r.slug}</code>,
         },
         { key: "status", header: "Estado", render: (r) => <StatusBadge value={r.status} /> },

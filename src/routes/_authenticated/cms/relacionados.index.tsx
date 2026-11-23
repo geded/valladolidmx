@@ -1,10 +1,11 @@
 /**
- * E6 · Related Collection — Admin Overrides (v1)
+ * E6 · Listas recomendadas — vista general de ajustes (v2, lenguaje de editor)
  *
- * Panel mínimo para que editores/administradores gestionen los pins y hides
- * de la Related Collection en fichas de empresa, producto, destino y evento.
- * v1 = lista + crear + eliminar. Iteración siguiente = edición inline y
- * pestaña embebida en cada Inspector de superficie.
+ * Reúne en una sola página los ajustes «Aparece primero» / «Que no aparezca»
+ * de las listas recomendadas al pie de las fichas de empresa, producto,
+ * destino y evento. Mismo lenguaje, buscador y tipos que el panel embebido en
+ * cada editor (`related-overrides-ui.ts` + `CmsEntitySearchPicker`): nunca se
+ * pide ni se muestra un código interno.
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -14,27 +15,33 @@ import {
   listOverridesCms,
   upsertOverride,
   deleteOverride,
+  resolveRelatedEntityNames,
   type RelatedEntityKind,
   type RelatedOverrideMode,
   type RelatedOverrideRow,
 } from "@/lib/related/overrides.functions";
+import {
+  KIND_LABELS,
+  MAX_PINS_SHOWN,
+  MODE_HELP,
+  MODE_LABELS,
+  RELATED_SECTION_NAMES,
+  honouredRelatedKinds,
+} from "@/lib/related/related-overrides-ui";
+import {
+  CmsEntitySearchPicker,
+  type CmsPickOption,
+} from "@/components/cms/CmsEntitySearchPicker";
 
 export const Route = createFileRoute("/_authenticated/cms/relacionados/")({
   head: () => ({
     meta: [
-      { title: "Colecciones relacionadas · CMS Studio" },
+      { title: "Listas recomendadas · CMS Studio" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: RelatedOverridesPage,
 });
-
-const KIND_LABELS: Record<RelatedEntityKind, string> = {
-  business: "Empresa",
-  product: "Producto",
-  destination: "Destino",
-  event: "Evento",
-};
 
 const SURFACE_BY_KIND: Record<RelatedEntityKind, string> = {
   business: "business-profile",
@@ -43,22 +50,25 @@ const SURFACE_BY_KIND: Record<RelatedEntityKind, string> = {
   event: "event-detail",
 };
 
+const ALL_KINDS = Object.keys(KIND_LABELS) as RelatedEntityKind[];
+
 function RelatedOverridesPage() {
   const qc = useQueryClient();
   const call = useServerFn(listOverridesCms);
   const upsertFn = useServerFn(upsertOverride);
   const deleteFn = useServerFn(deleteOverride);
+  const namesFn = useServerFn(resolveRelatedEntityNames);
 
   const [filterKind, setFilterKind] = useState<RelatedEntityKind | "">("");
-  const [filterId, setFilterId] = useState("");
+  const [filterEntity, setFilterEntity] = useState<CmsPickOption | null>(null);
 
   const query = useQuery({
-    queryKey: ["cms", "related-overrides", { filterKind, filterId }],
+    queryKey: ["cms", "related-overrides", { filterKind, filterId: filterEntity?.id ?? "" }],
     queryFn: () =>
       call({
         data: {
           entityType: filterKind || undefined,
-          entityId: filterId.trim() || undefined,
+          entityId: filterEntity?.id || undefined,
           limit: 200,
         },
       }),
@@ -75,14 +85,33 @@ function RelatedOverridesPage() {
 
   const rows = useMemo<RelatedOverrideRow[]>(() => query.data?.rows ?? [], [query.data]);
 
+  const refs = useMemo(() => {
+    const out: Array<{ kind: RelatedEntityKind; id: string }> = [];
+    for (const r of rows) {
+      out.push({ kind: r.entity_type, id: r.entity_id });
+      out.push({ kind: r.related_entity_type, id: r.related_entity_id });
+    }
+    return out;
+  }, [rows]);
+  const namesQuery = useQuery({
+    queryKey: ["cms", "related-overrides-names", refs.map((r) => `${r.kind}:${r.id}`).join(",")],
+    enabled: refs.length > 0,
+    queryFn: () => namesFn({ data: { refs } }),
+  });
+  const names = namesQuery.data?.names ?? {};
+  const nameOf = (kind: RelatedEntityKind, id: string) =>
+    names[`${kind}:${id}`]?.name ??
+    (namesQuery.isLoading ? "Cargando…" : `${KIND_LABELS[kind]} sin nombre`);
+
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <header>
-        <h1 className="text-2xl font-semibold">Colecciones relacionadas</h1>
+        <h1 className="text-2xl font-semibold">Listas recomendadas</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Fija (<code>pin</code>) u oculta (<code>hide</code>) ítems del bloque Related Collection
-          en fichas de empresa, producto, destino y evento. Complementa las reglas automáticas — no
-          las reemplaza.
+          Al final de cada ficha pública hay una lista de recomendaciones («Explora cerca de …» o
+          «Sigue descubriendo») que se arma sola. Aquí ves y ajustas, en un solo lugar, lo que
+          debe aparecer primero o no debe aparecer. También puedes hacerlo desde el editor de cada
+          ficha.
         </p>
       </header>
 
@@ -93,27 +122,37 @@ function RelatedOverridesPage() {
       />
 
       <section className="rounded-xl border bg-card p-4">
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <h2 className="text-sm font-semibold">Overrides existentes</h2>
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            <select
-              value={filterKind}
-              onChange={(e) => setFilterKind(e.target.value as RelatedEntityKind | "")}
-              className="h-8 rounded-md border bg-background px-2 text-xs"
-            >
-              <option value="">Todos los tipos</option>
-              {(Object.keys(KIND_LABELS) as RelatedEntityKind[]).map((k) => (
-                <option key={k} value={k}>
-                  {KIND_LABELS[k]}
-                </option>
-              ))}
-            </select>
-            <input
-              value={filterId}
-              onChange={(e) => setFilterId(e.target.value)}
-              placeholder="Filtrar por entity_id (uuid)"
-              className="h-8 w-64 rounded-md border bg-background px-2 text-xs"
-            />
+        <div className="mb-3 flex flex-wrap items-end gap-2">
+          <h2 className="text-sm font-semibold">Ajustes guardados</h2>
+          <div className="ml-auto flex w-full flex-wrap items-end gap-2 md:w-auto">
+            <label className="text-xs">
+              <span className="mb-1 block text-muted-foreground">Tipo de ficha</span>
+              <select
+                value={filterKind}
+                onChange={(e) => {
+                  setFilterKind(e.target.value as RelatedEntityKind | "");
+                  setFilterEntity(null);
+                }}
+                className="h-9 rounded-md border bg-background px-2 text-xs"
+              >
+                <option value="">Todas</option>
+                {ALL_KINDS.map((k) => (
+                  <option key={k} value={k}>
+                    {KIND_LABELS[k]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {filterKind && (
+              <div className="w-full md:w-72">
+                <CmsEntitySearchPicker
+                  key={filterKind}
+                  kind={filterKind}
+                  label={`Solo de esta ${KIND_LABELS[filterKind].toLowerCase()} (opcional)`}
+                  onPick={setFilterEntity}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -125,73 +164,54 @@ function RelatedOverridesPage() {
         )}
         {!query.isLoading && rows.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Sin overrides todavía. Usa el formulario de arriba para crear el primero.
+            No hay ajustes todavía: todas las listas se arman solas con las reglas automáticas.
           </p>
         )}
         {rows.length > 0 && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead className="text-left text-muted-foreground">
-                <tr>
-                  <th className="py-2 pr-3">Modo</th>
-                  <th className="py-2 pr-3">Ficha</th>
-                  <th className="py-2 pr-3">Relacionado</th>
-                  <th className="py-2 pr-3">Superficie</th>
-                  <th className="py-2 pr-3">Pos</th>
-                  <th className="py-2 pr-3">Nota</th>
-                  <th className="py-2"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.id} className="border-t align-top">
-                    <td className="py-2 pr-3">
-                      <span
-                        className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                          r.mode === "pin"
-                            ? "bg-primary/10 text-primary"
-                            : "bg-destructive/10 text-destructive"
-                        }`}
-                      >
-                        {r.mode}
-                      </span>
-                    </td>
-                    <td className="py-2 pr-3">
-                      <div className="font-medium">{KIND_LABELS[r.entity_type]}</div>
-                      <code className="text-[10px] text-muted-foreground">{r.entity_id}</code>
-                    </td>
-                    <td className="py-2 pr-3">
-                      <div className="font-medium">{KIND_LABELS[r.related_entity_type]}</div>
-                      <code className="text-[10px] text-muted-foreground">
-                        {r.related_entity_id}
-                      </code>
-                    </td>
-                    <td className="py-2 pr-3">
-                      <code>{r.surface}</code>
-                    </td>
-                    <td className="py-2 pr-3">{r.position ?? "—"}</td>
-                    <td className="py-2 pr-3 max-w-[220px] text-muted-foreground">
-                      {r.note ?? "—"}
-                    </td>
-                    <td className="py-2 text-right">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (window.confirm("¿Eliminar este override?")) {
-                            deleteMut.mutate(r.id);
-                          }
-                        }}
-                        className="rounded-md border border-destructive/40 px-2 py-1 text-[11px] font-medium text-destructive hover:bg-destructive/10"
-                        disabled={deleteMut.isPending}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="divide-y">
+            {rows.map((r) => (
+              <li key={r.id} className="flex flex-wrap items-start gap-3 py-2.5 text-xs">
+                <span
+                  className={`inline-flex shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold ${
+                    r.mode === "pin"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-destructive/10 text-destructive"
+                  }`}
+                >
+                  {MODE_LABELS[r.mode]}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium">
+                    {nameOf(r.related_entity_type, r.related_entity_id)}
+                    <span className="font-normal text-muted-foreground">
+                      {" "}
+                      · {KIND_LABELS[r.related_entity_type]}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    En la ficha de {KIND_LABELS[r.entity_type].toLowerCase()}{" "}
+                    <span className="font-medium text-foreground">
+                      {nameOf(r.entity_type, r.entity_id)}
+                    </span>{" "}
+                    · lista {RELATED_SECTION_NAMES[r.entity_type]}
+                  </div>
+                  {r.note && <p className="mt-0.5 text-[11px] text-muted-foreground">{r.note}</p>}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm("¿Quitar este ajuste? La lista volverá a su orden normal.")) {
+                      deleteMut.mutate(r.id);
+                    }
+                  }}
+                  className="rounded-md border border-destructive/40 px-2 py-1 text-[11px] font-medium text-destructive hover:bg-destructive/10"
+                  disabled={deleteMut.isPending}
+                >
+                  Quitar
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
     </div>
@@ -219,129 +239,154 @@ function CreateForm({
   error: string | null;
 }) {
   const [entityType, setEntityType] = useState<RelatedEntityKind>("business");
-  const [entityId, setEntityId] = useState("");
+  const [entity, setEntity] = useState<CmsPickOption | null>(null);
+  const allowed = honouredRelatedKinds(entityType);
   const [relatedEntityType, setRelatedEntityType] = useState<RelatedEntityKind>("business");
-  const [relatedEntityId, setRelatedEntityId] = useState("");
+  const [related, setRelated] = useState<CmsPickOption | null>(null);
   const [mode, setMode] = useState<RelatedOverrideMode>("pin");
-  const [position, setPosition] = useState("");
   const [note, setNote] = useState("");
+  const [round, setRound] = useState(0);
 
-  const surface = SURFACE_BY_KIND[entityType];
+  const relatedKind = allowed.includes(relatedEntityType)
+    ? relatedEntityType
+    : (allowed[0] ?? entityType);
+  const canSave = Boolean(entity && related && entity.id !== related.id);
 
   return (
     <form
-      className="grid grid-cols-1 gap-3 rounded-xl border bg-card p-4 md:grid-cols-6"
+      className="space-y-3 rounded-xl border bg-card p-4"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!entityId.trim() || !relatedEntityId.trim()) return;
+        if (!entity || !related) return;
         onSubmit({
           entityType,
-          entityId: entityId.trim(),
-          surface,
-          relatedEntityType,
-          relatedEntityId: relatedEntityId.trim(),
+          entityId: entity.id,
+          surface: SURFACE_BY_KIND[entityType],
+          relatedEntityType: relatedKind,
+          relatedEntityId: related.id,
           mode,
-          position: position.trim() ? Number(position) : null,
+          position: null,
           note: note.trim() || null,
         });
-        setEntityId("");
-        setRelatedEntityId("");
-        setPosition("");
+        setRelated(null);
         setNote("");
+        setRound((n) => n + 1);
       }}
     >
-      <label className="text-xs md:col-span-1">
-        <span className="mb-1 block text-muted-foreground">Ficha (tipo)</span>
-        <select
-          value={entityType}
-          onChange={(e) => setEntityType(e.target.value as RelatedEntityKind)}
-          className="h-9 w-full rounded-md border bg-background px-2"
-        >
-          {(Object.keys(KIND_LABELS) as RelatedEntityKind[]).map((k) => (
-            <option key={k} value={k}>
-              {KIND_LABELS[k]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="text-xs md:col-span-2">
-        <span className="mb-1 block text-muted-foreground">Ficha (uuid)</span>
-        <input
-          value={entityId}
-          onChange={(e) => setEntityId(e.target.value)}
-          placeholder="entity_id"
-          className="h-9 w-full rounded-md border bg-background px-2"
-        />
-      </label>
-      <label className="text-xs md:col-span-1">
-        <span className="mb-1 block text-muted-foreground">Relacionado (tipo)</span>
-        <select
-          value={relatedEntityType}
-          onChange={(e) => setRelatedEntityType(e.target.value as RelatedEntityKind)}
-          className="h-9 w-full rounded-md border bg-background px-2"
-        >
-          {(Object.keys(KIND_LABELS) as RelatedEntityKind[]).map((k) => (
-            <option key={k} value={k}>
-              {KIND_LABELS[k]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="text-xs md:col-span-2">
-        <span className="mb-1 block text-muted-foreground">Relacionado (uuid)</span>
-        <input
-          value={relatedEntityId}
-          onChange={(e) => setRelatedEntityId(e.target.value)}
-          placeholder="related_entity_id"
-          className="h-9 w-full rounded-md border bg-background px-2"
-        />
-      </label>
+      <h2 className="text-sm font-semibold">Nuevo ajuste</h2>
 
-      <label className="text-xs md:col-span-1">
-        <span className="mb-1 block text-muted-foreground">Modo</span>
-        <select
-          value={mode}
-          onChange={(e) => setMode(e.target.value as RelatedOverrideMode)}
-          className="h-9 w-full rounded-md border bg-background px-2"
-        >
-          <option value="pin">Pin (fijar)</option>
-          <option value="hide">Hide (ocultar)</option>
-        </select>
-      </label>
-      <label className="text-xs md:col-span-1">
-        <span className="mb-1 block text-muted-foreground">Posición</span>
-        <input
-          type="number"
-          min={0}
-          value={position}
-          onChange={(e) => setPosition(e.target.value)}
-          placeholder="0"
-          className="h-9 w-full rounded-md border bg-background px-2"
-        />
-      </label>
-      <label className="text-xs md:col-span-3">
-        <span className="mb-1 block text-muted-foreground">Nota editorial</span>
-        <input
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Rationale opcional (por qué se fija o se oculta)"
-          className="h-9 w-full rounded-md border bg-background px-2"
-        />
-      </label>
-      <div className="flex items-end md:col-span-1">
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="space-y-2">
+          <label className="block text-xs">
+            <span className="mb-1 block text-muted-foreground">1. ¿En qué tipo de ficha?</span>
+            <select
+              value={entityType}
+              onChange={(e) => {
+                setEntityType(e.target.value as RelatedEntityKind);
+                setEntity(null);
+                setRelated(null);
+              }}
+              className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+            >
+              {ALL_KINDS.map((k) => (
+                <option key={k} value={k}>
+                  {KIND_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <CmsEntitySearchPicker
+            key={`entity-${entityType}`}
+            kind={entityType}
+            label={`2. ¿Cuál ${KIND_LABELS[entityType].toLowerCase()}?`}
+            onPick={setEntity}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Se ajusta su lista {RELATED_SECTION_NAMES[entityType]}.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          {allowed.length > 1 && (
+            <label className="block text-xs">
+              <span className="mb-1 block text-muted-foreground">
+                3. ¿Qué tipo de recomendación?
+              </span>
+              <select
+                value={relatedKind}
+                onChange={(e) => {
+                  setRelatedEntityType(e.target.value as RelatedEntityKind);
+                  setRelated(null);
+                }}
+                className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+              >
+                {allowed.map((k) => (
+                  <option key={k} value={k}>
+                    {KIND_LABELS[k]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <CmsEntitySearchPicker
+            key={`related-${entityType}-${relatedKind}-${round}`}
+            kind={relatedKind}
+            label={`${allowed.length > 1 ? "4" : "3"}. ¿Qué ${KIND_LABELS[relatedKind].toLowerCase()} quieres ajustar?`}
+            excludeIds={entity ? [entity.id] : []}
+            onPick={setRelated}
+          />
+        </div>
+      </div>
+
+      <fieldset className="grid gap-2 md:grid-cols-2">
+        <legend className="mb-1 text-xs text-muted-foreground">¿Qué debe pasar?</legend>
+        {(["pin", "hide"] as RelatedOverrideMode[]).map((m) => (
+          <label
+            key={m}
+            className="flex cursor-pointer items-start gap-2 rounded-md border px-2 py-1.5 text-xs hover:bg-muted"
+          >
+            <input
+              type="radio"
+              name="related-mode-admin"
+              value={m}
+              checked={mode === m}
+              onChange={() => setMode(m)}
+              className="mt-0.5"
+            />
+            <span>
+              <span className="font-medium">{MODE_LABELS[m]}</span>
+              <span className="block text-muted-foreground">{MODE_HELP[m]}</span>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+
+      <div>
+        <label className="block text-xs">
+          <span className="mb-1 block text-muted-foreground">Motivo para el equipo (opcional)</span>
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Por ejemplo: lo pidió el dueño, o no debe salir porque cerró"
+            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+          />
+        </label>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          disabled={pending || !entityId.trim() || !relatedEntityId.trim()}
-          className="h-9 w-full rounded-md bg-primary px-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-95 disabled:opacity-60"
+          disabled={pending || !canSave}
+          className="h-9 rounded-md bg-primary px-4 text-xs font-semibold text-primary-foreground hover:opacity-95 disabled:opacity-60"
         >
-          {pending ? "Guardando…" : "Crear override"}
+          {pending ? "Guardando…" : "Guardar ajuste"}
         </button>
+        <span className="text-[11px] text-muted-foreground">
+          Cada lista muestra hasta {MAX_PINS_SHOWN} elementos fijados. Si ya existe el mismo ajuste,
+          se actualiza en lugar de repetirse.
+        </span>
       </div>
-      <p className="text-[11px] text-muted-foreground md:col-span-6">
-        Superficie asignada automáticamente: <code>{surface}</code>. La unicidad
-        <code> (ficha, superficie, relacionado)</code> hace un upsert idempotente.
-      </p>
-      {error && <p className="md:col-span-6 text-xs text-destructive">{error}</p>}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </form>
   );
 }

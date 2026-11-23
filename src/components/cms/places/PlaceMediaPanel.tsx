@@ -20,6 +20,7 @@ import {
   reorderPlaceMedia,
 } from "@/lib/places/places-cms.functions";
 import { PlaceSection, buttonClass } from "./PlaceSection";
+import { getEditorialStatusLabel } from "@/lib/cms/editorial-language";
 
 export interface PlaceMediaRow {
   id: string;
@@ -90,7 +91,7 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
     mutationFn: (mediaId: string) => detachFn({ data: { place_id: placeId, media_id: mediaId } }),
     onSuccess: () => {
       onChanged();
-      toast.success("Imagen desvinculada. El activo original se conserva intacto.");
+      toast.success("Foto quitada de este lugar. El archivo original se conserva en la Biblioteca.");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo desvincular."),
   });
@@ -106,15 +107,15 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
       }),
     onSuccess: () => {
       onChanged();
-      toast.success("Activo temporal borrado. Los activos oficiales aprobados no se tocan.");
+      toast.success("Foto temporal borrada. Las fotos oficiales aprobadas no se tocan.");
     },
     onError: (e) =>
       toast.error(
         e instanceof Error && e.message === "official_asset_delete_blocked"
-          ? "Es un activo oficial aprobado: sólo puede desasociarse, no borrarse."
+          ? "Es una foto oficial aprobada: puedes quitarla de este lugar, pero no borrarla."
           : e instanceof Error
             ? e.message
-            : "No se pudo borrar el activo.",
+            : "No se pudo borrar la foto.",
       ),
   });
 
@@ -168,7 +169,8 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
             ) : null}
           </div>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {approved ? "Aprobada" : "Pendiente de aprobación"} · {asset?.status ?? "draft"}
+            {approved ? "Aprobada" : "Pendiente de aprobación"} ·{" "}
+            {getEditorialStatusLabel(asset?.status ?? "draft").toLowerCase()}
             {temporary ? " · pendiente de sustitución por fotografía real" : ""}
           </p>
         </div>
@@ -197,8 +199,8 @@ export function PlaceMediaPanel({ placeId, media, assets, onChanged }: Props) {
   return (
     <PlaceSection
       id="place-media"
-      title="Medios"
-      description="Portada y galería mediante el flujo gobernado. Cambiar la referencia nunca sobrescribe el activo anterior."
+      title="Fotos"
+      description="Portada y galería del lugar. Si cambias una foto, la anterior se conserva en la Biblioteca; nunca se pierde."
     >
       <div className="md:col-span-2 space-y-4">
         <div className="rounded-lg border border-border bg-background p-3">

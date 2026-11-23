@@ -73,7 +73,7 @@ export function PlacePresentationPanel({
     <PlaceSection
       id="place-presentation"
       title="Presentación de la ficha"
-      description="Elige la dirección visual de la plantilla premium-entity-place. Cambiar la presentación nunca publica el lugar."
+      description="Elige el estilo visual de la página pública del lugar. Cambiar el estilo no publica el lugar."
     >
       <fieldset className="md:col-span-2">
         <legend className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

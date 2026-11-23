@@ -1043,7 +1043,7 @@ const cms: WorkspaceDefinition = {
          mismo Experience Builder — sin editor paralelo). */
       id: "cms.landing-seo",
       workspaceId: "cms",
-      label: "Landing SEO",
+      label: "Páginas para Google",
       icon: Sparkles,
       to: "/cms/landing-seo",
       group: "estudio",

@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/lib/toast";
+import { useAuth } from "@/hooks/useAuth";
 import { uploadStudioMediaViaServer } from "@/lib/experience-builder/studio-media.functions";
 import type { MediaRightsInput } from "@/lib/experience-builder/media-rights";
 import { Edit3, Loader2, Upload } from "lucide-react";
@@ -61,6 +62,10 @@ export const Route = createFileRoute("/_authenticated/cms/media")({
 function BatchToolbar() {
   const batch = useServerFn(suggestMediaAltBatch);
   const [loading, setLoading] = useState(false);
+  const { roles } = useAuth();
+  /* Herramienta técnica: pide códigos de imagen, así que sólo la ven
+     administradores. Los editores describen cada foto desde «Editar». */
+  if (!roles.includes("admin") && !roles.includes("super_admin")) return null;
   return (
     <Button
       size="sm"
@@ -68,7 +73,7 @@ function BatchToolbar() {
       disabled={loading}
       onClick={async () => {
         const raw = prompt(
-          "IDs de media separados por coma (máx 25). Idiomas: es,en,fr,de,it,pt (o subconjunto).",
+          "Herramienta técnica: pega los códigos de hasta 25 imágenes, separados por coma. Se sugiere su descripción en español e inglés.",
           "",
         );
         if (!raw) return;
@@ -84,7 +89,7 @@ function BatchToolbar() {
             data: { mediaIds, locales: ["es", "en"] },
           });
           toast.success(
-            `Lote: ${r.ok}/${r.total} ok · ${r.skipped} preservados · ${r.failed} fallos`,
+            `Listo: ${r.ok} de ${r.total} descritas · ${r.skipped} ya tenían descripción · ${r.failed} con error`,
           );
         } catch (e) {
           toast.error(e instanceof Error ? e.message : "Error en lote");
@@ -93,7 +98,7 @@ function BatchToolbar() {
         }
       }}
     >
-      {loading ? "Procesando…" : "Lote IA"}
+      {loading ? "Procesando…" : "Describir varias (IA)"}
     </Button>
   );
 }
@@ -367,14 +372,14 @@ function MediaPage() {
           },
           {
             key: "alt",
-            header: "ALT",
+            header: "Descripción",
             render: (r) => (
               <div className="w-40 space-y-1 sm:w-48">
                 <div
                   className="line-clamp-2 text-xs font-medium leading-snug"
-                  title={r.alt_text ?? "Sin ALT"}
+                  title={r.alt_text ?? "Sin descripción"}
                 >
-                  {r.alt_text ?? <span className="text-muted-foreground italic">(sin ALT)</span>}
+                  {r.alt_text ?? <span className="text-muted-foreground italic">(sin descripción)</span>}
                 </div>
                 {r.alt_text_ai && r.alt_text_source !== "human" && (
                   <div className="line-clamp-1 text-[10px] text-muted-foreground">
@@ -424,11 +429,15 @@ function MediaPage() {
             key: "kind",
             header: "Tipo",
             className: "hidden lg:table-cell",
-            render: (r) => <span className="text-xs text-muted-foreground">{r.kind ?? "—"}</span>,
+            render: (r) => (
+              <span className="text-xs text-muted-foreground">
+                {r.kind === "image" ? "Foto" : r.kind === "video" ? "Video" : (r.kind ?? "—")}
+              </span>
+            ),
           },
           {
             key: "bucket",
-            header: "Bucket",
+            header: "Carpeta",
             className: "hidden xl:table-cell",
             render: (r) => (
               <code className="text-xs text-muted-foreground">{r.storage_bucket ?? "—"}</code>
@@ -436,7 +445,7 @@ function MediaPage() {
           },
           {
             key: "dim",
-            header: "Dim.",
+            header: "Tamaño",
             className: "hidden xl:table-cell",
             render: (r) => (
               <span className="text-xs text-muted-foreground">

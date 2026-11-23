@@ -50,7 +50,9 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
     onSuccess: (res) => {
       void queryClient.invalidateQueries({ queryKey: ["eb", "seo-landing", entityType, entityId] });
       toast.success(
-        res.created ? "Landing SEO creada como borrador." : "Esta entidad ya tenía Landing SEO.",
+        res.created
+          ? "Página para Google creada como borrador."
+          : "Esta ficha ya tenía su página para Google; la abrimos.",
       );
       void navigate({
         to: "/cms/experience-builder",
@@ -60,8 +62,8 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
     onError: (error) =>
       toast.error(
         error instanceof Error && error.message === "seo_landing_entity_not_found"
-          ? "No se encontró la entidad de origen."
-          : "No fue posible crear la Landing SEO.",
+          ? "No encontramos esta ficha. Guarda primero y vuelve a intentarlo."
+          : "No fue posible crear la página para Google.",
       ),
   });
 
@@ -70,7 +72,14 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
   const state = resolution.data?.state ?? "none";
   const existingId = resolution.data?.composition?.id ?? null;
   const existingSlug = resolution.data?.composition?.slug ?? null;
-  const label = resolution.data?.actionLabel ?? "Crear Landing SEO";
+  /* Texto del botón en lenguaje de editor (la etiqueta técnica de
+   * `resolution.actionLabel` se conserva para el Experience Builder). */
+  const label =
+    state === "none"
+      ? "Crear página para Google"
+      : state === "draft"
+        ? "Revisar y publicar"
+        : "Abrir y cambiar";
   const promoPath = existingSlug ? `/l/${existingSlug}` : null;
 
   return (
@@ -79,14 +88,14 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
         <div className="min-w-0">
           <h3 className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="h-4 w-4 text-primary" aria-hidden />
-            Landing SEO premium
+            Página especial para Google y campañas
           </h3>
           <p className="mt-1 text-xs text-muted-foreground">
             {state === "none"
-              ? "Crea una landing editorial con la plantilla oficial. Nace como borrador no indexable y sólo usa datos reales de esta ficha."
+              ? "Es una página extra de esta ficha, pensada para aparecer en Google y para anuncios o redes. Se arma sola con los datos reales de la ficha y empieza como borrador: nadie la ve hasta que la publiques."
               : state === "draft"
-                ? "Esta ficha ya tiene una Landing SEO en borrador. No se crean duplicados."
-                : "Esta ficha tiene una Landing SEO publicada. Adminístrala desde el Experience Builder."}
+                ? "Esta ficha ya tiene su página para Google en borrador (nunca se crean copias). Ábrela para revisarla y publicarla."
+                : "Esta ficha ya tiene su página para Google publicada. Ábrela en el constructor para cambiar textos o fotos."}
           </p>
         </div>
         <button
@@ -138,8 +147,8 @@ export function SeoLandingAction({ entityType, entityId }: Props) {
           </div>
           <p className="mt-1.5 text-xs text-muted-foreground">
             {state === "published"
-              ? "Publicada: este enlace ya es visible para buscadores y campañas."
-              : "En borrador: el enlace sólo funcionará cuando publiques la landing."}
+              ? "Publicada: ya aparece en Google y puedes usar este enlace en anuncios y redes."
+              : "En borrador: el enlace funcionará cuando publiques la página."}
           </p>
           {state === "published" ? <LandingPerformanceCard landingPath={promoPath} /> : null}
         </div>

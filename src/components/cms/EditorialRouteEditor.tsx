@@ -14,10 +14,10 @@ const BASE_FIELDS: EditorField[] = [
   { name: "name", label: "Nombre de la ruta", type: "text", required: true },
   {
     name: "slug",
-    label: "Slug",
+    label: "Dirección web",
     type: "text",
     required: true,
-    helpText: "Identificador URL público: /rutas/mi-ruta",
+    helpText: "Final de la dirección de la ruta: /rutas/mi-ruta. Sólo minúsculas, números y guiones.",
   },
   { name: "summary", label: "Resumen", type: "textarea" },
   { name: "body", label: "Texto editorial", type: "textarea" },

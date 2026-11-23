@@ -8,7 +8,7 @@
  * Lenguaje: todo lo que ve el editor sale de `related-overrides-ui.ts`, que es
  * la misma autoridad que usan las pruebas del panel.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -29,13 +29,10 @@ import {
   honouredRelatedKinds,
   relatedPanelIntro,
 } from "@/lib/related/related-overrides-ui";
-import { CMS_SEARCH_DEBOUNCE_MS, CMS_SEARCH_MIN_CHARS } from "@/lib/cms/accent-search";
 import {
-  listBusinessesCms,
-  listDestinationsCms,
-  listEventsCms,
-  listProductsCms,
-} from "@/lib/cms/reads.functions";
+  CmsEntitySearchPicker,
+  type CmsPickOption,
+} from "@/components/cms/CmsEntitySearchPicker";
 
 const SURFACE_BY_KIND: Record<RelatedEntityKind, string> = {
   business: "business-profile",
@@ -47,157 +44,6 @@ const SURFACE_BY_KIND: Record<RelatedEntityKind, string> = {
 interface Props {
   entityType: RelatedEntityKind;
   entityId: string;
-}
-
-interface PickOption {
-  id: string;
-  name: string;
-  status: string;
-}
-
-/* ------------------------------------------------------------------ *
- * Búsqueda por nombre: el editor escribe 2 letras y elige, sin uuids.
- * ------------------------------------------------------------------ */
-function useRelatedSearch(kind: RelatedEntityKind, term: string) {
-  const [debounced, setDebounced] = useState("");
-  const businessesFn = useServerFn(listBusinessesCms);
-  const productsFn = useServerFn(listProductsCms);
-  const destinationsFn = useServerFn(listDestinationsCms);
-  const eventsFn = useServerFn(listEventsCms);
-
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(term.trim()), CMS_SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(t);
-  }, [term]);
-
-  const enabled = debounced.length >= CMS_SEARCH_MIN_CHARS;
-
-  const query = useQuery({
-    queryKey: ["cms", "related-search", kind, debounced] as const,
-    enabled,
-    queryFn: async () => {
-      const data = { search: debounced, limit: 8 };
-      if (kind === "business") {
-        const r = await businessesFn({ data });
-        return (r.rows ?? []).map((row) => ({
-          id: row.id,
-          name: row.display_name,
-          status: row.status,
-        })) as PickOption[];
-      }
-      if (kind === "product") {
-        const r = await productsFn({ data });
-        return (r.rows ?? []).map((row) => ({
-          id: row.id,
-          name: row.name,
-          status: row.status,
-        })) as PickOption[];
-      }
-      if (kind === "destination") {
-        const r = await destinationsFn({ data });
-        return (r.rows ?? []).map((row) => ({
-          id: row.id,
-          name: row.name,
-          status: row.status,
-        })) as PickOption[];
-      }
-      const r = await eventsFn({ data });
-      return (r.rows ?? []).map((row) => ({
-        id: row.id,
-        name: row.title,
-        status: row.status,
-      })) as PickOption[];
-    },
-  });
-
-  return {
-    options: query.data ?? [],
-    isSearching: enabled && query.isFetching,
-    ready: enabled,
-  };
-}
-
-function EntitySearchPicker({
-  kind,
-  excludeId,
-  onPick,
-}: {
-  kind: RelatedEntityKind;
-  excludeId: string;
-  onPick: (option: PickOption) => void;
-}) {
-  const [term, setTerm] = useState("");
-  const [picked, setPicked] = useState<PickOption | null>(null);
-  const { options, isSearching, ready } = useRelatedSearch(kind, term);
-
-  const visible = options.filter((o) => o.id !== excludeId);
-
-  return (
-    <div>
-      <label className="block text-xs">
-        <span className="mb-1 block text-muted-foreground">
-          {KIND_LABELS[kind]} que quieres ajustar
-        </span>
-        <input
-          value={picked ? picked.name : term}
-          onChange={(e) => {
-            setPicked(null);
-            setTerm(e.target.value);
-          }}
-          placeholder={`Escribe ${CMS_SEARCH_MIN_CHARS} o más letras y elige de la lista`}
-          className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-        />
-      </label>
-
-      {picked && (
-        <div className="mt-1 flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground">Elegido: {picked.name}</span>
-          <button
-            type="button"
-            onClick={() => {
-              setPicked(null);
-              setTerm("");
-            }}
-            className="rounded-md border px-2 py-0.5 text-[11px] hover:bg-muted"
-          >
-            Cambiar
-          </button>
-        </div>
-      )}
-
-      {!picked && ready && (
-        <ul className="mt-1 max-h-48 overflow-y-auto rounded-md border bg-background">
-          {isSearching && visible.length === 0 && (
-            <li className="px-2 py-1.5 text-xs text-muted-foreground">Buscando…</li>
-          )}
-          {!isSearching && visible.length === 0 && (
-            <li className="px-2 py-1.5 text-xs text-muted-foreground">
-              No encontramos nada con «{term.trim()}». Prueba con otras letras.
-            </li>
-          )}
-          {visible.map((o) => (
-            <li key={o.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  setPicked(o);
-                  onPick(o);
-                }}
-                className="flex w-full items-baseline justify-between gap-2 px-2 py-1.5 text-left text-xs hover:bg-muted"
-              >
-                <span className="min-w-0 flex-1 truncate font-medium">{o.name}</span>
-                {o.status !== "published" && (
-                  <span className="shrink-0 text-[10px] text-muted-foreground">
-                    {o.status === "draft" ? "borrador" : o.status}
-                  </span>
-                )}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
 }
 
 /* ------------------------------------------------------------------ *
@@ -248,9 +94,10 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
   const defaultRelatedKind: RelatedEntityKind = allowedKinds[0] ?? entityType;
 
   const [relatedKind, setRelatedKind] = useState<RelatedEntityKind>(defaultRelatedKind);
-  const [picked, setPicked] = useState<PickOption | null>(null);
+  const [picked, setPicked] = useState<CmsPickOption | null>(null);
   const [mode, setMode] = useState<RelatedOverrideMode>("pin");
   const [note, setNote] = useState("");
+  const [formRound, setFormRound] = useState(0);
 
   const canSave = Boolean(picked) && picked?.id !== entityId;
 
@@ -283,6 +130,7 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
           });
           setPicked(null);
           setNote("");
+          setFormRound((n) => n + 1);
         }}
       >
         {allowedKinds.length > 1 && (
@@ -305,10 +153,10 @@ export function RelatedOverridesPanel({ entityType, entityId }: Props) {
           </label>
         )}
 
-        <EntitySearchPicker
-          key={relatedKind}
+        <CmsEntitySearchPicker
+          key={`${relatedKind}-${formRound}`}
           kind={relatedKind}
-          excludeId={entityId}
+          excludeIds={[entityId]}
           onPick={setPicked}
         />
 

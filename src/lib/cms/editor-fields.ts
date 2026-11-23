@@ -4,10 +4,10 @@ export const REGION_FIELDS: EditorField[] = [
   { name: "name", label: "Nombre", type: "text", required: true },
   {
     name: "slug",
-    label: "Slug",
+    label: "Dirección web",
     type: "text",
     required: true,
-    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+    helpText: "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
   },
   {
     name: "state_id",
@@ -28,10 +28,27 @@ export const REGION_FIELDS: EditorField[] = [
 
 export const CATEGORY_FIELDS: EditorField[] = [
   { name: "name", label: "Nombre", type: "text", required: true },
-  { name: "slug", label: "Slug", type: "text", required: true },
+  {
+    name: "slug",
+    label: "Dirección web",
+    type: "text",
+    required: true,
+    helpText:
+      "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
+  },
   { name: "description", label: "Descripción", type: "textarea" },
-  { name: "icon", label: "Ícono (clave)", type: "text" },
-  { name: "sort_order", label: "Orden", type: "number" },
+  {
+    name: "icon",
+    label: "Ícono (opcional)",
+    type: "text",
+    helpText: "Nombre del dibujo que acompaña la categoría. Lo asigna el equipo de diseño; puedes dejarlo vacío.",
+  },
+  {
+    name: "sort_order",
+    label: "Orden",
+    type: "number",
+    helpText: "Número más bajo = aparece antes en las listas.",
+  },
   {
     // Lote 3C — autoridad CMS-first de familias de listado turístico.
     name: "listing_family_key",
@@ -56,10 +73,10 @@ export const ZONE_FIELDS: EditorField[] = [
   { name: "name", label: "Nombre", type: "text", required: true },
   {
     name: "slug",
-    label: "Slug",
+    label: "Dirección web",
     type: "text",
     required: true,
-    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+    helpText: "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
   },
   {
     name: "destination_id",
@@ -81,10 +98,10 @@ export const DESTINATION_FIELDS: EditorField[] = [
   { name: "name", label: "Nombre", type: "text", required: true },
   {
     name: "slug",
-    label: "Slug",
+    label: "Dirección web",
     type: "text",
     required: true,
-    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+    helpText: "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
   },
   {
     name: "tourism_region_id",
@@ -95,7 +112,7 @@ export const DESTINATION_FIELDS: EditorField[] = [
   },
   {
     name: "tagline",
-    label: "Descripción corta del hero",
+    label: "Frase de portada",
     type: "text",
     helpText: "Una sola frase breve que resume el destino en la portada.",
   },
@@ -107,15 +124,16 @@ export const DESTINATION_FIELDS: EditorField[] = [
   },
   {
     name: "highlights",
-    label: "Highlights",
+    label: "Lo más destacado",
     type: "tags",
     helpText: "Una idea por línea (o separadas por coma).",
   },
   {
     name: "hero_palette",
-    label: "Paleta del hero",
+    label: "Colores de la portada",
     type: "select",
     required: true,
+    helpText: "Tono de color que acompaña la foto principal del destino.",
     options: [
       { value: "territorio", label: "Territorio" },
       { value: "selva", label: "Selva" },
@@ -123,8 +141,18 @@ export const DESTINATION_FIELDS: EditorField[] = [
       { value: "atardecer", label: "Atardecer" },
     ],
   },
-  { name: "latitude", label: "Latitud", type: "number" },
-  { name: "longitude", label: "Longitud", type: "number" },
+  {
+    name: "latitude",
+    label: "Latitud",
+    type: "number",
+    helpText: "Más fácil: mueve el pin en «Ubicación del destino», más abajo.",
+  },
+  {
+    name: "longitude",
+    label: "Longitud",
+    type: "number",
+    helpText: "Más fácil: mueve el pin en «Ubicación del destino», más abajo.",
+  },
 ];
 
 /**
@@ -137,10 +165,10 @@ export const BUSINESS_FIELDS: EditorField[] = [
   { name: "legal_name", label: "Razón social", type: "text" },
   {
     name: "slug",
-    label: "Slug",
+    label: "Dirección web",
     type: "text",
     required: true,
-    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+    helpText: "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
   },
   {
     name: "destination_id",
@@ -172,10 +200,10 @@ export const PRODUCT_FIELDS: EditorField[] = [
   { name: "name", label: "Nombre", type: "text", required: true },
   {
     name: "slug",
-    label: "Slug",
+    label: "Dirección web",
     type: "text",
     required: true,
-    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+    helpText: "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
   },
   {
     name: "business_id",
@@ -208,10 +236,15 @@ export const PRODUCT_FIELDS: EditorField[] = [
     label: "Moneda",
     type: "text",
     placeholder: "MXN",
-    helpText: "Código ISO (MXN, USD, EUR…).",
+    helpText: "MXN = pesos mexicanos, USD = dólares, EUR = euros.",
   },
-  { name: "duration_minutes", label: "Duración (min)", type: "number" },
-  { name: "capacity", label: "Capacidad", type: "number" },
+  { name: "duration_minutes", label: "Duración (en minutos)", type: "number" },
+  {
+    name: "capacity",
+    label: "Capacidad",
+    type: "number",
+    helpText: "Número máximo de personas por salida o reservación.",
+  },
 ];
 
 /**
@@ -225,13 +258,13 @@ export const EVENT_FIELDS: EditorField[] = [
   { name: "title", label: "Título", type: "text", required: true },
   {
     name: "slug",
-    label: "Slug",
+    label: "Dirección web",
     type: "text",
     required: true,
-    helpText: "Identificador URL (sin espacios, sólo minúsculas y guiones).",
+    helpText: "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
   },
   { name: "summary", label: "Resumen", type: "textarea" },
-  { name: "body", label: "Cuerpo", type: "textarea" },
+  { name: "body", label: "Texto completo", type: "textarea" },
   { name: "destination_id", label: "Destino", type: "select", required: true, options: [] },
   {
     name: "business_id",
@@ -244,7 +277,13 @@ export const EVENT_FIELDS: EditorField[] = [
   { name: "ends_at", label: "Fin", type: "datetime" },
   { name: "venue_name", label: "Sede", type: "text" },
   { name: "is_free", label: "Entrada libre", type: "boolean" },
-  { name: "external_url", label: "URL externa", type: "text" },
+  {
+    name: "external_url",
+    label: "Enlace externo",
+    type: "text",
+    placeholder: "https://…",
+    helpText: "Página oficial o venta de boletos del evento (opcional).",
+  },
   {
     name: "cover_media_id",
     label: "Portada",

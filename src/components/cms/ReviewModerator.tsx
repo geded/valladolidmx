@@ -224,8 +224,7 @@ export function ReviewModerator({ id }: { id: string }) {
                 <details className="text-muted-foreground">
                   <summary className="cursor-pointer select-none">Detalle técnico</summary>
                   <div className="mt-1 grid gap-1 rounded-md bg-muted/50 p-2 font-mono text-[10px]">
-                    <div>Registro: metadata.moderation_history</div>
-                    <div>Acción: {h.action}</div>
+                                        <div>Acción: {h.action}</div>
                     <div>
                       Estado: {h.from_status} → {h.to_status}
                     </div>

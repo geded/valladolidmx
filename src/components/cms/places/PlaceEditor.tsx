@@ -111,7 +111,7 @@ const AUTOFILL_FIELDS = [
   { name: "best_time_to_visit", label: "Mejor momento para visitar" },
   { name: "contact_phone", label: "Teléfono" },
   { name: "contact_website", label: "Sitio web" },
-  { name: "google_place_id", label: "Google Place ID" },
+  { name: "google_place_id", label: "Ficha de Google Maps" },
 ];
 
 interface Props {
@@ -575,7 +575,7 @@ export function PlaceEditor({ placeId }: Props) {
         <PlaceSection
           id="place-new"
           title="Identidad y territorio"
-          description="Nombre, slug, destino y tipo quedan protegidos después del alta."
+          description="Nombre, dirección web, destino y tipo ya no se pueden cambiar después de crear el lugar."
         >
           <PlaceField name="new-name" label="Nombre" required>
             {({ id, describedBy }) => (
@@ -590,9 +590,9 @@ export function PlaceEditor({ placeId }: Props) {
           </PlaceField>
           <PlaceField
             name="new-slug"
-            label="Slug"
+            label="Dirección web"
             required
-            help="Minúsculas y guiones, sin acentos ni espacios."
+            help="Final de la dirección de la página, p. ej. cenote-zaci. Minúsculas y guiones, sin acentos ni espacios."
           >
             {({ id, describedBy }) => (
               <input

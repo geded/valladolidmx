@@ -247,7 +247,7 @@ export const resolveRelatedEntityNames = createServerFn({ method: "POST" })
     const raw = Array.isArray(data?.refs) ? data.refs : [];
     const seen = new Set<string>();
     const refs: Array<{ kind: RelatedEntityKind; id: string }> = [];
-    for (const ref of raw.slice(0, 200)) {
+    for (const ref of raw.slice(0, 500)) {
       if (!ref || typeof ref.id !== "string" || !ref.id.trim()) continue;
       let kind: RelatedEntityKind;
       try {

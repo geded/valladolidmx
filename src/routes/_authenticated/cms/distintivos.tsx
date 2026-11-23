@@ -132,7 +132,8 @@ function InstitutionalAuthorityPage() {
               disabled={authorityQ.isLoading || save.isPending}
             />
             <p className="text-xs text-muted-foreground">
-              Identificadores de destino separados por comas. Valor de referencia:{" "}
+              Escribe la dirección web de cada destino que lleva este distintivo, separadas por
+              comas (por ejemplo: valladolid, izamal). Valor original:{" "}
               {fallback[kind] || "—"}
             </p>
           </div>

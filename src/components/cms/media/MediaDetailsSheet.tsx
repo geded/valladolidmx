@@ -156,7 +156,7 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
   const references = usage.data?.references ?? [];
   const approvalChecks = media
     ? ([
-        [Boolean(alt.trim()), "Texto ALT"],
+        [Boolean(alt.trim()), "Descripción de la foto"],
         [Boolean(credit.trim()), "Crédito"],
         [Boolean(media.original_checksum), "Archivo original verificado"],
         [rightsConfirmed, "Derechos confirmados"],
@@ -275,7 +275,7 @@ export function MediaDetailsSheet({ mediaId, onOpenChange }: Props) {
             <section className="space-y-4 border-t border-border pt-5">
               <h3 className="text-sm font-semibold">Información de la foto</h3>
               <div className="space-y-2">
-                <Label htmlFor="media-alt">Texto alternativo (ALT)</Label>
+                <Label htmlFor="media-alt">Descripción de la foto (la leen Google y personas con lector de pantalla)</Label>
                 <Textarea
                   id="media-alt"
                   value={alt}
