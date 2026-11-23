@@ -35,6 +35,7 @@ import { ExperienceInfoGrid } from "@/components/experience-builder/blocks/exper
 import { ExperienceCtaBar } from "@/components/experience-builder/blocks/experience-cta-bar/ExperienceCtaBar";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/experience-products/ExperienceProductsBlock";
+import { ExperienceMenu } from "@/components/experience-builder/blocks/experience-menu/ExperienceMenu";
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
@@ -42,6 +43,7 @@ import { ExperienceGallery } from "@/components/experience-builder/blocks/experi
 import {
   businessToSubnavDTO,
   businessToDescriptionSectionDTO,
+  businessToMenuDTO,
   businessToCtaBarDTO,
   businessToStayEssentialsDTO,
   businessToStayAmenitiesDTO,
@@ -532,9 +534,16 @@ export function BusinessSurface({
   const hasRelated = Boolean(
     related && (related.sameCategory.length > 0 || related.sameDestinationOther.length > 0),
   );
+  /* Carta publicada: sección «Menú» y su ancla, sólo si existe. */
+  const menuDto = businessToMenuDTO(b);
+  const subnavAnchors = menuDto
+    ? subnavDto.anchors.flatMap((anchor) =>
+        anchor.id === "resumen" ? [anchor, { id: "menu", label: "Menú" }] : [anchor],
+      )
+    : subnavDto.anchors;
   const effectiveSubnavDto = {
     ...subnavDto,
-    anchors: subnavDto.anchors.filter((anchor) => {
+    anchors: subnavAnchors.filter((anchor) => {
       // Ningún ancla visible puede apuntar a una sección que no se renderiza.
       if (anchor.id === "contacto" && !contactSource) return false;
       if (anchor.id === "galeria" && !hasGalleryMedia) return false;
@@ -944,6 +953,12 @@ export function BusinessSurface({
       {stayPolicyDto ? (
         <section data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           <ExperienceInfoGrid dto={stayPolicyDto} />
+        </section>
+      ) : null}
+
+      {menuDto ? (
+        <section id="menu" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
+          <ExperienceMenu dto={menuDto} />
         </section>
       ) : null}
 

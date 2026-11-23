@@ -143,6 +143,48 @@ export interface MarketplaceBusinessDetail extends MarketplaceBusinessCard {
    * ya firmadas. Sólo medios publicados y no eliminados; nunca placeholders.
    */
   media?: MarketplaceBusinessMediaItem[];
+  /**
+   * Carta publicada (`business_menu_items` disponibles de una empresa
+   * publicada), en el orden del editor. Precio sólo de referencia.
+   */
+  menu?: MarketplaceMenuItem[];
+}
+
+/** Platillo o bebida de la carta pública. */
+export interface MarketplaceMenuItem {
+  section: string;
+  name: string;
+  description: string | null;
+  price_amount: number | null;
+  price_currency: string;
+  tags: string[];
+}
+
+/** Lectura de la carta publicada (RLS: empresa publicada + platillo disponible). */
+export async function readPublishedMenu(
+  supabase: { from: (t: string) => any },
+  businessId: string,
+): Promise<MarketplaceMenuItem[]> {
+  try {
+    const { data } = await supabase
+      .from("business_menu_items")
+      .select("section, name, description, price_amount, price_currency, tags")
+      .eq("business_id", businessId)
+      .eq("is_available", true)
+      .order("section_order", { ascending: true })
+      .order("sort_order", { ascending: true })
+      .limit(400);
+    return ((data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+      section: String(r["section"] ?? "Carta"),
+      name: String(r["name"] ?? ""),
+      description: typeof r["description"] === "string" ? r["description"] : null,
+      price_amount: r["price_amount"] === null || r["price_amount"] === undefined ? null : Number(r["price_amount"]),
+      price_currency: String(r["price_currency"] ?? "MXN"),
+      tags: Array.isArray(r["tags"]) ? (r["tags"] as unknown[]).map(String) : [],
+    }));
+  } catch {
+    return [];
+  }
 }
 
 /** Medio CMS de una empresa (portada o galería) con URL firmada. */
@@ -1500,9 +1542,11 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
     const vb = await import("@/lib/media/variant-bundles.server");
     if (await vb.shouldServePublicVariants())
       Object.assign(productCoverAssets, await vb.attachReadyVariants(productVariantBases));
+    const menu = await readPublishedMenu(supabase as never, String(biz.id));
     return {
       id: String(biz.id),
       media: detailMedia,
+      menu,
       slug: String(biz.slug),
       display_name: String(biz.display_name),
       tagline: typeof biz.tagline === "string" ? biz.tagline : "",

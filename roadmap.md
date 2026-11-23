@@ -1,5 +1,13 @@
 # Roadmap
 
+## Menú de restaurantes y cafeterías · 2026-11-23
+- [x] Guardar la carta por secciones dentro de la ficha de la empresa.
+- [x] Cargar foto o PDF de la carta: Alux la lee y el editor revisa antes de guardar.
+- [x] Editar la carta desde el CMS y desde el Portal de la empresa.
+- [x] Alux encuentra y recomienda por lo que trae la carta (precio solo de referencia).
+- [x] Mostrar la carta en la página pública del restaurante (Founder aprobó mostrarla; antes/después enviado).
+- [ ] Pendiente: foto por platillo (opcional) y probar la carta desde el Portal con una cuenta de empresa real; aprobación visual del Founder antes de publicar. Carta de ejemplo en «Fogón de Espita» (demo) se conserva hasta la frase de validación.
+
 ## CMS fácil de usar: no perder lo escrito al salir a copiar datos · 2026-11-21
 
 - [x] Al volver a la app, el CMS ya no se vacía mientras se confirma la sesión.

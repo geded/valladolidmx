@@ -16,6 +16,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { BusinessAttributesPanel } from "@/components/cms/BusinessAttributesPanel";
+import { BusinessMenuPanel } from "@/components/cms/BusinessMenuPanel";
 import {
   getBusinessCard,
   listBusinessAuditLog,
@@ -297,6 +298,7 @@ function FichaPage() {
       </section>
 
       {businessId ? <BusinessAttributesPanel businessId={businessId} /> : null}
+      {businessId ? <BusinessMenuPanel businessId={businessId} /> : null}
       <AuditSection loading={auditQuery.isLoading} entries={auditQuery.data ?? []} />
     </div>
   );

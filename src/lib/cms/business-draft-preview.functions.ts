@@ -12,7 +12,10 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
+import {
+  readPublishedMenu,
+  type MarketplaceBusinessDetail,
+} from "@/lib/catalog/marketplace-reads.functions";
 import { resolveBusinessPlanTier } from "@/lib/plans/plans-catalog";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -89,6 +92,7 @@ export const getBusinessDraftPreview = createServerFn({ method: "GET" })
         .limit(24),
     ]);
 
+    const menu = await readPublishedMenu(supabase, String(biz.id));
     const loc = (locations ?? [])[0] ?? null;
     const contact = (contacts ?? [])[0] ?? null;
     const meta = (biz.metadata ?? {}) as Record<string, unknown>;
@@ -122,6 +126,7 @@ export const getBusinessDraftPreview = createServerFn({ method: "GET" })
         ? { type: String(contact.type), value: String(contact.value), label: contact.label ?? null }
         : null,
       provenance: "published",
+      menu,
       products: (products ?? []).map((p: any) => ({
         id: p.id,
         slug: p.slug,

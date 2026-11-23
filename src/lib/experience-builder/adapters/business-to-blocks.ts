@@ -14,6 +14,11 @@ import { resolveBusinessVariant } from "@/components/surfaces/BusinessSurface";
 import type { MarketplaceBusinessDetail } from "@/lib/catalog/marketplace-reads.functions";
 import type { ExperienceHeroDTO } from "@/lib/experience-builder/blocks/experience-hero/contract";
 import type { ExperienceSubnavDTO } from "@/lib/experience-builder/blocks/experience-subnav/contract";
+import {
+  EXPERIENCE_MENU_CONTRACT_VERSION,
+  type ExperienceMenuDTO,
+} from "@/lib/experience-builder/blocks/experience-menu/contract";
+import { MENU_TAGS, type MenuTag } from "@/lib/menu/menu-model";
 import { EXPERIENCE_SUBNAV_PRESETS } from "@/lib/experience-builder/blocks/experience-subnav/contract";
 import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/experience-section/contract";
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
@@ -68,6 +73,45 @@ export function businessToSubnavDTO(b: MarketplaceBusinessDetail): ExperienceSub
     ariaLabel: "Secciones de la ficha",
     anchors: EXPERIENCE_SUBNAV_PRESETS.business.filter((a) => a.id !== "promociones" || showPromos),
     capabilities: { scrollSpy: true, collapseOnMobile: true, showIcons: false },
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Menu — carta publicada (restaurantes y cafeterías). Sin carta, null.
+ * ------------------------------------------------------------------ */
+export function businessToMenuDTO(b: MarketplaceBusinessDetail): ExperienceMenuDTO | null {
+  const items = (b.menu ?? []).filter((i) => i.name.trim().length > 0);
+  if (items.length === 0) return null;
+  const sections: ExperienceMenuDTO["sections"] = [];
+  for (const item of items) {
+    const title = item.section.trim() || "Carta";
+    let section = sections.find((s) => s.title === title);
+    if (!section) {
+      section = { id: `menu-${sections.length + 1}`, title, items: [] };
+      sections.push(section);
+    }
+    const amount = item.price_amount;
+    const priceLabel =
+      amount === null || !Number.isFinite(amount)
+        ? null
+        : `$${Number.isInteger(amount) ? amount : amount.toFixed(2)}${item.price_currency === "USD" ? " USD" : ""}`;
+    section.items.push({
+      name: item.name,
+      description: item.description,
+      priceLabel,
+      tags: item.tags
+        .filter((t): t is MenuTag => t in MENU_TAGS)
+        .map((t) => MENU_TAGS[t]),
+    });
+  }
+  return {
+    contractVersion: EXPERIENCE_MENU_CONTRACT_VERSION,
+    variant: "sections",
+    heading: "Menú",
+    ariaLabel: `Menú de ${b.display_name}`,
+    sections,
+    footnote: `Precios de referencia publicados por ${b.display_name}. No se cobra en línea.`,
+    capabilities: { previewPerSection: 4 },
   };
 }
 

@@ -21,6 +21,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildCanonicalEntityUrl } from "@/lib/experience-builder/canonical-entity-binding";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
 import { computeOpenNow } from "@/lib/business/open-now";
+import {
+  menuFactsFor,
+  menuSearchText,
+  normalizeMenuItems,
+  type MenuItem,
+} from "@/lib/menu/menu-model";
 import { PUEBLOS_MAGICOS_AUTORIZADOS } from "@/lib/experience-builder/blocks/experience-institutional-badges/institutional-badges.registry";
 import {
   loadAluxCanonicalCandidates,
@@ -354,6 +360,58 @@ function attributeFacts(raw: unknown): {
 
 /* ─────────────────────────── carga por destino ─────────────────────────── */
 
+/** Páginas de 1,000 platillos por destino (≈ 50 restaurantes × 100 opciones). */
+const MENU_SCAN_PAGES = 6;
+
+/**
+ * Carta publicada de las empresas del destino, agrupada por empresa. Sirve
+ * para encontrar el negocio por lo que trae su carta y para citar platillos
+ * con precio de referencia (nunca venta en línea).
+ */
+async function loadMenusFor(
+  sb: SupabaseClient,
+  destinationId: string,
+): Promise<Map<string, MenuItem[]>> {
+  const out = new Map<string, MenuItem[]>();
+  try {
+    for (let page = 0; page < MENU_SCAN_PAGES; page++) {
+      const { data, error } = await sb
+        .from("business_menu_items")
+        .select(
+          "business_id, section, name, description, price_amount, price_currency, tags, businesses!inner(destination_id)",
+        )
+        .eq("businesses.destination_id", destinationId)
+        .eq("is_available", true)
+        .order("business_id", { ascending: true })
+        .order("section_order", { ascending: true })
+        .order("sort_order", { ascending: true })
+        .range(page * 1000, page * 1000 + 999);
+      if (error || !data) break;
+      for (const row of data as Array<Record<string, unknown>>) {
+        const bid = String(row["business_id"]);
+        const [item] = normalizeMenuItems([
+          {
+            section: row["section"],
+            name: row["name"],
+            description: row["description"],
+            priceAmount: row["price_amount"],
+            priceCurrency: row["price_currency"],
+            tags: row["tags"],
+          },
+        ]);
+        if (!item) continue;
+        const arr = out.get(bid) ?? [];
+        arr.push(item);
+        out.set(bid, arr);
+      }
+      if (data.length < 1000) break;
+    }
+  } catch {
+    /* Sin carta: Alux sigue con la ficha. */
+  }
+  return out;
+}
+
 async function loadBusinessesFor(
   sb: SupabaseClient,
   destination: ConverseDestination,
@@ -377,9 +435,10 @@ async function loadBusinessesFor(
     .eq(...PUBLIC_BUSINESS_ELIGIBILITY_EQ)
     .order("display_name", { ascending: true });
   if (requiredIds) query = query.in("id", [...requiredIds]);
-  const { data, error } = await query.limit(
-    requiredIds ? Math.max(1, requiredIds.length) : BUSINESS_SCAN_LIMIT,
-  );
+  const [{ data, error }, menus] = await Promise.all([
+    query.limit(requiredIds ? Math.max(1, requiredIds.length) : BUSINESS_SCAN_LIMIT),
+    loadMenusFor(sb, destination.id),
+  ]);
   if (error || !data) return { candidates: [], ids: [], index: new Map() };
 
   const allRows = (data as Array<Record<string, unknown>>).map((row) => {
@@ -423,7 +482,14 @@ async function loadBusinessesFor(
           terms: priority.terms,
           idOf: (r) => r.id,
           nameOf: (r) => r.name,
-          textOf: (r) => [r.name, r.tagline ?? "", r.description ?? "", r.categoryName].join(" "),
+          textOf: (r) =>
+            [
+              r.name,
+              r.tagline ?? "",
+              r.description ?? "",
+              r.categoryName,
+              menuSearchText(menus.get(r.id) ?? []),
+            ].join(" "),
           weightOf: (r) => priority.weights.get(r.id) ?? 0,
           qualityOf: (r) => quality.get(r.id) ?? 0,
         },
@@ -475,13 +541,16 @@ async function loadBusinessesFor(
     const facts: AluxConverseFact[] = [];
     const unavailable: AluxUnavailableFactKind[] = [];
     if (r.categoryName) facts.push(fact(`Categoría: ${r.categoryName}`));
+    /* La carta va al frente: es lo que responde «¿dónde hay…?». */
+    const menuFacts = menuFactsFor(menus.get(r.id) ?? [], priority.terms);
+    for (const line of menuFacts) facts.push(fact(line));
     const open = openStateFrom(hoursBy.get(r.id));
     if (open.label) facts.push(fact(open.label));
     else unavailable.push("horario");
     const attrs = attributeFacts(r.attrs);
     facts.push(...attrs.facts);
     if (!attrs.hasAccess) unavailable.push("accesibilidad");
-    if (!attrs.hasPrice) unavailable.push("precio");
+    if (!attrs.hasPrice && menuFacts.length === 0) unavailable.push("precio");
     if (!coordsBy.has(r.id)) unavailable.push("distancia");
     unavailable.push("disponibilidad", "reconocimientos");
     const summary = sanitizeCmsText(r.tagline ?? r.description, 140) || null;

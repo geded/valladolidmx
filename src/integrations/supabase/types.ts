@@ -1377,6 +1377,72 @@ export type Database = {
           },
         ]
       }
+      business_menu_items: {
+        Row: {
+          business_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_available: boolean
+          name: string
+          price_amount: number | null
+          price_currency: string
+          section: string
+          section_order: number
+          sort_order: number
+          tags: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_available?: boolean
+          name: string
+          price_amount?: number | null
+          price_currency?: string
+          section?: string
+          section_order?: number
+          sort_order?: number
+          tags?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_available?: boolean
+          name?: string
+          price_amount?: number | null
+          price_currency?: string
+          section?: string
+          section_order?: number
+          sort_order?: number
+          tags?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_menu_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_menu_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_monthly_reports: {
         Row: {
           business_id: string
