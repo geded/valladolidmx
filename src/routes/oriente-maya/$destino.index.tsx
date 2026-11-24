@@ -1,3 +1,4 @@
+import { publicReadMemo } from "@/lib/server/public-read-memo";
 /**
  * /oriente-maya/{destino} — Ficha pública de Destino (SSR).
  *
@@ -62,8 +63,7 @@ function buildDestinationContext(slug: string, displayName: string): RouteContex
   });
 }
 
-export const Route = createFileRoute("/oriente-maya/$destino/")({
-  loader: async ({ params }) => {
+async function loadDestinationPage(params: { destino: string }) {
     const [
       db,
       related,
@@ -133,7 +133,11 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
       routes,
       listingFamilyTaxonomy,
     };
-  },
+}
+
+export const Route = createFileRoute("/oriente-maya/$destino/")({
+  loader: ({ params }) =>
+    publicReadMemo(`destination-page:${params.destino}`, () => loadDestinationPage(params)),
   head: ({ loaderData, params }) =>
     loaderData
       ? buildPublicHead({
