@@ -105,15 +105,23 @@ function serve<T>(key: string, hit: Entry, fn: () => Promise<T>): T {
   return hit.value as T;
 }
 
-export async function publicReadMemo<T>(key: string, fn: () => Promise<T>): Promise<T> {
+export async function publicReadMemo<T>(
+  key: string,
+  fn: () => Promise<T>,
+  options: { maxAgeMs?: number; staleWhileRevalidate?: boolean } = {},
+): Promise<T> {
   if (typeof window !== "undefined") return fn();
   const changed = await cmsChangedAt();
+  const maxAge = options.maxAgeMs ?? STALE_MS;
+  const reuse = (hit: Entry) => options.staleWhileRevalidate === false
+    ? hit.value as T
+    : serve(key, hit, fn);
   const local = store.get(key);
-  if (local && local.at > changed && Date.now() - local.at < STALE_MS) return serve(key, local, fn);
+  if (local && local.at > changed && Date.now() - local.at < maxAge) return reuse(local);
   const shared = await readShared(key);
-  if (shared && shared.at > changed && Date.now() - shared.at < STALE_MS) {
+  if (shared && shared.at > changed && Date.now() - shared.at < maxAge) {
     remember(key, shared);
-    return serve(key, shared, fn);
+    return reuse(shared);
   }
   return load(key, fn);
 }

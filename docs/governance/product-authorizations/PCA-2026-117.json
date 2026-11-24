@@ -1,0 +1,21 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-117",
+  "title": "Inicio y Valladolid: reutilización acotada de HTML público",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Founder 2026-11-24 21:09 UTC: «Autorizado» a mejorar carga de Inicio/Valladolid y buscar entrega de páginas ya armadas. Delta exclusivamente de transporte sobre public_read_cache existente; sin rediseño, cambios CMS, migraciones, publicaciones ni ranking comercial.",
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/cache/public-read-memo.ts" },
+    { "operation": "modify", "path": "src/lib/cache/AGENTS.md" },
+    { "operation": "modify", "path": "src/lib/server/public-page-cache.ts" },
+    { "operation": "modify", "path": "src/start.ts" }
+  ],
+  "public_routes": ["/", "/oriente-maya/valladolid"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bunx vitest run scripts/cache/public-html.test.ts scripts/cache/public-read-memo-cms-change.test.ts scripts/cache/page-warm.test.ts scripts/navigation/public-page-cache.test.ts scripts/media/signed-urls-memo.test.ts",
+    "Comparación completa de Inicio y Valladolid en 1440/834/430/390"
+  ]
+}

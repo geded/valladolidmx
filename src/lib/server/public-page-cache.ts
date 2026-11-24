@@ -4,6 +4,9 @@
  * así que la misma página sirve a todos los visitantes. Fresca 60 s; hasta
  * 10 min se entrega al instante y se renueva en segundo plano.
  */
+import { publicReadMemo } from "../cache/public-read-memo";
+import { Buffer } from "node:buffer";
+
 const FRESH_MS = 60_000;
 const STALE_MS = 10 * 60_000;
 const STAMP = "x-vmx-cached-at";
@@ -20,7 +23,54 @@ export function isCacheablePageRequest(request: Request): boolean {
   if (/\.[a-z0-9]{2,5}$/i.test(url.pathname)) return false;
   if (/(?:^|&)(?:preview|draft|nocache|sw)=/.test(url.search.slice(1))) return false;
   if (request.headers.has("authorization")) return false;
+  if (request.headers.has("cookie")) return false;
   return true;
+}
+
+/** Piloto acotado: ninguna búsqueda, presentación editorial o sesión compartida. */
+export function isSharedHtmlRequest(request: Request): boolean {
+  const url = new URL(request.url);
+  return isCacheablePageRequest(request) && !url.search &&
+    ["/", "/oriente-maya/valladolid", "/oriente-maya/valladolid/"].includes(url.pathname) &&
+    !/no-cache|no-store|max-age=0/i.test(request.headers.get("cache-control") ?? "") &&
+    request.headers.get("pragma") !== "no-cache";
+}
+
+type HtmlCopy = { bodyBase64: string; headers: [string, string][] };
+class UncacheableHtml extends Error {
+  constructor(readonly response: Response) { super("Uncacheable public response"); }
+}
+
+export async function serveSharedHtml(request: Request, render: () => Promise<Response>): Promise<Response> {
+  // Se reutiliza la tabla y el invalidado CMS existentes; no hay otro almacén.
+  const build = String(import.meta.env["VMX_HTML_BUILD_ID"] ?? "dev");
+  const key = `public-html:base64:${build}:${request.url}:${request.headers.get("accept-language") ?? ""}`;
+  let rendered = false;
+  try {
+    const copy = await publicReadMemo<HtmlCopy>(key, async () => {
+      rendered = true;
+      const response = await render();
+      const vary = (response.headers.get("vary") ?? "").toLowerCase();
+      if (!isStorableResponse(response) || (vary && vary !== "accept-encoding") ||
+          response.headers.has("content-encoding")) throw new UncacheableHtml(response);
+      // Sólo dos documentos públicos, con tamaño acotado. No comprime respuestas.
+      const body = await response.clone().text();
+      if (new TextEncoder().encode(body).length > 1_000_000) throw new UncacheableHtml(response);
+      const headers = Array.from(response.headers.entries()).filter(([name]) =>
+        !["content-length", "transfer-encoding", "connection", "date"].includes(name.toLowerCase()),
+      );
+      // SSR puede incluir NUL en su stream serializado: JSONB no admite NUL.
+      return { bodyBase64: Buffer.from(body, "utf8").toString("base64"), headers };
+    }, { maxAgeMs: FRESH_MS, staleWhileRevalidate: false });
+    const out = new Response(Buffer.from(copy.bodyBase64, "base64").toString("utf8"), { headers: copy.headers });
+    // No sumar otra vida en CDN/navegador: CMS invalida la única copia compartida.
+    out.headers.set("cache-control", "no-store");
+    out.headers.set("x-vmx-html", rendered ? "MISS" : "HIT");
+    return out;
+  } catch (error) {
+    if (error instanceof UncacheableHtml) return error.response;
+    throw error;
+  }
 }
 
 export function isStorableResponse(response: Response): boolean {
@@ -53,6 +103,8 @@ export async function servePublicPage(
   ctx: Ctx,
   render: () => Promise<Response>,
 ): Promise<Response> {
+  // El middleware Start cubre también el preview. No apilar la copia del borde.
+  if (["/", "/oriente-maya/valladolid", "/oriente-maya/valladolid/"].includes(new URL(request.url).pathname)) return render();
   const cache = edgeCache();
   if (!cache || !isCacheablePageRequest(request)) return render();
   const key = cacheKey(request);

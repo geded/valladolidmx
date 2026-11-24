@@ -15,6 +15,8 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    // La copia HTML nunca cruza publicaciones con chunks de otra versión.
+    define: { "import.meta.env.VMX_HTML_BUILD_ID": JSON.stringify(Date.now().toString(36)) },
     plugins: [
       mcpPlugin(),
       VitePWA({

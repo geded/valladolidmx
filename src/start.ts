@@ -22,7 +22,14 @@ const errorMiddleware = createMiddleware().server(async ({ request, next }) => {
   }
 });
 
+// The same request boundary runs in preview and after publishing.
+const publicHtmlMiddleware = createMiddleware().server(async ({ request, next }) => {
+  const { isSharedHtmlRequest, serveSharedHtml } = await import("./lib/server/public-page-cache");
+  if (!isSharedHtmlRequest(request)) return next();
+  return serveSharedHtml(request, async () => (await next()).response);
+});
+
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],
-  requestMiddleware: [errorMiddleware],
+  requestMiddleware: [errorMiddleware, publicHtmlMiddleware],
 }));

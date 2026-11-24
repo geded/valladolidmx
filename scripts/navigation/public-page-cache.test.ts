@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isCacheablePageRequest, isStorableResponse } from "../../src/lib/server/public-page-cache";
+import { isCacheablePageRequest, isSharedHtmlRequest, isStorableResponse } from "../../src/lib/server/public-page-cache";
 const page = (path: string, extra: Record<string, string> = {}) =>
   new Request(`https://x.mx${path}`, { headers: { accept: "text/html", ...extra } });
 describe("copia breve de páginas públicas", () => {
@@ -15,5 +15,14 @@ describe("copia breve de páginas públicas", () => {
     expect(isStorableResponse(new Response("x", { headers: { "content-type": "text/html", "set-cookie": "a=1" } }))).toBe(false);
     expect(isStorableResponse(new Response("x", { status: 500, headers: { "content-type": "text/html" } }))).toBe(false);
     expect(isStorableResponse(new Response("x", { headers: { "content-type": "text/html" } }))).toBe(true);
+  });
+  it("solo comparte Inicio y Valladolid sin sesión ni filtros", () => {
+    expect(isSharedHtmlRequest(page("/"))).toBe(true);
+    expect(isSharedHtmlRequest(page("/oriente-maya/valladolid"))).toBe(true);
+    for (const path of ["/hoteles", "/oriente-maya/izamal", "/?destino=izamal", "/oriente-maya/valladolid?presentacion=cinematografica"])
+      expect(isSharedHtmlRequest(page(path))).toBe(false);
+    expect(isSharedHtmlRequest(page("/", { cookie: "session=test" }))).toBe(false);
+    expect(isSharedHtmlRequest(page("/", { authorization: "Bearer test" }))).toBe(false);
+    expect(isSharedHtmlRequest(page("/", { "cache-control": "no-cache" }))).toBe(false);
   });
 });

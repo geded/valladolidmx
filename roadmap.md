@@ -1,5 +1,10 @@
 # Roadmap
 
+## Velocidad de Inicio y Valladolid · 2026-11-24
+- [x] Reutilizar HTML público ya renderizado en la caché existente, limitado a Inicio y Valladolid; excluir sesiones, filtros, borradores y respuestas privadas.
+- [x] Conservar invalidación CMS, versiones de publicación, fotos, orden editorial y reglas de visibilidad; 13 pruebas PASS y comparación completa en 1440/834/430/390 sin cambios de contenido ni geometría.
+- [ ] Medir después de publicar (espera publicación del Founder); la meta de 1,000 visitantes simultáneos aún no está certificada. Constructor autenticado y gobernanza global con revisiones históricas pendientes no certificados; informe en docs/public-speed-2026-11-24.md.
+
 ## Alta de Copalli Café · 2026-11-23
 - [x] Ficha con datos de Google, horario, contacto y carta de bebidas (74 opciones).
 - [x] Logo, portada y 9 fotos de su Facebook subidos desde el CMS.
