@@ -167,8 +167,7 @@ export const BUSINESS_FIELDS: EditorField[] = [
     name: "slug",
     label: "Dirección web",
     type: "text",
-    required: true,
-    helpText: "Final de la dirección de la página, p. ej. casa-azul. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
+    helpText: "Opcional. Si la dejas vacía, se crea sola a partir del nombre público. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
   },
   {
     name: "destination_id",

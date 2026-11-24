@@ -322,6 +322,56 @@ async function logCmsAudit(
   }
 }
 
+/* ─────────────  Dirección web automática en altas de empresa  ───────────── */
+/**
+ * El alta de una empresa ya no exige escribir la dirección web: si el
+ * editor la deja vacía, se genera a partir del nombre público y se le
+ * añade un sufijo numérico cuando ya existe otra empresa con la misma.
+ * Sólo aplica en el alta (insert); una dirección ya guardada jamás se
+ * reescribe sola.
+ */
+function slugifyBusinessName(value: string): string {
+  return value
+    .normalize("NFD")
+    /* Diacríticos combinantes (U+0300–U+036F), igual que
+       `slugifySegment` de seo-landing-creation. */
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+}
+
+async function ensureBusinessSlug(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  clean: Record<string, unknown>,
+): Promise<void> {
+  const current = typeof clean.slug === "string" ? clean.slug.trim() : "";
+  if (current) {
+    clean.slug = current;
+    return;
+  }
+  const base =
+    slugifyBusinessName(String(clean.display_name ?? "")) ||
+    slugifyBusinessName(String(clean.legal_name ?? "")) ||
+    "empresa";
+  const { data: taken } = await db
+    .from("businesses")
+    .select("slug")
+    .ilike("slug", `${base}%`);
+  const used = new Set(
+    (taken ?? []).map((r: { slug: string }) => r.slug.toLowerCase()),
+  );
+  let candidate = base;
+  let n = 2;
+  while (used.has(candidate)) {
+    candidate = `${base}-${n}`;
+    n += 1;
+  }
+  clean.slug = candidate;
+}
+
 /* ─────────────────────────  Upsert genérico  ────────────────────────── */
 
 interface UpsertInput {
@@ -373,6 +423,9 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
     }
 
     await assertBusinessRules(data.table, "insert", clean, context);
+    if (data.table === "businesses") {
+      await ensureBusinessSlug(db, clean);
+    }
     const { data: row, error } = await db
       .from(data.table)
       .insert({
