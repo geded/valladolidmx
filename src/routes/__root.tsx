@@ -17,6 +17,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/context";
 import { AuthProvider } from "@/hooks/useAuth";
+import { useInAppLinks } from "@/lib/navigation/in-app-links";
 import { PublicHeader, PublicFooter, OfflineBanner } from "@/components/discovery";
 // H2·P3 · C1 — Lazy Toaster: `sonner` y su `<Toaster />` sólo se
 // descargan cuando el shim `@/lib/toast` dispara el primer toast, o
@@ -404,6 +405,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useInAppLinks(useRouter());
   const rootData = Route.useLoaderData() as
     | {
         omxdsVisualFoundationsEnabled: boolean;

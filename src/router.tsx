@@ -45,7 +45,10 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
+    // Al tocar o señalar un enlace se adelanta la siguiente página; lo
+    // adelantado sirve 30 s para que el clic no la vuelva a pedir.
+    defaultPreload: "intent",
+    defaultPreloadStaleTime: 30_000,
     defaultErrorComponent: DefaultErrorComponent,
   });
 

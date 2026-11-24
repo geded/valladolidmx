@@ -620,3 +620,5 @@
 - [x] Dirección web `el-cuyo` y nombre «El Cuyo» corregidos; el destino ya se ve.
 - [x] Arreglar todo lo de El Cuyo: frase corta, puntos destacados separados y nombres de dos hoteles.
 - [x] Las empresas no se dejaban abrir desde la página del destino (enlace antiguo mandaba a Oriente Maya); ahora abren su ficha en todos los destinos.
+
+- [x] Velocidad al tocar empresas y destinos: enlaces internos sin recargar el sitio, carga adelantada al tocar y una sola lectura reutilizable por ficha.

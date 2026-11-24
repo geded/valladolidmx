@@ -7,6 +7,8 @@
  * Nada de UX profunda ni composición nueva: eso llega en N2.2.
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { publicReadMemo } from "@/lib/cache/public-read-memo";
 import { getEvaluationLotSlugs } from "@/lib/omxds/evaluation-lot.functions";
 import { isInEvaluationLot } from "@/lib/omxds/evaluation-lot";
 import { getNonDiscoverableBusinessSlugs } from "@/lib/omxds/public-eligibility.functions";
@@ -36,8 +38,9 @@ import {
 } from "@/lib/businesses/business-copy-resolution";
 import { bindBusinessRoute } from "@/lib/experience-builder/canonical-entity-binding";
 
-export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
-  loader: async ({ params }) => {
+type BusinessPageParams = { destino: string; categoria: string; empresa: string };
+
+async function loadBusinessPage(params: BusinessPageParams) {
     const resolution = await resolveTerritorialPath({
       data: {
         destino: params.destino,
@@ -45,7 +48,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
         empresa: params.empresa,
       },
     });
-    if (resolution.reason !== "ok" || !resolution.business) throw notFound();
+    if (resolution.reason !== "ok" || !resolution.business) return null;
     const [business, specific, template, surfaceContractsEnabled, evaluationLot, nonDiscoverable] =
       await Promise.all([
         getMarketplaceBusinessBySlug({ data: { slug: params.empresa } }),
@@ -65,7 +68,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
         // G8-R1-F1I-R1 · DEF-F1I-001 — revisión de fuente no aprobada ⇒ noindex.
         getNonDiscoverableBusinessSlugs().catch(() => [] as readonly string[]),
       ]);
-    if (!business) throw notFound();
+    if (!business) return null;
     // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
     // (fail-closed dentro del evaluador: published, is_demo_seed=false, grant
     // activo, plan efectivo, procedencia portal, auditoría, ubicación,
@@ -111,6 +114,29 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
         // G8-R1-F1I-R1 · empresa publicada sin revisión de fuente aprobada.
         (nonDiscoverable ?? []).includes(params.empresa),
     };
+}
+
+/** Una sola petición por ficha, con la copia breve compartida del servidor
+ *  (lecturas públicas): tocar una empresa ya no espera cuatro idas y vueltas. */
+const getBusinessPage = createServerFn({ method: "GET" })
+  .inputValidator((d: BusinessPageParams) => ({
+    destino: String(d.destino),
+    categoria: String(d.categoria),
+    empresa: String(d.empresa),
+  }))
+  .handler(({ data }) =>
+    publicReadMemo(`business-page:${data.destino}/${data.categoria}/${data.empresa}`, () =>
+      loadBusinessPage(data),
+    ),
+  );
+
+export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa/")({
+  loader: async ({ params }) => {
+    const page = await getBusinessPage({
+      data: { destino: params.destino, categoria: params.categoria, empresa: params.empresa },
+    });
+    if (!page) throw notFound();
+    return page;
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [], links: [], scripts: [] };

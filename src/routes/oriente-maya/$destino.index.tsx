@@ -1,4 +1,5 @@
 import { publicReadMemo } from "@/lib/cache/public-read-memo";
+import { createServerFn } from "@tanstack/react-start";
 /**
  * /oriente-maya/{destino} — Ficha pública de Destino (SSR).
  *
@@ -86,7 +87,7 @@ async function loadDestinationPage(params: { destino: string }) {
       listPublicRoutes({ data: { destino: null, limit: 24 } }).catch(() => []),
       getListingFamilyTaxonomy().catch(() => ({ available: false as const, taxonomy: {} })),
     ]);
-    if (!db) throw notFound();
+    if (!db) return null;
     const dest = {
       slug: params.destino,
       name: db?.name ?? params.destino,
@@ -135,9 +136,20 @@ async function loadDestinationPage(params: { destino: string }) {
     };
 }
 
+/** Una sola petición por destino, con la copia breve compartida del
+ *  servidor: al navegar dentro del sitio ya no se esperan nueve lecturas. */
+const getDestinationPage = createServerFn({ method: "GET" })
+  .inputValidator((d: { destino: string }) => ({ destino: String(d.destino) }))
+  .handler(({ data }) =>
+    publicReadMemo(`destination-page:${data.destino}`, () => loadDestinationPage(data)),
+  );
+
 export const Route = createFileRoute("/oriente-maya/$destino/")({
-  loader: ({ params }) =>
-    publicReadMemo(`destination-page:${params.destino}`, () => loadDestinationPage(params)),
+  loader: async ({ params }) => {
+    const page = await getDestinationPage({ data: { destino: params.destino } });
+    if (!page) throw notFound();
+    return page;
+  },
   head: ({ loaderData, params }) =>
     loaderData
       ? buildPublicHead({
