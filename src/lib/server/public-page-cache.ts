@@ -27,11 +27,18 @@ export function isCacheablePageRequest(request: Request): boolean {
   return true;
 }
 
+/** Inicio, Oriente Maya, cada destino, sus listados y los listados generales. */
+const SHARED_HTML_PATH =
+  /^\/(?:|oriente-maya(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+)?)?|hoteles|restaurantes|experiencias|casas-de-vacaciones|eventos|sitios-de-interes)\/?$/;
+export function isSharedHtmlPath(pathname: string): boolean {
+  return SHARED_HTML_PATH.test(pathname);
+}
+
 /** Piloto acotado: ninguna búsqueda, presentación editorial o sesión compartida. */
 export function isSharedHtmlRequest(request: Request): boolean {
   const url = new URL(request.url);
   return isCacheablePageRequest(request) && !url.search &&
-    ["/", "/oriente-maya/valladolid", "/oriente-maya/valladolid/"].includes(url.pathname) &&
+    isSharedHtmlPath(url.pathname) &&
     !/no-cache|no-store|max-age=0/i.test(request.headers.get("cache-control") ?? "") &&
     request.headers.get("pragma") !== "no-cache";
 }
@@ -114,7 +121,7 @@ export async function servePublicPage(
   render: () => Promise<Response>,
 ): Promise<Response> {
   // El middleware Start cubre también el preview. No apilar la copia del borde.
-  if (["/", "/oriente-maya/valladolid", "/oriente-maya/valladolid/"].includes(new URL(request.url).pathname)) return render();
+  if (isSharedHtmlPath(new URL(request.url).pathname)) return render();
   const cache = edgeCache();
   if (!cache || !isCacheablePageRequest(request)) return render();
   const key = cacheKey(request);
