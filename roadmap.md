@@ -615,3 +615,8 @@
   - Opción 1 · Compartir calendarios (iCal): el hotel pega el enlace de Airbnb/Booking en su panel y viceversa; solo pasa «ocupado/libre», no precios ni datos del huésped; actualización cada pocas horas; el hotel sigue confirmando cada reserva.
   - Opción 2 · Gestor de canales (Cloudbeds, SiteMinder): conexión completa con precios, cupos y reservas al instante; requiere que el hotel contrate el servicio; conviene a hoteles con más habitaciones.
   - El calendario actual (noches, stock por habitación, precio por día, bloqueos) ya tiene la estructura que ambas opciones necesitan; se agrega como opción aditiva sin rehacer nada.
+
+## El Cuyo (2026-11-24)
+- [x] Dirección web `el-cuyo` y nombre «El Cuyo» corregidos; el destino ya se ve.
+- [x] Arreglar todo lo de El Cuyo: frase corta, puntos destacados separados y nombres de dos hoteles.
+- [x] Las empresas no se dejaban abrir desde la página del destino (enlace antiguo mandaba a Oriente Maya); ahora abren su ficha en todos los destinos.

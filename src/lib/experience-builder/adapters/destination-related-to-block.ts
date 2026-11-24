@@ -16,6 +16,7 @@ import type {
   ExperienceRelatedItem,
 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
 import { EXPERIENCE_RELATED_ITEM_V11_DEFAULTS as V11 } from "@/lib/experience-builder/blocks/experience-related-collection/contract";
+import { resolveCanonicalPath } from "@/lib/navigation";
 
 /** Mapea empresas del marketplace a items universales. */
 export function destinationRelatedBucketToItems(
@@ -30,7 +31,15 @@ export function destinationRelatedBucketToItems(
     title: b.display_name,
     subtitle: null,
     description: b.tagline || null,
-    href: `/marketplace/${b.slug}`,
+    href:
+      b.destination_slug && b.category_slug
+        ? resolveCanonicalPath({
+            kind: "business",
+            slug: b.slug,
+            category: b.category_slug,
+            destination: b.destination_slug,
+          })
+        : `/marketplace/${b.slug}`,
     imageUrl: b.cover_url ?? null,
     imageAsset: b.cover_asset,
     imageAlt: b.display_name,
