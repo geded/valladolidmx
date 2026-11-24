@@ -3,7 +3,32 @@
  * ganchos cron. Registra cada RPC y cada escritura sin tocar la red ni la
  * base real: el "transporte" (`enqueue_email`) es un contador.
  */
+import { mock } from "bun:test";
 import type { CronSupabase } from "../../src/lib/cron/cron-hook-auth.server";
+
+// El envío ya no usa la cola `enqueue_email`: va directo al servicio de correo.
+// En pruebas, ese envío se redirige al cliente simulado como la RPC de siempre,
+// así el contador y el bloqueo en simulación siguen cubriendo el transporte.
+mock.module("../../src/lib/email/managed-send.server", () => ({
+  sendManagedPayload: async (
+    client: {
+      rpc: (fn: string, args: unknown) => Promise<{ error: { message: string } | null }>;
+      from: (t: string) => { insert: (row: unknown) => Promise<unknown> };
+    },
+    args: { payload: { to: string; label?: string; message_id?: string } },
+  ) => {
+    const { error } = await client.rpc("enqueue_email", args);
+    if (error) return { error };
+    // Igual que el envío real: deja constancia en el registro de correos.
+    await client.from("email_send_log").insert({
+      message_id: args.payload.message_id ?? null,
+      template_name: args.payload.label ?? "unknown",
+      recipient_email: args.payload.to,
+      status: "sent",
+    });
+    return { error: null };
+  },
+}));
 
 export type FakeResp<T = unknown> = { data: T; error: { message: string } | null };
 
