@@ -676,6 +676,62 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
       pErr = prodsFailed && prodRows.length === 0 ? new Error("products_failed") : null;
     }
 
+    /* La página del destino muestra pocas tarjetas por sección: se eligen
+       con los paquetes de visibilidad y destacados vigentes, y sólo esas
+       viajan a la página (la lista completa vive en «Ver hoteles», etc.). */
+    if (bizIds.length > 0) {
+      const [vizRows, spotRows] = await Promise.all([
+        selectInChunks<Record<string, unknown>>(bizIds, (chunk) =>
+          sb
+            .from("business_effective_visibility")
+            .select("business_id, levers, is_default")
+            .in("business_id", chunk),
+        ).catch(() => [] as Record<string, unknown>[]),
+        selectInChunks<Record<string, unknown>>(bizIds, (chunk) =>
+          sb.from("active_founder_spotlights").select("business_id, boost").in("business_id", chunk),
+        ).catch(() => [] as Record<string, unknown>[]),
+      ]);
+      const boostById = new Map<string, number>();
+      for (const v of vizRows) {
+        if (v.is_default === true) continue;
+        const levers = (v.levers as Record<string, unknown> | null) ?? {};
+        const boost = Number(levers.discovery_boost ?? levers.search_weight ?? 0);
+        if (Number.isFinite(boost) && boost > 0) boostById.set(String(v.business_id), boost);
+      }
+      const spotlighted = new Set(spotRows.map((r) => String(r.business_id)));
+      const withCover = new Set((bmedia ?? []).map((r) => String(r.business_id)));
+      const { pickDestinationSection, destinationSectionSeed } = await import(
+        "@/lib/destinations/destination-rail-order"
+      );
+      const seed = destinationSectionSeed(dest.slug);
+      const describe = (c: MarketplaceBusinessCard) => ({
+        id: c.id,
+        hasCover: withCover.has(c.id),
+        visibilityBoost: boostById.get(c.id) ?? 0,
+        pinned: spotlighted.has(c.id),
+      });
+      grouped.hoteles = pickDestinationSection(grouped.hoteles, describe, seed);
+      grouped.restaurantes = pickDestinationSection(grouped.restaurantes, describe, seed);
+      grouped.experiencias = pickDestinationSection(grouped.experiencias, describe, seed);
+      // Los fijados por el editor en este destino conservan su lugar al frente.
+      const editorPinned = new Set(pinnedIds.business);
+      const pinnedHead = grouped.otras.filter((c) => editorPinned.has(c.id));
+      grouped.otras = [
+        ...pinnedHead,
+        ...pickDestinationSection(
+          grouped.otras.filter((c) => !editorPinned.has(c.id)),
+          describe,
+          seed,
+        ),
+      ];
+      const kept = new Set(
+        [...grouped.hoteles, ...grouped.restaurantes, ...grouped.experiencias, ...grouped.otras].map(
+          (c) => c.id,
+        ),
+      );
+      bmedia = (bmedia ?? []).filter((r) => kept.has(String(r.business_id)));
+    }
+
     if (bizIds.length > 0 && bmedia && bmedia.length > 0) {
       {
         try {
