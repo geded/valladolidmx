@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { handleCronHook } from "@/lib/cron/cron-hook-auth.server";
-import { runProposalPaymentReminders } from "@/lib/cron/jobs/proposal-payment-reminders.server";
 
 /**
  * Recordatorios de pago de propuestas aceptadas.
@@ -13,7 +12,7 @@ import { runProposalPaymentReminders } from "@/lib/cron/jobs/proposal-payment-re
 export const Route = createFileRoute("/api/public/hooks/proposal-payment-reminders")({
   server: {
     handlers: {
-      POST: ({ request }) => handleCronHook(request, runProposalPaymentReminders),
+      POST: ({ request }) => handleCronHook(request, async (sb, ctx) => (await import("@/lib/cron/jobs/proposal-payment-reminders.server")).runProposalPaymentReminders(sb, ctx)),
     },
   },
 });

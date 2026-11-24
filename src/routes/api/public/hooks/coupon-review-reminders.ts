@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { handleCronHook } from "@/lib/cron/cron-hook-auth.server";
-import { runCouponReviewReminders } from "@/lib/cron/jobs/coupon-review-reminders.server";
 
 /**
  * Ola 6.1 · Cron horario que envía recordatorios de reseña a viajeros que
@@ -13,7 +12,7 @@ import { runCouponReviewReminders } from "@/lib/cron/jobs/coupon-review-reminder
 export const Route = createFileRoute("/api/public/hooks/coupon-review-reminders")({
   server: {
     handlers: {
-      POST: ({ request }) => handleCronHook(request, runCouponReviewReminders),
+      POST: ({ request }) => handleCronHook(request, async (sb, ctx) => (await import("@/lib/cron/jobs/coupon-review-reminders.server")).runCouponReviewReminders(sb, ctx)),
     },
   },
 });

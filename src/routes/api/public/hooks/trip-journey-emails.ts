@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { handleCronHook } from "@/lib/cron/cron-hook-auth.server";
-import { runTripJourneyEmails } from "@/lib/cron/jobs/trip-journey-emails.server";
 
 /**
  * Etapa 8 · Correos del viaje.
@@ -14,7 +13,7 @@ import { runTripJourneyEmails } from "@/lib/cron/jobs/trip-journey-emails.server
 export const Route = createFileRoute("/api/public/hooks/trip-journey-emails")({
   server: {
     handlers: {
-      POST: ({ request }) => handleCronHook(request, runTripJourneyEmails),
+      POST: ({ request }) => handleCronHook(request, async (sb, ctx) => (await import("@/lib/cron/jobs/trip-journey-emails.server")).runTripJourneyEmails(sb, ctx)),
     },
   },
 });

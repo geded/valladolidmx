@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { handleCronHook } from "@/lib/cron/cron-hook-auth.server";
-import { runVisibilityNotifications } from "@/lib/cron/jobs/visibility-notifications.server";
 
 /**
  * Ola 7.9 · Cron diario de notificaciones de ciclo de vida de visibilidad
@@ -13,7 +12,7 @@ import { runVisibilityNotifications } from "@/lib/cron/jobs/visibility-notificat
 export const Route = createFileRoute("/api/public/hooks/visibility-notifications")({
   server: {
     handlers: {
-      POST: ({ request }) => handleCronHook(request, runVisibilityNotifications),
+      POST: ({ request }) => handleCronHook(request, async (sb, ctx) => (await import("@/lib/cron/jobs/visibility-notifications.server")).runVisibilityNotifications(sb, ctx)),
     },
   },
 });

@@ -17,8 +17,6 @@
  *  - La respuesta contiene únicamente contadores: nunca correos, nombres ni ids.
  */
 import * as React from "react";
-import { render } from "@react-email/render";
-import { TEMPLATES } from "@/lib/email-templates/registry";
 import type { CronSupabase } from "@/lib/cron/cron-hook-auth.server";
 
 export const CRON_DRY_RUN_HEADER = "x-cron-dry-run";
@@ -150,6 +148,11 @@ export async function previewCandidate(
     .maybeSingle();
   if (suppressed) return "would_suppress";
 
+  // Plantillas y render de correo se cargan sólo al simular, nunca al abrir páginas.
+  const [{ render }, { TEMPLATES }] = await Promise.all([
+    import("@react-email/render"),
+    import("@/lib/email-templates/registry"),
+  ]);
   const template = TEMPLATES[candidate.templateName];
   if (!template) return "render_failed";
   try {
