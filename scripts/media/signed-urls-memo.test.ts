@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { signedUrlsMemo } from "./signed-url-memo";
+import { signedUrlsMemo } from "../../src/lib/media/signed-url-memo";
 
 describe("signedUrlsMemo", () => {
   it("firma todas las fotos de un bucket en una sola llamada y conserva el orden", async () => {
