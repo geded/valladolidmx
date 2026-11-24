@@ -1,4 +1,4 @@
-import { publicReadMemo } from "@/lib/server/public-read-memo";
+import { publicReadMemo } from "@/lib/cache/public-read-memo";
 /**
  * /oriente-maya/{destino} — Ficha pública de Destino (SSR).
  *
