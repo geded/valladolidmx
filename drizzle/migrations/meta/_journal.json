@@ -204,6 +204,13 @@
       "when": 1795473078722,
       "tag": "0028_store_order_note_fix_type",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1795527206235,
+      "tag": "0029_media_variants_path_index",
+      "breakpoints": true
     }
   ]
 }

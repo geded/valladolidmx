@@ -1,0 +1,2 @@
+CREATE INDEX IF NOT EXISTS idx_media_variants_bucket_path ON public.media_asset_variants (bucket, path, status);
+CREATE INDEX IF NOT EXISTS idx_media_variants_current_ready ON public.media_asset_variants (asset_id) WHERE status = 'ready' AND is_current = true;

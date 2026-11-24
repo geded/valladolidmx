@@ -1,3 +1,4 @@
+import logoSymbol from "@/assets/brand/logo-symbol.png.asset.json";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, queryOptions } from "@tanstack/react-query";
 import {
@@ -356,6 +357,10 @@ function RootShell({ children }: { children: ReactNode }) {
         // Fondo crema desde el primer instante: la app instalada en iPhone
         // mostraba negro mientras llegaban los estilos.
         backgroundColor: "#f9f5ee",
+        backgroundImage: `url("${logoSymbol.url}")`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center 42vh",
+        backgroundSize: "88px auto",
         ...ACTIVE_BRAND_THEME_STYLE,
         ...brandPaletteStyle(brandSettings.palette),
         ...aluxPaletteStyle(brandSettings.aluxPalette),
@@ -368,7 +373,7 @@ function RootShell({ children }: { children: ReactNode }) {
           <script dangerouslySetInnerHTML={{ __html: OMXDS_THEME_BOOTSTRAP }} />
         ) : null}
       </head>
-      <body>
+      <body style={{ minHeight: "100dvh" }}>
         {children}
         <Scripts />
       </body>
