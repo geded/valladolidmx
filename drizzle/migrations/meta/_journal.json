@@ -211,6 +211,13 @@
       "when": 1795527206235,
       "tag": "0029_media_variants_path_index",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1795531209661,
+      "tag": "0030_public_read_cache",
+      "breakpoints": true
     }
   ]
 }

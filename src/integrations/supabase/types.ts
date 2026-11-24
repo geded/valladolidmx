@@ -7359,6 +7359,24 @@ export type Database = {
           },
         ]
       }
+      public_read_cache: {
+        Row: {
+          key: string
+          refreshed_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          refreshed_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          refreshed_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       related_overrides: {
         Row: {
           created_at: string
