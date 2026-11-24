@@ -21,7 +21,10 @@ type StorageClient = {
   };
 };
 
-const MARGIN_MS = 10 * 60_000;
+// Las páginas públicas guardan estos enlaces hasta 30 min (copia stale) más
+// hasta 10 min en el borde: cada enlace entregado debe vivir más que eso.
+const MARGIN_MS = 45 * 60_000;
+const MIN_TTL_S = 2 * 60 * 60;
 const MAX = 2000;
 const memo = new Map<string, { url: string; exp: number }>();
 const inflight = new Map<string, Promise<{ data: { signedUrl: string } | null; error: unknown }>>();
@@ -30,8 +33,9 @@ export async function signedUrlMemo(
   client: StorageClient,
   bucket: string,
   path: string,
-  expiresIn: number,
+  requested: number,
 ): Promise<{ data: { signedUrl: string } | null; error: unknown }> {
+  const expiresIn = Math.max(requested, MIN_TTL_S);
   const key = `${bucket}\u0000${path}\u0000${expiresIn}`;
   const now = Date.now();
   const hit = memo.get(key);
@@ -61,8 +65,9 @@ export async function signedUrlMemo(
 export async function signedUrlsMemo(
   client: StorageClient,
   items: ReadonlyArray<{ bucket: string; path: string }>,
-  expiresIn: number,
+  requested: number,
 ): Promise<Array<string | null>> {
+  const expiresIn = Math.max(requested, MIN_TTL_S);
   const now = Date.now();
   const out: Array<string | null> = items.map(() => null);
   const missing = new Map<string, Array<{ i: number; path: string }>>();
