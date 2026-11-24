@@ -26,6 +26,7 @@ import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LugaresRouteImport } from './routes/lugares'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as MaquetaGaleriaTarjetasRouteImport } from './routes/maqueta-galeria-tarjetas'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as OfflineRouteImport } from './routes/offline'
@@ -371,6 +372,11 @@ const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaquetaGaleriaTarjetasRoute = MaquetaGaleriaTarjetasRouteImport.update({
+  id: '/maqueta-galeria-tarjetas',
+  path: '/maqueta-galeria-tarjetas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -1901,6 +1907,7 @@ export interface FileRoutesByFullPath {
   '/lugares': typeof LugaresRouteWithChildren
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
+  '/maqueta-galeria-tarjetas': typeof MaquetaGaleriaTarjetasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
@@ -2179,6 +2186,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
+  '/maqueta-galeria-tarjetas': typeof MaquetaGaleriaTarjetasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
@@ -2451,6 +2459,7 @@ export interface FileRoutesById {
   '/lugares': typeof LugaresRouteWithChildren
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
+  '/maqueta-galeria-tarjetas': typeof MaquetaGaleriaTarjetasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
@@ -2733,6 +2742,7 @@ export interface FileRouteTypes {
     | '/lugares'
     | '/manifest.webmanifest'
     | '/mapa'
+    | '/maqueta-galeria-tarjetas'
     | '/marketplace'
     | '/mcp'
     | '/offline'
@@ -3011,6 +3021,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/manifest.webmanifest'
     | '/mapa'
+    | '/maqueta-galeria-tarjetas'
     | '/marketplace'
     | '/mcp'
     | '/offline'
@@ -3282,6 +3293,7 @@ export interface FileRouteTypes {
     | '/lugares'
     | '/manifest.webmanifest'
     | '/mapa'
+    | '/maqueta-galeria-tarjetas'
     | '/marketplace'
     | '/mcp'
     | '/offline'
@@ -3564,6 +3576,7 @@ export interface RootRouteChildren {
   LugaresRoute: typeof LugaresRouteWithChildren
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   MapaRoute: typeof MapaRoute
+  MaquetaGaleriaTarjetasRoute: typeof MaquetaGaleriaTarjetasRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   McpRoute: typeof McpRoute
   OfflineRoute: typeof OfflineRoute
@@ -3795,6 +3808,13 @@ declare module '@tanstack/react-router' {
       path: '/mapa'
       fullPath: '/mapa'
       preLoaderRoute: typeof MapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maqueta-galeria-tarjetas': {
+      id: '/maqueta-galeria-tarjetas'
+      path: '/maqueta-galeria-tarjetas'
+      fullPath: '/maqueta-galeria-tarjetas'
+      preLoaderRoute: typeof MaquetaGaleriaTarjetasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -6252,6 +6272,7 @@ const rootRouteChildren: RootRouteChildren = {
   LugaresRoute: LugaresRouteWithChildren,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   MapaRoute: MapaRoute,
+  MaquetaGaleriaTarjetasRoute: MaquetaGaleriaTarjetasRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   McpRoute: McpRoute,
   OfflineRoute: OfflineRoute,
