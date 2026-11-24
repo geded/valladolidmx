@@ -29,7 +29,7 @@ export function isCacheablePageRequest(request: Request): boolean {
 
 /** Inicio, Oriente Maya, cada destino, sus listados y los listados generales. */
 const SHARED_HTML_PATH =
-  /^\/(?:|oriente-maya(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+)?)?|hoteles|restaurantes|experiencias|casas-de-vacaciones|eventos|sitios-de-interes)\/?$/;
+  /^\/(?:|oriente-maya(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+)?)?)?|hoteles|restaurantes|experiencias|casas-de-vacaciones|eventos|sitios-de-interes)\/?$/;
 export function isSharedHtmlPath(pathname: string): boolean {
   return SHARED_HTML_PATH.test(pathname);
 }
