@@ -16,6 +16,7 @@
  *    transición explícita autorizada en este endpoint.
  */
 import { createServerFn } from "@tanstack/react-start";
+import { webAddressProblem } from "./web-address";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertAllowedTransition, type ContentStatus } from "@/lib/cms/workflow";
 
@@ -398,6 +399,8 @@ export const upsertCmsEntity = createServerFn({ method: "POST" })
       await assertEditorial(context);
     }
     const clean = sanitizePayload(data.table, data.payload);
+    const slugProblem = webAddressProblem(clean.slug);
+    if (slugProblem) throw new Error(slugProblem);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const db = context.supabase as any;
