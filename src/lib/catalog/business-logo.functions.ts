@@ -10,6 +10,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -59,9 +60,12 @@ export const getPublicBusinessLogo = createServerFn({ method: "GET" })
 
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: signed } = await supabaseAdmin.storage
-        .from(asset.storage_bucket)
-        .createSignedUrl(asset.storage_path, 3600);
+      const { data: signed } = await signedUrlMemo(
+        supabaseAdmin,
+        asset.storage_bucket,
+        asset.storage_path,
+        3600,
+      );
       return { url: signed?.signedUrl ?? null, name: biz.display_name ?? null } as const;
     } catch {
       return { url: null, name: biz.display_name ?? null } as const;

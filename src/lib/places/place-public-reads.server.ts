@@ -17,6 +17,7 @@ import type {
 import { resolveCanonicalPath } from "@/lib/navigation/canonical-paths";
 import type { PremiumPresentation } from "@/lib/omxds/presentation/presentation";
 import { resolvePlaceAttractionFamily } from "./place-taxonomy";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -84,9 +85,12 @@ async function signPlaceMedia(sb: any, placeId: string): Promise<PublicPlaceMedi
     if (!asset) continue;
     let url: string | null = null;
     if (asset.storage_bucket && asset.storage_path) {
-      const { data: signed } = await supabaseAdmin.storage
-        .from(asset.storage_bucket)
-        .createSignedUrl(asset.storage_path, 60 * 60);
+      const { data: signed } = await signedUrlMemo(
+        supabaseAdmin,
+        asset.storage_bucket,
+        asset.storage_path,
+        60 * 60,
+      );
       url = signed?.signedUrl ?? null;
     }
     if (url)
@@ -246,9 +250,12 @@ async function readNearbyBusinesses(
     )) {
       let url: string | null = null;
       if (asset.storage_bucket && asset.storage_path) {
-        const { data: signed } = await supabaseAdmin.storage
-          .from(asset.storage_bucket)
-          .createSignedUrl(asset.storage_path, 60 * 60);
+        const { data: signed } = await signedUrlMemo(
+          supabaseAdmin,
+          asset.storage_bucket,
+          asset.storage_path,
+          60 * 60,
+        );
         url = signed?.signedUrl ?? null;
       }
       coverById.set(asset.id, { url, alt: resolveMediaAlt(asset, { fallback: "" }) || null });
@@ -758,9 +765,12 @@ export async function readPublishedPlaceCards(
           if ((asset.metadata as Record<string, unknown> | null)?.ai_generated === true) continue;
         }
         if (!asset.storage_bucket || !asset.storage_path) continue;
-        const { data: signed } = await supabaseAdmin.storage
-          .from(asset.storage_bucket)
-          .createSignedUrl(asset.storage_path, 60 * 60);
+        const { data: signed } = await signedUrlMemo(
+          supabaseAdmin,
+          asset.storage_bucket,
+          asset.storage_path,
+          60 * 60,
+        );
         url = signed?.signedUrl ?? null;
         if (url) {
           coverIdByPlace.set(placeId, asset.id);

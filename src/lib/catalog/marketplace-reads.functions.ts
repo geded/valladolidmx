@@ -23,6 +23,7 @@ import {
   normalizeFilterAttributes,
   type TourismFilterAttributes,
 } from "@/lib/business-attributes/types";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -185,7 +186,10 @@ export async function readPublishedMenu(
       section: String(r["section"] ?? "Carta"),
       name: String(r["name"] ?? ""),
       description: typeof r["description"] === "string" ? r["description"] : null,
-      price_amount: r["price_amount"] === null || r["price_amount"] === undefined ? null : Number(r["price_amount"]),
+      price_amount:
+        r["price_amount"] === null || r["price_amount"] === undefined
+          ? null
+          : Number(r["price_amount"]),
       price_currency: String(r["price_currency"] ?? "MXN"),
       tags: Array.isArray(r["tags"]) ? (r["tags"] as unknown[]).map(String) : [],
     }));
@@ -477,9 +481,12 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
 
     const businessId = prod.business_id as string;
     const pageSaleAllowed = businessAllowsOnlineSale(
-      (await fetchPublicOnlineSales(supabase, prod.product_type === "experiencia" ? [] : [businessId])).get(
-        businessId,
-      ) ?? null,
+      (
+        await fetchPublicOnlineSales(
+          supabase,
+          prod.product_type === "experiencia" ? [] : [businessId],
+        )
+      ).get(businessId) ?? null,
       String(prod.product_type),
       "pagina",
     );
@@ -641,9 +648,12 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           rows.map(async (r) => {
             const a = r.media_assets;
             if (!a) return { row: r, url: null as string | null };
-            const { data: s } = await supabaseAdmin.storage
-              .from(a.storage_bucket)
-              .createSignedUrl(a.storage_path, 3600);
+            const { data: s } = await signedUrlMemo(
+              supabaseAdmin,
+              a.storage_bucket,
+              a.storage_path,
+              3600,
+            );
             return { row: r, url: s?.signedUrl ?? null };
           }),
         );
@@ -743,9 +753,12 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
       )?.media_assets;
       if (logoAsset?.storage_bucket && logoAsset.storage_path && !logoAsset.deleted_at) {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: signedLogo } = await supabaseAdmin.storage
-          .from(logoAsset.storage_bucket)
-          .createSignedUrl(logoAsset.storage_path, 3600);
+        const { data: signedLogo } = await signedUrlMemo(
+          supabaseAdmin,
+          logoAsset.storage_bucket,
+          logoAsset.storage_path,
+          3600,
+        );
         businessLogoUrl = signedLogo?.signedUrl ?? null;
         if (businessLogoUrl) {
           const vb = await import("@/lib/media/variant-bundles.server");
@@ -861,8 +874,7 @@ export const getMarketplaceProductBySlug = createServerFn({ method: "GET" })
           : null,
       direct_sale: {
         // Botón de compra sólo si la empresa tiene ese tipo de venta activado en su página.
-        enabled:
-          Boolean((prod as Record<string, unknown>).direct_sale_enabled) && pageSaleAllowed,
+        enabled: Boolean((prod as Record<string, unknown>).direct_sale_enabled) && pageSaleAllowed,
         price_amount:
           (prod as Record<string, unknown>).direct_sale_price_amount != null
             ? Number((prod as Record<string, unknown>).direct_sale_price_amount)
@@ -1447,9 +1459,12 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
         for (const row of detailMediaRows) {
           const a = row.media_assets;
           if (!a?.storage_bucket || !a.storage_path) continue;
-          const { data: signed } = await supabaseAdmin.storage
-            .from(a.storage_bucket)
-            .createSignedUrl(a.storage_path, 3600);
+          const { data: signed } = await signedUrlMemo(
+            supabaseAdmin,
+            a.storage_bucket,
+            a.storage_path,
+            3600,
+          );
           if (!signed?.signedUrl) continue;
           detailMedia.push({
             role: typeof row.role === "string" ? row.role : "gallery",
@@ -1534,9 +1549,12 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
               storage_bucket: string;
               storage_path: string;
             };
-            const { data: signed } = await supabaseAdmin.storage
-              .from(a.storage_bucket)
-              .createSignedUrl(a.storage_path, 3600);
+            const { data: signed } = await signedUrlMemo(
+              supabaseAdmin,
+              a.storage_bucket,
+              a.storage_path,
+              3600,
+            );
             if (signed?.signedUrl) {
               productCovers.set(pid, signed.signedUrl);
               productAssetIds.set(pid, a.id);

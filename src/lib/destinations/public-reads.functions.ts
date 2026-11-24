@@ -19,6 +19,7 @@ import {
 } from "@/lib/events/recurrence";
 import type { PublicMediaAttribution } from "@/lib/media/public-attribution";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 export interface PublicDestinationDTO {
   /** UUID canónico. Siempre presente en lecturas productivas; opcional en previews históricos. */
@@ -95,9 +96,12 @@ export const getPublicDestinationBySlug = createServerFn({ method: "GET" })
     const { isAccreditedDestinationMedia } = await import("./public-media-policy");
     if (media?.storage_bucket && media?.storage_path && isAccreditedDestinationMedia(media)) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: signed, error: signErr } = await supabaseAdmin.storage
-        .from(media.storage_bucket)
-        .createSignedUrl(media.storage_path, 60 * 60);
+      const { data: signed, error: signErr } = await signedUrlMemo(
+        supabaseAdmin,
+        media.storage_bucket,
+        media.storage_path,
+        60 * 60,
+      );
       if (signErr) console.error("[getPublicDestinationBySlug] sign error", signErr);
       hero_url = signed?.signedUrl ?? null;
       if (hero_url) {
@@ -272,9 +276,8 @@ export const getDestinationMapPoints = createServerFn({ method: "GET" })
     const destinationId =
       typeof destId === "string"
         ? destId
-        : ((
-            await sb.from("destinations").select("id").eq("slug", data.slug).maybeSingle()
-          ).data?.id ?? null);
+        : ((await sb.from("destinations").select("id").eq("slug", data.slug).maybeSingle()).data
+            ?.id ?? null);
     if (destinationId) {
       const { data: places } = await sb
         .from("points_of_interest")
@@ -350,9 +353,12 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
           }
         ).media_assets;
         if (!m?.storage_bucket || !m?.storage_path) return null;
-        const { data: s } = await supabaseAdmin.storage
-          .from(m.storage_bucket)
-          .createSignedUrl(m.storage_path, 60 * 60);
+        const { data: s } = await signedUrlMemo(
+          supabaseAdmin,
+          m.storage_bucket,
+          m.storage_path,
+          60 * 60,
+        );
         return s?.signedUrl ?? null;
       }),
     );
@@ -424,9 +430,12 @@ export const getDestinationGalleryMedia = createServerFn({ method: "GET" })
         if (!m?.storage_bucket || !m?.storage_path) return null;
         const { isAccreditedDestinationMedia } = await import("./public-media-policy");
         if (!isAccreditedDestinationMedia(m)) return null;
-        const { data: s } = await supabaseAdmin.storage
-          .from(m.storage_bucket)
-          .createSignedUrl(m.storage_path, 60 * 60);
+        const { data: s } = await signedUrlMemo(
+          supabaseAdmin,
+          m.storage_bucket,
+          m.storage_path,
+          60 * 60,
+        );
         if (!s?.signedUrl) return null;
         const meta = (m.metadata ?? {}) as Record<string, unknown>;
         const alt = resolveMediaAlt(m, { fallback: "" });
@@ -687,8 +696,7 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
             height: number | null;
             pipeline_status: string | null;
           } | null;
-          const assetOf = (r: unknown) =>
-            (r as { media_assets?: CoverAsset }).media_assets ?? null;
+          const assetOf = (r: unknown) => (r as { media_assets?: CoverAsset }).media_assets ?? null;
           // Una sola firma por bucket en lugar de una petición por foto.
           const signer = await import("@/lib/media/batch-sign.server");
           const signedByKey = await signer.signStorageObjects(
@@ -813,9 +821,12 @@ export const getDestinationRelated = createServerFn({ method: "GET" })
                     }
                   ).media_assets;
                   if (!a) return { id: r.product_id as string, url: null as string | null };
-                  const { data: s } = await supabaseAdmin.storage
-                    .from(a.storage_bucket)
-                    .createSignedUrl(a.storage_path, 3600);
+                  const { data: s } = await signedUrlMemo(
+                    supabaseAdmin,
+                    a.storage_bucket,
+                    a.storage_path,
+                    3600,
+                  );
                   if (s?.signedUrl) {
                     idByProduct.set(String(r.product_id), a.id);
                     productBases.push({

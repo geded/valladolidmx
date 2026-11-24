@@ -21,6 +21,7 @@ import type {
   EditorialRouteStopDTO,
   EditorialRouteStopKind,
 } from "./route-public-contract";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 const PALETTES = new Set<EditorialRoutePalette>(["territorio", "selva", "cenote", "atardecer"]);
 
@@ -94,9 +95,12 @@ async function signMedia(ids: string[]): Promise<Map<string, RouteMedia>> {
   for (const asset of (data ?? []) as Array<Record<string, unknown>>) {
     let url: string | null = null;
     if (asset.storage_bucket && asset.storage_path) {
-      const { data: signed } = await supabaseAdmin.storage
-        .from(String(asset.storage_bucket))
-        .createSignedUrl(String(asset.storage_path), 60 * 60);
+      const { data: signed } = await signedUrlMemo(
+        supabaseAdmin,
+        String(asset.storage_bucket),
+        String(asset.storage_path),
+        60 * 60,
+      );
       url = signed?.signedUrl ?? null;
     }
     if (url)

@@ -23,6 +23,7 @@ import {
   type EventRecurrenceFrequency,
   type EventScheduleTime,
 } from "@/lib/events/recurrence";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 export interface PublicEventCard {
   id: string;
@@ -91,7 +92,7 @@ async function signMedia(
   if (!bucket || !path) return null;
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, 60 * 60);
+    const { data } = await signedUrlMemo(supabaseAdmin, bucket, path, 60 * 60);
     return data?.signedUrl ?? null;
   } catch {
     return null;

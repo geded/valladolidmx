@@ -54,6 +54,7 @@ import {
   routePaceLabel,
   routePublicPath,
 } from "@/lib/routes-editorial/route-public-contract";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 export type SmartBlockJsonValue =
   | string
@@ -450,9 +451,7 @@ async function resolveStableMedia(ids: string[]): Promise<Map<string, string>> {
         // de destinos: se firman igual que en la ficha pública del destino.
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { data: signed } = await supabaseAdmin.storage
-            .from(bucket)
-            .createSignedUrl(path, 60 * 60 * 6);
+          const { data: signed } = await signedUrlMemo(supabaseAdmin, bucket, path, 60 * 60 * 6);
           if (signed?.signedUrl) out.set(id, signed.signedUrl);
         } catch {
           /* fail-closed: la tarjeta conserva su contenido sin medio */

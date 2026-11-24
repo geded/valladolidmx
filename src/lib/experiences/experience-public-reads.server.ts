@@ -44,6 +44,7 @@ import {
 } from "@/lib/media/variant-bundles.server";
 import { REGION_SCOPE_LABEL } from "@/lib/navigation/category-context";
 import { arrangeListing, dailySeed, meridaIsoDay } from "@/lib/visibility/commercial-slots";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 /**
  * Tarjeta del listado de Experiencias: el contrato turístico compartido más
@@ -223,9 +224,12 @@ async function signCovers(
     for (const link of own) {
       const asset = link.media_assets as Row | null;
       if (!asset?.storage_bucket || !asset?.storage_path) continue;
-      const { data: signed } = await storage
-        .from(asset.storage_bucket)
-        .createSignedUrl(asset.storage_path, 60 * 60);
+      const { data: signed } = await signedUrlMemo(
+        { storage },
+        asset.storage_bucket,
+        asset.storage_path,
+        60 * 60,
+      );
       if (signed?.signedUrl) {
         assetByProduct.set(productId, String(asset.id));
         bases.push({

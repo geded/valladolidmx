@@ -17,6 +17,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { MarketplaceBusinessCard } from "./marketplace-reads.functions";
 import { PUBLIC_BUSINESS_ELIGIBILITY_EQ } from "@/lib/omxds/public-eligibility";
+import { signedUrlMemo } from "@/lib/media/signed-url-memo";
 
 export interface BusinessRelatedDTO {
   sameCategory: MarketplaceBusinessCard[];
@@ -163,9 +164,12 @@ export const getBusinessRelated = createServerFn({ method: "GET" })
               } | null;
               if (!asset?.storage_bucket || !asset?.storage_path)
                 return [String(r.business_id), null] as const;
-              const { data: s } = await supabaseAdmin.storage
-                .from(asset.storage_bucket)
-                .createSignedUrl(asset.storage_path, 3600);
+              const { data: s } = await signedUrlMemo(
+                supabaseAdmin,
+                asset.storage_bucket,
+                asset.storage_path,
+                3600,
+              );
               if (s?.signedUrl) {
                 idByBusiness.set(String(r.business_id), asset.id);
                 bases.push({
