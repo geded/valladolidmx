@@ -10,6 +10,13 @@ type StorageClient = {
         path: string,
         expiresIn: number,
       ) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
+      createSignedUrls?: (
+        paths: string[],
+        expiresIn: number,
+      ) => Promise<{
+        data: Array<{ path: string | null; signedUrl: string | null; error?: unknown }> | null;
+        error: unknown;
+      }>;
     };
   };
 };
@@ -44,4 +51,55 @@ export async function signedUrlMemo(
     .finally(() => inflight.delete(key));
   inflight.set(key, p);
   return p;
+}
+
+/**
+ * Firma varias fotos a la vez: las ya firmadas salen de la memoria y las
+ * faltantes se piden en UNA sola llamada por bucket (no una por foto).
+ * Devuelve las URLs en el mismo orden; `null` si una no se pudo firmar.
+ */
+export async function signedUrlsMemo(
+  client: StorageClient,
+  items: ReadonlyArray<{ bucket: string; path: string }>,
+  expiresIn: number,
+): Promise<Array<string | null>> {
+  const now = Date.now();
+  const out: Array<string | null> = items.map(() => null);
+  const missing = new Map<string, Array<{ i: number; path: string }>>();
+  items.forEach((it, i) => {
+    const hit = memo.get(`${it.bucket}\u0000${it.path}\u0000${expiresIn}`);
+    if (hit && hit.exp - now > MARGIN_MS) out[i] = hit.url;
+    else {
+      const list = missing.get(it.bucket) ?? [];
+      list.push({ i, path: it.path });
+      missing.set(it.bucket, list);
+    }
+  });
+  await Promise.all(
+    [...missing].map(async ([bucket, list]) => {
+      const api = client.storage.from(bucket);
+      if (!api.createSignedUrls) {
+        const res = await Promise.all(
+          list.map((m) => signedUrlMemo(client, bucket, m.path, expiresIn).catch(() => null)),
+        );
+        res.forEach((r, k) => (out[list[k]!.i] = r?.data?.signedUrl ?? null));
+        return;
+      }
+      const uniq = [...new Set(list.map((m) => m.path))];
+      const { data } = await api.createSignedUrls(uniq, expiresIn).catch(() => ({ data: null }));
+      const byPath = new Map<string, string>();
+      for (const row of data ?? []) {
+        if (row.path && row.signedUrl && !row.error) {
+          byPath.set(row.path, row.signedUrl);
+          if (memo.size >= MAX) memo.delete(memo.keys().next().value as string);
+          memo.set(`${bucket}\u0000${row.path}\u0000${expiresIn}`, {
+            url: row.signedUrl,
+            exp: Date.now() + expiresIn * 1000,
+          });
+        }
+      }
+      for (const m of list) out[m.i] = byPath.get(m.path) ?? null;
+    }),
+  );
+  return out;
 }

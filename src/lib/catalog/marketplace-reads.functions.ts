@@ -23,7 +23,7 @@ import {
   normalizeFilterAttributes,
   type TourismFilterAttributes,
 } from "@/lib/business-attributes/types";
-import { signedUrlMemo } from "@/lib/media/signed-url-memo";
+import { signedUrlMemo, signedUrlsMemo } from "@/lib/media/signed-url-memo";
 
 function publicClient() {
   const url = process.env.SUPABASE_URL;
@@ -1456,16 +1456,21 @@ export const getMarketplaceBusinessBySlug = createServerFn({ method: "GET" })
       const variantBases: import("@/lib/media/variant-bundles.server").AssetBaseForVariants[] = [];
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        for (const row of detailMediaRows) {
+        // Todas las fotos de la ficha se firman juntas, no una por una.
+        const signedList = await signedUrlsMemo(
+          supabaseAdmin,
+          detailMediaRows.map((row) => ({
+            bucket: String(row.media_assets?.storage_bucket ?? ""),
+            path: String(row.media_assets?.storage_path ?? ""),
+          })),
+          3600,
+        );
+        for (const [idx, row] of detailMediaRows.entries()) {
           const a = row.media_assets;
           if (!a?.storage_bucket || !a.storage_path) continue;
-          const { data: signed } = await signedUrlMemo(
-            supabaseAdmin,
-            a.storage_bucket,
-            a.storage_path,
-            3600,
-          );
-          if (!signed?.signedUrl) continue;
+          const signedUrl = signedList[idx];
+          if (!signedUrl) continue;
+          const signed = { signedUrl };
           detailMedia.push({
             role: typeof row.role === "string" ? row.role : "gallery",
             url: signed.signedUrl,

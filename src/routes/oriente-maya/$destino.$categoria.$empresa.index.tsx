@@ -59,14 +59,19 @@ async function loadBusinessPage(params: BusinessPageParams) {
         getPublishedCompositionBySlug({
           data: { slug: `biz-${params.empresa}`, variant_key: params.empresa },
         }).catch(() => null),
-        getPublishedCompositionBySlug({
-          data: { slug: "__tpl_business__" },
-        }).catch(() => null),
-        getOmxdsSurfaceContractsFlag().catch(() => false),
+        // Lecturas comunes a todas las fichas: una sola copia compartida.
+        publicReadMemo("business-template", () =>
+          getPublishedCompositionBySlug({ data: { slug: "__tpl_business__" } }),
+        ).catch(() => null),
+        publicReadMemo("omxds-surface-contracts", () => getOmxdsSurfaceContractsFlag()).catch(
+          () => false,
+        ),
         // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
-        getEvaluationLotSlugs().catch(() => null),
+        publicReadMemo("evaluation-lot", () => getEvaluationLotSlugs()).catch(() => null),
         // G8-R1-F1I-R1 · DEF-F1I-001 — revisión de fuente no aprobada ⇒ noindex.
-        getNonDiscoverableBusinessSlugs().catch(() => [] as readonly string[]),
+        publicReadMemo("non-discoverable-businesses", () => getNonDiscoverableBusinessSlugs()).catch(
+          () => [] as readonly string[],
+        ),
       ]);
     if (!business) return null;
     // 19.21 · V1-P1.d — la elegibilidad Premium se evalúa SIEMPRE por ficha
@@ -75,23 +80,18 @@ async function loadBusinessPage(params: BusinessPageParams) {
     // contacto, SEO y media aprobada). La presentación Premium depende
     // exclusivamente de `premiumEligibility.eligible === true`; el flag global
     // conserva su función para el resto de contratos gobernados.
-    const premiumEligibility = await getBusinessPremiumEligibility({
-      data: { businessId: business.id },
-    }).catch(() => null);
-    // E2 · US-E2.1 — Related Collection contextual del negocio.
-    // Fallback silencioso: si falla no rompe el render de la ficha.
-    let related = null as Awaited<ReturnType<typeof getBusinessRelated>> | null;
-    try {
-      related = await getBusinessRelated({
+    // Elegibilidad y relacionados son independientes: se piden al mismo tiempo.
+    const [premiumEligibility, related] = await Promise.all([
+      getBusinessPremiumEligibility({ data: { businessId: business.id } }).catch(() => null),
+      // E2 · US-E2.1 — Related Collection contextual; fallo silencioso.
+      getBusinessRelated({
         data: {
           businessId: business.id,
           destinationSlug: business.destination_slug,
           categorySlug: business.category_slug,
         },
-      });
-    } catch {
-      related = null;
-    }
+      }).catch(() => null),
+    ]);
     const composition = specific ?? template ?? null;
     // G8-R1-C2 · La decisión de presentación pasa por el resolutor canónico:
     // override editorial aprobado → preset premium de familia → superficie

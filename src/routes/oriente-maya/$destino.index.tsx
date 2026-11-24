@@ -82,10 +82,15 @@ async function loadDestinationPage(params: { destino: string }) {
       getDestinationGalleryMedia({ data: { slug: params.destino } }).catch(() => []),
       getDestinationPremiumEligibility({ data: { slug: params.destino } }).catch(() => null),
       // G8-R1-F1G · Lote interno de evaluación → noindex mientras dure.
-      getEvaluationLotSlugs().catch(() => null),
-      resolveHomePremiumRealContent().catch(() => null),
-      listPublicRoutes({ data: { destino: null, limit: 24 } }).catch(() => []),
-      getListingFamilyTaxonomy().catch(() => ({ available: false as const, taxonomy: {} })),
+      publicReadMemo("evaluation-lot", () => getEvaluationLotSlugs()).catch(() => null),
+      // Misma copia compartida que usa Inicio.
+      publicReadMemo(`q:${JSON.stringify(["home-premium-real-content"])}`, () =>
+        resolveHomePremiumRealContent(),
+      ).catch(() => null),
+      publicReadMemo("public-routes:24", () =>
+        listPublicRoutes({ data: { destino: null, limit: 24 } }),
+      ).catch(() => []),
+      publicReadMemo("listing-family-taxonomy", () => getListingFamilyTaxonomy()).catch(() => ({ available: false as const, taxonomy: {} })),
     ]);
     if (!db) return null;
     const dest = {
