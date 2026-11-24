@@ -1,3 +1,4 @@
+import { ensureMemoQuery } from "@/lib/cache/public-read-memo";
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions } from "@tanstack/react-query";
 import { SITE } from "@/config/site";
@@ -77,14 +78,14 @@ export const Route = createFileRoute("/")({
     // Prefetch para SSR; nunca lanza — getPublishedHomeComposition cae a null
     // ante cualquier error, garantizando que la Home siempre cargue.
     const [published] = await Promise.all([
-      context.queryClient.ensureQueryData(publishedHomeQuery),
+      ensureMemoQuery<any>(context.queryClient, publishedHomeQuery),
       // Lote 3B — Destinos reales de CMS disponibles en SSR: la Home ya no
       // depende del fixture `DESTINOS_MOCK` para pintar la sección.
-      context.queryClient.ensureQueryData(publishedDestinationsQueryOptions).catch(() => []),
+      ensureMemoQuery(context.queryClient, publishedDestinationsQueryOptions).catch(() => []),
       // Lote 3E — Categorías destacadas reales de CMS en SSR: el buscador del
       // Hero y la sección de categorías ya no dependen de `CATEGORIAS_MOCK`.
-      context.queryClient.ensureQueryData(homeFeaturedCategoriesQueryOptions).catch(() => []),
-      context.queryClient.ensureQueryData(homeRealContentQuery).catch(() => null),
+      ensureMemoQuery(context.queryClient, homeFeaturedCategoriesQueryOptions).catch(() => []),
+      ensureMemoQuery(context.queryClient, homeRealContentQuery).catch(() => null),
     ]);
     const authorityTree = resolveHomePremiumAuthorityTree(published?.snapshot);
     const stableAuthorityTree = authorityTree ?? HOME_PREMIUM_FALLBACK_TREE;

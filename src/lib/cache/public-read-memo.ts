@@ -43,3 +43,17 @@ export function __resetPublicReadMemo() {
   store.clear();
   inflight.clear();
 }
+
+/** Igual que `queryClient.ensureQueryData`, pero en el servidor reutiliza la
+ *  memoria breve y deja el resultado en la caché de la petición. */
+export async function ensureMemoQuery<T>(
+  qc: { ensureQueryData: (o: any) => Promise<any>; setQueryData: (k: any, v: any) => unknown },
+  opts: { queryKey: readonly unknown[] },
+): Promise<T> {
+  if (typeof window !== "undefined") return qc.ensureQueryData(opts);
+  const value = await publicReadMemo(`q:${JSON.stringify(opts.queryKey)}`, () =>
+    qc.ensureQueryData(opts),
+  );
+  qc.setQueryData(opts.queryKey, value);
+  return value as T;
+}

@@ -1,3 +1,4 @@
+import { ensureMemoQuery, publicReadMemo } from "@/lib/cache/public-read-memo";
 import logoSymbol from "@/assets/brand/logo-symbol.png.asset.json";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, queryOptions } from "@tanstack/react-query";
@@ -260,17 +261,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       await Promise.all([
         // Offline First: sin red esta bandera fallaba y derribaba toda la
         // aplicación. Fail-safe al valor de código, como el resto del loader.
-        getOmxdsVisualFoundationsFlag().catch(() => false),
-        context.queryClient
-          .ensureQueryData(brandSettingsQueryOptions)
+        publicReadMemo("omxds-flag", () => getOmxdsVisualFoundationsFlag()).catch(() => false),
+        ensureMemoQuery(context.queryClient, brandSettingsQueryOptions)
           .catch(() => BRAND_SETTINGS_DEFAULTS),
         // Lote 3B · C — Autoridad institucional vigente (distintivos).
-        context.queryClient.ensureQueryData(institutionalAuthorityQueryOptions).catch(() => null),
+        ensureMemoQuery(context.queryClient, institutionalAuthorityQueryOptions).catch(() => null),
         // El chrome público debe llegar en la primera respuesta para evitar que
         // header y footer cambien de geometría después de hidratar React.
-        context.queryClient.ensureQueryData(rootPublishedHomeQuery).catch(() => null),
+        ensureMemoQuery(context.queryClient, rootPublishedHomeQuery).catch(() => null),
         // Configuración → Dominios: dominio canónico administrable.
-        getSiteDomainSettings().catch(() => SITE_DOMAIN_DEFAULTS),
+        publicReadMemo("site-domains", () => getSiteDomainSettings()).catch(() => SITE_DOMAIN_DEFAULTS),
       ]);
 
     // Aplica el dominio canónico vigente en SSR (antes de generar head/canonical).
