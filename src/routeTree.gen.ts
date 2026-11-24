@@ -253,6 +253,7 @@ import { Route as ApiPublicHooksCrmWhatsappRouteImport } from './routes/api/publ
 import { Route as ApiPublicHooksEbProcessScheduledPublishRouteImport } from './routes/api/public/hooks/eb-process-scheduled-publish'
 import { Route as ApiPublicHooksMediaSignatureRenewRouteImport } from './routes/api/public/hooks/media-signature-renew'
 import { Route as ApiPublicHooksProposalPaymentRemindersRouteImport } from './routes/api/public/hooks/proposal-payment-reminders'
+import { Route as ApiPublicHooksPublicPageWarmRouteImport } from './routes/api/public/hooks/public-page-warm'
 import { Route as ApiPublicHooksTripJourneyEmailsRouteImport } from './routes/api/public/hooks/trip-journey-emails'
 import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './routes/api/public/hooks/visibility-notifications'
 import { Route as ApiPublicHooksWhatsappAgentRouteImport } from './routes/api/public/hooks/whatsapp-agent'
@@ -1675,6 +1676,12 @@ const ApiPublicHooksProposalPaymentRemindersRoute =
     path: '/api/public/hooks/proposal-payment-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPublicPageWarmRoute =
+  ApiPublicHooksPublicPageWarmRouteImport.update({
+    id: '/api/public/hooks/public-page-warm',
+    path: '/api/public/hooks/public-page-warm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksTripJourneyEmailsRoute =
   ApiPublicHooksTripJourneyEmailsRouteImport.update({
     id: '/api/public/hooks/trip-journey-emails',
@@ -2104,6 +2111,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
+  '/api/public/hooks/public-page-warm': typeof ApiPublicHooksPublicPageWarmRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
@@ -2372,6 +2380,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
+  '/api/public/hooks/public-page-warm': typeof ApiPublicHooksPublicPageWarmRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
@@ -2652,6 +2661,7 @@ export interface FileRoutesById {
   '/api/public/hooks/eb-process-scheduled-publish': typeof ApiPublicHooksEbProcessScheduledPublishRoute
   '/api/public/hooks/media-signature-renew': typeof ApiPublicHooksMediaSignatureRenewRoute
   '/api/public/hooks/proposal-payment-reminders': typeof ApiPublicHooksProposalPaymentRemindersRoute
+  '/api/public/hooks/public-page-warm': typeof ApiPublicHooksPublicPageWarmRoute
   '/api/public/hooks/trip-journey-emails': typeof ApiPublicHooksTripJourneyEmailsRoute
   '/api/public/hooks/visibility-notifications': typeof ApiPublicHooksVisibilityNotificationsRoute
   '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
@@ -2933,6 +2943,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
+    | '/api/public/hooks/public-page-warm'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/hooks/whatsapp-agent'
@@ -3201,6 +3212,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
+    | '/api/public/hooks/public-page-warm'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/hooks/whatsapp-agent'
@@ -3480,6 +3492,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/eb-process-scheduled-publish'
     | '/api/public/hooks/media-signature-renew'
     | '/api/public/hooks/proposal-payment-reminders'
+    | '/api/public/hooks/public-page-warm'
     | '/api/public/hooks/trip-journey-emails'
     | '/api/public/hooks/visibility-notifications'
     | '/api/public/hooks/whatsapp-agent'
@@ -3649,6 +3662,7 @@ export interface RootRouteChildren {
   ApiPublicHooksEbProcessScheduledPublishRoute: typeof ApiPublicHooksEbProcessScheduledPublishRoute
   ApiPublicHooksMediaSignatureRenewRoute: typeof ApiPublicHooksMediaSignatureRenewRoute
   ApiPublicHooksProposalPaymentRemindersRoute: typeof ApiPublicHooksProposalPaymentRemindersRoute
+  ApiPublicHooksPublicPageWarmRoute: typeof ApiPublicHooksPublicPageWarmRoute
   ApiPublicHooksTripJourneyEmailsRoute: typeof ApiPublicHooksTripJourneyEmailsRoute
   ApiPublicHooksVisibilityNotificationsRoute: typeof ApiPublicHooksVisibilityNotificationsRoute
   ApiPublicHooksWhatsappAgentRoute: typeof ApiPublicHooksWhatsappAgentRoute
@@ -5372,6 +5386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksProposalPaymentRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/public-page-warm': {
+      id: '/api/public/hooks/public-page-warm'
+      path: '/api/public/hooks/public-page-warm'
+      fullPath: '/api/public/hooks/public-page-warm'
+      preLoaderRoute: typeof ApiPublicHooksPublicPageWarmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/trip-journey-emails': {
       id: '/api/public/hooks/trip-journey-emails'
       path: '/api/public/hooks/trip-journey-emails'
@@ -6355,6 +6376,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksMediaSignatureRenewRoute,
   ApiPublicHooksProposalPaymentRemindersRoute:
     ApiPublicHooksProposalPaymentRemindersRoute,
+  ApiPublicHooksPublicPageWarmRoute: ApiPublicHooksPublicPageWarmRoute,
   ApiPublicHooksTripJourneyEmailsRoute: ApiPublicHooksTripJourneyEmailsRoute,
   ApiPublicHooksVisibilityNotificationsRoute:
     ApiPublicHooksVisibilityNotificationsRoute,

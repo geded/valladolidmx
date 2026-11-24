@@ -2,12 +2,12 @@
  * Memoria breve en el servidor para lecturas públicas (anónimas) de las
  * páginas. Nivel 1: memoria del proceso. Nivel 2: tabla
  * `public_read_cache` compartida por todos los servidores (una sola
- * consulta en lugar de decenas). Fresco 60 s; hasta 5 min devuelve la copia
+ * consulta en lugar de decenas). Fresco 60 s; hasta 30 min devuelve la copia
  * y la renueva en segundo plano. En el navegador no guarda nada.
  */
 type Entry = { value: unknown; at: number; refreshing?: boolean };
 const FRESH_MS = 60_000;
-const STALE_MS = 5 * 60_000;
+const STALE_MS = 30 * 60_000;
 const MAX = 500;
 const store = new Map<string, Entry>();
 const inflight = new Map<string, Promise<unknown>>();
