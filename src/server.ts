@@ -1,3 +1,4 @@
+import { servePublicPage } from "./lib/server/public-page-cache";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -69,8 +70,12 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return withBaselineSecurityHeaders(await normalizeCatastrophicSsrResponse(response));
+      const response = await servePublicPage(
+        request,
+        ctx as { waitUntil?: (p: Promise<unknown>) => void },
+        async () => normalizeCatastrophicSsrResponse(await handler.fetch(request, env, ctx)),
+      );
+      return withBaselineSecurityHeaders(response);
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

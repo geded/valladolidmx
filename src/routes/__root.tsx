@@ -237,6 +237,20 @@ function InstitutionalAuthoritySync() {
   return null;
 }
 
+const IOS_SPLASH = [
+  { w: 440, h: 956, r: 3 },
+  { w: 430, h: 932, r: 3 },
+  { w: 402, h: 874, r: 3 },
+  { w: 393, h: 852, r: 3 },
+  { w: 390, h: 844, r: 3 },
+  { w: 428, h: 926, r: 3 },
+  { w: 375, h: 812, r: 3 },
+  { w: 414, h: 896, r: 2 },
+  { w: 414, h: 896, r: 3 },
+  { w: 375, h: 667, r: 2 },
+  { w: 320, h: 568, r: 2 },
+] as const;
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: async ({ context }) => {
     // Lote 3B · B — La identidad de marca administrable se precarga en SSR
@@ -302,6 +316,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/favicon.png", sizes: "64x64" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      // Pantalla de arranque de la app instalada en iPhone (crema + logo):
+      // sin ella iOS muestra negro mientras llega la primera página.
+      ...IOS_SPLASH.map(({ w, h, r }) => ({
+        rel: "apple-touch-startup-image",
+        href: `/splash/splash-${w * r}x${h * r}.png`,
+        media: `(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${r}) and (orientation: portrait)`,
+      })),
       // Tipografía centralizada vía tokens. Cargada por <link> según Tailwind v4.
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -360,7 +381,7 @@ function RootShell({ children }: { children: ReactNode }) {
         backgroundImage: `url("${logoSymbol.url}")`,
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center 42vh",
-        backgroundSize: "88px auto",
+        backgroundSize: "72px auto",
         ...ACTIVE_BRAND_THEME_STYLE,
         ...brandPaletteStyle(brandSettings.palette),
         ...aluxPaletteStyle(brandSettings.aluxPalette),
