@@ -76,10 +76,67 @@ export const getPublicListing = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }): Promise<PublicListingDTO> => {
     if (data.previewMedia) return readPublicListing(data);
-    const { publicReadMemo } = await import("@/lib/cache/public-read-memo");
-    return publicReadMemo(`public-listing:${data.family}:${data.destino ?? "*"}`, () =>
+    return deferListingCardMedia(await readMemoizedListing(data));
+  });
+
+function readMemoizedListing(data: {
+  family: ListingFamilyId;
+  destino: string | null;
+  previewMedia: boolean;
+}): Promise<PublicListingDTO> {
+  return import("@/lib/cache/public-read-memo").then(({ publicReadMemo }) =>
+    publicReadMemo(`public-listing:${data.family}:${data.destino ?? "*"}`, () =>
       readPublicListing(data),
-    );
+    ),
+  );
+}
+
+/** Tarjetas que viajan completas en la primera carga (igual al primer bloque visible). */
+export const LISTING_FIRST_PAINT_CARDS = 12;
+const DEFERRABLE_FAMILIES = new Set<ListingFamilyId>([
+  "hoteles",
+  "restaurantes",
+  "casas-de-vacaciones",
+  "experiencias",
+]);
+
+/**
+ * Estilo Airbnb: sólo el primer bloque lleva todas las versiones de su foto;
+ * el resto conserva nombre, filtros, mapa y foto original, y el listado pide
+ * sus versiones optimizadas por id justo antes de mostrarlas. El orden, la
+ * visibilidad y los filtros no cambian.
+ */
+export function deferListingCardMedia(dto: PublicListingDTO): PublicListingDTO {
+  if (!DEFERRABLE_FAMILIES.has(dto.family as ListingFamilyId)) return dto;
+  const deferred: string[] = [];
+  const items = dto.items.map((item, index) => {
+    if (index < LISTING_FIRST_PAINT_CARDS || !item.mediaAsset?.variants?.length) return item;
+    deferred.push(item.id);
+    return { ...item, mediaAsset: { ...item.mediaAsset, variants: [] } };
+  });
+  return deferred.length ? { ...dto, items, deferredMediaIds: deferred } : dto;
+}
+
+/** Versiones de foto de las tarjetas diferidas, leídas de la misma copia guardada. */
+export const getPublicListingCardMedia = createServerFn({ method: "GET" })
+  .inputValidator(
+    (data: { family?: unknown; destino?: unknown; ids?: unknown } | undefined) => ({
+      family: (isListingFamilyId(data?.family) ? data?.family : "hoteles") as ListingFamilyId,
+      destino: typeof data?.destino === "string" && data.destino.trim() ? data.destino : null,
+      ids: Array.isArray(data?.ids)
+        ? data.ids.filter((id): id is string => typeof id === "string").slice(0, 48)
+        : [],
+    }),
+  )
+  .handler(async ({ data }) => {
+    const wanted = new Set(data.ids);
+    const out: Record<string, NonNullable<PublicListingDTO["items"][number]["mediaAsset"]>> = {};
+    if (!wanted.size) return out;
+    const dto = await readMemoizedListing({ ...data, previewMedia: false });
+    for (const item of dto.items) {
+      if (wanted.has(item.id) && item.mediaAsset) out[item.id] = item.mediaAsset;
+    }
+    return out;
   });
 
 async function readPublicListing(data: {

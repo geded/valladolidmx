@@ -12,13 +12,14 @@ import {
   Sparkles,
   UtensilsCrossed,
 } from "lucide-react";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   TourismCard,
   type TourismCardVM,
 } from "@/components/experience-builder/tourism-card/TourismCard";
 import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
+import { getPublicListingCardMedia } from "@/lib/listings/listing-public-reads.functions";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { cn } from "@/lib/utils";
@@ -862,7 +863,31 @@ function TerritorialListingBody({
   useEffect(() => {
     setVisibleCount(LISTING_PAGE_SIZE);
   }, [activeFacets, audience, destination, price, primary, query, secondary, zone]);
-  const visibleItems = filteredItems.slice(0, visibleCount);
+  /* Estilo Airbnb: las tarjetas fuera del primer bloque llegan sin las
+     versiones optimizadas de su foto. Se piden por id para lo visible y el
+     siguiente bloque, así «Ver más» ya las encuentra listas. */
+  const [loadedMedia, setLoadedMedia] = useState<Record<string, MediaAssetInput>>({});
+  const requestedMedia = useRef(new Set<string>());
+  const deferredIds = useMemo(() => new Set(dto?.deferredMediaIds ?? []), [dto]);
+  const upcomingDeferred = filteredItems
+    .slice(0, visibleCount + LISTING_PAGE_SIZE)
+    .map((item) => item.source?.id)
+    .filter((id): id is string => Boolean(id && deferredIds.has(id) && !requestedMedia.current.has(id)));
+  const upcomingKey = upcomingDeferred.join(",");
+  useEffect(() => {
+    if (!dto || !upcomingKey) return;
+    const ids = upcomingKey.split(",");
+    ids.forEach((id) => requestedMedia.current.add(id));
+    void getPublicListingCardMedia({
+      data: { family: dto.family, destino: dto.destinationSlug, ids },
+    })
+      .then((media) => setLoadedMedia((prev) => ({ ...prev, ...media })))
+      .catch(() => ids.forEach((id) => requestedMedia.current.delete(id)));
+  }, [dto, upcomingKey]);
+  const visibleItems = filteredItems.slice(0, visibleCount).map((item) => {
+    const media = item.source?.id ? loadedMedia[item.source.id] : undefined;
+    return media ? { ...item, imageAsset: media } : item;
+  });
   const remainingItems = filteredItems.length - visibleItems.length;
   return (
     <div className="bg-[var(--background)] pb-4 text-[var(--foreground)] sm:pb-6">

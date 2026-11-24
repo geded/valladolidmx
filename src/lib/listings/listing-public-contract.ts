@@ -241,6 +241,11 @@ export interface PublicListingDTO {
     readonly metaLabel: string | null;
   };
   readonly items: readonly TourismCardVM[];
+  /**
+   * Tarjetas que llegan sin versiones optimizadas de su foto para aligerar la
+   * primera carga; el listado las pide al servidor antes de mostrarlas.
+   */
+  readonly deferredMediaIds?: readonly string[];
   /** Carriles editoriales de descubrimiento. Sólo `que-hacer` los publica. */
   readonly discoveryRails?: readonly PublicListingDiscoveryRail[];
   readonly destinationSlug: string | null;
