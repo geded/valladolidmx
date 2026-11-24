@@ -204,6 +204,34 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
     const bundles = (await vb.shouldServePublicVariants())
       ? await vb.attachReadyVariants(bases)
       : {};
+    // Fotos subidas desde el editor del destino viven en buckets privados:
+    // se firman igual que en la ficha del destino.
+    const signedHero = new Map<string, string>();
+    const toSign = (data ?? []).flatMap((row) => {
+      const m = row.media_assets;
+      return m &&
+        m.storage_bucket &&
+        m.storage_path &&
+        isAccreditedDestinationMedia(m) &&
+        !toStablePublicMediaUrl(m.storage_bucket, m.storage_path)
+        ? [m]
+        : [];
+    });
+    if (toSign.length > 0) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { signedUrlMemo } = await import("@/lib/media/signed-url-memo");
+      await Promise.all(
+        toSign.map(async (m) => {
+          const { data: s } = await signedUrlMemo(
+            supabaseAdmin,
+            m.storage_bucket as string,
+            m.storage_path as string,
+            60 * 60,
+          );
+          if (s?.signedUrl) signedHero.set(m.id, s.signedUrl);
+        }),
+      );
+    }
     return (data ?? []).map((row) => {
       const regionSlug =
         row.tourism_regions && typeof (row.tourism_regions as { slug?: unknown }).slug === "string"
@@ -217,7 +245,8 @@ export const listPublishedDestinations = createServerFn({ method: "GET" }).handl
       >[0];
       const imageUrl =
         heroMedia && isAccreditedDestinationMedia(heroMedia)
-          ? toStablePublicMediaUrl(heroMedia.storage_bucket, heroMedia.storage_path)
+          ? (toStablePublicMediaUrl(heroMedia.storage_bucket, heroMedia.storage_path) ??
+            (row.media_assets ? (signedHero.get(row.media_assets.id) ?? null) : null))
           : null;
       return {
         id: row.id,
