@@ -49,7 +49,7 @@ export async function attachReadyVariants(
     const ids = ready.map((a) => a.id);
     const [variantsResult, assetsResult] = await Promise.all([
       supabaseAdmin.from("media_asset_variants")
-        .select("asset_id, format, width, height, bucket, path, usage_context, variant_key")
+        .select("asset_id, format, width, height, bucket, path, usage_context")
         .in("asset_id", ids).eq("status", "ready").eq("is_current", true),
       supabaseAdmin.from("media_assets").select("id")
         .in("id", ids).eq("status", "published").is("deleted_at", null),
@@ -65,13 +65,13 @@ export async function attachReadyVariants(
           const url = toDerivedPublicMediaUrl(v.bucket, v.path);
           return url
             ? {
+                // Transporte compacto: sólo lo que resolveMediaSource lee.
+                // Sin `status` (ausente = listo), sin variant_key ni nulos.
                 format: v.format as MediaVariantFormat,
                 width: v.width,
-                height: v.height,
                 url,
-                status: "ready" as const,
-                usage_context: (v.usage_context as MediaUsageContext | null) ?? null,
-                variant_key: v.variant_key ?? null,
+                ...(v.height != null ? { height: v.height } : {}),
+                ...(v.usage_context ? { usage_context: v.usage_context as MediaUsageContext } : {}),
               }
             : null;
         })

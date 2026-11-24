@@ -128,9 +128,15 @@ import { setCanonicalDomain } from "@/config/site";
 
 const OMXDS_THEME_BOOTSTRAP = `(()=>{try{const r=document.documentElement;if(r.dataset.omxdsVisualFoundations!=="enabled")return;const k="valladolidmx:theme";const s=localStorage.getItem(k);const t=s==="sol"||s==="luna"?s:matchMedia("(prefers-color-scheme: dark)").matches?"luna":"sol";r.classList.toggle("dark",t==="luna");r.dataset.theme=t;r.style.colorScheme=t==="luna"?"dark":"light"}catch{}})();`;
 
+// Todas las páginas sólo necesitan el encabezado y pie de la Home publicada;
+// enviar la composición completa en cada página pesaba ~decenas de KB.
 const rootPublishedHomeQuery = queryOptions({
-  queryKey: ["eb", "published-home", "default"],
-  queryFn: () => getPublishedHomeComposition({ data: { variant_key: "default" } }),
+  queryKey: ["eb", "published-home-chrome", "default"],
+  queryFn: async () => {
+    const home = await getPublishedHomeComposition({ data: { variant_key: "default" } });
+    const chrome = (home as { snapshot?: { chrome?: unknown } } | null)?.snapshot?.chrome;
+    return chrome ? ({ snapshot: { chrome } } as unknown as typeof home) : null;
+  },
   staleTime: 60_000,
 });
 
