@@ -77,10 +77,64 @@ export function coerceAttributesToDefinitions(
   return out;
 }
 
+/** Palabras que los valores guardados escriben sin acento (`centro-historico`). */
+const SPANISH_ACCENTS: Record<string, string> = {
+  historico: "histórico",
+  asiatica: "asiática",
+  asiatico: "asiático",
+  ecologico: "ecológico",
+  economico: "económico",
+  bano: "baño",
+  banos: "baños",
+  menu: "menú",
+  recepcion: "recepción",
+  cafeteria: "cafetería",
+  panaderia: "panadería",
+  contemporanea: "contemporánea",
+  habitacion: "habitación",
+  habitaciones: "habitaciones",
+  jardin: "jardín",
+  lucia: "lucía",
+  dia: "día",
+  musica: "música",
+  fotografia: "fotografía",
+  arqueologico: "arqueológico",
+  arqueologica: "arqueológica",
+  gastronomia: "gastronomía",
+  cocteleria: "coctelería",
+  marisqueria: "marisquería",
+  tipica: "típica",
+  tipico: "típico",
+  autentico: "auténtico",
+  autentica: "auténtica",
+  ingles: "inglés",
+  medico: "médico",
+  rapida: "rápida",
+  rapido: "rápido",
+  cenote: "cenote",
+  ninos: "niños",
+  nino: "niño",
+  terraza: "terraza",
+  climatizacion: "climatización",
+  calefaccion: "calefacción",
+  television: "televisión",
+  energia: "energía",
+  ubicacion: "ubicación",
+  sotano: "sótano",
+  pequeno: "pequeño",
+  pequena: "pequeña",
+  espanol: "español",
+  peninsula: "península",
+  tunel: "túnel",
+};
+
 export function humanizeAttributeValue(value: string): string {
   return value
-    .split("-")
+    .split(/[-\s]+/)
     .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .map((raw) => {
+      const part = SPANISH_ACCENTS[raw.toLowerCase()] ?? raw;
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
     .join(" ");
 }

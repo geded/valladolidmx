@@ -66,6 +66,9 @@ interface ListingItem {
   href?: string;
   startsAt?: string | null;
   source?: TourismCardVM;
+  /** Filtros separados: para quién es y nivel de precio (no son servicios). */
+  audienceTags?: string[];
+  priceTags?: string[];
 }
 
 interface NearbyItem {
@@ -796,16 +799,42 @@ function TerritorialListingBody({
   const compactDiscovery = profile.family === "que-hacer";
   const [showMapMobile, setShowMapMobile] = useState(false);
   const [activeFacets, setActiveFacets] = useState<Record<string, string>>({});
-  const zones = useMemo(() => unique(items.map((item) => itemZone(item))), [items]);
+  const [destination, setDestination] = useState("");
+  const [audience, setAudience] = useState("");
+  const [price, setPrice] = useState("");
+  const destinations = useMemo(() => unique(items.map((item) => itemDestination(item))), [items]);
+  // «Colonia»: sólo zonas reales dentro del destino; el nombre del destino
+  // (o de otro destino) no es una colonia y va al filtro «Destino».
+  const destinationKeys = useMemo(() => new Set(destinations.map(normalize)), [destinations]);
+  const colonyOf = (item: ListingItem) => {
+    const value = itemZone(item);
+    return destinationKeys.has(normalize(value)) ? "" : value;
+  };
+  const zones = useMemo(
+    () => unique(items.map((item) => colonyOf(item))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [items, destinationKeys],
+  );
   const primaryValues = useMemo(() => unique(items.map((item) => item.type)), [items]);
   const secondaryValues = useMemo(
     () => unique(items.flatMap((item) => item.tags)).slice(0, 18),
     [items],
   );
+  const audienceValues = useMemo(
+    () => unique(items.flatMap((item) => item.audienceTags ?? [])),
+    [items],
+  );
+  const priceValues = useMemo(
+    () => sortPriceLevels(unique(items.flatMap((item) => item.priceTags ?? []))),
+    [items],
+  );
   const filteredItems = useMemo(() => {
     const needle = normalize(query);
     return items.filter((item) => {
-      if (zone && itemZone(item) !== zone) return false;
+      if (destination && itemDestination(item) !== destination) return false;
+      if (zone && colonyOf(item) !== zone) return false;
+      if (audience && !(item.audienceTags ?? []).includes(audience)) return false;
+      if (price && !(item.priceTags ?? []).includes(price)) return false;
       if (primary && item.type !== primary) return false;
       if (secondary && !item.tags.includes(secondary)) return false;
       if (
@@ -820,7 +849,8 @@ function TerritorialListingBody({
         [item.name, item.zone, item.copy, item.type, ...item.tags].join(" "),
       ).includes(needle);
     });
-  }, [activeFacets, facets, items, primary, query, secondary, zone]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFacets, audience, destination, facets, items, price, primary, query, secondary, zone]);
   const mappedItems = filteredItems.filter(
     (item) => item.source?.coordinates?.lat != null && item.source?.coordinates?.lng != null,
   );
@@ -831,7 +861,7 @@ function TerritorialListingBody({
   const [visibleCount, setVisibleCount] = useState(LISTING_PAGE_SIZE);
   useEffect(() => {
     setVisibleCount(LISTING_PAGE_SIZE);
-  }, [activeFacets, primary, query, secondary, zone]);
+  }, [activeFacets, audience, destination, price, primary, query, secondary, zone]);
   const visibleItems = filteredItems.slice(0, visibleCount);
   const remainingItems = filteredItems.length - visibleItems.length;
   return (
@@ -863,6 +893,18 @@ function TerritorialListingBody({
             hasMap={mappedItems.length > 0}
             onShowMap={() => setShowMapMobile(true)}
             compact={compactDiscovery}
+            extraSelects={[
+              ...(destinations.length > 1
+                ? [{ label: "Destino", value: destination, setValue: setDestination, options: destinations, first: true }]
+                : []),
+              { label: "Ideal para", value: audience, setValue: setAudience, options: audienceValues },
+              { label: "Precio", value: price, setValue: setPrice, options: priceValues },
+            ]}
+            onClearExtra={() => {
+              setDestination("");
+              setAudience("");
+              setPrice("");
+            }}
           />
         </div>
 
@@ -963,9 +1005,26 @@ function unique(values: string[]): string[] {
   return Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b, "es"));
 }
 
+const GENERIC_CUISINE_VALUES = new Set(["restaurante", "restaurantes", "bar", "bares", "snack-bar"]);
+
+const PRICE_ORDER = ["economico", "medio", "alto", "premium", "lujo"];
+function sortPriceLevels(values: string[]): string[] {
+  const rank = (v: string) => {
+    const i = PRICE_ORDER.indexOf(normalize(v));
+    return i === -1 ? PRICE_ORDER.length : i;
+  };
+  return [...values].sort((a, b) => rank(a) - rank(b));
+}
+
+/** Destino de la tarjeta según su dirección territorial `/oriente-maya/<destino>/…`. */
+function itemDestination(item: ListingItem): string {
+  const slug = item.href?.match(/^\/oriente-maya\/([^/?#]+)\//)?.[1];
+  return slug && slug !== "categoria" ? humanizeAttributeValue(slug) : "";
+}
+
 function itemZone(item: ListingItem): string {
   const structured = item.source ? attributeValues(item.source.filterAttributes?.zone)[0] : null;
-  return structured ? humanizeAttributeValue(structured) : item.zone;
+  return humanizeAttributeValue(structured ?? item.zone);
 }
 
 function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): ListingItem {
@@ -1003,9 +1062,21 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
                 "price_level",
               ]
             : ["services", "amenities", "accessibility", "traveler_profile", "price_level"];
-  const structuredType = attributeValues(item.filterAttributes?.[typeKey])[0];
-  const structuredTags = secondaryKeys.flatMap((key) =>
-    attributeValues(item.filterAttributes?.[key]).map(humanizeAttributeValue),
+  // «Restaurante» o «Bares» no son un tipo de cocina: se toma el siguiente valor real.
+  const typeValues = attributeValues(item.filterAttributes?.[typeKey]);
+  const structuredType =
+    profile.family === "restaurantes"
+      ? typeValues.find((value) => !GENERIC_CUISINE_VALUES.has(normalize(value)))
+      : typeValues[0];
+  const tagsFor = (keys: string[]) =>
+    keys.flatMap((key) => attributeValues(item.filterAttributes?.[key]).map(humanizeAttributeValue));
+  const separable = profile.family !== "eventos" && profile.family !== "lugares";
+  const audienceTags = separable ? tagsFor(["traveler_profile"]) : [];
+  const priceTags = separable ? tagsFor(["price_level"]) : [];
+  const structuredTags = tagsFor(
+    separable
+      ? secondaryKeys.filter((key) => key !== "traveler_profile" && key !== "price_level")
+      : secondaryKeys,
   );
   return {
     name: item.name,
@@ -1020,9 +1091,13 @@ function listingItemFromDTO(item: TourismCardVM, profile: ListingProfile): Listi
       ...item.highlights,
       ...item.badges.map((badge) => badge.label),
     ]),
+    audienceTags: unique(audienceTags),
+    priceTags: unique(priceTags),
     type: structuredType
       ? humanizeAttributeValue(structuredType)
-      : item.eyebrow?.trim() || profile.itemLabel,
+      : profile.family === "restaurantes"
+        ? ""
+        : item.eyebrow?.trim() || profile.itemLabel,
     href: item.href ?? undefined,
     startsAt: item.startsAt ?? null,
 
@@ -1166,6 +1241,8 @@ function Filters({
   hasMap,
   onShowMap,
   compact = false,
+  extraSelects = [],
+  onClearExtra,
 }: {
   profile: ListingProfile;
   query: string;
@@ -1185,22 +1262,38 @@ function Filters({
   hasMap: boolean;
   onShowMap: () => void;
   compact?: boolean;
+  extraSelects?: Array<{
+    label: string;
+    value: string;
+    setValue: (value: string) => void;
+    options: string[];
+    first?: boolean;
+  }>;
+  onClearExtra?: () => void;
 }) {
+  // «Zona» agrupa colonias del destino; el destino tiene su propio filtro.
+  // El tercer filtro conserva su nombre salvo «Ideal para», que ahora es
+  // un filtro aparte (para quién es) y deja aquí sólo servicios.
+  const thirdLabel = profile.filters[2] === "Ideal para" ? "Servicios" : profile.filters[2];
+  const hasAudience = extraSelects.some((s) => s.label === "Ideal para" && s.options.length > 0);
+  const zoneLabel = profile.filters[0] === "Zona" ? "Colonia" : profile.filters[0];
   const selects = [
-    { label: profile.filters[0], value: zone, setValue: setZone, options: zones },
+    ...extraSelects.filter((s) => s.first),
+    { label: zoneLabel, value: zone, setValue: setZone, options: zones },
     { label: profile.filters[1], value: primary, setValue: setPrimary, options: primaryValues },
     {
-      label: profile.filters[2],
+      label: hasAudience ? thirdLabel : profile.filters[2],
       value: secondary,
       setValue: setSecondary,
       options: secondaryValues,
     },
-  ];
+    ...extraSelects.filter((s) => !s.first),
+  ].filter((s) => s.options.length > 0 || s.value);
   return (
     <section
       className={`${compact ? "mt-3 p-2.5 sm:p-3" : "mt-4 p-3 sm:p-4"} rounded-2xl border border-[var(--border)] bg-card shadow-sm`}
     >
-      <div className="flex snap-x gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[1.4fr_repeat(3,1fr)_auto] lg:pb-0">
+      <div className="flex snap-x gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-wrap lg:overflow-visible lg:pb-0 lg:[&>label]:min-w-[10rem] lg:[&>label]:flex-1">
         <label className="relative min-w-[12.5rem] lg:min-w-0">
           <Search
             className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--muted-foreground)]"
@@ -1276,6 +1369,7 @@ function Filters({
             setPrimary("");
             setSecondary("");
             setActiveFacets({});
+            onClearExtra?.();
           }}
           className="inline-flex min-h-11 min-w-max items-center justify-center gap-2 rounded-xl bg-[var(--brand-surface-soft)] px-4 text-sm font-semibold"
         >
