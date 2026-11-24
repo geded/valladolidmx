@@ -46,6 +46,11 @@ export interface EditorField {
   required?: boolean;
   placeholder?: string;
   helpText?: string;
+  /**
+   * Inicio fijo que se muestra pegado al campo (p. ej. el dominio y la
+   * categoría antes de la dirección web). Puede depender de lo ya escrito.
+   */
+  prefix?: string | ((values: Record<string, string>) => string);
   /** Opciones para el tipo select. */
   options?: { value: string; label: string }[];
 }
@@ -432,6 +437,7 @@ export function EntityEditor(props: Props) {
           <Fragment key={f.name}>
             <FieldInput
               field={f}
+              prefix={typeof f.prefix === "function" ? f.prefix(values) : f.prefix}
               value={values[f.name] ?? ""}
               onChange={(v) => updateValue(f.name, v)}
             />
@@ -551,8 +557,13 @@ export function EntityEditor(props: Props) {
   );
 }
 
-function FieldInput(props: { field: EditorField; value: string; onChange: (v: string) => void }) {
-  const { field, value, onChange } = props;
+function FieldInput(props: {
+  field: EditorField;
+  value: string;
+  onChange: (v: string) => void;
+  prefix?: string | undefined;
+}) {
+  const { field, value, onChange, prefix } = props;
   if (field.type === "media") {
     return (
       <MediaIdField
@@ -632,6 +643,20 @@ function FieldInput(props: { field: EditorField; value: string; onChange: (v: st
             </option>
           ))}
         </select>
+      ) : prefix && field.type === "text" ? (
+        <div className="flex w-full flex-col overflow-hidden rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-primary sm:flex-row sm:items-stretch">
+          <span className="flex items-center break-all border-b border-border bg-muted/60 px-3 py-2 text-sm text-muted-foreground sm:max-w-[60%] sm:border-b-0 sm:border-r">
+            {prefix}
+          </span>
+          <input
+            required={field.required}
+            type="text"
+            value={value}
+            placeholder={field.placeholder}
+            onChange={(e) => onChange(e.target.value)}
+            className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm outline-none"
+          />
+        </div>
       ) : (
         <input
           required={field.required}

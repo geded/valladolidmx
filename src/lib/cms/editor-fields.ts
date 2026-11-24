@@ -167,7 +167,10 @@ export const BUSINESS_FIELDS: EditorField[] = [
     name: "slug",
     label: "Dirección web",
     type: "text",
-    helpText: "Opcional. Si la dejas vacía, se crea sola a partir del nombre público. Sólo minúsculas, números y guiones; evita cambiarla después de publicar.",
+    required: true,
+    placeholder: "copalli-cafe",
+    helpText:
+      "Es el nombre que tendrá la empresa en internet. La primera parte de la dirección ya la pone el sistema; tú escribe sólo el final, en minúsculas y con guiones en lugar de espacios, sin acentos ni puntos. Por ejemplo, para «Copalli Café» escribe copalli-cafe. Evita cambiarla después de publicar.",
   },
   {
     name: "destination_id",

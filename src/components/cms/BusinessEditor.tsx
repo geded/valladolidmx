@@ -17,6 +17,8 @@ import { BusinessZoneSelect } from "@/components/cms/BusinessZoneSelect";
 import { ExistingBusinessMatches } from "@/components/cms/ExistingBusinessMatches";
 import { SeoLandingAction } from "@/components/cms/SeoLandingAction";
 import { BUSINESS_FIELDS } from "@/lib/cms/editor-fields";
+import { getSiteDomainSettings } from "@/lib/settings/site-domains.functions";
+import { singularCategorySlug } from "@/lib/navigation/short-links";
 import {
   listBusinessCategoriesForSelect,
   listDestinationsForSelect,
@@ -44,8 +46,26 @@ export function BusinessEditor({ id }: Props) {
     queryFn: () => catsFn(),
   });
 
+  const domainsFn = useServerFn(getSiteDomainSettings);
+  const domains = useQuery({
+    queryKey: ["site", "domains"],
+    queryFn: () => domainsFn(),
+    staleTime: 5 * 60_000,
+  });
+  const primaryDomain = domains.data?.primaryDomain ?? "quehacerenvalladolid.com";
+
   const fields = useMemo(() => {
     return BUSINESS_FIELDS.map((f) => {
+      if (f.name === "slug") {
+        return {
+          ...f,
+          // Inicio fijo de la dirección: dominio + categoría elegida.
+          prefix: (values: Record<string, string>) => {
+            const cat = categories.data?.find((c) => c.id === values["primary_category_id"]);
+            return `${primaryDomain}/${cat ? singularCategorySlug(cat.slug) : "categoría"}/`;
+          },
+        };
+      }
       if (f.name === "destination_id") {
         return {
           ...f,
@@ -66,7 +86,7 @@ export function BusinessEditor({ id }: Props) {
       }
       return f;
     });
-  }, [destinations.data, categories.data]);
+  }, [destinations.data, categories.data, primaryDomain]);
 
   // Zona: se elige junto al destino y se guarda con el mismo botón.
   const zoneCtxFn = useServerFn(getBusinessZoneContext);

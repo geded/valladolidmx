@@ -41,6 +41,12 @@ describe("formularios del CMS · lenguaje de editor", () => {
     }
   });
 
+  test("la dirección web de una empresa es obligatoria y pide sólo el final", () => {
+    const slug = BUSINESS_FIELDS.find((f) => f.name === "slug");
+    expect(slug?.required).toBe(true);
+    expect(slug?.helpText ?? "").toContain("escribe sólo el final");
+  });
+
   test("cada relación de un lugar tiene nombre en español distinto del código", () => {
     for (const kind of PLACE_PRODUCT_RELATION_KINDS) {
       expect(PLACE_PRODUCT_RELATION_LABELS[kind]).toBeTruthy();
