@@ -87,7 +87,8 @@ async function loadDestinationPage(params: { destino: string }) {
       publicReadMemo(`q:${JSON.stringify(["home-premium-real-content"])}`, () =>
         resolveHomePremiumRealContent(),
       ).catch(() => null),
-      publicReadMemo("public-routes:24", () =>
+      // Version the transport after correcting public variant eligibility.
+      publicReadMemo("public-routes:24:published-media-v2", () =>
         listPublicRoutes({ data: { destino: null, limit: 24 } }),
       ).catch(() => []),
       publicReadMemo("listing-family-taxonomy", () => getListingFamilyTaxonomy()).catch(() => ({ available: false as const, taxonomy: {} })),
@@ -146,7 +147,7 @@ async function loadDestinationPage(params: { destino: string }) {
 const getDestinationPage = createServerFn({ method: "GET" })
   .inputValidator((d: { destino: string }) => ({ destino: String(d.destino) }))
   .handler(({ data }) =>
-    publicReadMemo(`destination-page:${data.destino}`, () => loadDestinationPage(data)),
+    publicReadMemo(`destination-page:published-media-v2:${data.destino}`, () => loadDestinationPage(data)),
   );
 
 export const Route = createFileRoute("/oriente-maya/$destino/")({

@@ -36,15 +36,16 @@ export function isSharedHtmlRequest(request: Request): boolean {
     request.headers.get("pragma") !== "no-cache";
 }
 
-type HtmlCopy = { bodyBase64: string; headers: [string, string][] };
+type HtmlCopy = { bodyGzipBase64: string; headers: [string, string][] };
 class UncacheableHtml extends Error {
   constructor(readonly response: Response) { super("Uncacheable public response"); }
 }
 
 export async function serveSharedHtml(request: Request, render: () => Promise<Response>): Promise<Response> {
+  const started = performance.now();
   // Se reutiliza la tabla y el invalidado CMS existentes; no hay otro almacén.
   const build = String(import.meta.env["VMX_HTML_BUILD_ID"] ?? "dev");
-  const key = `public-html:base64:${build}:${request.url}:${request.headers.get("accept-language") ?? ""}`;
+  const key = `public-html:gzip:${build}:${request.url}:${request.headers.get("accept-language") ?? ""}`;
   let rendered = false;
   try {
     const copy = await publicReadMemo<HtmlCopy>(key, async () => {
@@ -59,13 +60,22 @@ export async function serveSharedHtml(request: Request, render: () => Promise<Re
       const headers = Array.from(response.headers.entries()).filter(([name]) =>
         !["content-length", "transfer-encoding", "connection", "date"].includes(name.toLowerCase()),
       );
-      // SSR puede incluir NUL en su stream serializado: JSONB no admite NUL.
-      return { bodyBase64: Buffer.from(body, "utf8").toString("base64"), headers };
+      // Compact only the stored data, NEVER the HTTP response. JSONB rejects NUL.
+      const packed = await new Response(
+        new Blob([body]).stream().pipeThrough(new CompressionStream("gzip")),
+      ).arrayBuffer();
+      return { bodyGzipBase64: Buffer.from(packed).toString("base64"), headers };
     }, { maxAgeMs: FRESH_MS, staleWhileRevalidate: false });
-    const out = new Response(Buffer.from(copy.bodyBase64, "base64").toString("utf8"), { headers: copy.headers });
+    const lookupMs = performance.now() - started;
+    const bytes = Uint8Array.from(Buffer.from(copy.bodyGzipBase64, "base64"));
+    const body = await new Response(
+      new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip")),
+    ).text();
+    const out = new Response(body, { headers: copy.headers });
     // No sumar otra vida en CDN/navegador: CMS invalida la única copia compartida.
     out.headers.set("cache-control", "no-store");
     out.headers.set("x-vmx-html", rendered ? "MISS" : "HIT");
+    out.headers.append("server-timing", `vmx_html;dur=${lookupMs.toFixed(1)}, vmx_unpack;dur=${(performance.now() - started - lookupMs).toFixed(1)}`);
     return out;
   } catch (error) {
     if (error instanceof UncacheableHtml) return error.response;

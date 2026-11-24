@@ -33,6 +33,18 @@ describe("HTML público reutilizado", () => {
     expect(second.headers.get("cache-control")).toBe("no-store");
     expect(render).toHaveBeenCalledTimes(1);
   });
+  it("compacta solo lo guardado y devuelve intactos UTF-8, NUL y HTML sin doble compresión", async () => {
+    const body = "Valladolid · café · 🌴\0".repeat(1000);
+    const response = await serveSharedHtml(request(), async () => html(body));
+    expect(await response.text()).toBe(body);
+    expect(response.headers.has("content-encoding")).toBe(false);
+    expect(response.headers.get("server-timing")).toContain("vmx_html;dur=");
+    const stored = [...rows.values()].find((row) => row.value !== null);
+    expect(stored).toBeDefined();
+    expect(JSON.stringify(stored?.value).length).toBeLessThan(body.length / 4);
+    __resetPublicReadMemo();
+    expect(await (await serveSharedHtml(request(), async () => html("wrong"))).text()).toBe(body);
+  });
   it("nunca entrega HTML de más de 60 segundos ni lo renueva después de responder", async () => {
     const render = vi.fn(async () => html(`foto-${Date.now()}`));
     await serveSharedHtml(request(), render);

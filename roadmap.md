@@ -1,9 +1,12 @@
 # Roadmap
 
 ## Velocidad de Inicio y Valladolid · 2026-11-24
+- [x] Revisión tras publicación (21:28 UTC): copias HTML guardadas 85–87% menores, tiempos internos medibles; navegación empresa/regreso comprobada, sin 403 ni cambios de plantillas. Demora de alojamiento pendiente de medir tras nueva publicación.
+- [x] Reparar foto de ruta en Valladolid: no anunciar variantes de asset borrador; conserva original configurado (200), permisos y contrato. Preview 1440/834/430/390 sin fotos rotas.
 - [x] Reutilizar HTML público ya renderizado en la caché existente, limitado a Inicio y Valladolid; excluir sesiones, filtros, borradores y respuestas privadas.
 - [x] Conservar invalidación CMS, versiones de publicación, fotos, orden editorial y reglas de visibilidad; 13 pruebas PASS y comparación completa en 1440/834/430/390 sin cambios de contenido ni geometría.
-- [ ] Medir después de publicar (espera publicación del Founder); la meta de 1,000 visitantes simultáneos aún no está certificada. Constructor autenticado y gobernanza global con revisiones históricas pendientes no certificados; informe en docs/public-speed-2026-11-24.md.
+- [x] Medir primera publicación: copia HIT funciona pero Inicio conserva esperas variables; 0 respuestas 403, detectado 404 de foto y reparado en preview. Informe en docs/public-speed-2026-11-24.md.
+- [ ] Publicar reparación de 21:28 y medir espera del alojamiento con Server-Timing (espera Founder). 1,000 visitantes simultáneos, Constructor autenticado y reconciliación de evidencia histórica no certificados.
 
 ## Alta de Copalli Café · 2026-11-23
 - [x] Ficha con datos de Google, horario, contacto y carta de bebidas (74 opciones).

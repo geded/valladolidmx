@@ -5,12 +5,15 @@
   "status": "Approved",
   "branch": "main",
   "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
-  "founder_authority": "Founder 2026-11-24 21:09 UTC: «Autorizado» a mejorar carga de Inicio/Valladolid y buscar entrega de páginas ya armadas. Delta exclusivamente de transporte sobre public_read_cache existente; sin rediseño, cambios CMS, migraciones, publicaciones ni ranking comercial.",
+  "founder_authority": "Founder 2026-11-24 21:09 UTC: «Autorizado»; 21:28 UTC: «Ya está publicado, revisa y repara lo que hace falta». Delta de transporte: compactar copias guardadas (no respuesta HTTP), medir espera interna y corregir variantes anunciadas de un asset borrador sin relajar permisos; retirar sus copias antiguas. Sin rediseño, cambios CMS, migraciones, publicaciones ni ranking comercial.",
   "permissions": [
     { "operation": "modify", "path": "src/lib/cache/public-read-memo.ts" },
     { "operation": "modify", "path": "src/lib/cache/AGENTS.md" },
     { "operation": "modify", "path": "src/lib/server/public-page-cache.ts" },
-    { "operation": "modify", "path": "src/start.ts" }
+    { "operation": "modify", "path": "src/start.ts" },
+    { "operation": "modify", "path": "src/lib/media/variant-bundles.server.ts" },
+    { "operation": "create", "path": "src/lib/media/AGENTS.md" },
+    { "operation": "modify", "path": "src/routes/oriente-maya/$destino.index.tsx" }
   ],
   "public_routes": ["/", "/oriente-maya/valladolid"],
   "required_feature_flags": [],

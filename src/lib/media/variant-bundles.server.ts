@@ -44,17 +44,21 @@ export async function attachReadyVariants(
   if (ready.length === 0) return out;
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
-      .from("media_asset_variants")
-      .select("asset_id, format, width, height, bucket, path, usage_context, variant_key")
-      .in(
-        "asset_id",
-        ready.map((a) => a.id),
-      )
-      .eq("status", "ready")
-      .eq("is_current", true);
-    if (error || !data) return out;
+    // The public proxy refuses unpublished/deleted assets. Do not advertise
+    // their variants, even when an old CMS composition retains the original.
+    const ids = ready.map((a) => a.id);
+    const [variantsResult, assetsResult] = await Promise.all([
+      supabaseAdmin.from("media_asset_variants")
+        .select("asset_id, format, width, height, bucket, path, usage_context, variant_key")
+        .in("asset_id", ids).eq("status", "ready").eq("is_current", true),
+      supabaseAdmin.from("media_assets").select("id")
+        .in("id", ids).eq("status", "published").is("deleted_at", null),
+    ]);
+    const { data, error } = variantsResult;
+    if (error || !data || assetsResult.error || !assetsResult.data) return out;
+    const publishedIds = new Set(assetsResult.data.map((asset) => asset.id));
     for (const a of ready) {
+      if (!publishedIds.has(a.id)) continue;
       const variants = data
         .filter((v) => v.asset_id === a.id)
         .map((v) => {
