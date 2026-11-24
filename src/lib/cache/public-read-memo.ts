@@ -41,7 +41,7 @@ function plainJson(v: unknown, depth = 0): boolean {
   return false;
 }
 
-async function writeShared(key: string, value: unknown) {
+async function writeShared(key: string, value: unknown, at: number) {
   // Sólo datos JSON puros: fechas u objetos especiales cambiarían al volver.
   if (!plainJson(value)) return;
   try {
@@ -49,11 +49,31 @@ async function writeShared(key: string, value: unknown) {
     await sb.from("public_read_cache").upsert({
       key,
       value: JSON.parse(JSON.stringify(value ?? null)),
-      refreshed_at: new Date().toISOString(),
+      refreshed_at: new Date(at).toISOString(),
     });
   } catch {
     /* la copia compartida es opcional */
   }
+}
+
+// Cada guardado en el CMS borra las copias compartidas y marca la hora en
+// `__cms_changed__` (disparador en la base). Cada servidor consulta esa hora
+// como mucho cada 5 s y descarta su copia local si es anterior.
+const CHANGED_KEY = "__cms_changed__";
+const CHECK_MS = 5_000;
+let lastChange = 0;
+let checkedAt = 0;
+let checking: Promise<void> | null = null;
+async function cmsChangedAt(): Promise<number> {
+  if (Date.now() - checkedAt < CHECK_MS) return lastChange;
+  checking ??= readShared(CHANGED_KEY)
+    .then((e) => {
+      if (e && e.at > lastChange) lastChange = e.at;
+      checkedAt = Date.now();
+    })
+    .finally(() => (checking = null));
+  await checking;
+  return lastChange;
 }
 
 function remember(key: string, entry: Entry) {
@@ -64,10 +84,12 @@ function remember(key: string, entry: Entry) {
 function load<T>(key: string, fn: () => Promise<T>): Promise<T> {
   const running = inflight.get(key);
   if (running) return running as Promise<T>;
+  const started = Date.now();
   const p = fn()
     .then(async (value) => {
-      remember(key, { value, at: Date.now() });
-      await writeShared(key, value);
+      remember(key, { value, at: started });
+      // Si hubo un cambio del CMS mientras se leía, no guardar copia vieja.
+      if (started > lastChange) await writeShared(key, value, started);
       return value;
     })
     .finally(() => inflight.delete(key));
@@ -85,10 +107,11 @@ function serve<T>(key: string, hit: Entry, fn: () => Promise<T>): T {
 
 export async function publicReadMemo<T>(key: string, fn: () => Promise<T>): Promise<T> {
   if (typeof window !== "undefined") return fn();
+  const changed = await cmsChangedAt();
   const local = store.get(key);
-  if (local && Date.now() - local.at < STALE_MS) return serve(key, local, fn);
+  if (local && local.at > changed && Date.now() - local.at < STALE_MS) return serve(key, local, fn);
   const shared = await readShared(key);
-  if (shared && Date.now() - shared.at < STALE_MS) {
+  if (shared && shared.at > changed && Date.now() - shared.at < STALE_MS) {
     remember(key, shared);
     return serve(key, shared, fn);
   }
@@ -112,4 +135,6 @@ export async function ensureMemoQuery<T>(
 export function __resetPublicReadMemo() {
   store.clear();
   inflight.clear();
+  lastChange = 0;
+  checkedAt = 0;
 }
