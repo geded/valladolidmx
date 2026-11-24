@@ -8,8 +8,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { createHash } from "crypto";
-import { streamText } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import type { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import {
   retrieveAluxKnowledgeServer,
   knowledgeToPromptBlock,
@@ -517,6 +516,7 @@ async function refreshSessionSummary(
       "",
       "Devuelve SOLO el nuevo resumen incremental.",
     ].join("\n");
+    const { streamText } = await import("ai");
     const res = streamText({
       model: provider(model),
       system: sys,
@@ -843,6 +843,12 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         }
 
         // 5) Genera respuesta.
+        // Las librerías de IA se cargan sólo cuando Alux responde, no al
+        // despertar el servidor para cualquier página.
+        const [{ streamText }, { createLovableAiGatewayProvider }] = await Promise.all([
+          import("ai"),
+          import("@/lib/ai-gateway.server"),
+        ]);
         const provider = createLovableAiGatewayProvider(apiKey);
         const persona =
           settings?.persona ??
