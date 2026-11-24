@@ -75,6 +75,19 @@ export const getPublicListing = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data }): Promise<PublicListingDTO> => {
+    if (data.previewMedia) return readPublicListing(data);
+    const { publicReadMemo } = await import("@/lib/cache/public-read-memo");
+    return publicReadMemo(`public-listing:${data.family}:${data.destino ?? "*"}`, () =>
+      readPublicListing(data),
+    );
+  });
+
+async function readPublicListing(data: {
+  family: ListingFamilyId;
+  destino: string | null;
+  previewMedia: boolean;
+}): Promise<PublicListingDTO> {
+  {
     const contract = listingFamilyContract(data.family);
 
     if (contract.source === "businesses") {
@@ -138,7 +151,8 @@ export const getPublicListing = createServerFn({ method: "GET" })
       places,
       zones,
     });
-  });
+  }
+}
 
 /**
  * Listado Premium de empresas para CUALQUIER categoría publicada en CMS

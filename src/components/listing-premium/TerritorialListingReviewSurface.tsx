@@ -949,7 +949,7 @@ function listingPinCategory(family: string): MapPinCategory {
 }
 
 /** Tarjetas por bloque en listados largos; múltiplo de 4 por los espacios comerciales. */
-const LISTING_PAGE_SIZE = 24;
+const LISTING_PAGE_SIZE = 12;
 
 function normalize(value: string): string {
   return value
