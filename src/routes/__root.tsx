@@ -287,6 +287,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: SITE.default_description },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: SITE.name },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "format-detection", content: "telephone=no" },
       // H1 · SEO Sweep — Directiva por defecto para crawlers y AI (indexable).
       {
@@ -352,6 +353,9 @@ function RootShell({ children }: { children: ReactNode }) {
       suppressHydrationWarning
       data-tourism-brand={ACTIVE_BRAND.key}
       style={{
+        // Fondo crema desde el primer instante: la app instalada en iPhone
+        // mostraba negro mientras llegaban los estilos.
+        backgroundColor: "#f9f5ee",
         ...ACTIVE_BRAND_THEME_STYLE,
         ...brandPaletteStyle(brandSettings.palette),
         ...aluxPaletteStyle(brandSettings.aluxPalette),
