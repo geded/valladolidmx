@@ -127,6 +127,38 @@ describe("gm_authFailure multiinstancia", () => {
 });
 
 describe("enlaces seguros a Google Maps", () => {
+  it("reutiliza un mapa liberado en lugar de crear otro al navegar", () => {
+    const created: unknown[] = [];
+    const cleared: unknown[] = [];
+    class FakeMap {
+      options: unknown[] = [];
+      constructor(_el: unknown, options: unknown) {
+        created.push(this);
+        this.options.push(options);
+      }
+      setOptions(options: unknown) {
+        this.options.push(options);
+      }
+      unbindAll() {}
+    }
+    const container = () => ({ className: "", remove() {} });
+    (globalThis as Record<string, unknown>).document = { createElement: container };
+    const google = {
+      maps: {
+        Map: FakeMap,
+        event: { clearInstanceListeners: (x: unknown) => cleared.push(x), trigger() {} },
+      },
+    } as never;
+    const host = { appendChild() {} } as never;
+    const first = loader.acquireGoogleMap(google, host, { zoom: 10 });
+    first.release();
+    const second = loader.acquireGoogleMap(google, host, { zoom: 12 });
+    expect(created).toHaveLength(1);
+    expect(second.map).toBe(first.map);
+    expect(cleared).toEqual([first.map]);
+    second.release();
+  });
+
   it("construye enlaces de ficha y de ruta con coordenadas codificadas", () => {
     const place = loader.googleMapsPlaceUrl({ lat: 20.6896, lng: -88.2019, title: "Zací" });
     const dir = loader.googleMapsDirectionsUrl({ lat: 20.6896, lng: -88.2019 });

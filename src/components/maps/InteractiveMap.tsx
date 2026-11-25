@@ -19,6 +19,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import {
+  acquireGoogleMap,
   getGoogleMapsBrowserKey,
   loadGoogleMaps,
   subscribeGoogleMapsAuthFailure,
@@ -448,7 +449,20 @@ export function InteractiveMap({
        para que la memoria del teléfono no crezca con cada ruta visitada. */
     const overlays: unknown[] = [];
     let mapInstance: unknown = null;
+    let releaseMap: (() => void) | null = null;
     let releaseListeners: ((instance: unknown) => void) | null = null;
+    const dispose = () => {
+      cancelled = true;
+      for (const overlay of overlays.splice(0)) {
+        releaseListeners?.(overlay);
+        (overlay as { setMap?: (map: null) => void }).setMap?.(null);
+        (overlay as { unbindAll?: () => void }).unbindAll?.();
+      }
+      if (mapInstance) releaseListeners?.(mapInstance);
+      releaseMap?.();
+      releaseMap = null;
+      mapInstance = null;
+    };
 
     loadGoogleMaps(apiKey)
       .then((google) => {
@@ -474,7 +488,7 @@ export function InteractiveMap({
           left: basePad,
         };
 
-        const map = new google.maps.Map(ref.current, {
+        const lease = acquireGoogleMap(google, ref.current, {
           center: { lat, lng },
           zoom,
           styles: getBrandMapStyles(),
@@ -489,7 +503,11 @@ export function InteractiveMap({
             ? { restriction: { latLngBounds: restriction, strictBounds: false } }
             : {}),
           ...(typeof minZoom === "number" ? { minZoom } : {}),
+          ...(!restriction ? { restriction: null } : {}),
+          ...(typeof minZoom !== "number" ? { minZoom: null } : {}),
         });
+        const map = lease.map;
+        releaseMap = lease.release;
         mapInstance = map;
         const list: InteractiveMapMarker[] =
           markers && markers.length > 0 ? markers : [{ lat, lng, title: markerTitle }];
@@ -572,6 +590,7 @@ export function InteractiveMap({
           for (const pin of pinOverlays.splice(0)) {
             releaseListeners?.(pin);
             (pin as { setMap?: (map: null) => void }).setMap?.(null);
+            (pin as { unbindAll?: () => void }).unbindAll?.();
           }
         };
         const drawAll = () => list.forEach((m, i) => drawPin(m, i));
@@ -765,17 +784,12 @@ export function InteractiveMap({
         setReady(true);
       })
       .catch(() => {
-        setFailed(true);
+        if (!cancelled) {
+          dispose();
+          setFailed(true);
+        }
       });
-    return () => {
-      cancelled = true;
-      for (const overlay of overlays.splice(0)) {
-        releaseListeners?.(overlay);
-        (overlay as { setMap?: (map: null) => void }).setMap?.(null);
-      }
-      if (mapInstance) releaseListeners?.(mapInstance);
-      mapInstance = null;
-    };
+    return dispose;
   }, [
     shouldMount,
     lat,

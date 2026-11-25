@@ -11,6 +11,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import {
+  acquireGoogleMap,
   getGoogleMapsBrowserKey,
   loadGoogleMaps,
   subscribeGoogleMapsAuthFailure,
@@ -89,17 +90,25 @@ export function LocationPickerMap({
       return;
     }
     let cancelled = false;
+    let release: (() => void) | null = null;
     loadGoogleMaps(apiKey)
       .then((google) => {
         if (cancelled || !ref.current) return;
-        const map = new google.maps.Map(ref.current, {
-          center: { lat, lng },
-          zoom,
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: true,
-          gestureHandling: "greedy",
-        });
+        const lease = acquireGoogleMap(
+          google,
+          ref.current,
+          {
+            center: { lat, lng },
+            zoom,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: true,
+            gestureHandling: "greedy",
+          },
+          "picker",
+        );
+        release = lease.release;
+        const map = lease.map;
         const marker = new google.maps.Marker({
           position: { lat, lng },
           map,
@@ -118,10 +127,24 @@ export function LocationPickerMap({
         }) as never);
         mapRef.current = map;
         markerRef.current = marker;
+        release = () => {
+          google.maps.event?.clearInstanceListeners(marker);
+          marker.setMap(null);
+          marker.unbindAll();
+          mapRef.current = null;
+          markerRef.current = null;
+          lease.release();
+        };
       })
-      .catch(() => setFailed(true));
+      .catch(() => {
+        if (!cancelled) {
+          release?.();
+          setFailed(true);
+        }
+      });
     return () => {
       cancelled = true;
+      release?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);

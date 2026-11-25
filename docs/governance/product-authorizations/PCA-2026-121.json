@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-121",
+  "title": "Corrección localizada de memoria de mapas y lecturas públicas concurrentes",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Founder 2026-11-25 02:57 UTC: «Ok , vamos a hacerlo», en respuesta al diagnóstico de acumulación de memoria y primeras aperturas lentas. Reutilizar mapas mediante el cargador existente y paralelizar/deduplicar lecturas de la caché existente. Conservar plantillas, CMS, navegación, búsquedas, galerías, cartografía, marca, header/footer, Alux y Mi Viaje. Sin cambiar datos, permisos, pagos, cron, cuotas, despliegues o evidencias históricas.",
+  "permissions": [
+    { "operation": "modify", "path": "src/lib/maps/google-maps-loader.ts" },
+    { "operation": "modify", "path": "src/components/maps/InteractiveMap.tsx" },
+    { "operation": "modify", "path": "src/components/maps/LocationPickerMap.tsx" },
+    { "operation": "modify", "path": "src/lib/cache/public-read-memo.ts" },
+    { "operation": "modify", "path": "src/lib/maps/AGENTS.md" },
+    { "operation": "modify", "path": "src/lib/cache/AGENTS.md" }
+  ],
+  "public_routes": [
+    "/",
+    "/oriente-maya",
+    "/oriente-maya/valladolid",
+    "/hoteles",
+    "/restaurantes",
+    "/oriente-maya/valladolid/restaurantes/copalli-cafe"
+  ],
+  "required_feature_flags": [],
+  "required_tests": [
+    "Pruebas de caché compartida, concurrencia e invalidación CMS",
+    "Pruebas del cargador de mapas y limpieza de recursos",
+    "Búsqueda de Copalli, galería, ficha y regreso con búsqueda conservada",
+    "Comparación completa de superficies públicas en 1440/834/430/390 sin modificar su diseño",
+    "Compilación automática, lint localizado e inventario de gobernanza",
+    "Validación de Google Maps en origen publicado autorizado por el Founder, no simulación de éxito"
+  ]
+}

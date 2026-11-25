@@ -1,5 +1,10 @@
 # Roadmap
 
+## Memoria y primeras aperturas · 2026-11-25
+- [x] Diagnóstico de heap: SDK de Google Maps retiene contenedores anteriores; reutilización por el cargador existente y limpieza de overlays/picker implementadas sin modificar plantillas.
+- [x] Lecturas frías de marca CMS y copia compartida en paralelo, deduplicadas por clave; fechas y límites de caché/fotos intactos. 31 pruebas PASS, compilación automática OK y flujo Copalli/galería/regreso comprobado en preview; 24 revisiones en 1440/834/430/390 sin errores/desbordes. Informe: docs/memory-speed-2026-11-25.md.
+- [ ] Publicar y medir heap y primeras aperturas; Google Maps real requiere validación del Founder en origen autorizado. Gobernanza histórica superpuesta sigue bloqueada sin reconciliación explícita. Sin cambios de diseño, datos CMS, permisos, pagos, cron o capacidad contratada; no certificación de 1,000 usuarios ni Safari físico.
+
 ## Armonización de fotografías · 2026-11-25
 - [x] Alcance y plan aprobados: proporciones por función, sin rediseñar plantillas ni cambiar datos CMS.
 - [x] Armonizar tarjetas de Inicio y recomendaciones compartidas a 4:3; Pueblos Mágicos 4:3 móvil y 21:9 escritorio para conservar legibilidad. Región y listados comunes ya cumplían. Portadas principales, galerías y miniaturas específicas intactas.

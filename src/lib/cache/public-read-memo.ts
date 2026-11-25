@@ -11,6 +11,7 @@ const STALE_MS = 30 * 60_000;
 const MAX = 500;
 const store = new Map<string, Entry>();
 const inflight = new Map<string, Promise<unknown>>();
+const sharedReads = new Map<string, Promise<Entry | null>>();
 
 async function admin() {
   const mod = await import("@/integrations/supabase/client.server");
@@ -18,6 +19,14 @@ async function admin() {
 }
 
 async function readShared(key: string): Promise<Entry | null> {
+  const pending = sharedReads.get(key);
+  if (pending) return pending;
+  const read = fetchShared(key).finally(() => sharedReads.delete(key));
+  sharedReads.set(key, read);
+  return read;
+}
+
+async function fetchShared(key: string): Promise<Entry | null> {
   try {
     const sb = await admin();
     const { data } = await sb
@@ -111,14 +120,17 @@ export async function publicReadMemo<T>(
   options: { maxAgeMs?: number; staleWhileRevalidate?: boolean } = {},
 ): Promise<T> {
   if (typeof window !== "undefined") return fn();
-  const changed = await cmsChangedAt();
-  const maxAge = options.maxAgeMs ?? STALE_MS;
-  const reuse = (hit: Entry) => options.staleWhileRevalidate === false
-    ? hit.value as T
-    : serve(key, hit, fn);
   const local = store.get(key);
+  // A cold server can read the shared copy and the CMS stamp together.
+  // Await both before trusting the copy; invalidation is never bypassed.
+  const changeRead = cmsChangedAt();
+  const sharedRead = local ? null : readShared(key);
+  const changed = await changeRead;
+  const maxAge = options.maxAgeMs ?? STALE_MS;
+  const reuse = (hit: Entry) =>
+    options.staleWhileRevalidate === false ? (hit.value as T) : serve(key, hit, fn);
   if (local && local.at > changed && Date.now() - local.at < maxAge) return reuse(local);
-  const shared = await readShared(key);
+  const shared = await (sharedRead ?? readShared(key));
   if (shared && shared.at > changed && Date.now() - shared.at < maxAge) {
     remember(key, shared);
     return reuse(shared);
@@ -143,6 +155,7 @@ export async function ensureMemoQuery<T>(
 export function __resetPublicReadMemo() {
   store.clear();
   inflight.clear();
+  sharedReads.clear();
   lastChange = 0;
   checkedAt = 0;
 }

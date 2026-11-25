@@ -20,6 +20,8 @@
 type LatLng = { lat: number; lng: number };
 
 export interface GMapInstance {
+  setOptions: (options: Record<string, unknown>) => void;
+  unbindAll: () => void;
   fitBounds: (
     bounds: unknown,
     padding?: number | { top: number; right: number; bottom: number; left: number },
@@ -36,6 +38,8 @@ export interface GMap {
   new (el: HTMLElement, opts: Record<string, unknown>): GMapInstance;
 }
 export interface GMarkerInstance {
+  setMap: (map: unknown) => void;
+  unbindAll: () => void;
   addListener: (event: string, handler: (e: never) => void) => void;
   setPosition: (position: LatLng) => void;
 }
@@ -75,6 +79,10 @@ export interface GDirectionsRenderer {
 }
 export interface GoogleMapsNamespace {
   maps: {
+    event?: {
+      clearInstanceListeners: (instance: unknown) => void;
+      trigger: (instance: unknown, event: string) => void;
+    };
     Map: GMap;
     Marker: GMarker;
     Size: GSize;
@@ -109,6 +117,49 @@ let authListeners = new Set<Listener>();
 let authFailed = false;
 let authHookInstalled = false;
 let loaderPromise: Promise<GoogleMapsNamespace> | null = null;
+
+// The SDK retains its map containers internally and has no destroy API.
+// Reuse detached, non-React containers instead of creating another map on
+// every filter change/navigation. Only idle maps are eligible for reuse.
+type MapLease = {
+  map: GMapInstance;
+  container: HTMLDivElement;
+  kind: "public" | "picker";
+  idle: boolean;
+};
+const mapLeases: MapLease[] = [];
+
+export function acquireGoogleMap(
+  google: GoogleMapsNamespace,
+  host: HTMLElement,
+  options: Record<string, unknown>,
+  kind: MapLease["kind"] = "public",
+): { map: GMapInstance; release: () => void } {
+  let lease = mapLeases.find((entry) => entry.idle && entry.kind === kind);
+  if (!lease) {
+    const container = document.createElement("div");
+    container.className = "h-full w-full";
+    host.appendChild(container);
+    lease = { map: new google.maps.Map(container, options), container, kind, idle: false };
+    mapLeases.push(lease);
+  } else {
+    lease.idle = false;
+    host.appendChild(lease.container);
+    lease.map.setOptions(options);
+    google.maps.event?.trigger(lease.map, "resize");
+  }
+  const acquired = lease;
+  return {
+    map: acquired.map,
+    release: () => {
+      if (acquired.idle) return;
+      google.maps.event?.clearInstanceListeners(acquired.map);
+      acquired.map.unbindAll();
+      acquired.container.remove();
+      acquired.idle = true;
+    },
+  };
+}
 
 function getWindow(): (Window & typeof globalThis) | null {
   return typeof window === "undefined" ? null : window;
@@ -216,6 +267,7 @@ export function googleMapsDirectionsUrl(point: { lat: number; lng: number }): st
 
 /** Sólo para pruebas: restablece el estado del módulo. */
 export function __resetGoogleMapsLoaderForTests() {
+  mapLeases.length = 0;
   authListeners = new Set();
   authFailed = false;
   authHookInstalled = false;
