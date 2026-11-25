@@ -1698,6 +1698,62 @@ export type Database = {
           },
         ]
       }
+      business_venue_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          host_business_id: string
+          id: string
+          sort_order: number
+          venue_business_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          host_business_id: string
+          id?: string
+          sort_order?: number
+          venue_business_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          host_business_id?: string
+          id?: string
+          sort_order?: number
+          venue_business_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_venue_links_host_business_id_fkey"
+            columns: ["host_business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_venue_links_host_business_id_fkey"
+            columns: ["host_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_venue_links_venue_business_id_fkey"
+            columns: ["venue_business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_venue_links_venue_business_id_fkey"
+            columns: ["venue_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_view_events: {
         Row: {
           business_id: string
@@ -9087,6 +9143,10 @@ export type Database = {
       }
     }
     Functions: {
+      _business_venue_actor_ok: {
+        Args: { _actor: string; _host: string; _venue: string }
+        Returns: boolean
+      }
       _commerce_notify_booking: {
         Args: {
           _category: Database["public"]["Enums"]["notification_category"]
@@ -9496,10 +9556,12 @@ export type Database = {
           verified: boolean
         }[]
       }
+      business_public_hosts: { Args: { _business_id: string }; Returns: Json }
       business_public_source_summary: {
         Args: { _business_id: string }
         Returns: Json
       }
+      business_public_venues: { Args: { _business_id: string }; Returns: Json }
       business_review_state: {
         Args: { _business_ids?: string[] }
         Returns: {
@@ -9508,6 +9570,16 @@ export type Database = {
           review_notes: string
           submitted_for_review_at: string
         }[]
+      }
+      business_venue_candidates: { Args: { _term: string }; Returns: Json }
+      business_venue_link_add: {
+        Args: { _host: string; _venue: string }
+        Returns: Json
+      }
+      business_venue_link_remove: { Args: { _link_id: string }; Returns: Json }
+      business_venue_links_view: {
+        Args: { _business_id: string }
+        Returns: Json
       }
       business_visibility_performance: {
         Args: { _business_id: string; _window_days?: number }

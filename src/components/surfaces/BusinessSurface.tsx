@@ -38,6 +38,8 @@ import { ExperienceProductsBlock } from "@/components/experience-builder/blocks/
 import { ExperienceMenu } from "@/components/experience-builder/blocks/experience-menu/ExperienceMenu";
 import { MenuOrderCart } from "@/components/commerce/MenuOrderCart";
 import { TableBookingWidget } from "@/components/commerce/TableBookingWidget";
+import { HotelVenueSection } from "@/components/commerce/HotelVenueSection";
+import { useHashTargetScroll } from "@/lib/discovery/hash-scroll";
 import { ExperiencePromotionsBlock } from "@/components/experience-builder/blocks/experience-promotions/ExperiencePromotionsBlock";
 import { ExperienceReviewsBlock } from "@/components/experience-builder/blocks/experience-reviews/ExperienceReviewsBlock";
 import { ExperienceRelatedCollectionBlock } from "@/components/experience-builder/blocks/experience-related-collection/ExperienceRelatedCollectionBlock";
@@ -969,6 +971,10 @@ export function BusinessSurface({
 
       <TableBookingWidget businessId={b.id} businessName={b.display_name} />
 
+      <HotelVenueSection businessId={b.id} />
+
+      <HashTargetRegistrar anchorKey={b.id} />
+
       {menuDto ? (
         <section id="menu" data-eb-anchor className="mt-8 scroll-mt-24 sm:mt-10">
           {menuDto.capabilities.ordering ? <MenuOrderCart dto={menuDto} businessName={b.display_name} /> : <ExperienceMenu dto={menuDto} />}
@@ -1190,5 +1196,14 @@ function MobileStickyCtaRegistrar() {
     const release = registerStickyCta();
     return release;
   }, []);
+  return null;
+}
+
+/**
+ * HashTargetRegistrar — llega al bloque pedido por la URL (`#reservar-mesa`,
+ * `#menu`) aunque aparezca unos instantes después de cargar la ficha.
+ */
+function HashTargetRegistrar({ anchorKey }: { anchorKey: string }) {
+  useHashTargetScroll(anchorKey);
   return null;
 }

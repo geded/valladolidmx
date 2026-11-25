@@ -1,5 +1,10 @@
 # Roadmap
 
+## Restaurante del hotel (botón A, luego herramienta B) · 2026-11-25
+- [x] A · Vincular el restaurante/café del hotel a su ficha pública con tarjeta y botón directo a «Reservar mesa», administrable desde el Portal.
+- [x] A · Comprobado con Copalli y hoteles piloto: bloque público en 1440/430, ancla «Reservar mesa» y alta/baja del vínculo desde el Portal (prueba temporal ya eliminada). Fix incluido: el aviso de refresco de caché ahora es disparador de la tabla de vínculos, antes fallaba al guardar. Falta sólo publicar.
+- [ ] B · Herramienta de recepción para que el hotel aparte mesas en restaurantes del territorio para sus huéspedes (pendiente de diseño).
+
 ## Memoria y primeras aperturas · 2026-11-25
 - [x] Diagnóstico de heap: SDK de Google Maps retiene contenedores anteriores; reutilización por el cargador existente y limpieza de overlays/picker implementadas sin modificar plantillas.
 - [x] Lecturas frías de marca CMS y copia compartida en paralelo, deduplicadas por clave; fechas y límites de caché/fotos intactos. 31 pruebas PASS, compilación automática OK y flujo Copalli/galería/regreso comprobado en preview; 24 revisiones en 1440/834/430/390 sin errores/desbordes. Informe: docs/memory-speed-2026-11-25.md.

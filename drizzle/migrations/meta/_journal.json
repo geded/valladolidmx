@@ -309,6 +309,27 @@
       "when": 1795632012255,
       "tag": "0043_restaurant_booking_holds_manage_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1795635482849,
+      "tag": "0044_hotel_restaurant_links",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1795635576773,
+      "tag": "0045_venue_links_view_can_manage",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1795636496779,
+      "tag": "0046_venue_links_cache_trigger",
+      "breakpoints": true
     }
   ]
 }

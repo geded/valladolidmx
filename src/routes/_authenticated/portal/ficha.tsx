@@ -17,6 +17,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { BusinessAttributesPanel } from "@/components/cms/BusinessAttributesPanel";
 import { BusinessMenuPanel } from "@/components/cms/BusinessMenuPanel";
+import { HotelVenuePanel } from "@/components/commerce/HotelVenuePanel";
 import {
   getBusinessCard,
   listBusinessAuditLog,
@@ -299,6 +300,7 @@ function FichaPage() {
 
       {businessId ? <BusinessAttributesPanel businessId={businessId} /> : null}
       {businessId ? <BusinessMenuPanel businessId={businessId} /> : null}
+      {businessId ? <HotelVenuePanel businessId={businessId} /> : null}
       <AuditSection loading={auditQuery.isLoading} entries={auditQuery.data ?? []} />
     </div>
   );
