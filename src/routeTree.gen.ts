@@ -53,6 +53,7 @@ import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
+import { Route as CajaSlugRouteImport } from './routes/caja.$slug'
 import { Route as ContinuarTokenRouteImport } from './routes/continuar.$token'
 import { Route as EventosIndexRouteImport } from './routes/eventos.index'
 import { Route as EventosSlugRouteImport } from './routes/eventos.$slug'
@@ -515,6 +516,11 @@ const AuthenticatedPortalRouteRoute =
 const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   id: '/api/generate-image',
   path: '/api/generate-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CajaSlugRoute = CajaSlugRouteImport.update({
+  id: '/caja/$slug',
+  path: '/caja/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContinuarTokenRoute = ContinuarTokenRouteImport.update({
@@ -1953,6 +1959,7 @@ export interface FileRoutesByFullPath {
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/caja/$slug': typeof CajaSlugRoute
   '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/insertar/alux': typeof InsertarAluxRoute
@@ -2230,6 +2237,7 @@ export interface FileRoutesByTo {
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/caja/$slug': typeof CajaSlugRoute
   '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/insertar/alux': typeof InsertarAluxRoute
@@ -2511,6 +2519,7 @@ export interface FileRoutesById {
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/caja/$slug': typeof CajaSlugRoute
   '/continuar/$token': typeof ContinuarTokenRoute
   '/eventos/$slug': typeof EventosSlugRoute
   '/insertar/alux': typeof InsertarAluxRoute
@@ -2797,6 +2806,7 @@ export interface FileRouteTypes {
     | '/mi-viaje'
     | '/paginas'
     | '/api/generate-image'
+    | '/caja/$slug'
     | '/continuar/$token'
     | '/eventos/$slug'
     | '/insertar/alux'
@@ -3074,6 +3084,7 @@ export interface FileRouteTypes {
     | '/mi-viaje'
     | '/paginas'
     | '/api/generate-image'
+    | '/caja/$slug'
     | '/continuar/$token'
     | '/eventos/$slug'
     | '/insertar/alux'
@@ -3354,6 +3365,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mi-viaje'
     | '/_authenticated/paginas'
     | '/api/generate-image'
+    | '/caja/$slug'
     | '/continuar/$token'
     | '/eventos/$slug'
     | '/insertar/alux'
@@ -3632,6 +3644,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
+  CajaSlugRoute: typeof CajaSlugRoute
   ContinuarTokenRoute: typeof ContinuarTokenRoute
   InsertarAluxRoute: typeof InsertarAluxRoute
   LSlugRoute: typeof LSlugRoute
@@ -4036,6 +4049,13 @@ declare module '@tanstack/react-router' {
       path: '/api/generate-image'
       fullPath: '/api/generate-image'
       preLoaderRoute: typeof ApiGenerateImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/caja/$slug': {
+      id: '/caja/$slug'
+      path: '/caja/$slug'
+      fullPath: '/caja/$slug'
+      preLoaderRoute: typeof CajaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/continuar/$token': {
@@ -6355,6 +6375,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
+  CajaSlugRoute: CajaSlugRoute,
   ContinuarTokenRoute: ContinuarTokenRoute,
   InsertarAluxRoute: InsertarAluxRoute,
   LSlugRoute: LSlugRoute,

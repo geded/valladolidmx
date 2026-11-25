@@ -276,6 +276,11 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     maturity: "L3",
     notes: "Reservar mesa — enlace privado del cliente para ver, cambiar o cancelar su reservación, noindex.",
   },
+  "src/routes/caja.$slug.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    notes: "Reservar mesa — pantalla de caja con PIN para marcar mesas ocupadas, sin reservación y libres, noindex.",
+  },
   "src/routes/continuar.$token.tsx": {
     businessPriority: "high",
     maturity: "L3",
@@ -674,6 +679,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/convertir-en-anfitrion.tsx",
   "src/routes/continuar.$token.tsx",
   "src/routes/reservacion-mesa.$token.tsx",
+  "src/routes/caja.$slug.tsx",
   "src/routes/insertar.alux.tsx",
   "src/routes/empresas.tsx",
   "src/routes/eventos.$slug.tsx",

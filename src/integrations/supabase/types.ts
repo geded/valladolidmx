@@ -7489,6 +7489,9 @@ export type Database = {
           billing_enabled: boolean
           billing_mode: string
           business_id: string
+          cashier_fail_count: number
+          cashier_locked_until: string | null
+          cashier_pin_hash: string | null
           confirm_mode: string
           created_at: string
           duration_minutes: number
@@ -7508,6 +7511,9 @@ export type Database = {
           billing_enabled?: boolean
           billing_mode?: string
           business_id: string
+          cashier_fail_count?: number
+          cashier_locked_until?: string | null
+          cashier_pin_hash?: string | null
           confirm_mode?: string
           created_at?: string
           duration_minutes?: number
@@ -7527,6 +7533,9 @@ export type Database = {
           billing_enabled?: boolean
           billing_mode?: string
           business_id?: string
+          cashier_fail_count?: number
+          cashier_locked_until?: string | null
+          cashier_pin_hash?: string | null
           confirm_mode?: string
           created_at?: string
           duration_minutes?: number
@@ -7554,6 +7563,42 @@ export type Database = {
             foreignKeyName: "restaurant_booking_settings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurant_cashier_sessions: {
+        Row: {
+          business_id: string
+          created_at: string
+          expires_at: string
+          token_hash: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          expires_at: string
+          token_hash: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          expires_at?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_cashier_sessions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "restaurant_cashier_sessions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -9146,6 +9191,11 @@ export type Database = {
       _business_venue_actor_ok: {
         Args: { _actor: string; _host: string; _venue: string }
         Returns: boolean
+      }
+      _cashier_business: { Args: { _token: string }; Returns: string }
+      _cashier_hash: {
+        Args: { _business_id: string; _secret: string }
+        Returns: string
       }
       _commerce_notify_booking: {
         Args: {
@@ -11319,6 +11369,32 @@ export type Database = {
       }
       restaurant_booking_settings_save: {
         Args: { _business_id: string; _settings: Json }
+        Returns: undefined
+      }
+      restaurant_cashier_board: { Args: { _token: string }; Returns: Json }
+      restaurant_cashier_login: {
+        Args: { _pin: string; _slug: string }
+        Returns: Json
+      }
+      restaurant_cashier_pin_status: {
+        Args: { _business_id: string }
+        Returns: Json
+      }
+      restaurant_cashier_seat: {
+        Args: { _party: number; _table_id: string; _token: string }
+        Returns: string
+      }
+      restaurant_cashier_set: {
+        Args: {
+          _action: string
+          _reservation_id: string
+          _table_id?: string
+          _token: string
+        }
+        Returns: undefined
+      }
+      restaurant_cashier_set_pin: {
+        Args: { _business_id: string; _pin: string }
         Returns: undefined
       }
       restaurant_day_closed: {

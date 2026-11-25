@@ -37,6 +37,7 @@ import {
   type TableStatus,
 } from "@/lib/commerce/table-booking";
 import { ShareTableBookingCard } from "@/components/commerce/ShareTableBookingCard";
+import { CashierPinCard } from "@/components/commerce/CashierPinCard";
 import { FloorPlanView, GuestProfileCard, TableReportsView, WaitlistView } from "@/components/commerce/TableFloorTools";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
@@ -118,6 +119,7 @@ function TableReservationsPage() {
         <TableReportsView businessId={businessId} />
       ) : (
         <><ShareTableBookingCard businessId={businessId} />
+        <CashierPinCard businessId={businessId} />
         <SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
         <PoliciesForm businessId={businessId} /></>
       )}
