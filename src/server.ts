@@ -1,4 +1,4 @@
-import { servePublicPage } from "./lib/server/public-page-cache";
+import { servePublicPage, serveStaleSharedHtml } from "./lib/server/public-page-cache";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -70,9 +70,15 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
+      const workerCtx = ctx as { waitUntil?: (p: Promise<unknown>) => void };
+      // Inicio, destinos y listados: copia guardada al instante, renovada detrás.
+      const instant = await serveStaleSharedHtml(request, workerCtx, (r) =>
+        Promise.resolve(handler.fetch(r, env, ctx)),
+      ).catch(() => null);
+      if (instant) return withBaselineSecurityHeaders(instant);
       const response = await servePublicPage(
         request,
-        ctx as { waitUntil?: (p: Promise<unknown>) => void },
+        workerCtx,
         async () => normalizeCatastrophicSsrResponse(await handler.fetch(request, env, ctx)),
       );
       return withBaselineSecurityHeaders(response);

@@ -4,7 +4,7 @@
  * así que la misma página sirve a todos los visitantes. Fresca 60 s; hasta
  * 10 min se entrega al instante y se renueva en segundo plano.
  */
-import { publicReadMemo } from "../cache/public-read-memo";
+import { peekPublicReadMemo, publicReadMemo } from "../cache/public-read-memo";
 import { Buffer } from "node:buffer";
 
 const FRESH_MS = 60_000;
@@ -59,11 +59,71 @@ class UncacheableHtml extends Error {
   constructor(readonly response: Response) { super("Uncacheable public response"); }
 }
 
+/**
+ * Una página armada se entrega al instante hasta 10 min mientras se renueva
+ * detrás (la espera de 2–5 s al armarla se veía negra en el iPhone). El CMS
+ * sigue descartando al momento cualquier copia anterior a su último cambio;
+ * la clave incluye la versión publicada y las firmas de fotos viven ≥ 45 min.
+ */
+export const HTML_STALE_MS = 10 * 60_000;
+const REFRESH_HEADER = "x-vmx-html-refresh";
+let refreshToken: string | null = null;
+const refreshing = new Set<string>();
+
+function sharedHtmlKey(request: Request): string {
+  const build = String(import.meta.env["VMX_HTML_BUILD_ID"] ?? "dev");
+  return `public-html:gzip:${build}:${request.url}:${request.headers.get("accept-language") ?? ""}`;
+}
+
+/** Sólo la renovación interna de este servidor; un visitante no puede forzarla. */
+export function isForcedHtmlRefresh(request: Request): boolean {
+  return !!refreshToken && request.headers.get(REFRESH_HEADER) === refreshToken;
+}
+
+async function unpack(copy: HtmlCopy): Promise<string> {
+  const bytes = Uint8Array.from(Buffer.from(copy.bodyGzipBase64, "base64"));
+  return new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+}
+
+/**
+ * Entrega la copia guardada sin esperar a armarla; si tiene más de 60 s pide
+ * la renovación en segundo plano. `null` = no hay copia: se arma como siempre.
+ */
+export async function serveStaleSharedHtml(
+  request: Request,
+  ctx: Ctx,
+  refresh: (request: Request) => Promise<Response>,
+): Promise<Response | null> {
+  if (!ctx?.waitUntil || !isSharedHtmlRequest(request)) return null;
+  const started = performance.now();
+  const key = sharedHtmlKey(request);
+  const hit = await peekPublicReadMemo<HtmlCopy>(key, HTML_STALE_MS).catch(() => null);
+  if (!hit?.value?.bodyGzipBase64) return null;
+  const stale = hit.ageMs >= FRESH_MS;
+  if (stale && !refreshing.has(key)) {
+    refreshing.add(key);
+    refreshToken ??= crypto.randomUUID();
+    const headers = new Headers(request.headers);
+    headers.set(REFRESH_HEADER, refreshToken);
+    ctx.waitUntil(
+      refresh(new Request(request.url, { method: "GET", headers }))
+        .then((r) => r.arrayBuffer())
+        .catch(() => {})
+        .finally(() => refreshing.delete(key)),
+    );
+  }
+  const out = new Response(await unpack(hit.value), { headers: hit.value.headers });
+  out.headers.set("cache-control", "no-store");
+  out.headers.set("x-vmx-html", stale ? "STALE" : "HIT");
+  out.headers.append("server-timing", `vmx_html;dur=${(performance.now() - started).toFixed(1)}`);
+  return out;
+}
+
 export async function serveSharedHtml(request: Request, render: () => Promise<Response>): Promise<Response> {
   const cache = edgeCache();
   const build = String(import.meta.env["VMX_HTML_BUILD_ID"] ?? "dev");
   const nearKey = new Request(`${new URL(request.url).toString()}#${build}:${request.headers.get("accept-language") ?? ""}`.replace("#", "?__vmx_near="), { method: "GET" });
-  if (cache) {
+  if (cache && !isForcedHtmlRefresh(request)) {
     const near = await cache.match(nearKey).catch(() => undefined);
     if (near && Date.now() - Number(near.headers.get(STAMP) ?? 0) < NEAR_MS) {
       const out = new Response(near.body, near);
@@ -73,7 +133,7 @@ export async function serveSharedHtml(request: Request, render: () => Promise<Re
       return out;
     }
   }
-  const result = await serveSharedHtmlFromStore(request, render);
+  const result = await serveSharedHtmlFromStore(request, render, isForcedHtmlRefresh(request));
   if (cache && result.status === 200 && result.headers.has("x-vmx-html")) {
     const copy = new Response(result.clone().body, result);
     copy.headers.set(STAMP, String(Date.now()));
@@ -83,11 +143,14 @@ export async function serveSharedHtml(request: Request, render: () => Promise<Re
   return result;
 }
 
-async function serveSharedHtmlFromStore(request: Request, render: () => Promise<Response>): Promise<Response> {
+async function serveSharedHtmlFromStore(
+  request: Request,
+  render: () => Promise<Response>,
+  force = false,
+): Promise<Response> {
   const started = performance.now();
   // Se reutiliza la tabla y el invalidado CMS existentes; no hay otro almacén.
-  const build = String(import.meta.env["VMX_HTML_BUILD_ID"] ?? "dev");
-  const key = `public-html:gzip:${build}:${request.url}:${request.headers.get("accept-language") ?? ""}`;
+  const key = sharedHtmlKey(request);
   let rendered = false;
   try {
     const copy = await publicReadMemo<HtmlCopy>(key, async () => {
@@ -107,12 +170,9 @@ async function serveSharedHtmlFromStore(request: Request, render: () => Promise<
         new Blob([body]).stream().pipeThrough(new CompressionStream("gzip")),
       ).arrayBuffer();
       return { bodyGzipBase64: Buffer.from(packed).toString("base64"), headers };
-    }, { maxAgeMs: FRESH_MS, staleWhileRevalidate: false });
+    }, { maxAgeMs: force ? 0 : FRESH_MS, staleWhileRevalidate: false });
     const lookupMs = performance.now() - started;
-    const bytes = Uint8Array.from(Buffer.from(copy.bodyGzipBase64, "base64"));
-    const body = await new Response(
-      new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip")),
-    ).text();
+    const body = await unpack(copy);
     const out = new Response(body, { headers: copy.headers });
     // No sumar otra vida en CDN/navegador: CMS invalida la única copia compartida.
     out.headers.set("cache-control", "no-store");

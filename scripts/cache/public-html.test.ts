@@ -12,7 +12,7 @@ vi.mock("@/integrations/supabase/client.server", () => ({
   }) },
 }));
 import { __resetPublicReadMemo } from "@/lib/cache/public-read-memo";
-import { serveSharedHtml } from "@/lib/server/public-page-cache";
+import { isForcedHtmlRefresh, serveSharedHtml, serveStaleSharedHtml } from "@/lib/server/public-page-cache";
 
 const request = (path = "/", headers: Record<string, string> = {}) =>
   new Request(`https://site.test${path}`, { headers: { accept: "text/html", ...headers } });
@@ -45,7 +45,7 @@ describe("HTML público reutilizado", () => {
     __resetPublicReadMemo();
     expect(await (await serveSharedHtml(request(), async () => html("wrong"))).text()).toBe(body);
   });
-  it("nunca entrega HTML de más de 60 segundos ni lo renueva después de responder", async () => {
+  it("al armar en la misma petición no reutiliza HTML de más de 60 segundos", async () => {
     const render = vi.fn(async () => html(`foto-${Date.now()}`));
     await serveSharedHtml(request(), render);
     vi.setSystemTime(1_060_001);
@@ -90,4 +90,44 @@ import { test as t2, expect as e2 } from "vitest";
 t2("la cookie antirrobots del proveedor no cuenta como sesión", () => {
   e2(onlyProvider("__cf_bm=abc; _cfuvid=x")).toBe(true);
   e2(onlyProvider("__cf_bm=abc; sb-access=1")).toBe(false);
+});
+
+describe("HTML público · copia al instante con renovación detrás", () => {
+  beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(1_000_000); rows.clear(); __resetPublicReadMemo(); });
+  afterEach(() => { vi.useRealTimers(); });
+    const ctx = () => {
+      const pending: Promise<unknown>[] = [];
+      return { pending, waitUntil: (p: Promise<unknown>) => { pending.push(p); } };
+    };
+    it("entrega al instante una copia de 90 s y la renueva en segundo plano", async () => {
+      await serveSharedHtml(request(), async () => html("foto-vieja"));
+      vi.setSystemTime(1_090_000);
+      const c = ctx();
+      const refresh = vi.fn(async (r: Request) =>
+        serveSharedHtml(r, async () => html("foto-nueva")));
+      const out = await serveStaleSharedHtml(request(), c, refresh);
+      expect(await out?.text()).toBe("foto-vieja");
+      expect(out?.headers.get("x-vmx-html")).toBe("STALE");
+      expect(refresh).toHaveBeenCalledTimes(1);
+      expect(isForcedHtmlRefresh(refresh.mock.calls[0]![0])).toBe(true);
+      await Promise.all(c.pending);
+      const next = await serveStaleSharedHtml(request(), ctx(), refresh);
+      expect(await next?.text()).toBe("foto-nueva");
+      expect(next?.headers.get("x-vmx-html")).toBe("HIT");
+    });
+    it("no entrega copias de más de 10 minutos", async () => {
+      await serveSharedHtml(request(), async () => html("vieja"));
+      vi.setSystemTime(1_000_000 + 10 * 60_000 + 1);
+      expect(await serveStaleSharedHtml(request(), ctx(), vi.fn())).toBeNull();
+    });
+    it("un cambio del CMS impide entregar la copia anterior", async () => {
+      await serveSharedHtml(request(), async () => html("vieja"));
+      __resetPublicReadMemo();
+      rows.set("__cms_changed__", { value: null, refreshed_at: new Date(1_009_000).toISOString() });
+      vi.setSystemTime(1_010_000);
+      expect(await serveStaleSharedHtml(request(), ctx(), vi.fn())).toBeNull();
+    });
+    it("un visitante no puede forzar que se vuelva a armar", async () => {
+      expect(isForcedHtmlRefresh(request("/", { "x-vmx-html-refresh": "x" }))).toBe(false);
+    });
 });

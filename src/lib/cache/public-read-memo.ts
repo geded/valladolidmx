@@ -138,6 +138,30 @@ export async function publicReadMemo<T>(
   return load(key, fn);
 }
 
+/**
+ * Consulta una copia vigente sin leer de nuevo la fuente: la de este servidor
+ * o la compartida, siempre posterior al último cambio del CMS y dentro de
+ * `maxAgeMs`. Devuelve su antigüedad para que quien la entrega decida si
+ * renovarla en segundo plano. Nunca arma la respuesta.
+ */
+export async function peekPublicReadMemo<T>(
+  key: string,
+  maxAgeMs: number,
+): Promise<{ value: T; ageMs: number } | null> {
+  if (typeof window !== "undefined") return null;
+  const local = store.get(key);
+  const changeRead = cmsChangedAt();
+  const sharedRead = local ? null : readShared(key);
+  const changed = await changeRead;
+  const valid = (e: Entry | null | undefined): e is Entry =>
+    !!e && e.at > changed && Date.now() - e.at < maxAgeMs;
+  if (valid(local)) return { value: local.value as T, ageMs: Date.now() - local.at };
+  const shared = await (sharedRead ?? readShared(key));
+  if (!valid(shared)) return null;
+  remember(key, shared);
+  return { value: shared.value as T, ageMs: Date.now() - shared.at };
+}
+
 /** Igual que `queryClient.ensureQueryData`, pero en el servidor reutiliza la
  *  memoria breve y deja el resultado en la caché de la petición. */
 export async function ensureMemoQuery<T>(
