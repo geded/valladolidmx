@@ -641,6 +641,30 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const salt = process.env["ALUX_PUBLIC_IP_SALT"] ?? process.env["SUPABASE_URL"] ?? "vmx";
     const ipHash = createHash("sha256").update(`${salt}:${ip}`).digest("hex");
 
+    // Sólo conversaciones iniciadas desde las páginas de la plataforma: una
+    // llamada desde otro sitio o un programa sin navegador se rechaza.
+    {
+      const origin = headers.get("origin") ?? headers.get("referer") ?? "";
+      let originHost = "";
+      try {
+        originHost = origin ? new URL(origin).hostname.toLowerCase() : "";
+      } catch {
+        originHost = "";
+      }
+      const ownHost = new URL(request.url).hostname.toLowerCase();
+      const trusted =
+        originHost !== "" &&
+        (originHost === ownHost ||
+          /(^|\.)quehacerenvalladolid\.com$/.test(originHost) ||
+          /(^|\.)valladolid\.(mx|com\.mx)$/.test(originHost) ||
+          /\.lovable\.app$/.test(originHost) ||
+          originHost === "localhost");
+      const fetchSite = headers.get("sec-fetch-site");
+      if (!trusted || (fetchSite !== null && fetchSite !== "same-origin" && fetchSite !== "same-site")) {
+        throw new Error("alux_origin_not_allowed");
+      }
+    }
+
     let userId: string | null = null;
     const bearer = headers.get("authorization");
     if (bearer?.toLowerCase().startsWith("bearer ")) {
