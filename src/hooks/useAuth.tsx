@@ -5,6 +5,7 @@
  * Expone sesión Supabase + perfil + rol primario.
  * Suscribe onAuthStateChange y mantiene el cache de roles fresco.
  */
+import { avatarStoragePath, AVATAR_LINK_SECONDS } from "@/lib/traveler/avatar-path";
 import {
   createContext,
   useCallback,
@@ -83,7 +84,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", uid),
       ]);
-      setProfile((prof as ProfileRow | null) ?? null);
+      let profRow = (prof as ProfileRow | null) ?? null;
+      const avatarPath = avatarStoragePath(profRow?.avatar_url);
+      if (profRow && avatarPath) {
+        const { data: signed } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(avatarPath, AVATAR_LINK_SECONDS);
+        profRow = { ...profRow, avatar_url: signed?.signedUrl ?? null };
+      }
+      setProfile(profRow);
       setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
       identityUidRef.current = uid;
     } finally {

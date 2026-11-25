@@ -255,7 +255,7 @@ export const lookupCoupon = createServerFn({ method: "POST" })
     return {
       coupon,
       traveler_display_name: name,
-      traveler_avatar_url: (p.avatar_url as string | null) ?? null,
+      traveler_avatar_url: await (await import("@/lib/traveler/avatar-sign.server")).signAvatarForDisplay((p.avatar_url as string | null) ?? null),
       traveler_country_code: countryCode ? countryCode.toUpperCase() : null,
       traveler_country_name: countryName,
       business_slug: businessSlug,

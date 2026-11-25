@@ -198,4 +198,7 @@ describe("Dirección que recibe los avisos", () => {
       "https://www.quehacerenvalladolid.com",
     );
   });
+  test("un dominio ajeno nunca recibe los avisos", () => {
+    expect(resolveWebhookOrigin("https://evil.example.com")).toBe(STABLE_PREVIEW_ORIGIN);
+  });
 });

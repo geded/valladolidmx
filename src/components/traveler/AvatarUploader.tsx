@@ -4,17 +4,17 @@
  * - Valida tipo (image/*) y peso original ≤ 5 MB.
  * - Redimensiona en cliente a 512×512 JPEG (quality 0.85) → ≤ ~120 KB.
  * - Sube a `avatars/{userId}/avatar_{ts}.jpg` (upsert).
- * - Genera signed URL de larga duración (1 año) para renderizado público.
- * - Devuelve la URL final vía `onUploaded`.
+ * - Devuelve la ruta en el almacén vía `onUploaded`; cada lectura firma un enlace de 1 hora.
  */
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Camera, Loader2, Upload } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
+import { avatarStoragePath, AVATAR_LINK_SECONDS } from "@/lib/traveler/avatar-path";
 
 const MAX_ORIGINAL_BYTES = 5 * 1024 * 1024;
 const TARGET_SIZE = 512;
-const SIGNED_URL_SECONDS = 60 * 60 * 24 * 365;
+const SIGNED_URL_SECONDS = AVATAR_LINK_SECONDS;
 
 export interface AvatarUploaderProps {
   userId: string | undefined;
@@ -97,7 +97,7 @@ export function AvatarUploader({
         .createSignedUrl(path, SIGNED_URL_SECONDS);
       if (signed.error || !signed.data) throw signed.error ?? new Error("signed_url_failed");
       setPreview(signed.data.signedUrl);
-      onUploaded(signed.data.signedUrl);
+      onUploaded(path);
       toast.success("Foto actualizada");
     } catch (err) {
       toast.error((err as Error).message || "No se pudo subir la foto");
@@ -106,7 +106,26 @@ export function AvatarUploader({
     }
   }
 
-  const shown = preview ?? currentUrl ?? null;
+  const [currentSigned, setCurrentSigned] = useState<string | null>(null);
+  useEffect(() => {
+    const path = avatarStoragePath(currentUrl);
+    if (!path) {
+      setCurrentSigned(currentUrl ?? null);
+      return;
+    }
+    let alive = true;
+    void supabase.storage
+      .from("avatars")
+      .createSignedUrl(path, AVATAR_LINK_SECONDS)
+      .then(({ data }) => {
+        if (alive) setCurrentSigned(data?.signedUrl ?? null);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [currentUrl]);
+
+  const shown = preview ?? currentSigned ?? null;
 
   return (
     <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">

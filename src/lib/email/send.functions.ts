@@ -15,6 +15,24 @@ const Input = z.object({
   idempotencyKey: z.string().max(300).optional(),
 });
 
+/**
+ * Un negocio sólo puede mandar texto corto al viajero de su cupón: sin
+ * enlaces propios (los botones usan siempre las direcciones de la plataforma).
+ */
+function couponSafeData(input: Record<string, unknown> | undefined): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(input ?? {})) {
+    if (/url|link|href/i.test(k)) continue;
+    if (typeof v === "string") {
+      if (/(https?:|www\.|javascript:|<)/i.test(v)) continue;
+      out[k] = v.slice(0, 200);
+    } else if (typeof v === "number" || typeof v === "boolean") {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
 export const sendAppEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => Input.parse(data))
@@ -35,6 +53,7 @@ export const sendAppEmail = createServerFn({ method: "POST" })
 
     // Compuerta de autorización (fail-closed): destinatario fijo, propio,
     // staff de plataforma, concierge interno o viajero con cupón del negocio.
+    let viaCoupon = false;
     let authorized = Boolean(template.to) || (callerEmail !== "" && target === callerEmail);
     if (!authorized) {
       const { data: isAdmin } = await supabase.rpc("has_role", {
@@ -81,7 +100,8 @@ export const sendAppEmail = createServerFn({ method: "POST" })
             .in("business_id", businessIds)
             .limit(1)
             .maybeSingle();
-          authorized = Boolean(coupon);
+          authorized = Boolean(coupon) && data.templateName.startsWith("coupon-");
+          viaCoupon = authorized;
         }
       }
     }
@@ -104,7 +124,7 @@ export const sendAppEmail = createServerFn({ method: "POST" })
 
     try {
       const result = await sendTemplateEmail(data.templateName, effectiveRecipient, {
-        templateData: data.templateData ?? {},
+        templateData: viaCoupon ? couponSafeData(data.templateData) : (data.templateData ?? {}),
         idempotencyKey: data.idempotencyKey || messageId,
       });
       if (!result.sent) {

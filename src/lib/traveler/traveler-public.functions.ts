@@ -87,19 +87,8 @@ function pubClient() {
 }
 
 async function signAvatar(pathOrUrl: string | null): Promise<string | null> {
-  if (!pathOrUrl) return null;
-  if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
-    return pathOrUrl;
-  }
-  try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.storage
-      .from("avatars")
-      .createSignedUrl(pathOrUrl, 60 * 60); // 1 hora: deja de servir poco después de volver privado el perfil
-    return data?.signedUrl ?? null;
-  } catch {
-    return null;
-  }
+  const { signAvatarForDisplay } = await import("./avatar-sign.server");
+  return signAvatarForDisplay(pathOrUrl);
 }
 
 /**

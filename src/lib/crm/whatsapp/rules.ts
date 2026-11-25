@@ -358,6 +358,17 @@ export const STABLE_PREVIEW_ORIGIN =
  * o el equipo de desarrollo se usa la dirección estable de la vista previa;
  * desde el sitio publicado, el propio sitio.
  */
+/** Dominios propios del sitio publicado que pueden recibir avisos. */
+export const OWN_WEBHOOK_HOSTS = new Set([
+  "valladolidmx.lovable.app",
+  "www.quehacerenvalladolid.com",
+  "quehacerenvalladolid.com",
+  "www.valladolid.com.mx",
+  "valladolid.com.mx",
+  "www.valladolid.mx",
+  "valladolid.mx",
+]);
+
 export function resolveWebhookOrigin(requestOrigin: string | null | undefined): string {
   try {
     const url = new URL(requestOrigin ?? "");
@@ -371,7 +382,8 @@ export function resolveWebhookOrigin(requestOrigin: string | null | undefined): 
     ) {
       return STABLE_PREVIEW_ORIGIN;
     }
-    return url.origin;
+    // Sólo dominios propios: una cabecera ajena nunca decide a dónde llegan los avisos.
+    return OWN_WEBHOOK_HOSTS.has(host) ? url.origin : STABLE_PREVIEW_ORIGIN;
   } catch {
     return STABLE_PREVIEW_ORIGIN;
   }
