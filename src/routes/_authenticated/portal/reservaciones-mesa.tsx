@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeft, ChevronRight, Phone, Plus, Trash2 } from "lucide-react";
 import { toast } from "@/lib/toast";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -115,7 +116,8 @@ function TableReservationsPage() {
       ) : tab === "reportes" ? (
         <TableReportsView businessId={businessId} />
       ) : (
-        <SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
+        <><SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
+        <PoliciesForm businessId={businessId} /></>
       )}
     </div>
   );
@@ -322,5 +324,46 @@ function DayNav({ date, setDate }: { date: string; setDate: (v: string) => void 
       <p className="text-sm font-semibold capitalize">{date ? formatTableDate(`${date}T18:00:00Z`) : ""}</p>
       <Button size="icon" variant="ghost" aria-label="Día siguiente" onClick={() => setDate(shiftDay(date, 1))}><ChevronRight className="size-5" /></Button>
     </div>
+  );
+}
+
+/** Personas mínimas y políticas que el cliente lee antes de reservar (como OpenTable). */
+function PoliciesForm({ businessId }: { businessId: string }) {
+  type Rpc = (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+  const q = useQuery({
+    queryKey: ["table-booking-policies", businessId],
+    queryFn: async () => {
+      const { data } = await (supabase.from("restaurant_booking_settings") as unknown as {
+        select: (c: string) => { eq: (k: string, v: string) => { maybeSingle: () => PromiseLike<{ data: { min_party: number; policies: string | null } | null }> } };
+      }).select("min_party, policies").eq("business_id", businessId).maybeSingle();
+      return data ?? { min_party: 1, policies: null };
+    },
+  });
+  const [minParty, setMinParty] = useState(1);
+  const [policies, setPolicies] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (q.data) { setMinParty(q.data.min_party ?? 1); setPolicies(q.data.policies ?? ""); }
+  }, [q.data]);
+  async function save() {
+    setBusy(true);
+    const { error } = await (supabase.rpc as unknown as Rpc).bind(supabase)("restaurant_booking_policies_save", { _business_id: businessId, _min_party: minParty, _policies: policies });
+    setBusy(false);
+    if (error) toast.error("No se pudo guardar.");
+    else { toast.success("Políticas guardadas."); void q.refetch(); }
+  }
+  return (
+    <section className="mt-4 space-y-3 rounded-xl border border-border bg-card p-4">
+      <h2 className="text-lg font-semibold">Políticas para el cliente</h2>
+      <p className="text-sm text-muted-foreground">Se muestran antes de reservar y en el enlace donde el cliente cambia o cancela.</p>
+      <label className="block text-sm">Mínimo de personas por reservación
+        <Input type="number" min={1} className="mt-1 w-32" value={minParty} onChange={(e) => setMinParty(Math.max(1, Number(e.target.value) || 1))} />
+      </label>
+      <label className="block text-sm">Políticas (tolerancia, cancelación, niños, mascotas…)
+        <textarea className="mt-1 min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" maxLength={1500}
+          value={policies} placeholder="Ej. Tolerancia de 15 minutos. Si no puedes venir, cancela desde tu enlace." onChange={(e) => setPolicies(e.target.value)} />
+      </label>
+      <div className="flex justify-end"><Button disabled={busy} onClick={() => void save()}>{busy ? "Guardando…" : "Guardar políticas"}</Button></div>
+    </section>
   );
 }

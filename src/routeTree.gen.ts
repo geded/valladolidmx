@@ -113,6 +113,7 @@ import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PreviewF1kDestinationsRouteImport } from './routes/preview/f1k-destinations'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
+import { Route as ReservacionMesaTokenRouteImport } from './routes/reservacion-mesa.$token'
 import { Route as RutasIndexRouteImport } from './routes/rutas.index'
 import { Route as RutasSlugRouteImport } from './routes/rutas.$slug'
 import { Route as ViajeCompartidoTokenRouteImport } from './routes/viaje-compartido.$token'
@@ -858,6 +859,11 @@ const PreviewF1kDestinationsRoute = PreviewF1kDestinationsRouteImport.update({
 const ProductoSlugRoute = ProductoSlugRouteImport.update({
   id: '/producto/$slug',
   path: '/producto/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservacionMesaTokenRoute = ReservacionMesaTokenRouteImport.update({
+  id: '/reservacion-mesa/$token',
+  path: '/reservacion-mesa/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RutasIndexRoute = RutasIndexRouteImport.update({
@@ -2004,6 +2010,7 @@ export interface FileRoutesByFullPath {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/reservacion-mesa/$token': typeof ReservacionMesaTokenRoute
   '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
@@ -2279,6 +2286,7 @@ export interface FileRoutesByTo {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/reservacion-mesa/$token': typeof ReservacionMesaTokenRoute
   '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
@@ -2560,6 +2568,7 @@ export interface FileRoutesById {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/reservacion-mesa/$token': typeof ReservacionMesaTokenRoute
   '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
   '/viajero/$handle': typeof ViajeroHandleRoute
@@ -2845,6 +2854,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/reservacion-mesa/$token'
     | '/rutas/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
@@ -3120,6 +3130,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/reservacion-mesa/$token'
     | '/rutas/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
@@ -3400,6 +3411,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/reservacion-mesa/$token'
     | '/rutas/$slug'
     | '/viaje-compartido/$token'
     | '/viajero/$handle'
@@ -3675,6 +3687,7 @@ export interface RootRouteChildren {
   PreviewTokenRoute: typeof PreviewTokenRoute
   PreviewF1kDestinationsRoute: typeof PreviewF1kDestinationsRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
+  ReservacionMesaTokenRoute: typeof ReservacionMesaTokenRoute
   RutasSlugRoute: typeof RutasSlugRoute
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
   ViajeroHandleRoute: typeof ViajeroHandleRoute
@@ -4443,6 +4456,13 @@ declare module '@tanstack/react-router' {
       path: '/producto/$slug'
       fullPath: '/producto/$slug'
       preLoaderRoute: typeof ProductoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reservacion-mesa/$token': {
+      id: '/reservacion-mesa/$token'
+      path: '/reservacion-mesa/$token'
+      fullPath: '/reservacion-mesa/$token'
+      preLoaderRoute: typeof ReservacionMesaTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rutas/': {
@@ -6410,6 +6430,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewTokenRoute: PreviewTokenRoute,
   PreviewF1kDestinationsRoute: PreviewF1kDestinationsRoute,
   ProductoSlugRoute: ProductoSlugRoute,
+  ReservacionMesaTokenRoute: ReservacionMesaTokenRoute,
   RutasSlugRoute: RutasSlugRoute,
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,
   ViajeroHandleRoute: ViajeroHandleRoute,

@@ -256,9 +256,9 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
         </label>
       </div>
 
-      <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1" role="list" aria-label="Días próximos">
+      <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Días próximos">
         {quickDays.map((d) => (
-          <button key={d.iso} type="button" role="listitem"
+          <button key={d.iso} type="button"
             className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition-colors ${date === d.iso ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"}`}
             onClick={() => { setDate(d.iso); void pickSlot(null); setShowAll(false); }}>{d.label}</button>
         ))}

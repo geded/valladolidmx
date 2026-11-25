@@ -271,6 +271,11 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     maturity: "L3",
     notes: "CRM · Fase 4 — ventana de Alux insertada en páginas de aliados autorizados, noindex.",
   },
+  "src/routes/reservacion-mesa.$token.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    notes: "Reservar mesa — enlace privado del cliente para ver, cambiar o cancelar su reservación, noindex.",
+  },
   "src/routes/continuar.$token.tsx": {
     businessPriority: "high",
     maturity: "L3",
@@ -668,6 +673,7 @@ export const SCANNED_ROUTE_FILES: readonly string[] = [
   "src/routes/contacto.tsx",
   "src/routes/convertir-en-anfitrion.tsx",
   "src/routes/continuar.$token.tsx",
+  "src/routes/reservacion-mesa.$token.tsx",
   "src/routes/insertar.alux.tsx",
   "src/routes/empresas.tsx",
   "src/routes/eventos.$slug.tsx",

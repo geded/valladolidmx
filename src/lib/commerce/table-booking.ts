@@ -153,6 +153,8 @@ export const TABLE_BOOKING_ERRORS: Record<string, string> = {
   too_many_reservations: "Ya tienes 3 reservaciones activas en este restaurante.",
   forbidden: "No tienes permiso para esto.",
   table_taken: "Esa mesa ya está ocupada a esa hora.",
+  cannot_change: "Esta reservación ya no se puede cambiar.",
+  not_found: "No encontramos esta reservación.",
 };
 
 export function tableBookingError(message: string): string {
