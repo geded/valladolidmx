@@ -725,3 +725,10 @@ html[data-omxds-visual-foundations="enabled"] [data-omxds-visual-foundation="alu
   border-style: solid;
   border-color: var(--border);
 }
+
+/* Fotos de la plataforma: sin menú de «Guardar imagen» al mantener presionado ni arrastrar. */
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
