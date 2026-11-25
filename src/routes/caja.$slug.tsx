@@ -171,6 +171,20 @@ function BoardView({ token, onExit }: { token: string; onExit: () => void }) {
         </section>
       ) : null}
 
+      <details className="rounded-xl border border-border p-3 text-sm">
+        <summary className="cursor-pointer font-medium">Conectar con Soft Restaurant (automático)</summary>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted-foreground">
+          <li>En la computadora donde está Soft Restaurant, descarga los dos archivos en la misma carpeta.</li>
+          <li>Da doble clic en «iniciar-conector». La primera vez pide el nombre web del restaurante y el PIN de caja.</li>
+          <li>Deja la ventana abierta: al abrir una cuenta la mesa se marca ocupada y al cobrarla se libera.</li>
+        </ol>
+        <p className="mt-2 text-muted-foreground">Solo lee Soft Restaurant, nunca lo modifica. Si se apaga, sigue marcando a mano; las mesas se liberan solas al cumplir su tiempo.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button asChild variant="outline" size="sm"><a href="/downloads/iniciar-conector.bat" download="iniciar-conector.bat" data-reload-document>Descargar iniciar-conector</a></Button>
+          <Button asChild variant="outline" size="sm"><a href="/downloads/conector-softrestaurant.ps1" download="conector-softrestaurant.ps1" data-reload-document>Descargar conector</a></Button>
+        </div>
+      </details>
+
       {picked ? (
         <TableSheet
           table={picked}
