@@ -4,7 +4,8 @@
  * configuró sus mesas; si no, no dibuja nada y la plantilla queda igual.
  * La disponibilidad viene siempre de `restaurant_public_slots`.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, Check, Clock, Minus, Plus, Users } from "lucide-react";
@@ -15,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { sendTableBookingNotices } from "@/lib/commerce/table-booking.functions";
 import { formatTableDate, formatTableTime, meridaToday, tableBookingError } from "@/lib/commerce/table-booking";
 
-type Config = { enabled: boolean; max_party?: number; max_days_ahead?: number; confirm_mode?: string };
+type Config = { enabled: boolean; min_party?: number; policies?: string | null; max_party?: number; max_days_ahead?: number; confirm_mode?: string };
 type Slot = { slot_time: string; starts_at: string; available: boolean };
 type Rpc = (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
 const rpc = (supabase.rpc as unknown as Rpc).bind(supabase);
@@ -42,6 +43,18 @@ function SlotButton({ s, active, onPick }: { s: Slot; active: boolean; onPick: (
       className={`h-9 w-full rounded-md px-1 text-xs font-semibold ${active ? "ring-focus ring-2 ring-offset-2" : ""}`}
       onClick={() => onPick(s)}>{to12h(s.slot_time)}</Button>
   );
+}
+
+function reasonText(code: string, party: number, maxParty: number, minParty: number): string {
+  switch (code) {
+    case "above_max_party": return `En línea se reservan hasta ${maxParty} personas. Para grupos más grandes, contacta al restaurante.`;
+    case "below_min_party": return `Este restaurante recibe reservaciones desde ${minParty} personas.`;
+    case "too_far_ahead": return "Todavía no se puede reservar para esa fecha. Prueba un día más cercano.";
+    case "closed_day": return "El restaurante no abre reservaciones ese día. Prueba otra fecha.";
+    case "no_hours": return "El restaurante no recibe reservaciones ese día. Prueba otra fecha.";
+    case "same_day_cutoff": return "Ya pasó la hora límite para reservar hoy. Prueba mañana u otro día.";
+    default: return `Ya no quedan mesas para ${party} ese día. Prueba otra fecha o menos personas.`;
+  }
 }
 
 function addDays(iso: string, n: number): string {
@@ -77,7 +90,35 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<{ folio: string; status: string; starts_at: string; party_size: number } | null>(null);
+  const [done, setDone] = useState<{ folio: string; status: string; starts_at: string; party_size: number; manage_token?: string } | null>(null);
+  const [hold, setHold] = useState<{ token: string; expires_at: string } | null>(null);
+  const holdRef = useRef<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { holdRef.current = hold?.token ?? null; }, [hold]);
+  useEffect(() => () => { if (holdRef.current) void rpc("restaurant_release_hold", { _token: holdRef.current }); }, []);
+  useEffect(() => {
+    if (!hold) return;
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [hold]);
+  const holdLeft = hold ? Math.max(0, Math.floor((new Date(hold.expires_at).getTime() - now) / 1000)) : 0;
+
+  async function pickSlot(s: Slot | null) {
+    setError(null);
+    if (!s) {
+      if (hold) void rpc("restaurant_release_hold", { _token: hold.token });
+      setHold(null); setSlot(null); return;
+    }
+    setSlot(s);
+    const { data, error: err } = await rpc("restaurant_hold_slot", { _business_id: businessId, _starts_at: s.starts_at, _party: party, _replace: hold?.token ?? null });
+    if (err) {
+      setSlot(null); setHold(null);
+      setError("Alguien acaba de tomar esa hora. Elige otra.");
+      void slots.refetch();
+      return;
+    }
+    setHold(data as { token: string; expires_at: string });
+  }
 
   useEffect(() => {
     if (today && !date) setDate(today);
@@ -118,7 +159,17 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
     });
   }, [today, config.data?.max_days_ahead]);
 
+  const reason = useQuery({
+    queryKey: ["table-booking-reason", businessId, date, party],
+    enabled: Boolean(config.data?.enabled && date && slots.data && !slots.data.some((x) => x.available)),
+    queryFn: async () => {
+      const { data } = await rpc("restaurant_no_availability_reason", { _business_id: businessId, _date: date, _party: party });
+      return (data as string | null) ?? null;
+    },
+  });
+
   if (!config.data?.enabled) return null;
+  const minParty = Math.max(1, config.data.min_party ?? 1);
   const maxParty = config.data.max_party ?? 8;
   const maxDate = addDays(today || date, config.data.max_days_ahead ?? 60);
 
@@ -128,18 +179,19 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
     setError(null);
     const { data, error: err } = await rpc("restaurant_book", {
       _business_id: businessId, _starts_at: slot.starts_at, _party: party, _name: name, _phone: phone,
-      _email: email || null, _occasion: occasion || null, _note: note || null, _source: "pagina",
+      _email: email || null, _occasion: occasion || null, _note: note || null, _source: "pagina", _hold: hold?.token ?? null,
     });
     setBusy(false);
     if (err) {
       setError(tableBookingError(err.message));
       if (err.message.includes("slot_unavailable")) {
-        setSlot(null);
+        setSlot(null); setHold(null);
         void slots.refetch();
       }
       return;
     }
-    const r = data as { id: string; folio: string; status: string; starts_at: string; party_size: number };
+    const r = data as { id: string; folio: string; status: string; starts_at: string; party_size: number; manage_token: string };
+    holdRef.current = null; setHold(null);
     setDone(r);
     void notify({ data: { reservationId: r.id } }).catch(() => undefined);
   }
@@ -162,6 +214,11 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
             ) : (
               <p className="mt-2 text-sm">Te mandamos la confirmación por WhatsApp.</p>
             )}
+            {done.manage_token ? (
+              <Link to="/reservacion-mesa/$token" params={{ token: done.manage_token }} className="mt-3 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline">
+                Cambiar o cancelar mi reservación
+              </Link>
+            ) : null}
           </div>
         </div>
       </section>
@@ -178,22 +235,22 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
         <div className="text-sm font-medium">
           <span className="flex items-center gap-1.5"><Users className="size-4" aria-hidden /> Personas</span>
           <div className="mt-1 flex h-10 items-center justify-between rounded-md border border-input px-2">
-            <Button type="button" size="icon" variant="ghost" aria-label="Menos personas" disabled={party <= 1}
-              onClick={() => { setParty((p) => Math.max(1, p - 1)); setSlot(null); }}><Minus className="size-4" /></Button>
+            <Button type="button" size="icon" variant="ghost" aria-label="Menos personas" disabled={party <= minParty}
+              onClick={() => { setParty((p) => Math.max(minParty, p - 1)); void pickSlot(null); }}><Minus className="size-4" /></Button>
             <span aria-live="polite">{party} {party === 1 ? "persona" : "personas"}</span>
             <Button type="button" size="icon" variant="ghost" aria-label="Más personas" disabled={party >= maxParty}
-              onClick={() => { setParty((p) => Math.min(maxParty, p + 1)); setSlot(null); }}><Plus className="size-4" /></Button>
+              onClick={() => { setParty((p) => Math.min(maxParty, p + 1)); void pickSlot(null); }}><Plus className="size-4" /></Button>
           </div>
         </div>
         <label className="block text-sm font-medium">
           <span className="flex items-center gap-1.5"><CalendarDays className="size-4" aria-hidden /> Fecha</span>
           <Input type="date" className="mt-1" value={date} min={today} max={maxDate}
-            onChange={(e) => { setDate(e.target.value); setSlot(null); setShowAll(false); }} />
+            onChange={(e) => { setDate(e.target.value); void pickSlot(null); setShowAll(false); }} />
         </label>
         <label className="block text-sm font-medium">
           <span className="flex items-center gap-1.5"><Clock className="size-4" aria-hidden /> Hora</span>
           <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={prefTime}
-            onChange={(e) => { setPrefTime(e.target.value); setSlot(null); setShowAll(false); }}>
+            onChange={(e) => { setPrefTime(e.target.value); void pickSlot(null); setShowAll(false); }}>
             {PREF_TIMES.map((t) => <option key={t} value={t}>{to12h(t)}</option>)}
           </select>
         </label>
@@ -203,7 +260,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
         {quickDays.map((d) => (
           <button key={d.iso} type="button" role="listitem"
             className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition-colors ${date === d.iso ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"}`}
-            onClick={() => { setDate(d.iso); setSlot(null); setShowAll(false); }}>{d.label}</button>
+            onClick={() => { setDate(d.iso); void pickSlot(null); setShowAll(false); }}>{d.label}</button>
         ))}
       </div>
 
@@ -215,7 +272,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
           </div>
         ) : available.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">
-            {(slots.data ?? []).length === 0 ? "El restaurante no recibe reservaciones ese día." : `Ya no quedan mesas para ${party} ese día.`} Prueba otra fecha{(slots.data ?? []).length ? " o menos personas" : ""}.
+            {reasonText(reason.data ?? ((slots.data ?? []).length ? "fully_booked" : "no_hours"), party, maxParty, minParty)}
           </p>
         ) : (
           <>
@@ -223,7 +280,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
               <>
                 {nearMissing ? <p className="mt-1 text-xs text-muted-foreground">No hay mesa a las {to12h(prefTime)}; estos son los horarios más cercanos.</p> : null}
                 <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                  {nearest.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={setSlot} />)}
+                  {nearest.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={(x) => void pickSlot(x)} />)}
                 </div>
                 {available.length > nearest.length ? (
                   <button type="button" className="mt-3 text-sm font-medium text-primary underline-offset-4 hover:underline" onClick={() => setShowAll(true)}>
@@ -237,7 +294,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
                   <div key={g.label}>
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">{g.label}</p>
                     <div className="mt-1.5 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                      {g.items.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={setSlot} />)}
+                      {g.items.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={(x) => void pickSlot(x)} />)}
                     </div>
                   </div>
                 ))}
@@ -249,7 +306,16 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
         {slot ? (
           <p className="mt-3 rounded-md bg-muted px-3 py-2 text-sm">
             {party} {party === 1 ? "persona" : "personas"} · {formatTableDate(slot.starts_at)} · {to12h(slot.slot_time)}
+            {hold ? (holdLeft > 0
+              ? <span className="block text-xs text-muted-foreground">Te guardamos esta mesa {Math.floor(holdLeft / 60)}:{String(holdLeft % 60).padStart(2, "0")} min mientras completas tus datos.</span>
+              : <span className="block text-xs text-destructive">Se acabó el tiempo; puede que la mesa ya no esté. Puedes intentar reservar o elegir otra hora.</span>) : null}
           </p>
+        ) : null}
+        {config.data.policies ? (
+          <div className="mt-4 rounded-md border border-border px-3 py-2 text-sm">
+            <p className="font-semibold">Antes de reservar</p>
+            <p className="mt-1 whitespace-pre-line text-muted-foreground">{config.data.policies}</p>
+          </div>
         ) : null}
       </div>
 

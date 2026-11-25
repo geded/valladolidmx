@@ -7441,6 +7441,8 @@ export type Database = {
           max_days_ahead: number
           max_party: number
           min_notice_minutes: number
+          min_party: number
+          policies: string | null
           slot_minutes: number
           tables: Json
           updated_at: string
@@ -7458,6 +7460,8 @@ export type Database = {
           max_days_ahead?: number
           max_party?: number
           min_notice_minutes?: number
+          min_party?: number
+          policies?: string | null
           slot_minutes?: number
           tables?: Json
           updated_at?: string
@@ -7475,6 +7479,8 @@ export type Database = {
           max_days_ahead?: number
           max_party?: number
           min_notice_minutes?: number
+          min_party?: number
+          policies?: string | null
           slot_minutes?: number
           tables?: Json
           updated_at?: string
@@ -7550,6 +7556,7 @@ export type Database = {
           guest_name: string
           guest_phone: string | null
           id: string
+          manage_token: string
           note: string | null
           notices_sent_at: string | null
           occasion: string | null
@@ -7572,6 +7579,7 @@ export type Database = {
           guest_name: string
           guest_phone?: string | null
           id?: string
+          manage_token?: string
           note?: string | null
           notices_sent_at?: string | null
           occasion?: string | null
@@ -7594,6 +7602,7 @@ export type Database = {
           guest_name?: string
           guest_phone?: string | null
           id?: string
+          manage_token?: string
           note?: string | null
           notices_sent_at?: string | null
           occasion?: string | null
@@ -7616,6 +7625,51 @@ export type Database = {
           },
           {
             foreignKeyName: "restaurant_reservations_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurant_slot_holds: {
+        Row: {
+          business_id: string
+          created_at: string
+          ends_at: string
+          expires_at: string
+          party_size: number
+          starts_at: string
+          token: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          ends_at: string
+          expires_at: string
+          party_size: number
+          starts_at: string
+          token?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          ends_at?: string
+          expires_at?: string
+          party_size?: number
+          starts_at?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_slot_holds_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "restaurant_slot_holds_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
@@ -11176,6 +11230,7 @@ export type Database = {
         Args: {
           _business_id: string
           _email?: string
+          _hold?: string
           _name: string
           _note?: string
           _occasion?: string
@@ -11185,6 +11240,10 @@ export type Database = {
           _starts_at: string
         }
         Returns: Json
+      }
+      restaurant_booking_policies_save: {
+        Args: { _business_id: string; _min_party: number; _policies: string }
+        Returns: undefined
       }
       restaurant_booking_settings_save: {
         Args: { _business_id: string; _settings: Json }
@@ -11207,6 +11266,25 @@ export type Database = {
         }
         Returns: undefined
       }
+      restaurant_hold_slot: {
+        Args: {
+          _business_id: string
+          _party: number
+          _replace?: string
+          _starts_at: string
+        }
+        Returns: Json
+      }
+      restaurant_manage_cancel: { Args: { _token: string }; Returns: undefined }
+      restaurant_manage_get: { Args: { _token: string }; Returns: Json }
+      restaurant_manage_modify: {
+        Args: { _party: number; _starts_at: string; _token: string }
+        Returns: Json
+      }
+      restaurant_no_availability_reason: {
+        Args: { _business_id: string; _date: string; _party: number }
+        Returns: string
+      }
       restaurant_public_booking_config: {
         Args: { _business_id: string }
         Returns: Json
@@ -11219,6 +11297,7 @@ export type Database = {
           starts_at: string
         }[]
       }
+      restaurant_release_hold: { Args: { _token: string }; Returns: undefined }
       restaurant_reservation_update: {
         Args: {
           _id: string

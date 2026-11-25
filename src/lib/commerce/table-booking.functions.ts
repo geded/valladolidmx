@@ -30,12 +30,12 @@ export const sendTableBookingNotices = createServerFn({ method: "POST" })
       .eq("id", data.reservationId)
       .is("notices_sent_at", null)
       .gte("created_at", since)
-      .select("id, business_id, folio, starts_at, party_size, status, guest_name, guest_phone, occasion, note")
+      .select("id, business_id, folio, starts_at, party_size, status, guest_name, guest_phone, occasion, note, manage_token")
       .maybeSingle();
     if (error || !claimed) return { ok: false as const };
     const r = claimed as {
       business_id: string; folio: string; starts_at: string; party_size: number; status: string;
-      guest_name: string; guest_phone: string | null; occasion: string | null; note: string | null;
+      guest_name: string; guest_phone: string | null; occasion: string | null; note: string | null; manage_token: string;
     };
 
     try {
@@ -75,7 +75,8 @@ export const sendTableBookingNotices = createServerFn({ method: "POST" })
           guestTo.replace(/^\+/, ""),
           `Hola ${r.guest_name.split(" ")[0]}, ${pending ? "recibimos tu solicitud de mesa" : "tu mesa está reservada"} en ${name}.\n` +
             `${r.party_size} personas · ${when}\nFolio: ${r.folio}` +
-            (pending ? "\nEl restaurante te confirmará pronto." : "") + "\nValladolid.mx",
+            (pending ? "\nEl restaurante te confirmará pronto." : "") +
+            `\nCambia o cancela aquí: ${SITE.url}/reservacion-mesa/${r.manage_token}` + "\nValladolid.mx",
         ).catch(() => undefined);
       }
       return { ok: true as const, whatsapp: true };

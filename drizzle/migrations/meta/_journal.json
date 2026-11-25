@@ -302,6 +302,13 @@
       "when": 1795628627001,
       "tag": "0042_restaurant_booking_stage2",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1795632012255,
+      "tag": "0043_restaurant_booking_holds_manage_policies",
+      "breakpoints": true
     }
   ]
 }
