@@ -497,7 +497,7 @@ async function loadBusinessesFor(
       );
   const ids = rows.map((r) => r.id);
 
-  const [hoursRes, locRes] = await Promise.all([
+  const [hoursRes, locRes, tableSales] = await Promise.all([
     ids.length
       ? sb
           .from("business_hours")
@@ -510,7 +510,10 @@ async function loadBusinessesFor(
           .select("business_id, latitude, longitude, is_primary")
           .in("business_id", ids)
       : Promise.resolve({ data: [] as unknown[] }),
+    // «Reservar mesa»: sólo empresas con el modo `mesas` activado por el administrador.
+    fetchPublicOnlineSales(sb, ids),
   ]);
+  const wantsTable = priority.terms.some((t) => /^(mesa|mesas|reserv|apart)/.test(t));
   const hoursBy = new Map<string, HourRow[]>();
   for (const h of (hoursRes.data ?? []) as Array<Record<string, unknown>>) {
     const bid = String(h["business_id"]);
@@ -535,8 +538,11 @@ async function loadBusinessesFor(
 
   const candidates: AluxConverseCandidate[] = [];
   for (const r of rows) {
-    const href = hrefBy.get(r.id);
-    if (!href) continue;
+    const baseHref = hrefBy.get(r.id);
+    if (!baseHref) continue;
+    const tableBooking = tableSales.get(r.id)?.modes.includes("mesas") === true;
+    // Si piden mesa, la tarjeta abre directo el bloque «Reservar mesa» de la ficha.
+    const href = tableBooking && wantsTable ? `${baseHref}#reservar-mesa` : baseHref;
     const aluxWeight = priority.promoted.has(r.id) ? (priority.weights.get(r.id) ?? 0) : 0;
     const family = familyFromCategory(r.categorySlug);
     const facts: AluxConverseFact[] = [];
@@ -548,6 +554,8 @@ async function loadBusinessesFor(
     const open = openStateFrom(hoursBy.get(r.id));
     if (open.label) facts.push(fact(open.label));
     else unavailable.push("horario");
+    if (tableBooking)
+      facts.push(fact("Se puede reservar mesa en línea, sin costo, desde su ficha (fecha, hora y personas)"));
     const attrs = attributeFacts(r.attrs);
     facts.push(...attrs.facts);
     if (!attrs.hasAccess) unavailable.push("accesibilidad");
