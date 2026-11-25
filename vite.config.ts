@@ -46,6 +46,10 @@ export default defineConfig({
           // ruta NetworkFirst de navegación y sólo actúa si la red falla.
           // El valor por defecto del plugin ("index.html") debe anularse.
           navigateFallback: undefined,
+          // Al abrir la app instalada, el teléfono pide la página mientras
+          // el Service Worker despierta, en vez de esperar a que arranque.
+          // Sin esto iOS mostraba pantalla en blanco/negra al iniciar.
+          navigationPreload: true,
 
           // Sólo el cascarón público estable. Los chunks de rutas, CMS,
           // administración y sesiones se solicitan bajo demanda y nunca se
