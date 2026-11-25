@@ -1,5 +1,5 @@
 /**
- * /portal/reservaciones-mesa — Agenda de mesas del restaurante (Etapa 1).
+ * /portal/reservaciones-mesa — Agenda de mesas del restaurante (Etapas 1 y 2: agenda, plano, lista de espera, ficha y reportes).
  * Pensada para el teléfono: agenda del día con estados, alta por teléfono o
  * sin reservación, cerrar el día y ajustes de mesas y horarios.
  */
@@ -35,6 +35,7 @@ import {
   type TableBookingSettings,
   type TableStatus,
 } from "@/lib/commerce/table-booking";
+import { FloorPlanView, GuestProfileCard, TableReportsView, WaitlistView } from "@/components/commerce/TableFloorTools";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -63,7 +64,7 @@ function shiftDay(iso: string, n: number): string {
 function TableReservationsPage() {
   const businessId = useActiveBusinessId();
   const [date, setDate] = useState("");
-  const [tab, setTab] = useState<"agenda" | "ajustes">("agenda");
+  const [tab, setTab] = useState<"agenda" | "plano" | "espera" | "reportes" | "ajustes">("agenda");
   useEffect(() => setDate(meridaToday()), []);
   const fetchFn = useServerFn(getTableBookingPortal);
   const q = useQuery({
@@ -94,8 +95,12 @@ function TableReservationsPage() {
         ) : null}
       </header>
 
-      <div className="flex gap-2">
-        <Button size="sm" variant={tab === "agenda" ? "default" : "outline"} className="rounded-pill" onClick={() => setTab("agenda")}>Agenda</Button>
+      <div className="flex flex-wrap gap-2">
+        {(["agenda", "plano", "espera", "reportes"] as const).map((k) => (
+          <Button key={k} size="sm" variant={tab === k ? "default" : "outline"} className="rounded-pill" onClick={() => setTab(k)}>
+            {{ agenda: "Agenda", plano: "Plano", espera: "Espera", reportes: "Reportes" }[k]}
+          </Button>
+        ))}
         {d.canManage ? (
           <Button size="sm" variant={tab === "ajustes" ? "default" : "outline"} className="rounded-pill" onClick={() => setTab("ajustes")}>Ajustes</Button>
         ) : null}
@@ -103,6 +108,12 @@ function TableReservationsPage() {
 
       {tab === "agenda" ? (
         <Agenda businessId={businessId} date={date} setDate={setDate} data={d} />
+      ) : tab === "plano" ? (
+        <><DayNav date={date} setDate={setDate} /><FloorPlanView businessId={businessId} date={date} reservations={d.reservations} canManage={d.canManage} /></>
+      ) : tab === "espera" ? (
+        <WaitlistView businessId={businessId} date={date} />
+      ) : tab === "reportes" ? (
+        <TableReportsView businessId={businessId} />
       ) : (
         <SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
       )}
@@ -117,6 +128,7 @@ function Agenda({ businessId, date, setDate, data }: { businessId: string; date:
   const updateFn = useServerFn(updateTableReservation);
   const closeFn = useServerFn(setTableDayClosed);
   const [adding, setAdding] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
   const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "table-booking", businessId] });
   const update = useMutation({
     mutationFn: (v: { id: string; status: TableStatus }) => updateFn({ data: v }),
@@ -179,6 +191,9 @@ function Agenda({ businessId, date, setDate, data }: { businessId: string; date:
                   {r.guest_phone ? (
                     <Button asChild size="sm" variant="outline"><a href={`tel:${r.guest_phone}`}><Phone className="mr-1 size-4" />Llamar</a></Button>
                   ) : null}
+                  {r.guest_phone ? (
+                    <Button size="sm" variant="ghost" onClick={() => setOpen(open === r.id ? null : r.id)}>Ficha</Button>
+                  ) : null}
                   {nextTableActions(status).map((next) => (
                     <Button key={next} size="sm" variant={next === "cancelada" || next === "no_vino" || next === "rechazada" ? "outline" : "default"}
                       disabled={update.isPending} onClick={() => update.mutate({ id: r.id, status: next })}>
@@ -186,6 +201,7 @@ function Agenda({ businessId, date, setDate, data }: { businessId: string; date:
                     </Button>
                   ))}
                 </div>
+                {open === r.id && r.guest_phone ? <GuestProfileCard businessId={businessId} phone={r.guest_phone} name={r.guest_name} /> : null}
               </li>
             );
           })}
@@ -296,5 +312,15 @@ function SettingsForm({ businessId, initial }: { businessId: string; initial: Ta
       </div>
       <div className="flex justify-end"><Button disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending ? "Guardando…" : "Guardar ajustes"}</Button></div>
     </section>
+  );
+}
+
+function DayNav({ date, setDate }: { date: string; setDate: (v: string) => void }) {
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card p-2">
+      <Button size="icon" variant="ghost" aria-label="Día anterior" onClick={() => setDate(shiftDay(date, -1))}><ChevronLeft className="size-5" /></Button>
+      <p className="text-sm font-semibold capitalize">{date ? formatTableDate(`${date}T18:00:00Z`) : ""}</p>
+      <Button size="icon" variant="ghost" aria-label="Día siguiente" onClick={() => setDate(shiftDay(date, 1))}><ChevronRight className="size-5" /></Button>
+    </div>
   );
 }

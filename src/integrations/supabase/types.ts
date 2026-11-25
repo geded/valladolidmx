@@ -7436,6 +7436,7 @@ export type Database = {
           confirm_mode: string
           created_at: string
           duration_minutes: number
+          floor_plan: Json
           hours: Json
           max_days_ahead: number
           max_party: number
@@ -7452,6 +7453,7 @@ export type Database = {
           confirm_mode?: string
           created_at?: string
           duration_minutes?: number
+          floor_plan?: Json
           hours?: Json
           max_days_ahead?: number
           max_party?: number
@@ -7468,6 +7470,7 @@ export type Database = {
           confirm_mode?: string
           created_at?: string
           duration_minutes?: number
+          floor_plan?: Json
           hours?: Json
           max_days_ahead?: number
           max_party?: number
@@ -7494,6 +7497,48 @@ export type Database = {
           },
         ]
       }
+      restaurant_guest_notes: {
+        Row: {
+          business_id: string
+          note: string | null
+          phone_key: string
+          tags: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          business_id: string
+          note?: string | null
+          phone_key: string
+          tags?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          business_id?: string
+          note?: string | null
+          phone_key?: string
+          tags?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_guest_notes_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "restaurant_guest_notes_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       restaurant_reservations: {
         Row: {
           business_id: string
@@ -7513,6 +7558,7 @@ export type Database = {
           starts_at: string
           status: string
           status_changed_at: string
+          table_id: string | null
           updated_at: string
           user_id: string | null
         }
@@ -7534,6 +7580,7 @@ export type Database = {
           starts_at: string
           status?: string
           status_changed_at?: string
+          table_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -7555,6 +7602,7 @@ export type Database = {
           starts_at?: string
           status?: string
           status_changed_at?: string
+          table_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -7568,6 +7616,63 @@ export type Database = {
           },
           {
             foreignKeyName: "restaurant_reservations_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurant_waitlist: {
+        Row: {
+          business_id: string
+          created_at: string
+          created_by: string | null
+          guest_name: string
+          guest_phone: string | null
+          id: string
+          note: string | null
+          party_size: number
+          quoted_minutes: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          created_by?: string | null
+          guest_name: string
+          guest_phone?: string | null
+          id?: string
+          note?: string | null
+          party_size: number
+          quoted_minutes?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          created_by?: string | null
+          guest_name?: string
+          guest_phone?: string | null
+          id?: string
+          note?: string | null
+          party_size?: number
+          quoted_minutes?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_waitlist_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "restaurant_waitlist_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
@@ -9037,6 +9142,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      _restaurant_staff: { Args: { _business_id: string }; Returns: boolean }
       accept_business_invitation: { Args: { _token: string }; Returns: Json }
       accept_business_ownership_transfer: {
         Args: { _transfer_id: string }
@@ -11062,6 +11168,10 @@ export type Database = {
         Args: { _category_slug: string }
         Returns: string
       }
+      restaurant_assign_table: {
+        Args: { _id: string; _table_id: string }
+        Returns: undefined
+      }
       restaurant_book: {
         Args: {
           _business_id: string
@@ -11083,6 +11193,19 @@ export type Database = {
       restaurant_day_closed: {
         Args: { _business_id: string; _date: string }
         Returns: boolean
+      }
+      restaurant_floor_plan_save: {
+        Args: { _business_id: string; _plan: Json }
+        Returns: undefined
+      }
+      restaurant_guest_note_save: {
+        Args: {
+          _business_id: string
+          _note: string
+          _phone_key: string
+          _tags: string[]
+        }
+        Returns: undefined
       }
       restaurant_public_booking_config: {
         Args: { _business_id: string }
@@ -11120,6 +11243,21 @@ export type Database = {
           _starts_at: string
         }
         Returns: string
+      }
+      restaurant_waitlist_add: {
+        Args: {
+          _business_id: string
+          _name: string
+          _note: string
+          _party: number
+          _phone: string
+          _quoted: number
+        }
+        Returns: string
+      }
+      restaurant_waitlist_set: {
+        Args: { _id: string; _status: string }
+        Returns: undefined
       }
       review_entity_presentation_mode: {
         Args: {

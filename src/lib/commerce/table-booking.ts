@@ -152,6 +152,7 @@ export const TABLE_BOOKING_ERRORS: Record<string, string> = {
   invalid_email: "Revisa tu correo.",
   too_many_reservations: "Ya tienes 3 reservaciones activas en este restaurante.",
   forbidden: "No tienes permiso para esto.",
+  table_taken: "Esa mesa ya está ocupada a esa hora.",
 };
 
 export function tableBookingError(message: string): string {
