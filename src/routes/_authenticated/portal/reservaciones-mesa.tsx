@@ -36,6 +36,7 @@ import {
   type TableBookingSettings,
   type TableStatus,
 } from "@/lib/commerce/table-booking";
+import { ShareTableBookingCard } from "@/components/commerce/ShareTableBookingCard";
 import { FloorPlanView, GuestProfileCard, TableReportsView, WaitlistView } from "@/components/commerce/TableFloorTools";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
@@ -116,7 +117,8 @@ function TableReservationsPage() {
       ) : tab === "reportes" ? (
         <TableReportsView businessId={businessId} />
       ) : (
-        <><SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
+        <><ShareTableBookingCard businessId={businessId} />
+        <SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
         <PoliciesForm businessId={businessId} /></>
       )}
     </div>
