@@ -86,7 +86,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/lugares/$slug")({
       { property: "og:url", content: url },
       { name: "twitter:card", content: "summary_large_image" },
     ];
-    if (loaderData?.inEvaluationLot) {
+    if (false && loaderData?.inEvaluationLot) { // Founder 2026-11-25: liberado para Google.
       meta.push({ name: "robots", content: "noindex, nofollow" });
     }
     return {

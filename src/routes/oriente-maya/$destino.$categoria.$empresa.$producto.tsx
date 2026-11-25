@@ -149,7 +149,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       );
     }
     return buildPublicHead({
-      noindex: loaderData.inEvaluationLot,
+      noindex: false, // Founder 2026-11-25: lote de evaluación liberado para Google.
       title: `${p.name} · ${p.business.display_name} — ${SITE.name}`,
       description,
       path,

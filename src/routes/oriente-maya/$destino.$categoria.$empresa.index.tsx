@@ -150,7 +150,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/$categoria/$empresa
       b.description.slice(0, 300) ||
       `${b.display_name} en ${destName}, Oriente Maya de Yucatán.`;
     return buildPublicHead({
-      noindex: loaderData.inEvaluationLot,
+      noindex: false, // Founder 2026-11-25: lote de evaluación liberado para Google.
       title: `${b.display_name} · ${destName} — ${SITE.name}`,
       description,
       path,

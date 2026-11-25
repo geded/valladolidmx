@@ -159,7 +159,7 @@ export const Route = createFileRoute("/oriente-maya/$destino/")({
   head: ({ loaderData, params }) =>
     loaderData
       ? buildPublicHead({
-          noindex: loaderData.inEvaluationLot,
+          noindex: false, // Founder 2026-11-25: lote de evaluación liberado para Google.
           title: `${loaderData.dest.name} — ${ORIENTE_MAYA.name} · ${SITE.name}`,
           description:
             loaderData.db?.description?.trim() ||
