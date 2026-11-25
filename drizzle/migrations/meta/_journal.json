@@ -274,6 +274,20 @@
       "when": 1795622904769,
       "tag": "0038_online_sales_modes_allow_mesas",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1795623514593,
+      "tag": "0039_guard_orders_client_insert",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1795623574644,
+      "tag": "0040_holds_confirm_requires_paid",
+      "breakpoints": true
     }
   ]
 }

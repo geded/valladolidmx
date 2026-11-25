@@ -54,7 +54,7 @@ function DestinosAtlasPage() {
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList).replace(/</g, "\\u003c") }}
       />
       <DestinationsAtlasSurface destinations={destinations} />
     </PublicShell>

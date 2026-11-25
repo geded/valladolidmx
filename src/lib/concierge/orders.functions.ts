@@ -398,6 +398,9 @@ export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
       _note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
+    const result = res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
+    // Sólo un pago registrado por el equipo (estado «paid») confirma lugares y avisa.
+    if (result?.status !== "paid") return result;
     // Los lugares apartados quedan confirmados al registrarse el pago.
     try {
       await context.supabase.rpc("commerce_order_holds_confirm", { _order_id: data.orderId });

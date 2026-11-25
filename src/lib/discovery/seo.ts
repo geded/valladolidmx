@@ -163,7 +163,7 @@ export function buildPublicHead(options: DiscoveryHeadOptions): DiscoveryHead {
   if (jsonLd) allJsonLd.push(...jsonLd);
   const scripts: Array<{ type: string; children: string }> = allJsonLd.map((obj) => ({
     type: "application/ld+json",
-    children: JSON.stringify(obj),
+    children: JSON.stringify(obj).replace(/</g, "\\u003c"),
   }));
 
   return { meta, links, scripts };

@@ -317,6 +317,7 @@ export const getBusinessPagePerformance = createServerFn({ method: "POST" })
       .from("business_users")
       .select("business_id")
       .eq("business_id", data.business_id)
+      .eq("user_id", context.userId)
       .eq("status", "active")
       .maybeSingle();
 
