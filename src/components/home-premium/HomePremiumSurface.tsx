@@ -839,7 +839,9 @@ function PueblosMagicosSection({
   content: HomePremiumContent;
   onCreateRoute: () => void;
 }) {
-  const pueblos = content.destinos.items.filter((destination) => destination.puebloMagico);
+  const pueblos = (content.pueblosMagicos.items ?? content.destinos.items).filter(
+    (destination) => destination.puebloMagico,
+  );
   return (
     <section id="pueblos-magicos" aria-labelledby="pueblos-title">
       <SectionHead

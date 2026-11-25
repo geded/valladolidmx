@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pueblos Mágicos de Inicio · 2026-11-25
+- [x] Recuperar Valladolid, Izamal y Espita publicados sin que el máximo editorial de Destinos recorte esta sección; conservar fuentes CMS, fotografías y diseño.
+- [x] 41 pruebas y lint localizado PASS; Inicio completo idéntico fuera de las dos tarjetas recuperadas en 1440/834/430/390; fotografías reales y navegación Izamal/regreso verificadas. Informe: docs/home-pueblos-magicos-2026-11-25.md. Sin escritura CMS ni publicación automática.
+- [ ] Controles globales pendientes por autorizaciones históricas y la maqueta anterior ausente del inventario de rutas; Constructor autenticado y Safari físico no certificados. No se alteran evidencias históricas sin autorización del Founder.
+
 ## Galería aprobada en tarjetas · 2026-11-24
 - [x] Integrar hasta cinco fotos de la misma empresa en las tarjetas oficiales de listados, sin alterar contenido, orden, visibilidad, enlaces ni geometría.
 - [x] Cargar fotos adicionales sólo al interactuar; flechas, puntos, gesto táctil real en Chromium móvil, lectura de fotos y entrada/regreso a ficha comprobados.

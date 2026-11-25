@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-119",
+  "title": "Corrección localizada de los tres Pueblos Mágicos en Inicio",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Founder 2026-11-25 00:41 UTC: «Estoy checando la página de inicio y la sección de pueblos mágicos ya no presenta los 3 pueblos mágico solo 1 , porque ?». Corrección del recorte accidental: conservar la selección publicada de Valladolid, Izamal y Espita independientemente del máximo del carril Destinos. Sin rediseño, cambios de orden de secciones, CMS writes, permisos, migraciones ni publicación.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-content.ts" },
+    { "operation": "modify", "path": "src/components/home-premium/home-premium-real.ts" },
+    { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" }
+  ],
+  "public_routes": ["/"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bunx vitest run scripts/omxds/r1-f1l-r2/home-pueblos-magicos.test.ts scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+    "Inicio completo antes/después 1440/834/430/390: sólo dos tarjetas recuperadas en Pueblos Mágicos"
+  ]
+}

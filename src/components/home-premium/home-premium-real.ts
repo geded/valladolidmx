@@ -296,6 +296,12 @@ function withoutUnapprovedMedia(content: HomePremiumContent): HomePremiumContent
       slides: content.hero.slides.map(preserveApproved),
     },
     destinos: { ...content.destinos, items: content.destinos.items.map(preserveApproved) },
+    pueblosMagicos: {
+      ...content.pueblosMagicos,
+      ...(content.pueblosMagicos.items
+        ? { items: content.pueblosMagicos.items.map(preserveApproved) }
+        : {}),
+    },
     rutas: { ...content.rutas, items: content.rutas.items.map(preserveApproved) },
     experiencias: {
       ...content.experiencias,
@@ -395,9 +401,18 @@ function applyHomeRailLimits(
   content: HomePremiumContent,
   limits: HomeRailLimits | undefined,
 ): HomePremiumContent {
-  if (!limits) return content;
+  // These are two distinct approved sections. A Destinos editorial limit
+  // must not remove published Pueblos Mágicos from their own section.
+  const pueblosMagicos = {
+    ...content.pueblosMagicos,
+    items: (content.pueblosMagicos.items ?? content.destinos.items).filter(
+      (destination) => destination.puebloMagico,
+    ),
+  };
+  if (!limits) return { ...content, pueblosMagicos };
   return {
     ...content,
+    pueblosMagicos,
     destinos: { ...content.destinos, items: limited(content.destinos.items, limits.destinos) },
     rutas: { ...content.rutas, items: limited(content.rutas.items, limits.rutas) },
     experiencias: {
@@ -462,29 +477,33 @@ export function mergeHomeRealContent(
     media: mediaOf(card),
     caption: card.title,
   }));
+  const resolvedDestinations = homeDestinations.map((card, index) => {
+    const row = destinationRows[index];
+    return {
+      name: str(row?.name, card.title),
+      note: str(row?.note, card.subtitle),
+      media: rowMedia(row, mediaOf(card, "destination", index)),
+      puebloMagico: typeof row?.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
+      href: str(row?.href, card.href),
+    };
+  });
 
   return attachMediaAssets(
     applyHomeRailLimits(
       {
         ...safeContent,
+        // Rebuild from the current CMS corpus, never from a prior projection.
+        pueblosMagicos: {
+          ...safeContent.pueblosMagicos,
+          items: resolvedDestinations.filter((destination) => destination.puebloMagico),
+        },
         hero: {
           ...safeContent.hero,
           slides: realHeroSlides.length > 0 ? realHeroSlides : safeContent.hero.slides,
         },
         destinos: {
           ...safeContent.destinos,
-          items: homeDestinations.map((card, index) => {
-            const row = destinationRows[index];
-            const fallback = mediaOf(card, "destination", index);
-            return {
-              name: str(row?.name, card.title),
-              note: str(row?.note, card.subtitle),
-              media: rowMedia(row, fallback),
-              puebloMagico:
-                typeof row?.pueblo_magico === "boolean" ? row.pueblo_magico : card.puebloMagico,
-              href: str(row?.href, card.href),
-            };
-          }),
+          items: resolvedDestinations,
         },
         rutas: {
           ...safeContent.rutas,
@@ -621,7 +640,9 @@ export function resolveHomeSectionVisibility(
     experienciasAcceso: true,
     categorias: content.categorias.items.length > 0,
 
-    pueblosMagicos: content.destinos.items.some((item) => item.puebloMagico),
+    pueblosMagicos: (content.pueblosMagicos.items ?? content.destinos.items).some(
+      (item) => item.puebloMagico,
+    ),
     rutas: content.rutas.items.length > 0,
     experiencias: content.experiencias.items.length > 0,
     servicios: content.servicios.stays.length + content.servicios.food.length > 0,

@@ -181,6 +181,8 @@ export type HomePremiumContent = {
     actionHref: string;
     badgeNote: string;
     ctaLabel: string;
+    /** Published destinations, before the separate Destinos rail limit. */
+    items?: HomePremiumDestination[];
   };
   rutas: {
     kicker: string;
