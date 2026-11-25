@@ -37,7 +37,7 @@ export function ShareTableBookingCard({ businessId }: { businessId: string }) {
     queryFn: async () => {
       const { data } = await supabase
         .from("businesses")
-        .select("name, slug, status, business_categories!businesses_primary_category_id_fkey ( slug )")
+        .select("display_name, slug, status, business_categories!businesses_primary_category_id_fkey ( slug )")
         .eq("id", businessId)
         .maybeSingle();
       return data;
@@ -47,8 +47,8 @@ export function ShareTableBookingCard({ businessId }: { businessId: string }) {
   const category = (b?.business_categories as { slug?: string } | null)?.slug;
   if (!b || !b.slug || !category) return null;
   const link = tableBookingShareLink(category, b.slug);
-  const code = tableBookingEmbedCode(link, b.name ?? "");
-  const wa = `https://wa.me/?text=${encodeURIComponent(`Reserva tu mesa en ${b.name}: ${link}`)}`;
+  const code = tableBookingEmbedCode(link, b.display_name ?? "");
+  const wa = `https://wa.me/?text=${encodeURIComponent(`Reserva tu mesa en ${b.display_name}: ${link}`)}`;
 
   return (
     <section className="space-y-3 rounded-xl border border-border bg-card p-4">
