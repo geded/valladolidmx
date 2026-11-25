@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { createRouter, type ErrorComponentProps } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { routeTree } from "./routeTree.gen";
+import { PageSkeleton } from "@/components/common/PageSkeleton";
 
 function DefaultErrorComponent({ error, reset }: ErrorComponentProps) {
   // El visitante nunca ve el mensaje técnico: se registra para diagnóstico y
@@ -50,6 +51,10 @@ export const getRouter = () => {
     defaultPreload: "intent",
     defaultPreloadStaleTime: 30_000,
     defaultErrorComponent: DefaultErrorComponent,
+    // Si la siguiente página tarda, se muestra su esqueleto en vez de blanco.
+    defaultPendingComponent: PageSkeleton,
+    defaultPendingMs: 300,
+    defaultPendingMinMs: 300,
   });
 
   setupRouterSsrQueryIntegration({ router, queryClient });
