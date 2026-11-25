@@ -221,3 +221,40 @@ export const setTableDayClosed = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Mi Viaje: mesas que el viajero apartó con su cuenta (RLS: solo las suyas). */
+export const listMyTableReservations = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const sb = context.supabase as unknown as Loose;
+    const since = new Date(Date.now() - 6 * 3600_000).toISOString();
+    const { data, error } = await sb
+      .from("restaurant_reservations")
+      .select("id, business_id, folio, starts_at, party_size, status, occasion, manage_token")
+      .eq("user_id", context.userId)
+      .gte("starts_at", since)
+      .in("status", ["pendiente", "confirmada"])
+      .order("starts_at", { ascending: true })
+      .limit(20);
+    if (error) throw new Error("No pudimos leer tus mesas apartadas.");
+    const rows = (data ?? []) as Array<{
+      id: string; business_id: string; folio: string; starts_at: string; party_size: number;
+      status: string; occasion: string | null; manage_token: string;
+    }>;
+    const ids = [...new Set(rows.map((r) => r.business_id))];
+    const names = new Map<string, string>();
+    if (ids.length) {
+      const { data: biz } = await sb.from("businesses").select("id, display_name").in("id", ids);
+      for (const b of (biz ?? []) as Array<{ id: string; display_name: string }>) names.set(b.id, b.display_name);
+    }
+    return rows.map((r) => ({
+      id: r.id,
+      folio: r.folio,
+      startsAt: r.starts_at,
+      partySize: r.party_size,
+      status: r.status as "pendiente" | "confirmada",
+      occasion: r.occasion,
+      manageToken: r.manage_token,
+      restaurant: names.get(r.business_id) ?? "Restaurante",
+    }));
+  });
