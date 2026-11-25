@@ -1,0 +1,1 @@
+ALTER TABLE public.restaurant_reservations ADD COLUMN IF NOT EXISTS notices_sent_at timestamptz;

@@ -19,6 +19,8 @@ export const UNC_EVENT_TITLES: Record<string, string> = {
   "Traveler.SignedUp": "Nuevo viajero registrado",
   "CRM.Prospect.Created": "Nuevo prospecto de Alux",
   "CRM.Prospect.Returned": "Un prospecto regresó con Alux",
+  "Restaurant.Booking.Created": "Nueva reservación de mesa",
+  "Restaurant.Booking.Updated": "Cambio en una reservación de mesa",
 };
 
 export function uncEventTitle(eventType: string): string {
@@ -41,7 +43,7 @@ export const UNC_GROUP_LABELS: Record<UncGroup, string> = {
 
 export function uncEventGroup(eventType: string): UncGroup {
   if (eventType.startsWith("media.")) return "aprobaciones";
-  if (eventType.startsWith("Concierge.Booking")) return "reservas";
+  if (eventType.startsWith("Concierge.Booking") || eventType.startsWith("Restaurant.Booking")) return "reservas";
   if (eventType.startsWith("Traveler.")) return "viajeros";
   if (eventType.startsWith("CRM.")) return "viajeros";
   if (eventType.startsWith("Concierge.")) return "viajeros";

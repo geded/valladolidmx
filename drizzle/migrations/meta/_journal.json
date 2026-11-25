@@ -246,6 +246,34 @@
       "when": 1795619076084,
       "tag": "0034_eb_comment_reopen_owner_check",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1795622411380,
+      "tag": "0035_restaurant_table_booking",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795622447759,
+      "tag": "0036_restaurant_reservation_notices",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1795622734809,
+      "tag": "0037_restaurant_day_closed",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1795622904769,
+      "tag": "0038_online_sales_modes_allow_mesas",
+      "breakpoints": true
     }
   ]
 }

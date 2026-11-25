@@ -656,3 +656,10 @@
 - [x] Las empresas no se dejaban abrir desde la página del destino (enlace antiguo mandaba a Oriente Maya); ahora abren su ficha en todos los destinos.
 
 - [x] Velocidad al tocar empresas y destinos: enlaces internos sin recargar el sitio, carga adelantada al tocar y una sola lectura reutilizable por ficha.
+
+## Reservar mesa (tipo OpenTable)
+- [x] Etapa 1: activar por restaurante, ficha, agenda en Portal, avisos teléfono/WhatsApp, cobro apagado
+- [ ] Etapa 1: Alux aparta mesa en la plática
+- [ ] Etapa 1: la reservación entra a Mi Viaje
+- [ ] Etapa 2: zonas, plano, lista de espera, ficha del comensal, reportes
+- [ ] Etapa 3: cobro, depósitos, reseñas de quien asistió

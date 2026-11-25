@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { StoreProductsPanel } from "@/components/commerce/StoreProductsPanel";
 import { BusinessRatesCalendar } from "@/components/commerce/RatesCalendar";
+import { TableBookingBillingPanel } from "@/components/commerce/TableBookingBillingPanel";
 import {
   getBusinessOnlineSales,
   onlineSalesErrorMessage,
@@ -98,6 +99,11 @@ export function BusinessOnlineSalesPanel({
             <p className="mt-1 text-sm text-muted-foreground">
               Por: {state.channels.map((c) => ONLINE_SALES_CHANNEL_LABEL[c]).join(" · ")}.
             </p>
+            {state.modes.includes("mesas") ? (
+              <p className="mt-3 text-sm">
+                Tus reservaciones de mesa se manejan en «Reservaciones de mesa» del Portal.
+              </p>
+            ) : null}
             {state.modes.includes("reservas") ? (
               <div className="mt-4">
                 <BusinessRatesCalendar businessId={businessId} kind="noches" />
@@ -240,6 +246,7 @@ export function BusinessOnlineSalesPanel({
           <BusinessRatesCalendar businessId={businessId} kind="noches" />
         </div>
       ) : null}
+      {state.modes.includes("mesas") ? <TableBookingBillingPanel businessId={businessId} /> : null}
     </section>
   );
 }

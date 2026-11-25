@@ -370,6 +370,16 @@ const portal: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "portal.reservaciones-mesa",
+      workspaceId: "portal",
+      label: "Reservaciones de mesa",
+      icon: CalendarDays,
+      to: "/portal/reservaciones-mesa",
+      group: "operacion",
+      order: 6.6,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "portal.pagos",
       workspaceId: "portal",
       label: "Pagos y visibilidad",

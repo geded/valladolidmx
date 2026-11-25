@@ -1,0 +1,2 @@
+ALTER TABLE public.business_online_sales DROP CONSTRAINT business_online_sales_modes_ck;
+ALTER TABLE public.business_online_sales ADD CONSTRAINT business_online_sales_modes_ck CHECK (modes <@ ARRAY['tienda','pedidos','reservas','salidas','mesas']::text[]);

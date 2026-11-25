@@ -180,6 +180,7 @@ import { Route as AuthenticatedPortalPagosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPortalPresenciaRouteImport } from './routes/_authenticated/portal/presencia'
 import { Route as AuthenticatedPortalPropiedadRouteImport } from './routes/_authenticated/portal/propiedad'
 import { Route as AuthenticatedPortalReportesRouteImport } from './routes/_authenticated/portal/reportes'
+import { Route as AuthenticatedPortalReservacionesMesaRouteImport } from './routes/_authenticated/portal/reservaciones-mesa'
 import { Route as AuthenticatedPortalVentasEnLineaRouteImport } from './routes/_authenticated/portal/ventas-en-linea'
 import { Route as AuthenticatedPortalVisibilidadRouteImport } from './routes/_authenticated/portal/visibilidad'
 import { Route as AuthenticatedPortalWhatsappRouteImport } from './routes/_authenticated/portal/whatsapp'
@@ -1248,6 +1249,12 @@ const AuthenticatedPortalReportesRoute =
     path: '/reportes',
     getParentRoute: () => AuthenticatedPortalRouteRoute,
   } as any)
+const AuthenticatedPortalReservacionesMesaRoute =
+  AuthenticatedPortalReservacionesMesaRouteImport.update({
+    id: '/reservaciones-mesa',
+    path: '/reservaciones-mesa',
+    getParentRoute: () => AuthenticatedPortalRouteRoute,
+  } as any)
 const AuthenticatedPortalVentasEnLineaRoute =
   AuthenticatedPortalVentasEnLineaRouteImport.update({
     id: '/ventas-en-linea',
@@ -2062,6 +2069,7 @@ export interface FileRoutesByFullPath {
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
+  '/portal/reservaciones-mesa': typeof AuthenticatedPortalReservacionesMesaRoute
   '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/portal/whatsapp': typeof AuthenticatedPortalWhatsappRoute
@@ -2335,6 +2343,7 @@ export interface FileRoutesByTo {
   '/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/portal/reportes': typeof AuthenticatedPortalReportesRoute
+  '/portal/reservaciones-mesa': typeof AuthenticatedPortalReservacionesMesaRoute
   '/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/portal/whatsapp': typeof AuthenticatedPortalWhatsappRoute
@@ -2616,6 +2625,7 @@ export interface FileRoutesById {
   '/_authenticated/portal/presencia': typeof AuthenticatedPortalPresenciaRoute
   '/_authenticated/portal/propiedad': typeof AuthenticatedPortalPropiedadRoute
   '/_authenticated/portal/reportes': typeof AuthenticatedPortalReportesRoute
+  '/_authenticated/portal/reservaciones-mesa': typeof AuthenticatedPortalReservacionesMesaRoute
   '/_authenticated/portal/ventas-en-linea': typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   '/_authenticated/portal/visibilidad': typeof AuthenticatedPortalVisibilidadRoute
   '/_authenticated/portal/whatsapp': typeof AuthenticatedPortalWhatsappRoute
@@ -2900,6 +2910,7 @@ export interface FileRouteTypes {
     | '/portal/presencia'
     | '/portal/propiedad'
     | '/portal/reportes'
+    | '/portal/reservaciones-mesa'
     | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
     | '/portal/whatsapp'
@@ -3173,6 +3184,7 @@ export interface FileRouteTypes {
     | '/portal/presencia'
     | '/portal/propiedad'
     | '/portal/reportes'
+    | '/portal/reservaciones-mesa'
     | '/portal/ventas-en-linea'
     | '/portal/visibilidad'
     | '/portal/whatsapp'
@@ -3453,6 +3465,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portal/presencia'
     | '/_authenticated/portal/propiedad'
     | '/_authenticated/portal/reportes'
+    | '/_authenticated/portal/reservaciones-mesa'
     | '/_authenticated/portal/ventas-en-linea'
     | '/_authenticated/portal/visibilidad'
     | '/_authenticated/portal/whatsapp'
@@ -4901,6 +4914,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalReportesRouteImport
       parentRoute: typeof AuthenticatedPortalRouteRoute
     }
+    '/_authenticated/portal/reservaciones-mesa': {
+      id: '/_authenticated/portal/reservaciones-mesa'
+      path: '/reservaciones-mesa'
+      fullPath: '/portal/reservaciones-mesa'
+      preLoaderRoute: typeof AuthenticatedPortalReservacionesMesaRouteImport
+      parentRoute: typeof AuthenticatedPortalRouteRoute
+    }
     '/_authenticated/portal/ventas-en-linea': {
       id: '/_authenticated/portal/ventas-en-linea'
       path: '/ventas-en-linea'
@@ -5904,6 +5924,7 @@ interface AuthenticatedPortalRouteRouteChildren {
   AuthenticatedPortalPresenciaRoute: typeof AuthenticatedPortalPresenciaRoute
   AuthenticatedPortalPropiedadRoute: typeof AuthenticatedPortalPropiedadRoute
   AuthenticatedPortalReportesRoute: typeof AuthenticatedPortalReportesRoute
+  AuthenticatedPortalReservacionesMesaRoute: typeof AuthenticatedPortalReservacionesMesaRoute
   AuthenticatedPortalVentasEnLineaRoute: typeof AuthenticatedPortalVentasEnLineaRouteWithChildren
   AuthenticatedPortalVisibilidadRoute: typeof AuthenticatedPortalVisibilidadRoute
   AuthenticatedPortalWhatsappRoute: typeof AuthenticatedPortalWhatsappRoute
@@ -5930,6 +5951,8 @@ const AuthenticatedPortalRouteRouteChildren: AuthenticatedPortalRouteRouteChildr
     AuthenticatedPortalPresenciaRoute: AuthenticatedPortalPresenciaRoute,
     AuthenticatedPortalPropiedadRoute: AuthenticatedPortalPropiedadRoute,
     AuthenticatedPortalReportesRoute: AuthenticatedPortalReportesRoute,
+    AuthenticatedPortalReservacionesMesaRoute:
+      AuthenticatedPortalReservacionesMesaRoute,
     AuthenticatedPortalVentasEnLineaRoute:
       AuthenticatedPortalVentasEnLineaRouteWithChildren,
     AuthenticatedPortalVisibilidadRoute: AuthenticatedPortalVisibilidadRoute,

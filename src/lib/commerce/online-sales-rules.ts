@@ -10,7 +10,7 @@
  * La base de datos aplica la misma regla en `business_online_sale_allows`.
  */
 
-export const ONLINE_SALES_MODES = ["tienda", "pedidos", "reservas", "salidas"] as const;
+export const ONLINE_SALES_MODES = ["tienda", "pedidos", "reservas", "salidas", "mesas"] as const;
 export type OnlineSalesMode = (typeof ONLINE_SALES_MODES)[number];
 
 export const ONLINE_SALES_CHANNELS = ["pagina", "alux_pagina", "whatsapp"] as const;
@@ -29,6 +29,7 @@ export const ONLINE_SALES_MODE_LABEL: Record<OnlineSalesMode, { title: string; h
   pedidos: { title: "Pedidos para recoger", hint: "Cafeterías y restaurantes: se paga en línea y se recoge en el local." },
   reservas: { title: "Reservas por fecha", hint: "Hoteles y casas de vacaciones, con confirmación del hotel." },
   salidas: { title: "Tours, eventos y servicios con fecha", hint: "Tours, eventos, traslados y guías con fecha y hora." },
+  mesas: { title: "Reservar mesa", hint: "Restaurantes y cafeterías: el cliente aparta mesa por fecha, hora y personas. Gratis." },
 };
 
 export const ONLINE_SALES_CHANNEL_LABEL: Record<OnlineSalesChannel, string> = {

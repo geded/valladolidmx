@@ -7428,6 +7428,153 @@ export type Database = {
         }
         Relationships: []
       }
+      restaurant_booking_settings: {
+        Row: {
+          billing_enabled: boolean
+          billing_mode: string
+          business_id: string
+          confirm_mode: string
+          created_at: string
+          duration_minutes: number
+          hours: Json
+          max_days_ahead: number
+          max_party: number
+          min_notice_minutes: number
+          slot_minutes: number
+          tables: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          billing_enabled?: boolean
+          billing_mode?: string
+          business_id: string
+          confirm_mode?: string
+          created_at?: string
+          duration_minutes?: number
+          hours?: Json
+          max_days_ahead?: number
+          max_party?: number
+          min_notice_minutes?: number
+          slot_minutes?: number
+          tables?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          billing_enabled?: boolean
+          billing_mode?: string
+          business_id?: string
+          confirm_mode?: string
+          created_at?: string
+          duration_minutes?: number
+          hours?: Json
+          max_days_ahead?: number
+          max_party?: number
+          min_notice_minutes?: number
+          slot_minutes?: number
+          tables?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_booking_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "restaurant_booking_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurant_reservations: {
+        Row: {
+          business_id: string
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          folio: string
+          guest_email: string | null
+          guest_name: string
+          guest_phone: string | null
+          id: string
+          note: string | null
+          notices_sent_at: string | null
+          occasion: string | null
+          party_size: number
+          source: string
+          starts_at: string
+          status: string
+          status_changed_at: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          folio: string
+          guest_email?: string | null
+          guest_name: string
+          guest_phone?: string | null
+          id?: string
+          note?: string | null
+          notices_sent_at?: string | null
+          occasion?: string | null
+          party_size: number
+          source?: string
+          starts_at: string
+          status?: string
+          status_changed_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          folio?: string
+          guest_email?: string | null
+          guest_name?: string
+          guest_phone?: string | null
+          id?: string
+          note?: string | null
+          notices_sent_at?: string | null
+          occasion?: string | null
+          party_size?: number
+          source?: string
+          starts_at?: string
+          status?: string
+          status_changed_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_reservations_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_effective_visibility"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "restaurant_reservations_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           author_display_name: string | null
@@ -8870,6 +9017,26 @@ export type Database = {
         Args: { p_order_id: string }
         Returns: undefined
       }
+      _restaurant_booking_on: {
+        Args: { _business_id: string }
+        Returns: boolean
+      }
+      _restaurant_fits: {
+        Args: {
+          _business_id: string
+          _exclude?: string
+          _party: number
+          _start: string
+        }
+        Returns: boolean
+      }
+      _restaurant_notify: {
+        Args: {
+          _event: string
+          _r: Database["public"]["Tables"]["restaurant_reservations"]["Row"]
+        }
+        Returns: undefined
+      }
       accept_business_invitation: { Args: { _token: string }; Returns: Json }
       accept_business_ownership_transfer: {
         Args: { _transfer_id: string }
@@ -9041,6 +9208,10 @@ export type Database = {
       }
       admin_set_place_presentation_mode: {
         Args: { _mode: string; _place_id: string }
+        Returns: undefined
+      }
+      admin_set_restaurant_booking_billing: {
+        Args: { _business_id: string; _enabled: boolean; _mode: string }
         Returns: undefined
       }
       admin_top_products: {
@@ -10889,6 +11060,65 @@ export type Database = {
       }
       resolve_tourism_attribute_family: {
         Args: { _category_slug: string }
+        Returns: string
+      }
+      restaurant_book: {
+        Args: {
+          _business_id: string
+          _email?: string
+          _name: string
+          _note?: string
+          _occasion?: string
+          _party: number
+          _phone: string
+          _source?: string
+          _starts_at: string
+        }
+        Returns: Json
+      }
+      restaurant_booking_settings_save: {
+        Args: { _business_id: string; _settings: Json }
+        Returns: undefined
+      }
+      restaurant_day_closed: {
+        Args: { _business_id: string; _date: string }
+        Returns: boolean
+      }
+      restaurant_public_booking_config: {
+        Args: { _business_id: string }
+        Returns: Json
+      }
+      restaurant_public_slots: {
+        Args: { _business_id: string; _date: string; _party: number }
+        Returns: {
+          available: boolean
+          slot_time: string
+          starts_at: string
+        }[]
+      }
+      restaurant_reservation_update: {
+        Args: {
+          _id: string
+          _party?: number
+          _starts_at?: string
+          _status?: string
+        }
+        Returns: undefined
+      }
+      restaurant_set_day_closed: {
+        Args: { _business_id: string; _closed: boolean; _date: string }
+        Returns: undefined
+      }
+      restaurant_staff_create: {
+        Args: {
+          _business_id: string
+          _name: string
+          _note?: string
+          _party: number
+          _phone?: string
+          _source?: string
+          _starts_at: string
+        }
         Returns: string
       }
       review_entity_presentation_mode: {
