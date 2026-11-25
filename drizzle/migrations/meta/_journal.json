@@ -239,6 +239,13 @@
       "when": 1795589333668,
       "tag": "0033_security_media_and_avatar_ownership",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1795619076084,
+      "tag": "0034_eb_comment_reopen_owner_check",
+      "breakpoints": true
     }
   ]
 }
