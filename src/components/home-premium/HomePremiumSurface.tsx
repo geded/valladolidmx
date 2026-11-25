@@ -1145,7 +1145,7 @@ function ServiceColumn({
             <EditorialMediaFrame
               media={item.media}
               label={item.title}
-              className="h-full min-h-28 w-full object-cover lg:min-h-40"
+              className="aspect-square h-auto w-full self-start object-cover lg:aspect-[4/3]"
             />
             <div className="min-w-0 p-4">
               <p className="text-[10px] font-semibold uppercase text-primary">
