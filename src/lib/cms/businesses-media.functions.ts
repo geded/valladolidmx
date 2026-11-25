@@ -72,6 +72,9 @@ export const signBusinessImageUpload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: SignUploadInput) => {
     if (!d?.businessId || !d?.filename) throw new Error("invalid_input");
+    if (!/\.(jpe?g|png|webp|avif|gif|heic|heif)$/i.test(d.filename)) throw new Error("invalid_file_type");
+    if (d.contentType && !/^image\/(jpeg|png|webp|avif|gif|heic|heif)$/i.test(d.contentType))
+      throw new Error("invalid_file_type");
     return d;
   })
   .handler(async ({ data, context }) => {

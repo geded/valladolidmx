@@ -117,9 +117,10 @@ export const listDirectSaleOrders = createServerFn({ method: "POST" })
     }
     if (filters.from) query = query.gte("created_at", filters.from);
     if (filters.to) query = query.lte("created_at", filters.to);
-    if (filters.search) {
+    const safeSearch = (filters.search ?? "").replace(/[^\p{L}\p{N} @._-]/gu, "").trim();
+    if (safeSearch) {
       query = query.or(
-        `folio.ilike.%${filters.search}%,traveler_name.ilike.%${filters.search}%,traveler_email.ilike.%${filters.search}%`,
+        `folio.ilike.%${safeSearch}%,traveler_name.ilike.%${safeSearch}%,traveler_email.ilike.%${safeSearch}%`,
       );
     }
 

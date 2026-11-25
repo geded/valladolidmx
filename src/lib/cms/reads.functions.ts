@@ -247,6 +247,7 @@ export const listBusinessesCms = createServerFn({ method: "POST" })
       if (done.size) q = q.not("id", "in", `(${[...done].join(",")})`);
     }
     if (data?.categoryId) {
+      if (!/^[0-9a-f-]{36}$/i.test(data.categoryId)) throw new Error("invalid_category");
       // La categoría puede ser la principal o venir de la tabla de enlaces.
       const { data: links, error: linkError } = await context.supabase
         .from("business_category_links")

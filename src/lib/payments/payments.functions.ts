@@ -125,8 +125,14 @@ export const startPayment = createServerFn({ method: "POST" })
     const { getActiveProvider } = await import("./registry.server");
     const provider = getActiveProvider();
 
-    const host = getRequestHost();
-    const base = `https://${host}`;
+    const rawHost = (getRequestHost() ?? "").toLowerCase();
+    const hostName = rawHost.split(":")[0] ?? "";
+    const trustedHost =
+      /(^|\.)quehacerenvalladolid\.com$/.test(hostName) ||
+      /(^|\.)valladolid\.(mx|com\.mx)$/.test(hostName) ||
+      /\.lovable\.app$/.test(hostName) ||
+      hostName === "localhost";
+    const base = trustedHost ? `https://${rawHost}` : "https://www.quehacerenvalladolid.com";
     const intent = await provider.createIntent({
       orderId: order.id,
       userId,

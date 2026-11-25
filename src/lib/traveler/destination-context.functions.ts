@@ -99,12 +99,47 @@ export const resolveTravelerDestinationContext = createServerFn({ method: "POST"
     mod.registerDestinationContributor(mod.hoursContributor);
     mod.registerDestinationContributor(mod.trafficContributor);
 
+    // Rutas de tráfico (servicio de pago): sólo dentro de la península y con cupo por visitante.
+    let traffic = data.traffic ?? undefined;
+    if (traffic) {
+      const inBox = (g?: { lat: number; lon: number }) =>
+        !g || (g.lat >= 17 && g.lat <= 22.5 && g.lon >= -92.5 && g.lon <= -86);
+      const t = traffic as { origin?: { geo?: { lat: number; lon: number } }; destination?: { geo?: { lat: number; lon: number } } };
+      if (!inBox(t.origin?.geo) || !inBox(t.destination?.geo)) {
+        traffic = undefined;
+      } else {
+        try {
+          const { enforcePublicQuota } = await import("@/lib/security/public-quota.server");
+          await enforcePublicQuota("traveler.traffic", { perMinute: 10, perHour: 120 });
+        } catch {
+          traffic = undefined;
+        }
+      }
+    }
+
+    // Horarios: sólo de empresas publicadas.
+    let entities = data.entities ?? undefined;
+    if (entities?.length) {
+      const bizIds = entities.filter((e) => e.type === "business").map((e) => e.id);
+      let allowed = new Set<string>();
+      if (bizIds.length) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: pub } = await supabaseAdmin
+          .from("businesses")
+          .select("id")
+          .in("id", bizIds)
+          .eq("status", "published");
+        allowed = new Set((pub ?? []).map((r: { id: string }) => r.id));
+      }
+      entities = entities.filter((e) => e.type !== "business" || allowed.has(e.id));
+    }
+
     const resolved = await mod.resolveDestinationContext({
       scope: {
         destination: data.destination ?? undefined,
         geo: data.geo ?? undefined,
-        entities: data.entities ?? undefined,
-        traffic: data.traffic ?? undefined,
+        entities,
+        traffic,
       },
       at: new Date(),
       locale: data.locale,

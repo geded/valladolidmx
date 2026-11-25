@@ -119,6 +119,8 @@ export const computeRoute = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => RouteInput.parse(input))
   .handler(async ({ data }): Promise<RouteResult> => {
     try {
+      const { enforcePublicQuota } = await import("@/lib/security/public-quota.server");
+      await enforcePublicQuota("maps.computeRoute", { perMinute: 30, perHour: 300 });
       const res = await fetch(`${GATEWAY}/routes/directions/v2:computeRoutes`, {
         method: "POST",
         headers: {

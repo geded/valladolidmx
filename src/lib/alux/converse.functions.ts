@@ -677,6 +677,17 @@ export const aluxConverse = createServerFn({ method: "POST" })
       }
     }
 
+    // Una conversación ya ligada a una cuenta sólo la retoma esa misma cuenta.
+    {
+      const { data: owner } = await supabaseAdmin
+        .from("alux_public_sessions")
+        .select("traveler_user_id")
+        .eq("session_key", data.sessionKey)
+        .maybeSingle();
+      const ownerId = (owner as { traveler_user_id: string | null } | null)?.traveler_user_id ?? null;
+      if (ownerId && ownerId !== userId) throw new Error("alux_session_not_owned");
+    }
+
     // ── 2. Cliente público (RLS anon) para recuperación ─────────────────
     const sb = createClient(
       process.env["SUPABASE_URL"]!,

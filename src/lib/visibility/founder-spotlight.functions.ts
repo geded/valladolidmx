@@ -151,7 +151,7 @@ export const searchBusinessesForSpotlight = createServerFn({ method: "GET" })
     const { data: rows, error } = await (context.supabase as any)
       .from("businesses")
       .select("id, slug, display_name")
-      .or(`display_name.ilike.%${data.q}%,slug.ilike.%${data.q}%`)
+      .or(`display_name.ilike.%${data.q.replace(/[^\p{L}\p{N} _-]/gu, "")}%,slug.ilike.%${data.q.replace(/[^\p{L}\p{N} _-]/gu, "")}%`)
       .is("deleted_at", null)
       .limit(15);
     if (error) throw error;

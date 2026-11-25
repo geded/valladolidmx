@@ -77,7 +77,17 @@ export const getAluxTerritorialMemory = createServerFn({ method: "POST" })
     let rows: Row[] = [row as unknown as Row];
     let crossDevice = false;
     const travelerId = (row as { traveler_user_id: string | null }).traveler_user_id;
+    let callerId: string | null = null;
     if (travelerId) {
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const bearer = getRequest().headers.get("authorization") ?? "";
+      const token = bearer.toLowerCase().startsWith("bearer ") ? bearer.slice(7).trim() : "";
+      if (token && token.split(".").length === 3) {
+        const { data: u } = await supabaseAdmin.auth.getUser(token).catch(() => ({ data: { user: null } }));
+        callerId = u?.user?.id ?? null;
+      }
+    }
+    if (travelerId && callerId === travelerId) {
       const { data: all } = await supabaseAdmin
         .from("alux_public_sessions")
         .select(
