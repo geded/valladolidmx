@@ -143,8 +143,10 @@ export const getDestinationPremiumEligibility = createServerFn({ method: "GET" }
       if (!destination) return createIneligibleDestinationPremiumResult(["destination_not_found"]);
 
       const reasons: string[] = [];
-      if (destination.status !== "published") reasons.push("destination_not_published");
-      if (destination.is_demo_seed) reasons.push("destination_is_demo_seed");
+      // Un destino no publicado responde igual que uno inexistente: la
+      // lectura pública no revela su estado interno.
+      if (destination.status !== "published" || destination.is_demo_seed)
+        return createIneligibleDestinationPremiumResult(["destination_not_found"]);
       const hasGeography =
         typeof destination.latitude === "number" &&
         Number.isFinite(destination.latitude) &&
@@ -195,7 +197,7 @@ export const getDestinationPremiumEligibility = createServerFn({ method: "GET" }
         governed.length > 0 && governed.every((item) => linkedAssetIds.has(item.id));
       if (!allLinked) reasons.push("media_link_audit_missing");
 
-      if (reasons.length > 0) return createIneligibleDestinationPremiumResult(reasons);
+      if (reasons.length > 0) return createIneligibleDestinationPremiumResult(["not_eligible"]);
       return { eligible: true, reasons: [], cover, gallery };
     } catch {
       return createIneligibleDestinationPremiumResult(["eligibility_read_failed"]);

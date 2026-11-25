@@ -11,6 +11,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
 
@@ -43,8 +44,14 @@ export type GeocodeResult = {
 };
 
 export const geocodeAddress = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => GeocodeInput.parse(input))
-  .handler(async ({ data }): Promise<GeocodeResult> => {
+  .handler(async ({ data, context }): Promise<GeocodeResult> => {
+    // Sólo editores del CMS ubican direcciones (servicio con costo).
+    const { data: editorial } = await context.supabase.rpc("is_editor_or_admin", {
+      _user_id: context.userId,
+    });
+    if (!editorial) throw new Error("No autorizado");
     try {
       const url = new URL(`${GATEWAY}/maps/api/geocode/json`);
       url.searchParams.set("address", data.address);
@@ -89,11 +96,15 @@ export const geocodeAddress = createServerFn({ method: "POST" })
  * Routes API v2: distancia + duración entre dos puntos
  * ------------------------------------------------------------------ */
 
+// Sólo trayectos dentro de la península de Yucatán: el servicio no puede
+// usarse para calcular rutas arbitrarias del mundo a costa de la plataforma.
+const lat = z.number().gte(17).lte(22.5);
+const lng = z.number().gte(-92.5).lte(-86);
 const RouteInput = z.object({
-  originLat: z.number().gte(-90).lte(90),
-  originLng: z.number().gte(-180).lte(180),
-  destLat: z.number().gte(-90).lte(90),
-  destLng: z.number().gte(-180).lte(180),
+  originLat: lat,
+  originLng: lng,
+  destLat: lat,
+  destLng: lng,
   travelMode: z.enum(["DRIVE", "WALK", "BICYCLE", "TWO_WHEELER"]).optional(),
 });
 

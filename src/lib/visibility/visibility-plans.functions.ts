@@ -110,19 +110,28 @@ export const upsertVisibilityPlan = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<VisibilityPlan> => {
     await assertAdmin(context as never);
+    // Sólo campos editables del plan; nunca id, fechas ni autoría del cliente.
+    const EDITABLE = [
+      "slug", "name", "description_short", "description_long", "badge_variant",
+      "color_token", "display_order", "is_active", "is_public", "base_price_mxn",
+      "cycles", "limits", "visibility_levers", "commercial_rules", "reporting",
+    ] as const;
+    const src = data as Record<string, unknown>;
+    const picked: Record<string, unknown> = {};
+    for (const k of EDITABLE) if (k in src) picked[k] = src[k];
     const payload = {
-      ...data,
+      ...(picked as Partial<VisibilityPlan>),
       updated_by: context.userId,
       updated_at: new Date().toISOString(),
     };
     const query = data.id
       ? context.supabase
           .from("visibility_plans")
-          .update(payload)
+          .update(payload as never)
           .eq("id", data.id)
           .select("*")
           .single()
-      : context.supabase.from("visibility_plans").insert(payload).select("*").single();
+      : context.supabase.from("visibility_plans").insert(payload as never).select("*").single();
     const { data: row, error } = await query;
     if (error) throw error;
     return row as unknown as VisibilityPlan;

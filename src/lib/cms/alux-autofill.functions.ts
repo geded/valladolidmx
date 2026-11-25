@@ -13,6 +13,7 @@
  *    verificable (Wikimedia Commons y Openverse) y viajan con autor, licencia y
  *    enlace a la fuente para que el ingreso gobernado conserve los derechos.
  */
+import { safeFetch } from "@/lib/security/safe-fetch";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -379,7 +380,7 @@ async function searchBusinessSite(website: string): Promise<PhotoCandidate[]> {
     return [];
   }
   if (base.protocol !== "https:") return [];
-  const res = await fetch(base.toString(), {
+  const res = await safeFetch(base.toString(), {
     headers: { "User-Agent": "ValladolidMX-CMS/1.0" },
   }).catch(() => null);
   if (!res || !res.ok) return [];
@@ -769,7 +770,7 @@ async function extractOwnerContacts(pages: string[]): Promise<OwnerContact[]> {
         return;
       }
       if (base.protocol !== "https:") return;
-      const res = await fetch(base.toString(), {
+      const res = await safeFetch(base.toString(), {
         headers: {
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
@@ -1062,7 +1063,8 @@ export const aluxFetchPhotoBytes = createServerFn({ method: "POST" })
         Accept: "image/avif,image/webp,image/*,*/*;q=0.8",
       };
       if (referer) headers.Referer = referer;
-      const res = await fetch(url, { redirect: "follow", headers });
+      const res = await safeFetch(url, { headers }).catch(() => null);
+      if (!res) return { error: "photo_download_failed" as const };
       if (!res.ok) return { error: "photo_download_failed" as const };
       const buffer = new Uint8Array(await res.arrayBuffer());
       if (buffer.byteLength > MAX_PHOTO_BYTES) return { error: "photo_too_large" as const };

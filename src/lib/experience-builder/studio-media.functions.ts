@@ -551,7 +551,8 @@ export const importUrlToStudioMedia = createServerFn({ method: "POST" })
         buf = new TextEncoder().encode(decodeURIComponent(payload));
       }
     } else {
-      const resp = await fetch(data.url, { redirect: "follow" });
+      const { safeFetch } = await import("@/lib/security/safe-fetch");
+      const resp = await safeFetch(data.url);
       if (!resp.ok) throw new Error(`download_failed_${resp.status}`);
       mime = resp.headers.get("content-type")?.split(";")[0]?.trim() || "image/jpeg";
       if (!mime.startsWith("image/")) throw new Error("not_an_image");

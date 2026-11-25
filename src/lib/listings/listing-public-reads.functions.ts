@@ -71,7 +71,8 @@ export const getPublicListing = createServerFn({ method: "GET" })
     (data: { family?: unknown; destino?: unknown; previewMedia?: unknown } | undefined) => ({
       family: (isListingFamilyId(data?.family) ? data?.family : "hoteles") as ListingFamilyId,
       destino: typeof data?.destino === "string" && data.destino.trim() ? data.destino : null,
-      previewMedia: data?.previewMedia === true,
+      // Lectura pública: las fotos sin aprobar nunca se firman.
+      previewMedia: false as boolean,
     }),
   )
   .handler(async ({ data }): Promise<PublicListingDTO> => {

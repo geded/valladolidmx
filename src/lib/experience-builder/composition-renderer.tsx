@@ -15,6 +15,7 @@
  *    los bloques individuales no conocen su contenedor.
  */
 
+import { escapeStyleText, sanitizeEditorialHtml } from "@/lib/security/sanitize-html";
 import { Fragment, useContext, type ReactNode } from "react";
 import { getBlock } from "./block-registry";
 import { isContainerBlock } from "./layout-engine";
@@ -321,7 +322,7 @@ function RenderNode({ node, studio, wrap, variableContext }: RenderNodeProps): R
       data-eb-typo={scopedCss ? scopeId : undefined}
       data-hidden-on={hiddenOn.length > 0 ? hiddenOn.join(" ") : undefined}
     >
-      {scopedCss ? <style dangerouslySetInnerHTML={{ __html: scopedCss }} /> : null}
+      {scopedCss ? <style dangerouslySetInnerHTML={{ __html: escapeStyleText(scopedCss) }} /> : null}
       {content}
     </div>
   ) : (
@@ -873,7 +874,7 @@ const PRODUCTION_COMPONENT_MAP: Record<string, BlockPreview> = {
     return (
       <div className={`py-6 ${wrapper}`}>
         {/* eslint-disable-next-line react/no-danger */}
-        <div dangerouslySetInnerHTML={{ __html: html }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeEditorialHtml(html) }} />
       </div>
     );
   },

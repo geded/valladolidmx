@@ -605,7 +605,7 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           typeof body.locale === "string" && ALLOWED_LOCALES.has(body.locale) ? body.locale : "es";
         const localeBlock = LOCALE_DIRECTIVES[locale];
 
-        const history = Array.isArray(body.history)
+        let history: Msg[] = Array.isArray(body.history)
           ? body.history
               .filter(
                 (m): m is Msg =>
@@ -713,6 +713,24 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const prevSignals: TravelSignal[] = Array.isArray(prev.last_signals)
           ? (prev.last_signals as TravelSignal[])
           : [];
+
+        // El historial que ve el modelo sale de lo guardado en el servidor para
+        // esta sesión: nadie puede inventar respuestas previas de Alux.
+        {
+          const { data: stored } = await supabaseAdmin
+            .from("alux_public_messages")
+            .select("role, content")
+            .eq("session_id", sessionId)
+            .order("created_at", { ascending: false })
+            .limit(MAX_HISTORY_TURNS * 2);
+          history = (stored ?? [])
+            .reverse()
+            .filter(
+              (m): m is Msg =>
+                (m.role === "user" || m.role === "assistant") && typeof m.content === "string",
+            )
+            .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }));
+        }
 
         // 3) Log del mensaje del usuario.
         await supabaseAdmin.from("alux_public_messages").insert({

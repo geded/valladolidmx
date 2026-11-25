@@ -35,8 +35,10 @@ function toCsv(rows: Row[]): string {
     }, new Set()),
   );
   const escape = (v: unknown) => {
-    const s = v === null || v === undefined ? "" : String(v);
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    let s = v === null || v === undefined ? "" : String(v);
+    // Neutraliza fórmulas al abrir el archivo en hojas de cálculo.
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+    return /[",\n']/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   return [headers.join(","), ...rows.map((r) => headers.map((h) => escape(r[h])).join(","))].join(
     "\n",

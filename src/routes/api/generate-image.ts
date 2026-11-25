@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateImage, imageSettings } from "@/lib/image-gateway.server";
+import { requireRequestUser } from "@/lib/security/request-auth.server";
 
 export const Route = createFileRoute("/api/generate-image")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Sólo editores del CMS pueden generar imágenes (servicio con costo).
+        const auth = await requireRequestUser(request, { editor: true });
+        if (auth instanceof Response) return auth;
         const { prompt, stream = true } = await request.json();
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });

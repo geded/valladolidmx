@@ -704,7 +704,14 @@ export const startConciergeOnlinePayment = createServerFn({ method: "POST" })
     const { getActiveProvider } = await import("@/lib/payments/registry.server");
     const provider = getActiveProvider();
     const { getRequestHost } = await import("@tanstack/react-start/server");
-    const base = `https://${getRequestHost()}`;
+    // Sólo dominios propios de la plataforma; cualquier otro vuelve al principal.
+    const reqHost = String(getRequestHost() ?? "").toLowerCase().split(":")[0] ?? "";
+    const trusted =
+      /(^|\.)quehacerenvalladolid\.com$/.test(reqHost) ||
+      /(^|\.)valladolid\.(mx|com\.mx)$/.test(reqHost) ||
+      /\.lovable\.app$/.test(reqHost) ||
+      reqHost === "localhost";
+    const base = `https://${trusted ? reqHost : "www.quehacerenvalladolid.com"}`;
     const intent = await provider.createIntent({
       orderId: order.id,
       userId: context.userId,

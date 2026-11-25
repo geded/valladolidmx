@@ -174,7 +174,7 @@ function CheckoutPage() {
         // El aviso interno puede reintentarse; no bloquea la confirmación.
       }
       await orderQ.refetch();
-      toast.success("Viaje confirmado — te esperamos en el Oriente Maya");
+      toast.success("Reserva apartada — el concierge confirma al recibir tu pago en efectivo");
       navigate({
         to: "/cuenta/pagos/exito",
         search: { order: orderId },

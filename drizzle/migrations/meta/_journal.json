@@ -225,6 +225,20 @@
       "when": 1795547042125,
       "tag": "0031_cms_changes_clear_public_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795588822938,
+      "tag": "0032_security_payments_and_rpcs_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1795589333668,
+      "tag": "0033_security_media_and_avatar_ownership",
+      "breakpoints": true
     }
   ]
 }

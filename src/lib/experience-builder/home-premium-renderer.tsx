@@ -8,6 +8,7 @@
  * Home authority, CMS config, i18n, appearance and editor overlay while
  * keeping unrelated page families out of the Home chunk.
  */
+import { escapeStyleText } from "@/lib/security/sanitize-html";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import type { CSSProperties, ReactNode } from "react";
@@ -97,7 +98,7 @@ function HomePremiumNode({
       data-eb-typo={scopedCss ? localized.id : undefined}
       data-hidden-on={hiddenOn.length > 0 ? hiddenOn.join(" ") : undefined}
     >
-      {scopedCss ? <style dangerouslySetInnerHTML={{ __html: scopedCss }} /> : null}
+      {scopedCss ? <style dangerouslySetInnerHTML={{ __html: escapeStyleText(scopedCss) }} /> : null}
       {surface}
     </div>
   ) : (

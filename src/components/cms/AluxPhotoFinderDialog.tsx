@@ -12,6 +12,7 @@ import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import { ImageIcon, Loader2, MapPin, Search, Sparkles, Wand2, X } from "lucide-react";
 import { streamImage } from "@/lib/stream-image";
+import { supabase } from "@/integrations/supabase/client";
 import {
   aluxFetchPhotoBytes,
   aluxFindPhotos,
@@ -316,6 +317,8 @@ export function AluxPhotoFinderDialog({
       const fullPrompt = workingPlace
         ? `${genPrompt.trim()}, ${workingPlace}, México. Fotografía editorial de alta calidad, realista, sin texto, sin marcas de agua.`
         : `${genPrompt.trim()}. Fotografía editorial de alta calidad, realista, sin texto, sin marcas de agua.`;
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
       await streamImage(
         "/api/generate-image",
         { prompt: fullPrompt },
@@ -324,6 +327,7 @@ export function AluxPhotoFinderDialog({
           if (isFinal) setGenLoading(false);
         },
         controller.signal,
+        token ? { Authorization: `Bearer ${token}` } : undefined,
       );
       if (!controller.signal.aborted) setGenLoading(false);
     } catch (err) {

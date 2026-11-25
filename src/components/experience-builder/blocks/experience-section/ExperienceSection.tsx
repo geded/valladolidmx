@@ -1,6 +1,7 @@
 /**
  * H-03 · Ola I1.c — `vmx.experience.section` (Capa 1: Presentación).
  */
+import { sanitizeEditorialHtml } from "@/lib/security/sanitize-html";
 import { cn } from "@/lib/utils";
 import type { ExperienceSectionDTO } from "@/lib/experience-builder/blocks/experience-section/contract";
 
@@ -52,7 +53,7 @@ export function ExperienceSection({ dto, className }: ExperienceSectionProps) {
         capabilities.richText ? (
           <div
             className="prose prose-neutral max-w-none text-base"
-            dangerouslySetInnerHTML={{ __html: body }}
+            dangerouslySetInnerHTML={{ __html: sanitizeEditorialHtml(body) }}
           />
         ) : (
           <p className="text-base leading-relaxed text-foreground/90">{body}</p>

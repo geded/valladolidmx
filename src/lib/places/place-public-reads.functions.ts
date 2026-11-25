@@ -57,7 +57,8 @@ export const listPublishedPlaces = createServerFn({ method: "GET" })
   .inputValidator((input?: { destinationSlug?: string | null; previewMedia?: boolean }) => {
     const slug = input?.destinationSlug ?? null;
     if (slug !== null && !SLUG.test(slug)) throw new Error("invalid_slug");
-    return { destinationSlug: slug, previewMedia: input?.previewMedia === true };
+    // Lectura pública: nunca firma fotos sin aprobar, aunque se pida vista previa.
+    return { destinationSlug: slug, previewMedia: false };
   })
   .handler(async ({ data }): Promise<PublicPlaceCard[]> => {
     const { readPublishedPlaceCards } = await import("./place-public-reads.server");
