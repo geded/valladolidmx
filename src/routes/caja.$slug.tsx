@@ -184,6 +184,13 @@ function BoardView({ token, onExit }: { token: string; onExit: () => void }) {
           <Button asChild variant="outline" size="sm"><a href="/downloads/conector-softrestaurant.ps1" download="conector-softrestaurant.ps1" data-reload-document>Descargar conector</a></Button>
         </div>
       </details>
+      <details className="mt-4 rounded-xl border bg-card p-4 text-sm">
+        <summary className="cursor-pointer font-medium">¿Usas otro sistema de caja (SmartNet u otro)?</summary>
+        <p className="mt-2 text-muted-foreground">Descarga el detector en la computadora de caja y dale doble clic. Solo revisa qué base de datos usa tu sistema, no cambia nada, y deja un reporte en el Escritorio. Envíanos ese archivo o una foto de la ventana.</p>
+        <div className="mt-3">
+          <Button asChild variant="outline" size="sm"><a href="/downloads/detectar-sistema.bat" download="detectar-sistema.bat" data-reload-document>Descargar detector</a></Button>
+        </div>
+      </details>
 
       {picked ? (
         <TableSheet
