@@ -307,6 +307,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: `${SITE.name} — ${SITE.tagline}` },
       { name: "twitter:description", content: SITE.default_description },
+      // Fondo claro antes de que lleguen los estilos: con el iPhone en modo
+      // oscuro, iOS pintaba negro el arranque de la app instalada.
+      { name: "color-scheme", content: "light" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: SITE.name },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
