@@ -1,5 +1,15 @@
 # Roadmap
 
+## Taxi Alux · 2026-11-25
+- [x] Servicio integral activable sólo por administración, desactivado al inicio y sin conductores precargados.
+- [x] Cotización por distancia/tiempo, disponibilidad comprobada, registro obligatorio del viajero y pago únicamente en efectivo al conductor.
+- [x] Viajero: solicitud conservada al iniciar sesión, seguimiento e instalación de la app; correo siempre y avisos push cuando los autorice.
+- [x] Taxista: enlace privado creado por administración para llenar sus datos personales, idiomas, sindicato y vehículo; revisión, invitación de cuenta y aprobación antes de recibir viajes.
+- [x] Taxista: app instalable, disponibilidad, aceptación, ruta y estados del viaje.
+- [x] Administración: tarifas, alta/aprobación de taxistas y pantallas de viajes en proceso, realizados y cancelados.
+- [x] 8 pruebas de reglas, 290 rutas, tipos y recorrido completo con cuentas temporales: invitación, solicitud, aprobación, cotización $125, aceptación, llegada, viaje, efectivo y consulta por viajero/administración. Servicio y taxista temporal apagados al finalizar.
+- [ ] Publicación, piloto con taxistas reales y validación física de instalación, push, correo y GPS en celular. Demo temporal `TAXI-8C9BB957` retenida según Demo Pack Policy; no eliminar sin la frase literal autorizada.
+
 ## Restaurante del hotel (botón A, luego herramienta B) · 2026-11-25
 - [x] A · Vincular el restaurante/café del hotel a su ficha pública con tarjeta y botón directo a «Reservar mesa», administrable desde el Portal.
 - [x] A · Comprobado con Copalli y hoteles piloto: bloque público en 1440/430, ancla «Reservar mesa» y alta/baja del vínculo desde el Portal (prueba temporal ya eliminada). Fix incluido: el aviso de refresco de caché ahora es disparador de la tabla de vínculos, antes fallaba al guardar. Falta sólo publicar.

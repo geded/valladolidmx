@@ -39,6 +39,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RestaurantesRouteImport } from './routes/restaurantes'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TaxiRouteImport } from './routes/taxi'
 import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as CategoriaEmpresaRouteImport } from './routes/$categoria.$empresa'
@@ -52,6 +53,7 @@ import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMiViajeRouteImport } from './routes/_authenticated/mi-viaje'
 import { Route as AuthenticatedPaginasRouteImport } from './routes/_authenticated/paginas'
 import { Route as AuthenticatedPortalRouteRouteImport } from './routes/_authenticated/portal/route'
+import { Route as AuthenticatedTaxistaRouteImport } from './routes/_authenticated/taxista'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
 import { Route as CajaSlugRouteImport } from './routes/caja.$slug'
 import { Route as ContinuarTokenRouteImport } from './routes/continuar.$token'
@@ -114,6 +116,7 @@ import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as PreviewTokenRouteImport } from './routes/preview.$token'
 import { Route as PreviewF1kDestinationsRouteImport } from './routes/preview/f1k-destinations'
 import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
+import { Route as RegistroTaxistaTokenRouteImport } from './routes/registro-taxista.$token'
 import { Route as ReservacionMesaTokenRouteImport } from './routes/reservacion-mesa.$token'
 import { Route as RutasIndexRouteImport } from './routes/rutas.index'
 import { Route as RutasSlugRouteImport } from './routes/rutas.$slug'
@@ -145,6 +148,7 @@ import { Route as AuthenticatedCmsObservabilidadRouteImport } from './routes/_au
 import { Route as AuthenticatedCmsPagosRouteImport } from './routes/_authenticated/cms/pagos'
 import { Route as AuthenticatedCmsRcVisualRouteImport } from './routes/_authenticated/cms/rc-visual'
 import { Route as AuthenticatedCmsSimulationRouteImport } from './routes/_authenticated/cms/simulation'
+import { Route as AuthenticatedCmsTaxiAluxRouteImport } from './routes/_authenticated/cms/taxi-alux'
 import { Route as AuthenticatedCmsTravelPlansRouteImport } from './routes/_authenticated/cms/travel-plans'
 import { Route as AuthenticatedCmsVentasEnLineaRouteImport } from './routes/_authenticated/cms/ventas-en-linea'
 import { Route as AuthenticatedCmsVisibilidadRouteImport } from './routes/_authenticated/cms/visibilidad'
@@ -168,6 +172,7 @@ import { Route as AuthenticatedCuentaNotificacionesRouteImport } from './routes/
 import { Route as AuthenticatedCuentaPerfilRouteImport } from './routes/_authenticated/cuenta/perfil'
 import { Route as AuthenticatedCuentaPerfilPublicoRouteImport } from './routes/_authenticated/cuenta/perfil-publico'
 import { Route as AuthenticatedCuentaStageSimulatorRouteImport } from './routes/_authenticated/cuenta/stage-simulator'
+import { Route as AuthenticatedCuentaTaxiRouteImport } from './routes/_authenticated/cuenta/taxi'
 import { Route as AuthenticatedPaginasSplatRouteImport } from './routes/_authenticated/paginas.$'
 import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal/index'
 import { Route as AuthenticatedPortalActividadRouteImport } from './routes/_authenticated/portal/actividad'
@@ -443,6 +448,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TaxiRoute = TaxiRouteImport.update({
+  id: '/taxi',
+  path: '/taxi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TerminosRoute = TerminosRouteImport.update({
   id: '/terminos',
   path: '/terminos',
@@ -513,6 +523,11 @@ const AuthenticatedPortalRouteRoute =
     path: '/portal',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTaxistaRoute = AuthenticatedTaxistaRouteImport.update({
+  id: '/taxista',
+  path: '/taxista',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   id: '/api/generate-image',
   path: '/api/generate-image',
@@ -867,6 +882,11 @@ const ProductoSlugRoute = ProductoSlugRouteImport.update({
   path: '/producto/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegistroTaxistaTokenRoute = RegistroTaxistaTokenRouteImport.update({
+  id: '/registro-taxista/$token',
+  path: '/registro-taxista/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReservacionMesaTokenRoute = ReservacionMesaTokenRouteImport.update({
   id: '/reservacion-mesa/$token',
   path: '/reservacion-mesa/$token',
@@ -1039,6 +1059,12 @@ const AuthenticatedCmsSimulationRoute =
     path: '/simulation',
     getParentRoute: () => AuthenticatedCmsRoute,
   } as any)
+const AuthenticatedCmsTaxiAluxRoute =
+  AuthenticatedCmsTaxiAluxRouteImport.update({
+    id: '/taxi-alux',
+    path: '/taxi-alux',
+    getParentRoute: () => AuthenticatedCmsRoute,
+  } as any)
 const AuthenticatedCmsTravelPlansRoute =
   AuthenticatedCmsTravelPlansRouteImport.update({
     id: '/travel-plans',
@@ -1177,6 +1203,11 @@ const AuthenticatedCuentaStageSimulatorRoute =
     path: '/stage-simulator',
     getParentRoute: () => AuthenticatedCuentaRouteRoute,
   } as any)
+const AuthenticatedCuentaTaxiRoute = AuthenticatedCuentaTaxiRouteImport.update({
+  id: '/taxi',
+  path: '/taxi',
+  getParentRoute: () => AuthenticatedCuentaRouteRoute,
+} as any)
 const AuthenticatedPaginasSplatRoute =
   AuthenticatedPaginasSplatRouteImport.update({
     id: '/$',
@@ -1945,6 +1976,7 @@ export interface FileRoutesByFullPath {
   '/restaurantes': typeof RestaurantesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/taxi': typeof TaxiRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -1958,6 +1990,7 @@ export interface FileRoutesByFullPath {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/taxista': typeof AuthenticatedTaxistaRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/caja/$slug': typeof CajaSlugRoute
   '/continuar/$token': typeof ContinuarTokenRoute
@@ -2017,6 +2050,7 @@ export interface FileRoutesByFullPath {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/registro-taxista/$token': typeof RegistroTaxistaTokenRoute
   '/reservacion-mesa/$token': typeof ReservacionMesaTokenRoute
   '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
@@ -2049,6 +2083,7 @@ export interface FileRoutesByFullPath {
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/rc-visual': typeof AuthenticatedCmsRcVisualRoute
   '/cms/simulation': typeof AuthenticatedCmsSimulationRoute
+  '/cms/taxi-alux': typeof AuthenticatedCmsTaxiAluxRoute
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
@@ -2070,6 +2105,7 @@ export interface FileRoutesByFullPath {
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/cuenta/stage-simulator': typeof AuthenticatedCuentaStageSimulatorRoute
+  '/cuenta/taxi': typeof AuthenticatedCuentaTaxiRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/canjear': typeof AuthenticatedPortalCanjearRoute
@@ -2228,6 +2264,7 @@ export interface FileRoutesByTo {
   '/restaurantes': typeof RestaurantesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/taxi': typeof TaxiRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/$categoria/$empresa': typeof CategoriaEmpresaRoute
@@ -2236,6 +2273,7 @@ export interface FileRoutesByTo {
   '/empresa': typeof AuthenticatedEmpresaRoute
   '/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/taxista': typeof AuthenticatedTaxistaRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/caja/$slug': typeof CajaSlugRoute
   '/continuar/$token': typeof ContinuarTokenRoute
@@ -2294,6 +2332,7 @@ export interface FileRoutesByTo {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/registro-taxista/$token': typeof RegistroTaxistaTokenRoute
   '/reservacion-mesa/$token': typeof ReservacionMesaTokenRoute
   '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
@@ -2325,6 +2364,7 @@ export interface FileRoutesByTo {
   '/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/cms/rc-visual': typeof AuthenticatedCmsRcVisualRoute
   '/cms/simulation': typeof AuthenticatedCmsSimulationRoute
+  '/cms/taxi-alux': typeof AuthenticatedCmsTaxiAluxRoute
   '/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
@@ -2346,6 +2386,7 @@ export interface FileRoutesByTo {
   '/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/cuenta/stage-simulator': typeof AuthenticatedCuentaStageSimulatorRoute
+  '/cuenta/taxi': typeof AuthenticatedCuentaTaxiRoute
   '/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/portal/canjear': typeof AuthenticatedPortalCanjearRoute
@@ -2505,6 +2546,7 @@ export interface FileRoutesById {
   '/restaurantes': typeof RestaurantesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/taxi': typeof TaxiRoute
   '/terminos': typeof TerminosRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -2518,6 +2560,7 @@ export interface FileRoutesById {
   '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/mi-viaje': typeof AuthenticatedMiViajeRoute
   '/_authenticated/paginas': typeof AuthenticatedPaginasRouteWithChildren
+  '/_authenticated/taxista': typeof AuthenticatedTaxistaRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/caja/$slug': typeof CajaSlugRoute
   '/continuar/$token': typeof ContinuarTokenRoute
@@ -2577,6 +2620,7 @@ export interface FileRoutesById {
   '/preview/$token': typeof PreviewTokenRoute
   '/preview/f1k-destinations': typeof PreviewF1kDestinationsRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/registro-taxista/$token': typeof RegistroTaxistaTokenRoute
   '/reservacion-mesa/$token': typeof ReservacionMesaTokenRoute
   '/rutas/$slug': typeof RutasSlugRoute
   '/viaje-compartido/$token': typeof ViajeCompartidoTokenRoute
@@ -2609,6 +2653,7 @@ export interface FileRoutesById {
   '/_authenticated/cms/pagos': typeof AuthenticatedCmsPagosRoute
   '/_authenticated/cms/rc-visual': typeof AuthenticatedCmsRcVisualRoute
   '/_authenticated/cms/simulation': typeof AuthenticatedCmsSimulationRoute
+  '/_authenticated/cms/taxi-alux': typeof AuthenticatedCmsTaxiAluxRoute
   '/_authenticated/cms/travel-plans': typeof AuthenticatedCmsTravelPlansRoute
   '/_authenticated/cms/ventas-en-linea': typeof AuthenticatedCmsVentasEnLineaRoute
   '/_authenticated/cms/visibilidad': typeof AuthenticatedCmsVisibilidadRouteWithChildren
@@ -2630,6 +2675,7 @@ export interface FileRoutesById {
   '/_authenticated/cuenta/perfil': typeof AuthenticatedCuentaPerfilRoute
   '/_authenticated/cuenta/perfil-publico': typeof AuthenticatedCuentaPerfilPublicoRoute
   '/_authenticated/cuenta/stage-simulator': typeof AuthenticatedCuentaStageSimulatorRoute
+  '/_authenticated/cuenta/taxi': typeof AuthenticatedCuentaTaxiRoute
   '/_authenticated/paginas/$': typeof AuthenticatedPaginasSplatRoute
   '/_authenticated/portal/actividad': typeof AuthenticatedPortalActividadRoute
   '/_authenticated/portal/canjear': typeof AuthenticatedPortalCanjearRoute
@@ -2792,6 +2838,7 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/taxi'
     | '/terminos'
     | '/unsubscribe'
     | '/admin'
@@ -2805,6 +2852,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
+    | '/taxista'
     | '/api/generate-image'
     | '/caja/$slug'
     | '/continuar/$token'
@@ -2864,6 +2912,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/registro-taxista/$token'
     | '/reservacion-mesa/$token'
     | '/rutas/$slug'
     | '/viaje-compartido/$token'
@@ -2896,6 +2945,7 @@ export interface FileRouteTypes {
     | '/cms/pagos'
     | '/cms/rc-visual'
     | '/cms/simulation'
+    | '/cms/taxi-alux'
     | '/cms/travel-plans'
     | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
@@ -2917,6 +2967,7 @@ export interface FileRouteTypes {
     | '/cuenta/perfil'
     | '/cuenta/perfil-publico'
     | '/cuenta/stage-simulator'
+    | '/cuenta/taxi'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/canjear'
@@ -3075,6 +3126,7 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/taxi'
     | '/terminos'
     | '/unsubscribe'
     | '/$categoria/$empresa'
@@ -3083,6 +3135,7 @@ export interface FileRouteTypes {
     | '/empresa'
     | '/mi-viaje'
     | '/paginas'
+    | '/taxista'
     | '/api/generate-image'
     | '/caja/$slug'
     | '/continuar/$token'
@@ -3141,6 +3194,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/registro-taxista/$token'
     | '/reservacion-mesa/$token'
     | '/rutas/$slug'
     | '/viaje-compartido/$token'
@@ -3172,6 +3226,7 @@ export interface FileRouteTypes {
     | '/cms/pagos'
     | '/cms/rc-visual'
     | '/cms/simulation'
+    | '/cms/taxi-alux'
     | '/cms/travel-plans'
     | '/cms/ventas-en-linea'
     | '/cms/visibilidad'
@@ -3193,6 +3248,7 @@ export interface FileRouteTypes {
     | '/cuenta/perfil'
     | '/cuenta/perfil-publico'
     | '/cuenta/stage-simulator'
+    | '/cuenta/taxi'
     | '/paginas/$'
     | '/portal/actividad'
     | '/portal/canjear'
@@ -3351,6 +3407,7 @@ export interface FileRouteTypes {
     | '/restaurantes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/taxi'
     | '/terminos'
     | '/unsubscribe'
     | '/_authenticated/admin'
@@ -3364,6 +3421,7 @@ export interface FileRouteTypes {
     | '/_authenticated/empresa'
     | '/_authenticated/mi-viaje'
     | '/_authenticated/paginas'
+    | '/_authenticated/taxista'
     | '/api/generate-image'
     | '/caja/$slug'
     | '/continuar/$token'
@@ -3423,6 +3481,7 @@ export interface FileRouteTypes {
     | '/preview/$token'
     | '/preview/f1k-destinations'
     | '/producto/$slug'
+    | '/registro-taxista/$token'
     | '/reservacion-mesa/$token'
     | '/rutas/$slug'
     | '/viaje-compartido/$token'
@@ -3455,6 +3514,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cms/pagos'
     | '/_authenticated/cms/rc-visual'
     | '/_authenticated/cms/simulation'
+    | '/_authenticated/cms/taxi-alux'
     | '/_authenticated/cms/travel-plans'
     | '/_authenticated/cms/ventas-en-linea'
     | '/_authenticated/cms/visibilidad'
@@ -3476,6 +3536,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cuenta/perfil'
     | '/_authenticated/cuenta/perfil-publico'
     | '/_authenticated/cuenta/stage-simulator'
+    | '/_authenticated/cuenta/taxi'
     | '/_authenticated/paginas/$'
     | '/_authenticated/portal/actividad'
     | '/_authenticated/portal/canjear'
@@ -3638,6 +3699,7 @@ export interface RootRouteChildren {
   RestaurantesRoute: typeof RestaurantesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TaxiRoute: typeof TaxiRoute
   TerminosRoute: typeof TerminosRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   CategoriaEmpresaRoute: typeof CategoriaEmpresaRoute
@@ -3700,6 +3762,7 @@ export interface RootRouteChildren {
   PreviewTokenRoute: typeof PreviewTokenRoute
   PreviewF1kDestinationsRoute: typeof PreviewF1kDestinationsRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
+  RegistroTaxistaTokenRoute: typeof RegistroTaxistaTokenRoute
   ReservacionMesaTokenRoute: typeof ReservacionMesaTokenRoute
   RutasSlugRoute: typeof RutasSlugRoute
   ViajeCompartidoTokenRoute: typeof ViajeCompartidoTokenRoute
@@ -3953,6 +4016,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/taxi': {
+      id: '/taxi'
+      path: '/taxi'
+      fullPath: '/taxi'
+      preLoaderRoute: typeof TaxiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terminos': {
       id: '/terminos'
       path: '/terminos'
@@ -4042,6 +4112,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof AuthenticatedPortalRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/taxista': {
+      id: '/_authenticated/taxista'
+      path: '/taxista'
+      fullPath: '/taxista'
+      preLoaderRoute: typeof AuthenticatedTaxistaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/api/generate-image': {
@@ -4478,6 +4555,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/registro-taxista/$token': {
+      id: '/registro-taxista/$token'
+      path: '/registro-taxista/$token'
+      fullPath: '/registro-taxista/$token'
+      preLoaderRoute: typeof RegistroTaxistaTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reservacion-mesa/$token': {
       id: '/reservacion-mesa/$token'
       path: '/reservacion-mesa/$token'
@@ -4695,6 +4779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCmsSimulationRouteImport
       parentRoute: typeof AuthenticatedCmsRoute
     }
+    '/_authenticated/cms/taxi-alux': {
+      id: '/_authenticated/cms/taxi-alux'
+      path: '/taxi-alux'
+      fullPath: '/cms/taxi-alux'
+      preLoaderRoute: typeof AuthenticatedCmsTaxiAluxRouteImport
+      parentRoute: typeof AuthenticatedCmsRoute
+    }
     '/_authenticated/cms/travel-plans': {
       id: '/_authenticated/cms/travel-plans'
       path: '/travel-plans'
@@ -4854,6 +4945,13 @@ declare module '@tanstack/react-router' {
       path: '/stage-simulator'
       fullPath: '/cuenta/stage-simulator'
       preLoaderRoute: typeof AuthenticatedCuentaStageSimulatorRouteImport
+      parentRoute: typeof AuthenticatedCuentaRouteRoute
+    }
+    '/_authenticated/cuenta/taxi': {
+      id: '/_authenticated/cuenta/taxi'
+      path: '/taxi'
+      fullPath: '/cuenta/taxi'
+      preLoaderRoute: typeof AuthenticatedCuentaTaxiRouteImport
       parentRoute: typeof AuthenticatedCuentaRouteRoute
     }
     '/_authenticated/paginas/$': {
@@ -5894,6 +5992,7 @@ interface AuthenticatedCuentaRouteRouteChildren {
   AuthenticatedCuentaPerfilRoute: typeof AuthenticatedCuentaPerfilRoute
   AuthenticatedCuentaPerfilPublicoRoute: typeof AuthenticatedCuentaPerfilPublicoRoute
   AuthenticatedCuentaStageSimulatorRoute: typeof AuthenticatedCuentaStageSimulatorRoute
+  AuthenticatedCuentaTaxiRoute: typeof AuthenticatedCuentaTaxiRoute
   AuthenticatedCuentaIndexRoute: typeof AuthenticatedCuentaIndexRoute
   AuthenticatedCuentaCheckoutOrderIdRoute: typeof AuthenticatedCuentaCheckoutOrderIdRoute
   AuthenticatedCuentaDocumentosOrderIdRoute: typeof AuthenticatedCuentaDocumentosOrderIdRoute
@@ -5920,6 +6019,7 @@ const AuthenticatedCuentaRouteRouteChildren: AuthenticatedCuentaRouteRouteChildr
       AuthenticatedCuentaPerfilPublicoRoute,
     AuthenticatedCuentaStageSimulatorRoute:
       AuthenticatedCuentaStageSimulatorRoute,
+    AuthenticatedCuentaTaxiRoute: AuthenticatedCuentaTaxiRoute,
     AuthenticatedCuentaIndexRoute: AuthenticatedCuentaIndexRoute,
     AuthenticatedCuentaCheckoutOrderIdRoute:
       AuthenticatedCuentaCheckoutOrderIdRoute,
@@ -6088,6 +6188,7 @@ interface AuthenticatedCmsRouteChildren {
   AuthenticatedCmsPagosRoute: typeof AuthenticatedCmsPagosRoute
   AuthenticatedCmsRcVisualRoute: typeof AuthenticatedCmsRcVisualRoute
   AuthenticatedCmsSimulationRoute: typeof AuthenticatedCmsSimulationRoute
+  AuthenticatedCmsTaxiAluxRoute: typeof AuthenticatedCmsTaxiAluxRoute
   AuthenticatedCmsTravelPlansRoute: typeof AuthenticatedCmsTravelPlansRoute
   AuthenticatedCmsVentasEnLineaRoute: typeof AuthenticatedCmsVentasEnLineaRoute
   AuthenticatedCmsVisibilidadRoute: typeof AuthenticatedCmsVisibilidadRouteWithChildren
@@ -6149,6 +6250,7 @@ const AuthenticatedCmsRouteChildren: AuthenticatedCmsRouteChildren = {
   AuthenticatedCmsPagosRoute: AuthenticatedCmsPagosRoute,
   AuthenticatedCmsRcVisualRoute: AuthenticatedCmsRcVisualRoute,
   AuthenticatedCmsSimulationRoute: AuthenticatedCmsSimulationRoute,
+  AuthenticatedCmsTaxiAluxRoute: AuthenticatedCmsTaxiAluxRoute,
   AuthenticatedCmsTravelPlansRoute: AuthenticatedCmsTravelPlansRoute,
   AuthenticatedCmsVentasEnLineaRoute: AuthenticatedCmsVentasEnLineaRoute,
   AuthenticatedCmsVisibilidadRoute:
@@ -6229,6 +6331,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
   AuthenticatedMiViajeRoute: typeof AuthenticatedMiViajeRoute
   AuthenticatedPaginasRoute: typeof AuthenticatedPaginasRouteWithChildren
+  AuthenticatedTaxistaRoute: typeof AuthenticatedTaxistaRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -6241,6 +6344,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
   AuthenticatedMiViajeRoute: AuthenticatedMiViajeRoute,
   AuthenticatedPaginasRoute: AuthenticatedPaginasRouteWithChildren,
+  AuthenticatedTaxistaRoute: AuthenticatedTaxistaRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -6368,6 +6472,7 @@ const rootRouteChildren: RootRouteChildren = {
   RestaurantesRoute: RestaurantesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TaxiRoute: TaxiRoute,
   TerminosRoute: TerminosRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   CategoriaEmpresaRoute: CategoriaEmpresaRoute,
@@ -6451,6 +6556,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreviewTokenRoute: PreviewTokenRoute,
   PreviewF1kDestinationsRoute: PreviewF1kDestinationsRoute,
   ProductoSlugRoute: ProductoSlugRoute,
+  RegistroTaxistaTokenRoute: RegistroTaxistaTokenRoute,
   ReservacionMesaTokenRoute: ReservacionMesaTokenRoute,
   RutasSlugRoute: RutasSlugRoute,
   ViajeCompartidoTokenRoute: ViajeCompartidoTokenRoute,

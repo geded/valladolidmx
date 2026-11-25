@@ -1,0 +1,303 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { CarFront, Check, MapPin, Navigation, Power, ShieldCheck, UserRound } from "lucide-react";
+import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
+import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
+import { TaxiAppInstallCard } from "@/components/taxi/TaxiAppInstallCard";
+import { TaxiRideMap } from "@/components/taxi/TaxiRideMap";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  acceptDriverRide,
+  getMyTaxiDriver,
+  getTaxiRideTracking,
+  listDriverOpenRides,
+  listDriverTaxiRides,
+  setDriverAvailability,
+  setDriverRideStatus,
+  updateDriverLocation,
+} from "@/lib/taxi/taxi.functions";
+import {
+  formatTaxiDate,
+  formatTaxiMoney,
+  isTaxiRideActive,
+  nextDriverRideStatus,
+  TAXI_STATUS_LABELS,
+  taxiErrorMessage,
+  type TaxiOpenRide,
+  type TaxiRide,
+} from "@/lib/taxi/rules";
+import { toast } from "@/lib/toast";
+
+export const Route = createFileRoute("/_authenticated/taxista")({
+  head: () => ({
+    meta: [
+      { title: "Panel del conductor · Taxi Alux" },
+      { name: "description", content: "Acepta solicitudes, comparte tu ubicación y gestiona tus viajes." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: TaxiDriverPage,
+});
+
+function TaxiDriverPage() {
+  return (
+    <WorkspaceProvider initialWorkspaceId="taxista">
+      <WorkspaceShell title="Taxi Alux · Conductor">
+        <DriverDashboard />
+      </WorkspaceShell>
+    </WorkspaceProvider>
+  );
+}
+
+function DriverDashboard() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const driverFn = useServerFn(getMyTaxiDriver);
+  const ridesFn = useServerFn(listDriverTaxiRides);
+  const openFn = useServerFn(listDriverOpenRides);
+  const availableFn = useServerFn(setDriverAvailability);
+  const acceptFn = useServerFn(acceptDriverRide);
+  const statusFn = useServerFn(setDriverRideStatus);
+  const locationFn = useServerFn(updateDriverLocation);
+  const trackingFn = useServerFn(getTaxiRideTracking);
+  const [busy, setBusy] = useState(false);
+  const [locationNote, setLocationNote] = useState<string | null>(null);
+  const lastLocationSent = useRef(0);
+
+  const driverQ = useQuery({
+    queryKey: ["taxi", "driver", user?.id],
+    queryFn: () => driverFn(),
+    refetchInterval: 15_000,
+  });
+  const driver = driverQ.data;
+  const ridesQ = useQuery({
+    queryKey: ["taxi", "driver-rides", user?.id],
+    queryFn: () => ridesFn(),
+    enabled: Boolean(driver?.approved),
+    refetchInterval: 10_000,
+  });
+  const openQ = useQuery({
+    queryKey: ["taxi", "driver-open", user?.id],
+    queryFn: () => openFn(),
+    enabled: Boolean(driver?.approved && driver.is_available),
+    refetchInterval: 8_000,
+  });
+  const rides = useMemo(() => ridesQ.data ?? [], [ridesQ.data]);
+  const activeRide = rides.find((ride) => isTaxiRideActive(ride.status) && ride.status !== "requested") ?? null;
+  const trackingQ = useQuery({
+    queryKey: ["taxi", "driver-tracking", activeRide?.id],
+    queryFn: () => trackingFn({ data: { rideId: activeRide!.id } }),
+    enabled: Boolean(activeRide),
+    refetchInterval: 10_000,
+  });
+
+  useEffect(() => {
+    if (!driver?.approved || (!driver.is_available && !activeRide) || !navigator.geolocation) return;
+    const watch = navigator.geolocation.watchPosition(
+      (position) => {
+        if (Date.now() - lastLocationSent.current < 15_000) return;
+        lastLocationSent.current = Date.now();
+        void locationFn({
+          data: { lat: position.coords.latitude, lng: position.coords.longitude },
+        })
+          .then(() => setLocationNote("Ubicación actualizada"))
+          .catch(() => setLocationNote("No pudimos actualizar tu ubicación"));
+      },
+      () => setLocationNote("Autoriza tu ubicación para que el viajero pueda seguir el taxi."),
+      { enableHighAccuracy: true, maximumAge: 10_000, timeout: 15_000 },
+    );
+    return () => navigator.geolocation.clearWatch(watch);
+  }, [driver?.approved, driver?.is_available, activeRide, locationFn]);
+
+  async function refresh() {
+    await queryClient.invalidateQueries({ queryKey: ["taxi"] });
+  }
+
+  async function toggleAvailability(available: boolean) {
+    setBusy(true);
+    try {
+      await availableFn({ data: { available } });
+      toast.success(available ? "Ya puedes recibir solicitudes." : "Dejaste de recibir solicitudes.");
+      await refresh();
+    } catch (error) {
+      toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function accept(ride: TaxiOpenRide) {
+    setBusy(true);
+    try {
+      await acceptFn({ data: { rideId: ride.id } });
+      toast.success("Viaje aceptado. Ya puedes ver los datos de recogida.");
+      await refresh();
+    } catch (error) {
+      toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function advance(ride: TaxiRide) {
+    const next = nextDriverRideStatus(ride.status);
+    if (!next) return;
+    if (next === "completed" && !window.confirm("Confirma que recibiste el efectivo y terminaste el viaje.")) return;
+    setBusy(true);
+    try {
+      await statusFn({ data: { rideId: ride.id, status: next } });
+      toast.success(next === "completed" ? "Viaje realizado y pago en efectivo registrado." : "Estado actualizado.");
+      await refresh();
+    } catch (error) {
+      toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (driverQ.isLoading) return <p className="text-sm text-muted-foreground">Cargando tu panel…</p>;
+  if (!driver) {
+    return (
+      <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-6 shadow-soft">
+        <ShieldCheck className="size-8 text-primary" />
+        <h1 className="mt-3 text-2xl font-semibold">Tu cuenta aún no es de taxista</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Pide al administrador de Valladolid.mx un enlace de registro. Después de llenar tus datos
+          y recibir aprobación, este panel te permitirá aceptar viajes.
+        </p>
+        <Button asChild variant="outline" className="mt-4"><Link to="/taxi">Conocer Taxi Alux</Link></Button>
+      </section>
+    );
+  }
+  if (!driver.approved) {
+    return (
+      <section className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-6 shadow-soft">
+        <ShieldCheck className="size-8 text-primary" />
+        <h1 className="mt-3 text-2xl font-semibold">Tu solicitud está en revisión</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          El administrador debe validar tus datos y tu vehículo antes de que puedas recibir viajes.
+        </p>
+      </section>
+    );
+  }
+
+  const next = activeRide ? nextDriverRideStatus(activeRide.status) : null;
+  const nextLabel = next === "arrived" ? "Llegué por el viajero" : next === "in_progress" ? "Iniciar viaje" : next === "completed" ? "Terminar y registrar efectivo" : null;
+
+  return (
+    <div className="mx-auto max-w-6xl pb-14">
+      <header className="border-b border-border pb-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Taxi Alux · Conductor</p>
+        <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold sm:text-3xl">Hola, {driver.display_name}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {driver.vehicle_description}{driver.vehicle_color ? ` ${driver.vehicle_color}` : ""} · {driver.plates}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
+            <Power className={`size-5 ${driver.is_available ? "text-success" : "text-muted-foreground"}`} />
+            <div>
+              <p className="text-sm font-medium">{driver.is_available ? "Estoy disponible" : "No recibo solicitudes"}</p>
+              <p className="text-[11px] text-muted-foreground">Sólo acepta cuando puedas atender</p>
+            </div>
+            <Switch checked={driver.is_available} disabled={busy || Boolean(activeRide)} onCheckedChange={toggleAvailability} aria-label="Disponibilidad del taxista" />
+          </div>
+        </div>
+      </header>
+
+      <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_310px]">
+        <div className="space-y-5">
+          {activeRide ? (
+            <section className="rounded-2xl border border-primary/30 bg-card p-4 shadow-elevated sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs text-muted-foreground">{activeRide.folio}</p>
+                  <h2 className="mt-1 text-xl font-semibold">{TAXI_STATUS_LABELS[activeRide.status]}</h2>
+                </div>
+                <Badge>{formatTaxiMoney(activeRide.fare_amount, activeRide.currency)} · efectivo</Badge>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl bg-secondary/60 p-3 text-sm">
+                  <p className="text-xs text-muted-foreground">Recoger en</p>
+                  <p className="mt-1 font-medium">{activeRide.origin_label}</p>
+                </div>
+                <div className="rounded-xl bg-secondary/60 p-3 text-sm">
+                  <p className="text-xs text-muted-foreground">Destino</p>
+                  <p className="mt-1 font-medium">{activeRide.destination_label}</p>
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-border p-3 text-sm">
+                <p className="flex items-center gap-2"><UserRound className="size-4" /> {activeRide.traveler_name} · {activeRide.passengers} personas</p>
+                <p className="mt-1 text-muted-foreground">{activeRide.traveler_phone}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{formatTaxiDate(activeRide.requested_for)}</p>
+                {activeRide.notes ? <p className="mt-2 text-xs">Notas: {activeRide.notes}</p> : null}
+              </div>
+              <div className="mt-4"><TaxiRideMap ride={activeRide} tracking={trackingQ.data} /></div>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                {locationNote ?? "Mantén este panel abierto durante el servicio para actualizar tu ubicación."}
+              </p>
+              {next && nextLabel ? (
+                <Button type="button" className="mt-4 w-full" disabled={busy} onClick={() => advance(activeRide)}>
+                  <Check className="mr-2 size-4" /> {nextLabel}
+                </Button>
+              ) : null}
+            </section>
+          ) : (
+            <section className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+              <h2 className="flex items-center gap-2 text-lg font-semibold"><Navigation className="size-5 text-primary" /> Solicitudes disponibles</h2>
+              {!driver.is_available ? (
+                <p className="mt-4 text-sm text-muted-foreground">Activa «Estoy disponible» para ver solicitudes.</p>
+              ) : null}
+              {driver.is_available && openQ.isLoading ? <p className="mt-4 text-sm text-muted-foreground">Buscando solicitudes…</p> : null}
+              {driver.is_available && (openQ.data ?? []).length === 0 && !openQ.isLoading ? (
+                <p className="mt-4 rounded-xl bg-secondary/60 p-4 text-sm text-muted-foreground">No hay solicitudes esperando. La pantalla se actualiza sola.</p>
+              ) : null}
+              <div className="mt-4 space-y-3">
+                {(openQ.data ?? []).map((ride) => (
+                  <article key={ride.id} className="rounded-xl border border-border p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold">{ride.origin_label} → {ride.destination_label}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{formatTaxiDate(ride.requested_for)} · {ride.passengers} personas</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{ride.distance_km.toFixed(1)} km · {ride.estimated_minutes} min</p>
+                      </div>
+                      <Badge variant="outline">{formatTaxiMoney(ride.fare_amount, ride.currency)}</Badge>
+                    </div>
+                    <Button type="button" className="mt-3 w-full" disabled={busy} onClick={() => accept(ride)}>Aceptar este viaje</Button>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        <aside className="space-y-4">
+          <TaxiAppInstallCard signedIn />
+          <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <h2 className="flex items-center gap-2 text-sm font-semibold"><MapPin className="size-4 text-primary" /> Tus últimos viajes</h2>
+            <div className="mt-3 space-y-3">
+              {rides.filter((ride) => ride.id !== activeRide?.id).slice(0, 8).map((ride) => (
+                <div key={ride.id} className="border-t border-border pt-3 text-xs">
+                  <p className="font-medium">{ride.destination_label}</p>
+                  <p className="mt-1 text-muted-foreground">{TAXI_STATUS_LABELS[ride.status]} · {formatTaxiMoney(ride.fare_amount, ride.currency)}</p>
+                </div>
+              ))}
+              {rides.filter((ride) => ride.id !== activeRide?.id).length === 0 ? <p className="text-xs text-muted-foreground">Aún no hay viajes terminados.</p> : null}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-border bg-card p-4 text-xs leading-5 text-muted-foreground shadow-soft">
+            <CarFront className="mb-2 size-5 text-primary" />
+            Recuerda: en esta etapa el viajero paga el total en efectivo. Al terminar, registra el
+            cobro con el botón «Terminar y registrar efectivo».
+          </section>
+        </aside>
+      </div>
+    </div>
+  );
+}

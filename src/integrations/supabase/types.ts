@@ -8217,6 +8217,324 @@ export type Database = {
         }
         Relationships: []
       }
+      taxi_driver_invitations: {
+        Row: {
+          applicant_notes: string | null
+          created_at: string
+          created_by: string | null
+          driver_id: string | null
+          email: string | null
+          english: boolean
+          full_name: string | null
+          id: string
+          insurance_reference: string | null
+          invited_email: string | null
+          invited_name: string | null
+          languages: string[]
+          license_number: string | null
+          phone: string | null
+          plates: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          token: string
+          union_name: string | null
+          vehicle_color: string | null
+          vehicle_description: string | null
+          vehicle_number: string | null
+          vehicle_year: number | null
+        }
+        Insert: {
+          applicant_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          email?: string | null
+          english?: boolean
+          full_name?: string | null
+          id?: string
+          insurance_reference?: string | null
+          invited_email?: string | null
+          invited_name?: string | null
+          languages?: string[]
+          license_number?: string | null
+          phone?: string | null
+          plates?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          token?: string
+          union_name?: string | null
+          vehicle_color?: string | null
+          vehicle_description?: string | null
+          vehicle_number?: string | null
+          vehicle_year?: number | null
+        }
+        Update: {
+          applicant_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          email?: string | null
+          english?: boolean
+          full_name?: string | null
+          id?: string
+          insurance_reference?: string | null
+          invited_email?: string | null
+          invited_name?: string | null
+          languages?: string[]
+          license_number?: string | null
+          phone?: string | null
+          plates?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          token?: string
+          union_name?: string | null
+          vehicle_color?: string | null
+          vehicle_description?: string | null
+          vehicle_number?: string | null
+          vehicle_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxi_driver_invitations_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "taxi_drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      taxi_drivers: {
+        Row: {
+          approved: boolean
+          created_at: string
+          created_by: string | null
+          display_name: string
+          email: string
+          english: boolean
+          id: string
+          insurance_reference: string | null
+          is_available: boolean
+          languages: string[]
+          last_location_lat: number | null
+          last_location_lng: number | null
+          license_number: string | null
+          location_updated_at: string | null
+          phone: string | null
+          plates: string
+          union_name: string | null
+          updated_at: string
+          user_id: string
+          vehicle_color: string | null
+          vehicle_description: string
+          vehicle_number: string | null
+          vehicle_year: number | null
+        }
+        Insert: {
+          approved?: boolean
+          created_at?: string
+          created_by?: string | null
+          display_name: string
+          email: string
+          english?: boolean
+          id?: string
+          insurance_reference?: string | null
+          is_available?: boolean
+          languages?: string[]
+          last_location_lat?: number | null
+          last_location_lng?: number | null
+          license_number?: string | null
+          location_updated_at?: string | null
+          phone?: string | null
+          plates: string
+          union_name?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_color?: string | null
+          vehicle_description: string
+          vehicle_number?: string | null
+          vehicle_year?: number | null
+        }
+        Update: {
+          approved?: boolean
+          created_at?: string
+          created_by?: string | null
+          display_name?: string
+          email?: string
+          english?: boolean
+          id?: string
+          insurance_reference?: string | null
+          is_available?: boolean
+          languages?: string[]
+          last_location_lat?: number | null
+          last_location_lng?: number | null
+          license_number?: string | null
+          location_updated_at?: string | null
+          phone?: string | null
+          plates?: string
+          union_name?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_color?: string | null
+          vehicle_description?: string
+          vehicle_number?: string | null
+          vehicle_year?: number | null
+        }
+        Relationships: []
+      }
+      taxi_ride_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          from_status: string | null
+          id: string
+          note: string | null
+          ride_id: string
+          to_status: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          ride_id: string
+          to_status?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          ride_id?: string
+          to_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxi_ride_events_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "taxi_rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      taxi_rides: {
+        Row: {
+          accepted_at: string | null
+          arrived_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cash_paid: boolean
+          completed_at: string | null
+          created_at: string
+          currency: string
+          destination_label: string
+          destination_lat: number
+          destination_lng: number
+          distance_km: number
+          driver_id: string | null
+          estimated_minutes: number
+          fare_amount: number
+          folio: string
+          id: string
+          notes: string | null
+          origin_label: string
+          origin_lat: number
+          origin_lng: number
+          passengers: number
+          payment_method: string
+          requested_for: string
+          started_at: string | null
+          status: string
+          traveler_id: string
+          traveler_name: string
+          traveler_phone: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          arrived_at?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cash_paid?: boolean
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          destination_label: string
+          destination_lat: number
+          destination_lng: number
+          distance_km: number
+          driver_id?: string | null
+          estimated_minutes: number
+          fare_amount: number
+          folio: string
+          id?: string
+          notes?: string | null
+          origin_label: string
+          origin_lat: number
+          origin_lng: number
+          passengers?: number
+          payment_method?: string
+          requested_for?: string
+          started_at?: string | null
+          status?: string
+          traveler_id: string
+          traveler_name: string
+          traveler_phone: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          arrived_at?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cash_paid?: boolean
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          destination_label?: string
+          destination_lat?: number
+          destination_lng?: number
+          distance_km?: number
+          driver_id?: string | null
+          estimated_minutes?: number
+          fare_amount?: number
+          folio?: string
+          id?: string
+          notes?: string | null
+          origin_label?: string
+          origin_lat?: number
+          origin_lng?: number
+          passengers?: number
+          payment_method?: string
+          requested_for?: string
+          started_at?: string | null
+          status?: string
+          traveler_id?: string
+          traveler_name?: string
+          traveler_phone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxi_rides_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "taxi_drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tourism_attribute_definitions: {
         Row: {
           active: boolean
@@ -9307,6 +9625,15 @@ export type Database = {
         Returns: undefined
       }
       _restaurant_staff: { Args: { _business_id: string }; Returns: boolean }
+      _taxi_notify: {
+        Args: {
+          _audience: string
+          _event: string
+          _r: Database["public"]["Tables"]["taxi_rides"]["Row"]
+          _recipient: string
+        }
+        Returns: undefined
+      }
       accept_business_invitation: { Args: { _token: string }; Returns: Json }
       accept_business_ownership_transfer: {
         Args: { _transfer_id: string }
@@ -11587,6 +11914,330 @@ export type Database = {
       }
       submit_business_for_review: {
         Args: { _business_id: string }
+        Returns: undefined
+      }
+      taxi_admin_complete_driver_invitation: {
+        Args: { _driver_id: string; _invitation_id: string; _user_id: string }
+        Returns: undefined
+      }
+      taxi_admin_create_driver_invitation: {
+        Args: { _invited_email?: string; _invited_name?: string }
+        Returns: {
+          applicant_notes: string | null
+          created_at: string
+          created_by: string | null
+          driver_id: string | null
+          email: string | null
+          english: boolean
+          full_name: string | null
+          id: string
+          insurance_reference: string | null
+          invited_email: string | null
+          invited_name: string | null
+          languages: string[]
+          license_number: string | null
+          phone: string | null
+          plates: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          token: string
+          union_name: string | null
+          vehicle_color: string | null
+          vehicle_description: string | null
+          vehicle_number: string | null
+          vehicle_year: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "taxi_driver_invitations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      taxi_admin_reject_driver_invitation: {
+        Args: { _invitation_id: string }
+        Returns: undefined
+      }
+      taxi_admin_save_settings: {
+        Args: {
+          _base_fare_cents: number
+          _enabled: boolean
+          _minimum_fare_cents: number
+          _night_surcharge_bps: number
+          _per_km_cents: number
+          _per_minute_cents: number
+        }
+        Returns: undefined
+      }
+      taxi_admin_set_driver_approval: {
+        Args: { _approved: boolean; _driver_id: string }
+        Returns: undefined
+      }
+      taxi_admin_upsert_driver: {
+        Args: {
+          _approved: boolean
+          _display_name: string
+          _email: string
+          _english: boolean
+          _insurance_reference: string
+          _languages: string[]
+          _license_number: string
+          _phone: string
+          _plates: string
+          _user_id: string
+          _vehicle_description: string
+        }
+        Returns: {
+          approved: boolean
+          created_at: string
+          created_by: string | null
+          display_name: string
+          email: string
+          english: boolean
+          id: string
+          insurance_reference: string | null
+          is_available: boolean
+          languages: string[]
+          last_location_lat: number | null
+          last_location_lng: number | null
+          license_number: string | null
+          location_updated_at: string | null
+          phone: string | null
+          plates: string
+          union_name: string | null
+          updated_at: string
+          user_id: string
+          vehicle_color: string | null
+          vehicle_description: string
+          vehicle_number: string | null
+          vehicle_year: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "taxi_drivers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      taxi_cancel_ride: {
+        Args: { _reason?: string; _ride_id: string }
+        Returns: {
+          accepted_at: string | null
+          arrived_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cash_paid: boolean
+          completed_at: string | null
+          created_at: string
+          currency: string
+          destination_label: string
+          destination_lat: number
+          destination_lng: number
+          distance_km: number
+          driver_id: string | null
+          estimated_minutes: number
+          fare_amount: number
+          folio: string
+          id: string
+          notes: string | null
+          origin_label: string
+          origin_lat: number
+          origin_lng: number
+          passengers: number
+          payment_method: string
+          requested_for: string
+          started_at: string | null
+          status: string
+          traveler_id: string
+          traveler_name: string
+          traveler_phone: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "taxi_rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      taxi_driver_accept_ride: {
+        Args: { _ride_id: string }
+        Returns: {
+          accepted_at: string | null
+          arrived_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cash_paid: boolean
+          completed_at: string | null
+          created_at: string
+          currency: string
+          destination_label: string
+          destination_lat: number
+          destination_lng: number
+          distance_km: number
+          driver_id: string | null
+          estimated_minutes: number
+          fare_amount: number
+          folio: string
+          id: string
+          notes: string | null
+          origin_label: string
+          origin_lat: number
+          origin_lng: number
+          passengers: number
+          payment_method: string
+          requested_for: string
+          started_at: string | null
+          status: string
+          traveler_id: string
+          traveler_name: string
+          traveler_phone: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "taxi_rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      taxi_driver_invitation_public: { Args: { _token: string }; Returns: Json }
+      taxi_driver_open_rides: { Args: never; Returns: Json }
+      taxi_driver_set_available: {
+        Args: { _available: boolean }
+        Returns: undefined
+      }
+      taxi_driver_set_ride_status: {
+        Args: { _ride_id: string; _status: string }
+        Returns: {
+          accepted_at: string | null
+          arrived_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cash_paid: boolean
+          completed_at: string | null
+          created_at: string
+          currency: string
+          destination_label: string
+          destination_lat: number
+          destination_lng: number
+          distance_km: number
+          driver_id: string | null
+          estimated_minutes: number
+          fare_amount: number
+          folio: string
+          id: string
+          notes: string | null
+          origin_label: string
+          origin_lat: number
+          origin_lng: number
+          passengers: number
+          payment_method: string
+          requested_for: string
+          started_at: string | null
+          status: string
+          traveler_id: string
+          traveler_name: string
+          traveler_phone: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "taxi_rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      taxi_driver_update_location: {
+        Args: { _lat: number; _lng: number }
+        Returns: undefined
+      }
+      taxi_public_config: { Args: never; Returns: Json }
+      taxi_quote: {
+        Args: {
+          _destination_lat: number
+          _destination_lng: number
+          _origin_lat: number
+          _origin_lng: number
+          _requested_for?: string
+        }
+        Returns: Json
+      }
+      taxi_request_ride: {
+        Args: {
+          _destination_label: string
+          _destination_lat: number
+          _destination_lng: number
+          _notes?: string
+          _origin_label: string
+          _origin_lat: number
+          _origin_lng: number
+          _passengers: number
+          _payment_method?: string
+          _requested_for: string
+          _traveler_name: string
+          _traveler_phone: string
+        }
+        Returns: {
+          accepted_at: string | null
+          arrived_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cash_paid: boolean
+          completed_at: string | null
+          created_at: string
+          currency: string
+          destination_label: string
+          destination_lat: number
+          destination_lng: number
+          distance_km: number
+          driver_id: string | null
+          estimated_minutes: number
+          fare_amount: number
+          folio: string
+          id: string
+          notes: string | null
+          origin_label: string
+          origin_lat: number
+          origin_lng: number
+          passengers: number
+          payment_method: string
+          requested_for: string
+          started_at: string | null
+          status: string
+          traveler_id: string
+          traveler_name: string
+          traveler_phone: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "taxi_rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      taxi_ride_tracking: { Args: { _ride_id: string }; Returns: Json }
+      taxi_submit_driver_invitation: {
+        Args: {
+          _applicant_notes?: string
+          _email: string
+          _english: boolean
+          _full_name: string
+          _insurance_reference: string
+          _languages: string[]
+          _license_number: string
+          _phone: string
+          _plates: string
+          _token: string
+          _union_name: string
+          _vehicle_color: string
+          _vehicle_description: string
+          _vehicle_number: string
+          _vehicle_year: number
+        }
         Returns: undefined
       }
       transition_content_status: {

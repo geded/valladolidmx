@@ -21,6 +21,12 @@ export const UNC_EVENT_TITLES: Record<string, string> = {
   "CRM.Prospect.Returned": "Un prospecto regresó con Alux",
   "Restaurant.Booking.Created": "Nueva reservación de mesa",
   "Restaurant.Booking.Updated": "Cambio en una reservación de mesa",
+  "taxi.requested": "Nueva solicitud de Taxi Alux",
+  "taxi.accepted": "Taxi Alux asignado",
+  "taxi.arrived": "Tu Taxi Alux llegó",
+  "taxi.in_progress": "Viaje de Taxi Alux en curso",
+  "taxi.completed": "Viaje de Taxi Alux realizado",
+  "taxi.cancelled": "Viaje de Taxi Alux cancelado",
 };
 
 export function uncEventTitle(eventType: string): string {
@@ -43,7 +49,7 @@ export const UNC_GROUP_LABELS: Record<UncGroup, string> = {
 
 export function uncEventGroup(eventType: string): UncGroup {
   if (eventType.startsWith("media.")) return "aprobaciones";
-  if (eventType.startsWith("Concierge.Booking") || eventType.startsWith("Restaurant.Booking")) return "reservas";
+  if (eventType.startsWith("Concierge.Booking") || eventType.startsWith("Restaurant.Booking") || eventType.startsWith("taxi.")) return "reservas";
   if (eventType.startsWith("Traveler.")) return "viajeros";
   if (eventType.startsWith("CRM.")) return "viajeros";
   if (eventType.startsWith("Concierge.")) return "viajeros";

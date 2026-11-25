@@ -337,6 +337,20 @@
       "when": 1795639896923,
       "tag": "0047_restaurant_cashier_screen",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1795644568734,
+      "tag": "0048_taxi_alux_service",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1795644745085,
+      "tag": "0049_taxi_driver_invitations",
+      "breakpoints": true
     }
   ]
 }

@@ -16,6 +16,7 @@ import { template as tripConfirmedTemplate } from "./trip-confirmed";
 import { template as conciergeProposalSentTemplate } from "./concierge-proposal-sent";
 import { template as bookingPaidAdminTemplate } from "./booking-paid-admin";
 import { template as travelerSignupAdminTemplate } from "./traveler-signup-admin";
+import { template as taxiRideStatusTemplate } from "./taxi-ride-status";
 import { template as proposalPaymentReminderTemplate } from "./proposal-payment-reminder";
 import { template as proposalPaymentStalledTeamTemplate } from "./proposal-payment-stalled-team";
 import {
@@ -60,6 +61,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "concierge-proposal-sent": conciergeProposalSentTemplate,
   "booking-paid-admin": bookingPaidAdminTemplate,
   "traveler-signup-admin": travelerSignupAdminTemplate,
+  "taxi-ride-status": taxiRideStatusTemplate,
   "proposal-payment-reminder": proposalPaymentReminderTemplate,
   "proposal-payment-stalled-team": proposalPaymentStalledTeamTemplate,
   "booking-created": bookingCreatedTemplate,

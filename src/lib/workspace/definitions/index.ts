@@ -43,7 +43,7 @@ import {
 import { Plus, ExternalLink, Search, Home } from "lucide-react";
 import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
 import { ShoppingBag, CalendarDays } from "lucide-react";
-import { UserPlus, Timer } from "lucide-react";
+import { UserPlus, Timer, CarFront } from "lucide-react";
 
 import type { WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
@@ -935,6 +935,17 @@ const cms: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cms.taxi-alux",
+      workspaceId: "cms",
+      label: "Taxi Alux",
+      icon: CarFront,
+      to: "/cms/taxi-alux",
+      group: "operacion",
+      order: 10.055,
+      roles: ["super_admin", "admin"],
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cms.experiencias",
       workspaceId: "cms",
       label: "Experiencias",
@@ -1241,6 +1252,16 @@ const cuenta: WorkspaceDefinition = {
       surfaces: ["sidebar", "palette"],
     },
     {
+      id: "cuenta.taxi",
+      workspaceId: "cuenta",
+      label: "Taxi Alux",
+      icon: CarFront,
+      to: "/cuenta/taxi",
+      group: "viaje",
+      order: 5.5,
+      surfaces: ["sidebar", "palette"],
+    },
+    {
       id: "cuenta.conc",
       workspaceId: "cuenta",
       label: "Concierge",
@@ -1393,13 +1414,70 @@ const cuenta: WorkspaceDefinition = {
   },
 };
 
+const taxista: WorkspaceDefinition = {
+  id: "taxista",
+  label: "Taxi Alux · Conductor",
+  shortLabel: "Taxista",
+  description: "Solicitudes, rutas activas y viajes realizados.",
+  icon: CarFront,
+  accent: "selva",
+  rootPath: "/taxista",
+  roles: ["authenticated"],
+  navigation: [
+    {
+      id: "taxista.home",
+      workspaceId: "taxista",
+      label: "Mis viajes",
+      icon: CarFront,
+      to: "/taxista",
+      group: "servicio",
+      order: 1,
+      surfaces: ["sidebar", "bottom", "palette"],
+      primary: true,
+    },
+    {
+      id: "taxista.public",
+      workspaceId: "taxista",
+      label: "Página de Taxi Alux",
+      icon: ExternalLink,
+      to: "/taxi",
+      group: "servicio",
+      order: 2,
+      surfaces: ["sidebar", "palette"],
+    },
+  ],
+  commands: [
+    {
+      id: "taxista.cmd.open-rides",
+      label: "Ver solicitudes y mi ruta activa",
+      icon: CarFront,
+      group: "operar",
+      run: (ctx) => ctx.navigate("/taxista"),
+    },
+  ],
+  alux: {
+    headline: "Revisa las solicitudes y avanza cada etapa del viaje.",
+    summary: "La ubicación se comparte sólo mientras estás disponible o atiendes un viaje.",
+  },
+  aluxCapabilities: [{ id: "taxista.rides.read", label: "Leer viajes asignados" }],
+  context: {
+    workspaceId: "taxista",
+    entities: [{ type: "taxi-ride", label: "Viaje de Taxi Alux" }],
+    selectionModes: ["single"],
+    views: [
+      { id: "active", label: "Viaje activo", kind: "map" },
+      { id: "history", label: "Viajes realizados", kind: "list" },
+    ],
+  },
+};
+
 let bootstrapped = false;
 
 /** Registra las definiciones base. Idempotente. */
 export function bootstrapWorkspaceDefinitions(): void {
   if (bootstrapped) return;
   bootstrapped = true;
-  [founder, portal, concierge, cms, cuenta].forEach(registerWorkspace);
+  [founder, portal, concierge, cms, cuenta, taxista].forEach(registerWorkspace);
 }
 
 export const baseWorkspaceDefinitions = {
@@ -1408,4 +1486,5 @@ export const baseWorkspaceDefinitions = {
   concierge,
   cms,
   cuenta,
+  taxista,
 };

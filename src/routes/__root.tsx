@@ -439,6 +439,7 @@ function RootComponent() {
     pathname.startsWith("/cuenta") ||
     pathname.startsWith("/concierge") ||
     pathname.startsWith("/empresa") ||
+    pathname.startsWith("/taxista") ||
     // Fase 4 CRM · ventana de Alux insertada en páginas de aliados (sin chrome del sitio).
     pathname.startsWith("/insertar/") ||
     (pathname.startsWith("/lovable/founder-") &&

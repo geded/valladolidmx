@@ -1,0 +1,105 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { CarFront, Languages, ShieldCheck } from "lucide-react";
+import { PublicShell } from "@/components/discovery";
+import { TaxiQuoteForm } from "@/components/taxi/TaxiQuoteForm";
+import { TaxiAppInstallCard } from "@/components/taxi/TaxiAppInstallCard";
+import { Button } from "@/components/ui/button";
+import { buildPublicHead } from "@/lib/discovery/seo";
+import { getTaxiPublicConfig } from "@/lib/taxi/taxi.functions";
+import { useAuth } from "@/hooks/useAuth";
+
+const configQuery = queryOptions({
+  queryKey: ["taxi", "public-config"],
+  queryFn: () => getTaxiPublicConfig(),
+  staleTime: 15_000,
+});
+
+export const Route = createFileRoute("/taxi")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(configQuery),
+  head: () =>
+    buildPublicHead({
+      title: "Taxi Alux · Transporte turístico en Valladolid y Oriente Maya",
+      description:
+        "Cotiza y solicita conductores turísticos aprobados, con precio antes de pedir, pago en efectivo y seguimiento desde la aplicación.",
+      path: "/taxi",
+      breadcrumbs: [
+        { label: "Inicio", path: "/" },
+        { label: "Taxi Alux", path: "/taxi" },
+      ],
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: "Taxi Alux",
+          serviceType: "Transporte turístico",
+          areaServed: "Valladolid y Oriente Maya de Yucatán",
+          provider: { "@type": "Organization", name: "Valladolid.mx" },
+        },
+      ],
+    }),
+  component: TaxiPage,
+});
+
+function TaxiPage() {
+  const { data: config } = useSuspenseQuery(configQuery);
+  const { user } = useAuth();
+  return (
+    <PublicShell
+      crumbs={[{ label: "Inicio", to: "/" }, { label: "Taxi Alux" }]}
+      compactCrumbsOnMobile
+      className="pb-12 pt-5 sm:pt-8"
+    >
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-7 max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Taxi Alux</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+            Tu traslado por el Oriente Maya, con precio antes de pedir
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+            Conductores turísticos revisados por Valladolid.mx, atención en inglés y pago en
+            efectivo al terminar tu viaje.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2 text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
+              <ShieldCheck className="size-4 text-primary" /> Conductores aprobados
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
+              <Languages className="size-4 text-primary" /> Inglés para viajeros
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
+              <CarFront className="size-4 text-primary" /> Efectivo al conductor
+            </span>
+          </div>
+        </header>
+
+        {config.enabled ? (
+          <TaxiQuoteForm config={config} />
+        ) : (
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-soft sm:p-8">
+            <CarFront className="size-8 text-primary" />
+            <h2 className="mt-3 text-xl font-semibold">Taxi Alux todavía no está disponible</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              El administrador está preparando la red de conductores. En cuanto active el servicio
+              y haya disponibilidad, aquí podrás cotizar y solicitar tu traslado.
+            </p>
+          </section>
+        )}
+
+        <div className="mt-6 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <TaxiAppInstallCard signedIn={Boolean(user)} />
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+            <h2 className="text-sm font-semibold">¿Eres taxista turístico?</h2>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              Tu acceso requiere una invitación del administrador. Después de llenar el formulario
+              y ser aprobado, instala la app para recibir solicitudes y ver tus rutas.
+            </p>
+            <Button asChild variant="outline" size="sm" className="mt-4">
+              <Link to="/taxista">Entrar al panel de taxista</Link>
+            </Button>
+          </section>
+        </div>
+      </div>
+    </PublicShell>
+  );
+}
