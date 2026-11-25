@@ -243,7 +243,7 @@ export function PremiumShowcaseGrid({
             to={item.to}
             params={item.params as never}
             onClick={() => onOpen?.(item.key)}
-            className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
+            className="group relative aspect-[4/3] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
           >
             {/* Tarjeta con título superpuesto: el marcador neutral F1L no
                 repite el nombre para evitar el doble rótulo sin fotografía. */}
@@ -348,7 +348,7 @@ export function PremiumCompactRow({
       <EditorialMediaFrame
         media={item.media}
         label={item.name}
-        className="h-full w-full object-cover"
+        className="aspect-[4/3] h-auto w-full self-start object-cover"
       />
       <div className="flex min-w-0 flex-col justify-center p-4">
         <p className="text-[10px] font-semibold uppercase text-primary">

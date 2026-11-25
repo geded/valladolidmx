@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-120",
+  "title": "Armonización localizada de fotografías sobre las autoridades públicas existentes",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Founder 2026-11-25 02:15 UTC: «Si unifica toda la platafoma que se vea en levante y armonizado todo», seguido de aprobación sin cambios del plan Armonización de fotografías de ValladolidMX. Delta: tarjetas fotográficas equivalentes 4:3, franjas de Pueblos Mágicos 21:9 en escritorio con 4:3 móvil para preservar el texto, miniaturas de experiencias con proporción estable. Conservar composiciones principales, galerías, CMS, textos, orden, enlaces, filtros, visibilidad, marca, header/footer, breadcrumb, mapas, Alux y Mi Viaje. Sin datos, migraciones, permisos, pagos, cron ni publicación. No actualizar reconocimientos históricos para forzar PASS.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/home-premium/HomePremiumSurface.tsx" },
+    { "operation": "modify", "path": "src/components/home-premium/shared/PremiumShowcase.tsx" },
+    { "operation": "modify", "path": "src/components/experience-builder/tourism-card/TourismCard.tsx" }
+  ],
+  "public_routes": ["/", "/oriente-maya", "/destinos", "/oriente-maya/valladolid", "/hoteles", "/restaurantes", "/casas-de-vacaciones", "/que-hacer", "/lugares", "/eventos", "/rutas", "/oriente-maya/valladolid/restaurantes/copalli-cafe", "/oriente-maya/valladolid/hoteles/mesondelmarques", "/oriente-maya/valladolid/casas-de-vacaciones/casa-de-las-rutas", "/oriente-maya/valladolid/experiencias/coqui-coqui-valladolid", "/oriente-maya/valladolid/lugares/calzada-de-los-frailes", "/eventos/zazil-tunich", "/rutas/pueblos-coloniales"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bunx vitest run scripts/media/card-gallery.test.ts scripts/omxds/r1-f1l-r2/premium-runtime-connection.contract.test.ts",
+    "Comparación completa por familia antes/después en 1440/834/430/390: sólo marcos autorizados, textos y enlaces preservados",
+    "Constructor con sesión y vista previa real: verificar autoridad compartida sin guardar ni publicar",
+    "Lint localizado, inventario de rutas, Governance Integrity y Product Authorization; documentar bloqueos históricos sin modificar su evidencia"
+  ]
+}

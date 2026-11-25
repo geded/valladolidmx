@@ -371,26 +371,31 @@ export function TourismCard({
         <div
           className={cn(
             "relative w-full overflow-hidden bg-muted",
-            !vm.mediaUrl
-              ? "h-24 sm:h-28"
-              : caps.compact
-                ? "aspect-[16/9] max-h-36"
-                : "aspect-[4/3]",
+            !vm.mediaUrl ? "h-24 sm:h-28" : "aspect-[4/3] shrink-0",
           )}
         >
           {vm.mediaUrl ? (
-            caps.showGallery && (galleryPhotos || ["business", "hotel", "restaurant"].includes(vm.entityKind ?? "")) ? (
-              <CardMediaGallery key={vm.id} name={vm.name}
-                cover={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name,
-                  ...(vm.mediaAsset ? { asset: vm.mediaAsset, assetId: vm.mediaAsset.id } : {}) }}
+            caps.showGallery &&
+            (galleryPhotos || ["business", "hotel", "restaurant"].includes(vm.entityKind ?? "")) ? (
+              <CardMediaGallery
+                key={vm.id}
+                name={vm.name}
+                cover={{
+                  url: vm.mediaUrl,
+                  alt: vm.mediaAlt ?? vm.name,
+                  ...(vm.mediaAsset ? { asset: vm.mediaAsset, assetId: vm.mediaAsset.id } : {}),
+                }}
                 {...(galleryPhotos ? { photos: galleryPhotos } : { businessId: vm.id })}
-                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
-            ) : <EditorialMediaFrame
-              media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name, asset: vm.mediaAsset }}
-              context="card"
-              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            />
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              />
+            ) : (
+              <EditorialMediaFrame
+                media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name, asset: vm.mediaAsset }}
+                context="card"
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            )
           ) : (
             <MediaPlaceholder kind={vm.entityKind} />
           )}
@@ -588,7 +593,7 @@ function PrimaryCta({
 /* ------------------------------------------------------------------ *
  * TourismCardRow — Variante LIST / COMPACT.
  * ------------------------------------------------------------------ */
-export interface TourismCardRowProps extends TourismCardProps {}
+export type TourismCardRowProps = TourismCardProps;
 
 export function TourismCardRow({
   vm,

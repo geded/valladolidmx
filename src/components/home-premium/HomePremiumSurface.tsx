@@ -668,7 +668,7 @@ function RoutesSection({
                 active ? "border-primary shadow-elevated" : "border-border",
               )}
             >
-              <div className="relative aspect-[16/11] overflow-hidden">
+              <div className="relative aspect-[4/3] shrink-0 overflow-hidden">
                 <EditorialMediaFrame
                   media={route.media}
                   label={route.title}
@@ -761,7 +761,7 @@ function DestinationsSection({
             data-eb-card={index}
             to={destination.href ?? "/destinos"}
             onClick={() => onOpen(destination.name)}
-            className="group relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
+            className="group relative aspect-[4/3] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
           >
             <EditorialMediaFrame
               media={destination.media}
@@ -860,7 +860,7 @@ function PueblosMagicosSection({
           <Link
             key={pueblo.name}
             to={pueblo.href ?? "/oriente-maya"}
-            className="group relative h-[12.5rem] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated lg:h-[15rem]"
+            className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated lg:aspect-[21/9]"
           >
             <EditorialMediaFrame
               media={pueblo.media}
@@ -935,7 +935,7 @@ function ExperiencesSection({
               <Link
                 data-eb-card={index}
                 to={item.href}
-                className="relative h-[15rem] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
+                className="relative aspect-[4/3] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
               >
                 <EditorialMediaFrame
                   media={item.media}
@@ -1073,7 +1073,7 @@ function CompactMediaRow({
         <EditorialMediaFrame
           media={item.media}
           label={item.title}
-          className="h-full w-full object-cover"
+          className="aspect-[4/3] h-auto w-full self-start object-cover"
         />
         <div className="flex min-w-0 flex-col justify-center p-4">
           <p className="text-[10px] font-semibold uppercase text-primary">{item.category}</p>
@@ -1465,7 +1465,7 @@ function EditorialSection({
             <Link
               key={item.title}
               to={item.href}
-              className="relative h-[12.5rem] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated lg:h-[15rem]"
+              className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated"
             >
               <EditorialMediaFrame
                 media={item.media}

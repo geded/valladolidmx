@@ -1,5 +1,11 @@
 # Roadmap
 
+## Armonización de fotografías · 2026-11-25
+- [x] Alcance y plan aprobados: proporciones por función, sin rediseñar plantillas ni cambiar datos CMS.
+- [x] Armonizar tarjetas de Inicio y recomendaciones compartidas a 4:3; Pueblos Mágicos 4:3 móvil y 21:9 escritorio para conservar legibilidad. Región y listados comunes ya cumplían. Portadas principales, galerías y miniaturas específicas intactas.
+- [x] Comparar 17 páginas públicas válidas en 1440/834/430/390: mismos textos y enlaces, sin desbordes ni errores de JavaScript; abrir Copalli desde búsqueda y regresar. 40 pruebas y paridad Home PASS; lint sin errores y Governance Integrity PASS. Informe: docs/photo-harmony-2026-11-25.md.
+- [ ] Cierre pendiente: Product Authorization bloqueado por evidencias históricas y permisos superpuestos (requiere autorización de reconciliación); inventario omite dos maquetas anteriores. Constructor abre con sesión pero su canvas no quedó certificado; galería interactiva no certificada en este lote, productos individuales sin ejemplo público comprobado y Safari físico requieren revisión. No publicar como certificación completa.
+
 ## Pueblos Mágicos de Inicio · 2026-11-25
 - [x] Recuperar Valladolid, Izamal y Espita publicados sin que el máximo editorial de Destinos recorte esta sección; conservar fuentes CMS, fotografías y diseño.
 - [x] 41 pruebas y lint localizado PASS; Inicio completo idéntico fuera de las dos tarjetas recuperadas en 1440/834/430/390; fotografías reales y navegación Izamal/regreso verificadas. Informe: docs/home-pueblos-magicos-2026-11-25.md. Sin escritura CMS ni publicación automática.
