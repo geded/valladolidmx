@@ -85,3 +85,9 @@ describe("HTML público reutilizado", () => {
     expect(rows.size).toBe(0);
   });
 });
+import { hasOnlyProviderCookies as onlyProvider } from "../../src/lib/server/public-page-cache";
+import { test as t2, expect as e2 } from "vitest";
+t2("la cookie antirrobots del proveedor no cuenta como sesión", () => {
+  e2(onlyProvider("__cf_bm=abc; _cfuvid=x")).toBe(true);
+  e2(onlyProvider("__cf_bm=abc; sb-access=1")).toBe(false);
+});

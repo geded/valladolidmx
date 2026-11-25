@@ -19,7 +19,7 @@ describe("copia breve de páginas públicas", () => {
   it("solo comparte Inicio y Valladolid sin sesión ni filtros", () => {
     expect(isSharedHtmlRequest(page("/"))).toBe(true);
     expect(isSharedHtmlRequest(page("/oriente-maya/valladolid"))).toBe(true);
-    for (const path of ["/hoteles", "/oriente-maya/izamal", "/?destino=izamal", "/oriente-maya/valladolid?presentacion=cinematografica"])
+    for (const path of ["/cms", "/?destino=izamal", "/oriente-maya/valladolid?presentacion=cinematografica"])
       expect(isSharedHtmlRequest(page(path))).toBe(false);
     expect(isSharedHtmlRequest(page("/", { cookie: "session=test" }))).toBe(false);
     expect(isSharedHtmlRequest(page("/", { authorization: "Bearer test" }))).toBe(false);

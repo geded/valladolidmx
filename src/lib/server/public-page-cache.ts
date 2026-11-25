@@ -23,9 +23,20 @@ export function isCacheablePageRequest(request: Request): boolean {
   if (/\.[a-z0-9]{2,5}$/i.test(url.pathname)) return false;
   if (/(?:^|&)(?:preview|draft|nocache|sw)=/.test(url.search.slice(1))) return false;
   if (request.headers.has("authorization")) return false;
-  if (request.headers.has("cookie")) return false;
+  if (!hasOnlyProviderCookies(request.headers.get("cookie"))) return false;
   return true;
 }
+
+/** Cookies automáticas del proveedor (protección contra robots); nunca son sesión. */
+const PROVIDER_COOKIE = /^(?:__cf_bm|cf_clearance|_cfuvid|__cflb|cf_ob_info|cf_use_ob)$/;
+export function hasOnlyProviderCookies(cookie: string | null): boolean {
+  if (!cookie) return true;
+  return cookie.split(";").map((c) => c.trim().split("=")[0] ?? "").filter(Boolean)
+    .every((name) => PROVIDER_COOKIE.test(name));
+}
+
+/** Copia en el servidor más cercano; tan breve que un cambio CMS se ve en segundos. */
+const NEAR_MS = 8_000;
 
 /** Inicio, Oriente Maya, cada destino, sus listados y los listados generales. */
 const SHARED_HTML_PATH =
@@ -49,6 +60,30 @@ class UncacheableHtml extends Error {
 }
 
 export async function serveSharedHtml(request: Request, render: () => Promise<Response>): Promise<Response> {
+  const cache = edgeCache();
+  const build = String(import.meta.env["VMX_HTML_BUILD_ID"] ?? "dev");
+  const nearKey = new Request(`${new URL(request.url).toString()}#${build}:${request.headers.get("accept-language") ?? ""}`.replace("#", "?__vmx_near="), { method: "GET" });
+  if (cache) {
+    const near = await cache.match(nearKey).catch(() => undefined);
+    if (near && Date.now() - Number(near.headers.get(STAMP) ?? 0) < NEAR_MS) {
+      const out = new Response(near.body, near);
+      out.headers.set("cache-control", "no-store");
+      out.headers.set("x-vmx-html", "NEAR");
+      out.headers.delete(STAMP);
+      return out;
+    }
+  }
+  const result = await serveSharedHtmlFromStore(request, render);
+  if (cache && result.status === 200 && result.headers.has("x-vmx-html")) {
+    const copy = new Response(result.clone().body, result);
+    copy.headers.set(STAMP, String(Date.now()));
+    copy.headers.set("cache-control", `public, max-age=${Math.round(NEAR_MS / 1000)}`);
+    await cache.put(nearKey, copy).catch(() => {});
+  }
+  return result;
+}
+
+async function serveSharedHtmlFromStore(request: Request, render: () => Promise<Response>): Promise<Response> {
   const started = performance.now();
   // Se reutiliza la tabla y el invalidado CMS existentes; no hay otro almacén.
   const build = String(import.meta.env["VMX_HTML_BUILD_ID"] ?? "dev");
