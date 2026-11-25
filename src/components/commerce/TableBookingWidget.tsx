@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarDays, Check, Minus, Plus, Users } from "lucide-react";
+import { CalendarDays, Check, Clock, Minus, Plus, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,28 @@ type Rpc = (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: un
 const rpc = (supabase.rpc as unknown as Rpc).bind(supabase);
 
 const OCCASIONS = ["", "Cumpleaños", "Aniversario", "Reunión de negocios", "Cita", "Celebración"];
+
+const PREF_TIMES = Array.from({ length: 33 }, (_, i) => { const m = 7 * 60 + i * 30; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; });
+
+function minutes(t: string): number {
+  const [h, m] = t.split(":");
+  return Number(h) * 60 + Number(m ?? 0);
+}
+
+function to12h(t: string): string {
+  const m = minutes(t);
+  const h = Math.floor(m / 60);
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m % 60).padStart(2, "0")} ${h < 12 ? "a. m." : "p. m."}`;
+}
+
+function SlotButton({ s, active, onPick }: { s: Slot; active: boolean; onPick: (s: Slot) => void }) {
+  return (
+    <Button type="button" size="sm" variant="default" aria-pressed={active}
+      className={`h-9 w-full rounded-md px-1 text-xs font-semibold ${active ? "ring-focus ring-2 ring-offset-2" : ""}`}
+      onClick={() => onPick(s)}>{to12h(s.slot_time)}</Button>
+  );
+}
 
 function addDays(iso: string, n: number): string {
   const d = new Date(`${iso}T12:00:00Z`);
@@ -71,6 +93,30 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
       return (data ?? []) as Slot[];
     },
   });
+
+  const [prefTime, setPrefTime] = useState("19:00");
+  const [showAll, setShowAll] = useState(false);
+  const available = useMemo(() => (slots.data ?? []).filter((s) => s.available), [slots.data]);
+  const nearest = useMemo(() => {
+    const pref = minutes(prefTime);
+    return [...available].sort((a, b) => Math.abs(minutes(a.slot_time) - pref) - Math.abs(minutes(b.slot_time) - pref))
+      .slice(0, 5).sort((a, b) => minutes(a.slot_time) - minutes(b.slot_time));
+  }, [available, prefTime]);
+  const nearMissing = available.length > 0 && !available.some((s) => s.slot_time.slice(0, 5) === prefTime);
+  const groups = useMemo(() => {
+    const defs = [{ label: "Desayuno", to: 720 }, { label: "Comida", to: 1080 }, { label: "Cena", to: 1440 }];
+    return defs.map((d, i) => ({ label: d.label, items: available.filter((s) => { const m = minutes(s.slot_time); return m < d.to && m >= (i ? defs[i - 1]!.to : 0); }) }))
+      .filter((g) => g.items.length);
+  }, [available]);
+  const quickDays = useMemo(() => {
+    if (!today) return [];
+    const maxN = Math.min(13, config.data?.max_days_ahead ?? 60);
+    return Array.from({ length: maxN + 1 }, (_, i) => {
+      const iso = addDays(today, i);
+      const label = i === 0 ? "Hoy" : i === 1 ? "Mañana" : new Date(`${iso}T12:00:00Z`).toLocaleDateString("es-MX", { weekday: "short", day: "numeric", timeZone: "UTC" });
+      return { iso, label };
+    });
+  }, [today, config.data?.max_days_ahead]);
 
   if (!config.data?.enabled) return null;
   const maxParty = config.data.max_party ?? 8;
@@ -126,14 +172,9 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
     <section id="reservar-mesa" data-eb-anchor className="mt-8 scroll-mt-24 rounded-2xl border border-border bg-card p-5 shadow-soft sm:mt-10 sm:p-6">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Reservar mesa</p>
       <h2 className="mt-1 text-2xl">Aparta tu mesa en {businessName}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Sin costo. Elige el día, cuántas personas y la hora.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Sin costo. Elige personas, fecha y hora.</p>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <label className="block text-sm font-medium">
-          <span className="flex items-center gap-1.5"><CalendarDays className="size-4" aria-hidden /> Día</span>
-          <Input type="date" className="mt-1" value={date} min={today} max={maxDate}
-            onChange={(e) => { setDate(e.target.value); setSlot(null); }} />
-        </label>
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="text-sm font-medium">
           <span className="flex items-center gap-1.5"><Users className="size-4" aria-hidden /> Personas</span>
           <div className="mt-1 flex h-10 items-center justify-between rounded-md border border-input px-2">
@@ -144,24 +185,72 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
               onClick={() => { setParty((p) => Math.min(maxParty, p + 1)); setSlot(null); }}><Plus className="size-4" /></Button>
           </div>
         </div>
+        <label className="block text-sm font-medium">
+          <span className="flex items-center gap-1.5"><CalendarDays className="size-4" aria-hidden /> Fecha</span>
+          <Input type="date" className="mt-1" value={date} min={today} max={maxDate}
+            onChange={(e) => { setDate(e.target.value); setSlot(null); setShowAll(false); }} />
+        </label>
+        <label className="block text-sm font-medium">
+          <span className="flex items-center gap-1.5"><Clock className="size-4" aria-hidden /> Hora</span>
+          <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={prefTime}
+            onChange={(e) => { setPrefTime(e.target.value); setSlot(null); setShowAll(false); }}>
+            {PREF_TIMES.map((t) => <option key={t} value={t}>{to12h(t)}</option>)}
+          </select>
+        </label>
       </div>
 
-      <div className="mt-4">
-        <p className="text-sm font-medium">Hora</p>
+      <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1" role="list" aria-label="Días próximos">
+        {quickDays.map((d) => (
+          <button key={d.iso} type="button" role="listitem"
+            className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition-colors ${date === d.iso ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"}`}
+            onClick={() => { setDate(d.iso); setSlot(null); setShowAll(false); }}>{d.label}</button>
+        ))}
+      </div>
+
+      <div className="mt-5">
+        <p className="text-sm font-semibold">Elige una hora</p>
         {slots.isLoading ? (
-          <p className="mt-2 text-sm text-muted-foreground">Buscando horarios…</p>
-        ) : (slots.data ?? []).length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">No hay horarios ese día. Prueba otra fecha.</p>
-        ) : (slots.data ?? []).every((s) => !s.available) ? (
-          <p className="mt-2 text-sm text-muted-foreground">Ya no quedan mesas para {party} ese día. Prueba otra fecha o menos personas.</p>
-        ) : (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {(slots.data ?? []).filter((s) => s.available).map((s) => (
-              <Button key={s.starts_at} type="button" size="sm" variant={slot?.starts_at === s.starts_at ? "default" : "outline"}
-                className="rounded-pill" onClick={() => setSlot(s)}>{s.slot_time}</Button>
-            ))}
+          <div className="mt-2 flex gap-2" aria-label="Buscando horarios">
+            {[0, 1, 2, 3, 4].map((i) => <div key={i} className="h-9 w-20 animate-pulse rounded-md bg-muted" />)}
           </div>
+        ) : available.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {(slots.data ?? []).length === 0 ? "El restaurante no recibe reservaciones ese día." : `Ya no quedan mesas para ${party} ese día.`} Prueba otra fecha{(slots.data ?? []).length ? " o menos personas" : ""}.
+          </p>
+        ) : (
+          <>
+            {!showAll ? (
+              <>
+                {nearMissing ? <p className="mt-1 text-xs text-muted-foreground">No hay mesa a las {to12h(prefTime)}; estos son los horarios más cercanos.</p> : null}
+                <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                  {nearest.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={setSlot} />)}
+                </div>
+                {available.length > nearest.length ? (
+                  <button type="button" className="mt-3 text-sm font-medium text-primary underline-offset-4 hover:underline" onClick={() => setShowAll(true)}>
+                    Ver todos los horarios ({available.length})
+                  </button>
+                ) : null}
+              </>
+            ) : (
+              <div className="mt-2 space-y-3">
+                {groups.map((g) => (
+                  <div key={g.label}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">{g.label}</p>
+                    <div className="mt-1.5 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                      {g.items.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={setSlot} />)}
+                    </div>
+                  </div>
+                ))}
+                <button type="button" className="text-sm font-medium text-primary underline-offset-4 hover:underline" onClick={() => setShowAll(false)}>Ver menos</button>
+              </div>
+            )}
+          </>
         )}
+        {slot ? (
+          <p className="mt-3 rounded-md bg-muted px-3 py-2 text-sm">
+            {party} {party === 1 ? "persona" : "personas"} · {formatTableDate(slot.starts_at)} · {to12h(slot.slot_time)}
+          </p>
+        ) : null}
       </div>
 
       {slot ? (
@@ -185,7 +274,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
           </label>
           {error ? <p className="text-sm text-destructive sm:col-span-2">{error}</p> : null}
           <Button className="sm:col-span-2" disabled={busy || name.trim().length < 2 || phone.replace(/\D/g, "").length < 10} onClick={() => void submit()}>
-            {busy ? "Reservando…" : config.data.confirm_mode === "confirmacion" ? `Solicitar mesa a las ${slot.slot_time}` : `Reservar a las ${slot.slot_time}`}
+            {busy ? "Reservando…" : config.data.confirm_mode === "confirmacion" ? `Solicitar mesa a las ${to12h(slot.slot_time)}` : `Reservar a las ${to12h(slot.slot_time)}`}
           </Button>
         </div>
       ) : null}
