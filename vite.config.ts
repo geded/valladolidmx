@@ -7,6 +7,10 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { VitePWA } from "vite-plugin-pwa";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
+import {
+  launchShellCachedResponseWillBeUsed,
+  launchShellHandlerDidError,
+} from "./src/pwa/launch-shell";
 
 export default defineConfig({
   tanstackStart: {
@@ -127,25 +131,25 @@ export default defineConfig({
                 !/^\/(?:~oauth|api|auth|cms|portal|admin|cuenta|concierge|empresa)(?:\/|$)/.test(
                   url.pathname,
                 ),
-              handler: "NetworkFirst",
+              // 2026-11-25 · Arranque instantáneo (como Airbnb): al abrir la app
+              // instalada se muestra la última copia guardada de esta misma
+              // versión y la red la renueva en segundo plano. Con la app ya
+              // abierta, recargas y enlaces siguen pidiendo la red primero.
+              // Antes el iPhone quedaba en negro hasta 3-4 s esperando al
+              // servidor y a los tipos de letra. Ver src/pwa/launch-shell.ts.
+              handler: "StaleWhileRevalidate",
               options: {
                 // v2: purga cachés de navegación envenenadas con la pantalla
                 // "Estás sin conexión" de builds anteriores.
                 cacheName: "html-pages-v2",
-                /* Sin timeout corto: con 4 s, una respuesta SSR algo lenta
-                   se interpretaba como "sin red" y el visitante veía un
-                   parpadeo de la pantalla "Estás sin conexión" antes de que
-                   cargara la categoría. El fallback offline debe activarse
-                   sólo cuando la red realmente falla. */
-                networkTimeoutSeconds: 20,
                 expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 },
-                // Único punto donde puede aparecer la pantalla sin conexión:
-                // cuando red y caché fallan de verdad.
+                cacheableResponse: { statuses: [200] },
+                // Si la red falla: copia guardada y, sin ella, la pantalla
+                // oficial sin conexión (único punto donde puede aparecer).
                 plugins: [
                   {
-                    handlerDidError: async () =>
-                      (await caches.match("/offline.html", { ignoreSearch: true })) ??
-                      Response.error(),
+                    cachedResponseWillBeUsed: launchShellCachedResponseWillBeUsed,
+                    handlerDidError: launchShellHandlerDidError,
                   },
                 ],
               },

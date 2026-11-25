@@ -247,6 +247,7 @@ function InstitutionalAuthoritySync() {
 
 const IOS_SPLASH = [
   { w: 440, h: 956, r: 3 },
+  { w: 420, h: 912, r: 3 },
   { w: 430, h: 932, r: 3 },
   { w: 402, h: 874, r: 3 },
   { w: 393, h: 852, r: 3 },
@@ -397,6 +398,9 @@ function RootShell({ children }: { children: ReactNode }) {
         ...aluxPaletteStyle(brandSettings.aluxPalette),
       }}
       data-omxds-visual-foundations={omxdsVisualFoundationsEnabled ? "enabled" : undefined}
+      // Hora en que el servidor armó esta página: la app instalada abre con
+      // una copia guardada y la renueva al instante si ya no es reciente.
+      data-rendered-at={typeof window === "undefined" ? String(Date.now()) : undefined}
     >
       <head>
         <HeadContent />
@@ -470,6 +474,22 @@ function RootComponent() {
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
+
+  // Arranque instantáneo de la app instalada: si abrió con una copia guardada
+  // que ya no es reciente, se renuevan los datos en su lugar (como al jalar
+  // para actualizar), sin recargar ni perder la posición.
+  const launchRouter = useRouter();
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const renderedAt = Number(document.documentElement.dataset.renderedAt ?? "");
+    if (!Number.isFinite(renderedAt) || renderedAt <= 0) return;
+    if (Date.now() - renderedAt < 2 * 60_000) return;
+    const standalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    if (!standalone || navigator.onLine === false) return;
+    void Promise.allSettled([queryClient.invalidateQueries(), launchRouter.invalidate()]);
+  }, [queryClient, launchRouter]);
 
   // H2·P3 — Prefetch idle de los widgets diferidos. Se invoca en el
   // primer `requestIdleCallback` (o setTimeout fallback) tras la
