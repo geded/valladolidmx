@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-118",
+  "title": "Galería aprobada: capacidad fotográfica de tarjetas oficiales de listados",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Founder 2026-11-24 23:54 UTC, respuesta a «¿Apruebas la maqueta de la galería deslizable para aplicarla a la tarjeta oficial de todos los listados?»: «Aprobada, aplícala». Sólo fotografía: hasta cinco fotos reales de la misma empresa, cargadas al interactuar, con flechas, puntos y gesto horizontal. Conservar tarjetas, textos, precios, distintivos, orden, visibilidad, filtros, mapa, rutas, geometría, marca, Alux y Mi Viaje. No CMS writes, migraciones, pagos, cambios de permisos ni publicación.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/experience-builder/tourism-card/TourismCard.tsx" },
+    { "operation": "create", "path": "src/components/experience-builder/tourism-card/CardMediaGallery.tsx" },
+    { "operation": "create", "path": "src/components/experience-builder/tourism-card/card-gallery.ts" },
+    { "operation": "create", "path": "src/components/experience-builder/tourism-card/AGENTS.md" },
+    { "operation": "modify", "path": "src/components/surfaces/TourismListingSurface.tsx" },
+    { "operation": "create", "path": "src/lib/catalog/business-card-gallery.functions.ts" },
+    { "operation": "modify", "path": "src/routes/maqueta-galeria-tarjetas.tsx" }
+  ],
+  "public_routes": ["/hoteles", "/restaurantes", "/casas-de-vacaciones", "/experiencias", "/oriente-maya/$destino/$categoria", "/oriente-maya/categoria/$categoria", "/maqueta-galeria-tarjetas"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bunx vitest run scripts/media/card-gallery.test.ts scripts/media/signed-urls-memo.test.ts scripts/media/variant-publication.test.ts",
+    "bun test scripts/visibility/listing-arrangement.contract.test.ts scripts/omxds/i2/business-card.contract.test.ts",
+    "Comparación completa de listados en 1440/834/430/390 y galería real con navegación a ficha"
+  ]
+}

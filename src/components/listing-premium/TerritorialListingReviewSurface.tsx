@@ -20,6 +20,7 @@ import {
 import type { FacetDef } from "@/components/surfaces/TourismListingSurface";
 import type { PublicListingDTO } from "@/lib/listings/listing-public-contract";
 import { getPublicListingCardMedia } from "@/lib/listings/listing-public-reads.functions";
+import { CardMediaGallery } from "@/components/experience-builder/tourism-card/CardMediaGallery";
 import { attributeValues, humanizeAttributeValue } from "@/lib/business-attributes/types";
 import { FavoriteButton } from "@/components/commerce/FavoriteButton";
 import { cn } from "@/lib/utils";
@@ -1463,7 +1464,12 @@ function ListingCard({
         }`}
       >
         {item.image ? (
-          <picture className="contents">
+          kinds.favorite === "business" && item.source ? (
+            <CardMediaGallery key={item.source.id} businessId={item.source.id} name={item.name}
+              cover={{ url: item.image, alt: item.name,
+                ...(item.imageAsset ? { asset: item.imageAsset, assetId: item.imageAsset.id } : {}) }}
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+          ) : <picture className="contents">
             {resolveMediaSource(item.imageAsset, {
               fallbackUrl: item.image,
               context: "card",
@@ -1588,6 +1594,7 @@ function QueHacerDiscoveryCard({
         contractVariant="compact"
         capabilities={{
           compact: true,
+          showGallery: true,
           showBusiness: false,
           showRating: false,
           showHighlights: false,

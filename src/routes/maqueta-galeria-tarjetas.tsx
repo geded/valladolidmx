@@ -10,14 +10,12 @@
  * evolución de `TourismCard` (variant/capability), nunca como card paralela.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
 import { getPublicListing } from "@/lib/listings/listing-public-reads.functions";
 import { getMarketplaceBusinessBySlug } from "@/lib/catalog/marketplace-reads.functions";
 import {
   TourismCard,
   type TourismCardVM,
 } from "@/components/experience-builder/tourism-card/TourismCard";
-import { cn } from "@/lib/utils";
 
 interface MockBusiness {
   vm: TourismCardVM;
@@ -51,6 +49,11 @@ export const Route = createFileRoute("/maqueta-galeria-tarjetas")({
   head: () => ({
     meta: [
       { title: "Maqueta interna: galería deslizable en tarjetas" },
+      { name: "description", content: "Comparación aprobada de las tarjetas de Valladolid.mx con galería de fotos de cada empresa." },
+      { property: "og:title", content: "Galería de empresas · Valladolid.mx" },
+      { property: "og:description", content: "Revisión interna de la galería integrada en la tarjeta oficial." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -89,133 +92,11 @@ function MockupPage() {
         <h2 className="mb-4 text-lg font-semibold">Propuesta: galería deslizable</h2>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {businesses.map((b) => (
-            <SwipeGalleryCard key={`new-${b.vm.id}`} vm={b.vm} photos={b.photos} />
+            <TourismCard key={`new-${b.vm.id}`} vm={b.vm} galleryPhotos={b.photos}
+              capabilities={{ showGallery: true }} />
           ))}
         </div>
       </section>
     </main>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Tarjeta propuesta — misma estructura y tokens que TourismCard; sólo
- * cambia el área de la foto por una galería deslizable.
- * ------------------------------------------------------------------ */
-function SwipeGalleryCard({
-  vm,
-  photos,
-}: {
-  vm: TourismCardVM;
-  photos: { url: string; alt: string }[];
-}) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [index, setIndex] = useState(0);
-
-  const scrollTo = (next: number) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const clamped = Math.max(0, Math.min(photos.length - 1, next));
-    track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
-    setIndex(clamped);
-  };
-
-  const onScroll = () => {
-    const track = trackRef.current;
-    if (!track || track.clientWidth === 0) return;
-    setIndex(Math.round(track.scrollLeft / track.clientWidth));
-  };
-
-  return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-shadow hover:shadow-elevated">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
-        <div
-          ref={trackRef}
-          onScroll={onScroll}
-          className="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {photos.map((p, i) => (
-            <img
-              key={i}
-              src={p.url}
-              alt={p.alt}
-              loading={i === 0 ? "eager" : "lazy"}
-              className="h-full w-full shrink-0 snap-center object-cover"
-            />
-          ))}
-        </div>
-
-        {vm.eyebrow || vm.entityKind ? (
-          <span className="absolute left-3 top-3 max-w-[70%] truncate rounded-pill bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground shadow-soft backdrop-blur">
-            {vm.eyebrow ?? "Empresa"}
-          </span>
-        ) : null}
-
-        {index > 0 ? (
-          <button
-            type="button"
-            aria-label="Foto anterior"
-            onClick={() => scrollTo(index - 1)}
-            className="absolute left-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur transition-opacity md:opacity-0 md:group-hover:opacity-100"
-          >
-            ‹
-          </button>
-        ) : null}
-        {index < photos.length - 1 ? (
-          <button
-            type="button"
-            aria-label="Foto siguiente"
-            onClick={() => scrollTo(index + 1)}
-            className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-background/90 text-foreground shadow-soft backdrop-blur transition-opacity md:opacity-0 md:group-hover:opacity-100"
-          >
-            ›
-          </button>
-        ) : null}
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center gap-1.5">
-          {photos.map((_, i) => (
-            <span
-              key={i}
-              className={cn(
-                "h-1.5 w-1.5 rounded-full bg-background/60 shadow-soft transition-all",
-                i === index && "w-3 bg-background",
-              )}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col p-5">
-        {vm.location ? (
-          <p className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
-            <span className="truncate">{vm.location.label}</span>
-          </p>
-        ) : null}
-        <h3 className="mt-1 text-base font-semibold leading-tight">
-          {vm.href ? (
-            <a href={vm.href} className="hover:underline">
-              {vm.name}
-            </a>
-          ) : (
-            vm.name
-          )}
-        </h3>
-        {vm.tagline ? (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{vm.tagline}</p>
-        ) : null}
-        {vm.rating ? (
-          <p className="mt-2 flex items-center gap-1 text-xs">
-            <span className="font-semibold text-foreground">★ {vm.rating.value.toFixed(1)}</span>
-            {vm.rating.count > 0 ? (
-              <span className="text-muted-foreground">({vm.rating.count} reseñas)</span>
-            ) : null}
-          </p>
-        ) : null}
-        {vm.priceAmount != null ? (
-          <p className="mt-2 text-sm font-semibold text-foreground">
-            ${vm.priceAmount.toFixed(0)} <span className="font-normal text-muted-foreground">MXN</span>
-          </p>
-        ) : null}
-      </div>
-    </article>
   );
 }

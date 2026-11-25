@@ -23,6 +23,8 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { EditorialMediaFrame } from "@/components/omxds/EditorialMediaFrame";
 import type { TourismFilterAttributes } from "@/lib/business-attributes/types";
+import { CardMediaGallery } from "./CardMediaGallery";
+import type { CardGalleryPhoto } from "@/lib/catalog/business-card-gallery.functions";
 
 /* ------------------------------------------------------------------ *
  * View Model — común a toda la Biblioteca Turística.
@@ -134,6 +136,7 @@ export interface TourismCardVM {
 
 export interface TourismCardCapabilities {
   showMedia: boolean;
+  showGallery: boolean;
   showEyebrow: boolean;
   showBusiness: boolean;
   showTagline: boolean;
@@ -156,6 +159,7 @@ export interface TourismCardCapabilities {
 
 export const DEFAULT_TOURISM_CAPABILITIES: TourismCardCapabilities = {
   showMedia: true,
+  showGallery: false,
   showEyebrow: true,
   showBusiness: true,
   showTagline: true,
@@ -323,6 +327,7 @@ function MediaPlaceholder({ kind }: { kind: TourismEntityKind | null }) {
  * ------------------------------------------------------------------ */
 export interface TourismCardProps {
   vm: TourismCardVM;
+  galleryPhotos?: readonly CardGalleryPhoto[];
   capabilities?: Partial<TourismCardCapabilities>;
   className?: string;
   /** Slot para inyectar acciones interactivas (FavoriteButton, etc.). */
@@ -336,6 +341,7 @@ export interface TourismCardProps {
 
 export function TourismCard({
   vm,
+  galleryPhotos,
   capabilities,
   className,
   renderActions,
@@ -373,7 +379,13 @@ export function TourismCard({
           )}
         >
           {vm.mediaUrl ? (
-            <EditorialMediaFrame
+            caps.showGallery && (galleryPhotos || ["business", "hotel", "restaurant"].includes(vm.entityKind ?? "")) ? (
+              <CardMediaGallery key={vm.id} name={vm.name}
+                cover={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name,
+                  ...(vm.mediaAsset ? { asset: vm.mediaAsset, assetId: vm.mediaAsset.id } : {}) }}
+                {...(galleryPhotos ? { photos: galleryPhotos } : { businessId: vm.id })}
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+            ) : <EditorialMediaFrame
               media={{ url: vm.mediaUrl, alt: vm.mediaAlt ?? vm.name, asset: vm.mediaAsset }}
               context="card"
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"

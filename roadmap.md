@@ -1,5 +1,11 @@
 # Roadmap
 
+## Galería aprobada en tarjetas · 2026-11-24
+- [x] Integrar hasta cinco fotos de la misma empresa en las tarjetas oficiales de listados, sin alterar contenido, orden, visibilidad, enlaces ni geometría.
+- [x] Cargar fotos adicionales sólo al interactuar; flechas, puntos, gesto táctil real en Chromium móvil, lectura de fotos y entrada/regreso a ficha comprobados.
+- [x] Comparar hoteles, restaurantes, casas y experiencias completos en 1440/834/430/390: mismos textos, enlaces y alturas de secciones, sin desbordes; 17 pruebas PASS y compilación automática OK. Informe: docs/card-gallery-2026-11-24.md. Sin publicación.
+- [ ] Cierre de controles globales: autorizaciones históricas con huellas desactualizadas; lint global excedió diez minutos; constructor autenticado y Safari físico pendientes. No se modificaron evidencias históricas ni permisos para forzar PASS.
+
 ## Velocidad de Inicio y Valladolid · 2026-11-24
 - [x] Revisión tras publicación (21:28 UTC): copias HTML guardadas 85–87% menores, tiempos internos medibles; navegación empresa/regreso comprobada, sin 403 ni cambios de plantillas. Demora de alojamiento pendiente de medir tras nueva publicación.
 - [x] Reparar foto de ruta en Valladolid: no anunciar variantes de asset borrador; conserva original configurado (200), permisos y contrato. Preview 1440/834/430/390 sin fotos rotas.

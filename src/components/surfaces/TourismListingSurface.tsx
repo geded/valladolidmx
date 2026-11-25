@@ -456,7 +456,7 @@ export function TourismListingSurface({
                 ) : (
                   <TourismCard
                     vm={vm}
-                    capabilities={capabilities}
+                    capabilities={{ showGallery: true, ...capabilities }}
                     renderActions={(v) => renderCardActions(v, favoriteKindFor, showAddToTrip)}
                   />
                 );
