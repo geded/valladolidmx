@@ -27,6 +27,7 @@ import { Route as LugaresRouteImport } from './routes/lugares'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as MaquetaGaleriaTarjetasRouteImport } from './routes/maqueta-galeria-tarjetas'
+import { Route as MaquetaMedidasFotosRouteImport } from './routes/maqueta-medidas-fotos'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as OfflineRouteImport } from './routes/offline'
@@ -377,6 +378,11 @@ const MapaRoute = MapaRouteImport.update({
 const MaquetaGaleriaTarjetasRoute = MaquetaGaleriaTarjetasRouteImport.update({
   id: '/maqueta-galeria-tarjetas',
   path: '/maqueta-galeria-tarjetas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaquetaMedidasFotosRoute = MaquetaMedidasFotosRouteImport.update({
+  id: '/maqueta-medidas-fotos',
+  path: '/maqueta-medidas-fotos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -1908,6 +1914,7 @@ export interface FileRoutesByFullPath {
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/maqueta-galeria-tarjetas': typeof MaquetaGaleriaTarjetasRoute
+  '/maqueta-medidas-fotos': typeof MaquetaMedidasFotosRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
@@ -2187,6 +2194,7 @@ export interface FileRoutesByTo {
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/maqueta-galeria-tarjetas': typeof MaquetaGaleriaTarjetasRoute
+  '/maqueta-medidas-fotos': typeof MaquetaMedidasFotosRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
@@ -2460,6 +2468,7 @@ export interface FileRoutesById {
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/mapa': typeof MapaRoute
   '/maqueta-galeria-tarjetas': typeof MaquetaGaleriaTarjetasRoute
+  '/maqueta-medidas-fotos': typeof MaquetaMedidasFotosRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/offline': typeof OfflineRoute
@@ -2743,6 +2752,7 @@ export interface FileRouteTypes {
     | '/manifest.webmanifest'
     | '/mapa'
     | '/maqueta-galeria-tarjetas'
+    | '/maqueta-medidas-fotos'
     | '/marketplace'
     | '/mcp'
     | '/offline'
@@ -3022,6 +3032,7 @@ export interface FileRouteTypes {
     | '/manifest.webmanifest'
     | '/mapa'
     | '/maqueta-galeria-tarjetas'
+    | '/maqueta-medidas-fotos'
     | '/marketplace'
     | '/mcp'
     | '/offline'
@@ -3294,6 +3305,7 @@ export interface FileRouteTypes {
     | '/manifest.webmanifest'
     | '/mapa'
     | '/maqueta-galeria-tarjetas'
+    | '/maqueta-medidas-fotos'
     | '/marketplace'
     | '/mcp'
     | '/offline'
@@ -3577,6 +3589,7 @@ export interface RootRouteChildren {
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   MapaRoute: typeof MapaRoute
   MaquetaGaleriaTarjetasRoute: typeof MaquetaGaleriaTarjetasRoute
+  MaquetaMedidasFotosRoute: typeof MaquetaMedidasFotosRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   McpRoute: typeof McpRoute
   OfflineRoute: typeof OfflineRoute
@@ -3815,6 +3828,13 @@ declare module '@tanstack/react-router' {
       path: '/maqueta-galeria-tarjetas'
       fullPath: '/maqueta-galeria-tarjetas'
       preLoaderRoute: typeof MaquetaGaleriaTarjetasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maqueta-medidas-fotos': {
+      id: '/maqueta-medidas-fotos'
+      path: '/maqueta-medidas-fotos'
+      fullPath: '/maqueta-medidas-fotos'
+      preLoaderRoute: typeof MaquetaMedidasFotosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -6273,6 +6293,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   MapaRoute: MapaRoute,
   MaquetaGaleriaTarjetasRoute: MaquetaGaleriaTarjetasRoute,
+  MaquetaMedidasFotosRoute: MaquetaMedidasFotosRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   McpRoute: McpRoute,
   OfflineRoute: OfflineRoute,
