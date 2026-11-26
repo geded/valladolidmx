@@ -78,6 +78,8 @@ import {
   snapshotTitle,
 } from "@/lib/traveler/itinerary-document";
 import { useItineraryProgress } from "@/lib/traveler/itinerary-progress";
+import { computeTripProgress } from "@/lib/traveler/trip-progress";
+import { estimateLeg, formatLeg } from "@/lib/traveler/itinerary-document";
 import { TripItineraryDocument } from "@/components/traveler/TripItineraryDocument";
 import { deriveTripPhase, type TripPhase } from "@/lib/traveler/trip-phase";
 import { NowNextLaterSurface } from "@/components/traveler/NowNextLaterSurface";
@@ -1005,8 +1007,11 @@ function ItinerarioViews({
   folio: string | null;
 }) {
   const [view, setView] = useState<ItinerarioView>("documento");
+  const showSideMap = view !== "mapa";
   return (
     <section className="space-y-4">
+      <TripProgressPanel data={data} onSeeTimeline={() => setView("timeline")} />
+      <TaxiAppInstallCard signedIn purpose="trip" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="shrink-0 text-lg font-medium">Tu itinerario</h2>
         <div
@@ -1044,15 +1049,26 @@ function ItinerarioViews({
         </div>
       </div>
 
-      {view === "documento" ? (
-        <ItinerarioDocumento data={data} reservedIds={reservedIds} folio={folio} />
-      ) : view === "lista" ? (
-        <PlanItemsSection data={data} onChanged={onChanged} reservedIds={reservedIds} />
-      ) : view === "timeline" ? (
-        <ItinerarioTimeline data={data} onChanged={onChanged} />
-      ) : (
-        <ItinerarioMap data={data} />
-      )}
+      <div className={showSideMap ? "lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-6" : ""}>
+        <div className="min-w-0">
+          {view === "documento" ? (
+            <ItinerarioDocumento data={data} reservedIds={reservedIds} folio={folio} />
+          ) : view === "lista" ? (
+            <PlanItemsSection data={data} onChanged={onChanged} reservedIds={reservedIds} />
+          ) : view === "timeline" ? (
+            <ItinerarioTimeline data={data} onChanged={onChanged} />
+          ) : (
+            <ItinerarioMap data={data} />
+          )}
+        </div>
+        {showSideMap ? (
+          <aside className="hidden lg:block">
+            <div className="sticky top-20">
+              <ItinerarioMap data={data} compact />
+            </div>
+          </aside>
+        ) : null}
+      </div>
     </section>
   );
 }
@@ -1074,6 +1090,24 @@ function ItinerarioTimeline({
   const suggestFn = useServerFn(suggestPlanDaySchedule);
   const restoreFn = useServerFn(restorePlanDaySchedule);
   const updateItemFn = useServerFn(updatePlanItem);
+  const fetchGeoT = useServerFn(getPlanItemsGeo);
+  const geoPayload = useMemo(
+    () =>
+      data.items
+        .filter((i) => i.target_id && (i.item_kind === "business" || i.item_kind === "destination"))
+        .map((i) => ({ id: i.id, kind: i.item_kind, target_id: i.target_id })),
+    [data.items],
+  );
+  const geoT = useQuery({
+    queryKey: ["mi-viaje", "itinerario-geo", data.plan.id, geoPayload.length],
+    queryFn: () => fetchGeoT({ data: { items: geoPayload } }),
+    enabled: geoPayload.length > 0,
+  });
+  const geoById = useMemo(() => {
+    const m = new Map<string, { lat: number; lng: number }>();
+    for (const g of geoT.data?.geo ?? []) m.set(g.item_id, { lat: g.lat, lng: g.lng });
+    return m;
+  }, [geoT.data]);
 
   const restoreSchedule = useMutation({
     mutationFn: (previous: SuggestDayScheduleResult["previous"]) =>
@@ -1257,6 +1291,10 @@ function ItinerarioTimeline({
               const snap = it.snapshot ?? {};
               const canUp = idx > 0;
               const canDown = idx < items.length - 1;
+              const nextIt = items[idx + 1];
+              const here = geoById.get(it.id);
+              const there = nextIt ? geoById.get(nextIt.id) : undefined;
+              const leg = here && there ? estimateLeg(here, there) : null;
               return (
                 <li key={it.id} className="relative">
                   <span className="absolute -left-[21px] top-2 grid size-3 place-items-center rounded-full bg-primary" />
@@ -1319,6 +1357,12 @@ function ItinerarioTimeline({
                       </div>
                     ) : null}
                   </div>
+                  {leg ? (
+                    <p className="mt-2 inline-flex items-center gap-1 rounded-pill bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                      {leg.mode === "walk" ? "A pie" : "En auto"} · {formatLeg(leg)} hasta la
+                      siguiente parada
+                    </p>
+                  ) : null}
                 </li>
               );
             })}
@@ -1486,7 +1530,8 @@ function StopDoneToggle({ planId, itemId }: { planId: string; itemId: string }) 
   );
 }
 
-function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
+function ItinerarioMap({ data, compact = false }: { data: TravelPlanWithItems; compact?: boolean }) {
+  const [day, setDay] = useState<number | "all">("all");
   const fetchGeo = useServerFn(getPlanItemsGeo);
   const itemsPayload = useMemo(
     () =>
@@ -1507,15 +1552,33 @@ function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
     return m;
   }, [data.items]);
 
+  const dayOptions = useMemo(() => {
+    const s = new Set<number>();
+    for (const i of data.items) if (typeof i.day_index === "number") s.add(i.day_index);
+    return [...s].sort((a, b) => a - b);
+  }, [data.items]);
   const markers = useMemo(() => {
-    const geo = q.data?.geo ?? [];
-    return geo.map((g) => ({
-      lat: g.lat,
-      lng: g.lng,
-      title: snapshotTitle(itemsById.get(g.item_id)?.snapshot) ?? undefined,
-      href: null as string | null,
-    }));
-  }, [q.data, itemsById]);
+    const geo = new Map((q.data?.geo ?? []).map((g) => [g.item_id, g] as const));
+    const ordered = [...data.items]
+      .filter((i) => geo.has(i.id) && (day === "all" || i.day_index === day))
+      .sort(
+        (a, b) =>
+          (a.day_index ?? 9999) - (b.day_index ?? 9999) ||
+          (a.starts_at_local ?? "").localeCompare(b.starts_at_local ?? "") ||
+          a.position - b.position,
+      );
+    return ordered.map((i, idx) => {
+      const g = geo.get(i.id)!;
+      return {
+        lat: g.lat,
+        lng: g.lng,
+        key: i.id,
+        order: idx + 1,
+        title: `${idx + 1}. ${snapshotTitle(itemsById.get(i.id)?.snapshot) ?? "Parada"}`,
+        href: null as string | null,
+      };
+    });
+  }, [q.data, itemsById, data.items, day]);
 
   if (itemsPayload.length === 0) {
     return (
@@ -1541,18 +1604,45 @@ function ItinerarioMap({ data }: { data: TravelPlanWithItems }) {
     );
   }
   const first = markers[0];
+  const dayChips =
+    dayOptions.length > 1 ? (
+      <div className="flex flex-wrap gap-1.5 border-b px-3 py-2">
+        {(["all", ...dayOptions] as const).map((d) => (
+          <button
+            key={String(d)}
+            type="button"
+            onClick={() => setDay(d)}
+            aria-pressed={day === d}
+            className={`rounded-pill border px-2.5 py-0.5 text-[11px] font-medium transition ${
+              day === d
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-background text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {d === "all" ? "Todo el viaje" : `Día ${d + 1}`}
+          </button>
+        ))}
+      </div>
+    ) : null;
   return (
     <div className="overflow-hidden rounded-lg border bg-card">
-      <InteractiveMap
-        lat={first.lat}
-        lng={first.lng}
-        zoom={12}
-        markers={markers}
-        className="h-[380px] w-full"
-      />
+      {dayChips}
+      {first ? (
+        <InteractiveMap
+          key={String(day)}
+          lat={first.lat}
+          lng={first.lng}
+          zoom={12}
+          markers={markers}
+          routeStops={day === "all" ? undefined : markers.map((m) => ({ lat: m.lat, lng: m.lng, key: m.key }))}
+          className={compact ? "h-[calc(100vh-14rem)] min-h-[360px] w-full" : "h-[420px] w-full"}
+        />
+      ) : (
+        <p className="p-6 text-center text-sm text-muted-foreground">Este día no tiene paradas con ubicación.</p>
+      )}
       <p className="border-t px-3 py-2 text-xs text-muted-foreground">
-        {markers.length} ubicación{markers.length === 1 ? "" : "es"} en tu viaje. Los pines muestran
-        destinos y empresas guardadas.
+        Los números siguen el orden de tu recorrido
+        {day === "all" ? ". Elige un día para ver su ruta." : " del día."}
       </p>
     </div>
   );
@@ -2763,5 +2853,135 @@ function TripPhaseCard({
         </Link>
       </div>
     </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Avance del viaje: en qué punto voy y qué falta                      */
+/* ------------------------------------------------------------------ */
+
+function meridaTodayIso(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Merida",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function TripProgressPanel({
+  data,
+  onSeeTimeline,
+}: {
+  data: TravelPlanWithItems;
+  onSeeTimeline: () => void;
+}) {
+  const { done, toggle } = useItineraryProgress(data.plan.id);
+  const p = useMemo(
+    () =>
+      computeTripProgress(data.items, done, {
+        startDate: data.plan.start_date,
+        endDate: data.plan.end_date,
+        today: meridaTodayIso(),
+      }),
+    [data.items, data.plan.start_date, data.plan.end_date, done],
+  );
+  const next = p.nextItemId ? data.items.find((i) => i.id === p.nextItemId) : null;
+  const nextTitle = next ? snapshotTitle(next.snapshot) || "Parada" : null;
+  const where =
+    p.total > 0 && p.done === p.total
+      ? "¡Completaste todas las paradas de tu viaje!"
+      : p.todayIndex !== null
+        ? `Hoy vas en el día ${p.todayIndex + 1} de ${Math.max(p.totalDays, 1)}`
+        : data.plan.start_date
+          ? "Tu viaje aún no empieza"
+          : "Aún no eliges fechas para tu viaje";
+  return (
+    <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-soft sm:p-5">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+            Tu avance
+          </p>
+          <p className="mt-1 font-serif text-lg leading-tight text-foreground">{where}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {p.done} de {p.total} paradas hechas
+            {p.unscheduled > 0 ? ` · ${p.unscheduled} sin día asignado` : ""}
+          </p>
+        </div>
+        <span className="shrink-0 font-serif text-2xl text-primary">{p.percent}%</span>
+      </div>
+      <div
+        className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted"
+        role="progressbar"
+        aria-valuenow={p.percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Avance del viaje"
+      >
+        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${p.percent}%` }} />
+      </div>
+      {p.days.length > 0 ? (
+        <ol className="-mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible">
+          {p.days.map((d) => {
+            const complete = d.total > 0 && d.done === d.total;
+            const today = d.dayIndex === p.todayIndex;
+            return (
+              <li
+                key={String(d.dayIndex)}
+                className={`inline-flex shrink-0 items-center gap-1 rounded-pill border px-2.5 py-1 text-[11px] font-medium ${
+                  complete
+                    ? "border-success bg-success text-success-foreground"
+                    : today
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-background text-muted-foreground"
+                }`}
+              >
+                {complete ? <Check className="size-3" aria-hidden /> : null}
+                Día {(d.dayIndex as number) + 1}
+                {today ? " · hoy" : ""} · {d.done}/{d.total}
+              </li>
+            );
+          })}
+        </ol>
+      ) : null}
+      {next && nextTitle ? (
+        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-primary/25 bg-primary/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+              Sigue
+            </p>
+            <p className="truncate text-sm font-medium text-foreground">{nextTitle}</p>
+            <p className="text-xs text-muted-foreground">
+              {typeof next.day_index === "number" ? `Día ${next.day_index + 1}` : "Sin día asignado"}
+              {next.starts_at_local ? ` · ${next.starts_at_local.slice(0, 5)}` : ""}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:flex">
+            <Button size="sm" variant="outline" className="min-h-10" onClick={onSeeTimeline}>
+              Ver recorrido
+            </Button>
+            <Button size="sm" className="min-h-10" onClick={() => toggle(next.id)}>
+              <Check className="size-3.5" aria-hidden /> Ya la hice
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:flex">
+        <Link
+          to="/oriente-maya"
+          className="inline-flex min-h-10 items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-1 font-medium text-foreground hover:bg-accent"
+        >
+          <Plus className="size-3" aria-hidden /> Agregar parada
+        </Link>
+        <Link
+          to="/alux"
+          search={{ prompt: "Sugiéreme una parada más para mi itinerario en el Oriente Maya." }}
+          className="inline-flex min-h-10 items-center justify-center gap-1 rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-center font-medium text-primary hover:bg-primary/15"
+        >
+          <Sparkles className="size-3" aria-hidden /> Sugerencia de Alux
+        </Link>
+      </div>
+    </div>
   );
 }

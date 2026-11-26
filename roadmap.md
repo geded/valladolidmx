@@ -678,3 +678,5 @@
 - [ ] Etapa 1: la reservación entra a Mi Viaje
 - [ ] Etapa 2: zonas, plano, lista de espera, ficha del comensal, reportes
 - [ ] Etapa 3: cobro, depósitos, reseñas de quien asistió
+- [x] Itinerario estilo Wanderlog: avance, mapa lateral numerado, traslados, invitación a instalar la app
+- [x] Itinerario optimizado para celular

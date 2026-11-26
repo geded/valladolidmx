@@ -17,7 +17,7 @@ const COPY = {
   },
   trip: {
     title: "Instala la app para acompañar tu viaje",
-    body: "Es importante instalarla en tu celular: así recibes los avisos cuando tu concierge te responda o confirme reservaciones, y puedes seguir tu itinerario día por día durante el viaje, incluso con poca señal. Sin instalarla recibirás únicamente correos.",
+    body: "Es importante instalarla en tu celular: así recibes avisos y alertas de tu viaje, tienes el chat con tu concierge y Alux siempre a la mano, y puedes seguir tu itinerario día por día durante el viaje, incluso con poca señal. Sin instalarla recibirás únicamente correos.",
   },
 } as const;
 
