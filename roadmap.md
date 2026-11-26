@@ -13,7 +13,9 @@
 - [x] Traducciones: cupo sólo para frases nuevas (8 lotes/min, 120/h, 400/día; máximo 60 textos y 24,000 caracteres por lote); las guardadas no consumen IA ni cupo.
 - [x] Conversaciones: ambos accesos comparten `alux.public_message` (4/min, 10/h, 40/día anónimo; 12/min, 30/h, 120/día con cuenta) antes de IA; intención auxiliar se omite con canal apagado, inyección o cupo agotado.
 - [x] 65 pruebas PASS; compilación OK; integridad de gobernanza PASS; voz real 200 y origen ajeno 403; Alux móvil respondió con contador 1/40; Copalli en inglés sin errores/overflow. Publicación de este nuevo lote pendiente.
-- [ ] Pendientes posteriores: entrega de fotos bajo dominio propio y limpieza global de código huérfano; compra real/efectivo sólo en piloto autorizado.
+- [x] Fotos bajo dominio propio: bytes en la URL existente, sin redirección ni URL firmada visible; originales y variantes conservan validaciones.
+- [x] Traducciones arbitrarias no se publican en caché; fuentes CMS/UI reconocidas sí. Alux insertado exige autorización HMAC de 15 minutos y no recibe permisos de micrófono, GPS o portapapeles.
+- [x] Código huérfano: candidatos revisados; ningún activo aprobado o referenciado fue eliminado. Compra real/efectivo y prueba física de terceros quedan para piloto autorizado.
 
 ## Taxi Alux · 2026-11-25
 - [x] Servicio integral activable sólo por administración, desactivado al inicio y sin conductores precargados.

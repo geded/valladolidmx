@@ -42,27 +42,32 @@ export const getAluxPublicChannels = createServerFn({ method: "GET" }).handler(a
   return { web: c.web };
 });
 
-/** Público: ¿puede abrirse la ventana insertada en este sitio? */
+/** Público: valida la autorización firmada de una ventana insertada. */
 export const getAluxEmbedStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
-    z.object({ host: z.string().max(255).default("") }).parse(d ?? {}),
+    z.object({ token: z.string().max(4096).default("") }).parse(d ?? {}),
   )
   .handler(async ({ data }) => {
-    const [{ supabaseAdmin }, server] = await Promise.all([
+    const disabled = { enabled: false as const, host: null, destino: null, empresa: null };
+    const secret = process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? "";
+    if (!secret) return disabled;
+    const [{ supabaseAdmin }, server, tokens] = await Promise.all([
       import("@/integrations/supabase/client.server"),
       import("./channels.server"),
+      import("./embed-token.server"),
     ]);
+    const grant = tokens.verifyAluxEmbedToken(data.token, secret);
+    if (!grant) return disabled;
     let flags: Record<string, unknown> = {};
     try {
       flags = await server.readAluxSettingsFlagsServer(supabaseAdmin);
     } catch {
-      return { enabled: false };
+      return disabled;
     }
-    if (!channelsFromFlags(flags).embed) return { enabled: false };
-    const host = normalizeEmbedHost(data.host);
+    if (!channelsFromFlags(flags).embed) return disabled;
     const allowed = server.embedHostsFromFlags(flags);
-    const ok = host !== null && allowed.some((a) => host === a || host.endsWith(`.${a}`));
-    return { enabled: ok };
+    const ok = allowed.some((host) => grant.host === host || grant.host.endsWith(`.${host}`));
+    return ok ? { enabled: true as const, ...grant } : disabled;
   });
 
 export const getAluxChannelsAdmin = createServerFn({ method: "GET" })

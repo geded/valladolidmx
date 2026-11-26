@@ -1,8 +1,7 @@
 /**
  * CRM · Fase 4 — ¿Puede mostrarse Alux en este sitio?
- * Lo consulta `public/alux-embed.js` desde páginas de aliados. Solo
- * responde un booleano: canal «Alux en otras páginas» encendido y sitio
- * en la lista autorizada. Sin datos personales ni configuración.
+ * Devuelve una autorización firmada de 15 minutos para el host y las pistas
+ * normalizadas. El marco debe presentarla; no basta con declarar un host.
  */
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -12,10 +11,10 @@ const CORS = {
   "access-control-allow-headers": "content-type",
 } as const;
 
-function reply(enabled: boolean): Response {
-  return new Response(JSON.stringify({ enabled }), {
+function reply(enabled: boolean, token: string | null = null): Response {
+  return new Response(JSON.stringify({ enabled, token }), {
     status: 200,
-    headers: { ...CORS, "content-type": "application/json", "cache-control": "public, max-age=60" },
+    headers: { ...CORS, "content-type": "application/json", "cache-control": "no-store" },
   });
 }
 
@@ -25,18 +24,33 @@ export const Route = createFileRoute("/api/public/alux/embed-status")({
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const [{ supabaseAdmin }, server, rules] = await Promise.all([
-          import("@/integrations/supabase/client.server"),
-          import("@/lib/alux/channels.server"),
-          import("@/lib/alux/channels"),
+        const [{ server, rules, tokens }, secret] = await Promise.all([
+          Promise.all([
+            import("@/lib/alux/channels.server"),
+            import("@/lib/alux/channels"),
+            import("@/lib/alux/embed-token.server"),
+          ]).then(([server, rules, tokens]) => ({ server, rules, tokens })),
+          Promise.resolve(process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? ""),
         ]);
         const host = rules.normalizeEmbedHost(url.searchParams.get("host") ?? "");
-        if (!host) return reply(false);
+        if (!host || !secret) return reply(false);
         try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const flags = await server.readAluxSettingsFlagsServer(supabaseAdmin);
           if (!rules.channelsFromFlags(flags).embed) return reply(false);
           const hosts = server.embedHostsFromFlags(flags);
-          return reply(hosts.some((h) => host === h || host.endsWith(`.${h}`)));
+          if (!hosts.some((allowed) => host === allowed || host.endsWith(`.${allowed}`))) {
+            return reply(false);
+          }
+          const token = tokens.issueAluxEmbedToken(
+            {
+              host,
+              destino: url.searchParams.get("destino"),
+              empresa: url.searchParams.get("empresa"),
+            },
+            secret,
+          );
+          return token ? reply(true, token) : reply(false);
         } catch {
           return reply(false);
         }

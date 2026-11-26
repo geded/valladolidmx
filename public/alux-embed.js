@@ -20,7 +20,7 @@
   var destino = attr("data-destino");
   var empresa = attr("data-empresa");
 
-  function start() {
+  function start(token) {
     var btn = document.createElement("button");
     btn.type = "button";
     btn.setAttribute("aria-label", "Abrir Alux, concierge del Oriente Maya");
@@ -61,13 +61,8 @@
       if (!frame) {
         frame = document.createElement("iframe");
         frame.title = "Alux, concierge del Oriente Maya";
-        frame.src =
-          origin +
-          "/insertar/alux?host=" +
-          encodeURIComponent(host) +
-          (destino ? "&destino=" + encodeURIComponent(destino) : "") +
-          (empresa ? "&empresa=" + encodeURIComponent(empresa) : "");
-        frame.allow = "microphone; geolocation; clipboard-write";
+        frame.src = origin + "/insertar/alux?token=" + encodeURIComponent(token);
+        frame.referrerPolicy = "no-referrer";
         frame.style.cssText = "width:100%;flex:1;border:0";
         panel.appendChild(frame);
       }
@@ -84,14 +79,23 @@
     document.body.appendChild(btn);
   }
 
-  fetch(origin + "/api/public/alux/embed-status?host=" + encodeURIComponent(host))
+  fetch(
+    origin +
+      "/api/public/alux/embed-status?host=" +
+      encodeURIComponent(host) +
+      (destino ? "&destino=" + encodeURIComponent(destino) : "") +
+      (empresa ? "&empresa=" + encodeURIComponent(empresa) : ""),
+  )
     .then(function (r) {
       return r.ok ? r.json() : { enabled: false };
     })
     .then(function (d) {
-      if (!d || d.enabled !== true) return;
-      if (document.body) start();
-      else document.addEventListener("DOMContentLoaded", start);
+      if (!d || d.enabled !== true || typeof d.token !== "string" || !d.token) return;
+      function open() {
+        start(d.token);
+      }
+      if (document.body) open();
+      else document.addEventListener("DOMContentLoaded", open);
     })
     .catch(function () {});
 })();

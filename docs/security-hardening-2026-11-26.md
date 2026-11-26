@@ -41,8 +41,14 @@ Después de que el Founder publicó el primer lote, se reforzó el consumo de IA
 - `/restaurante/copalli-cafe` redirige a la ficha canónica; selector English, Copalli visible, lotes de traducción 200, cero errores y cero desbordamiento. El slug inexistente `cafe-copalli` mostró el 404 esperado y no se modificó.
 - Este lote no requirió migraciones, escrituras CMS ni cambios en datos reales. Las cuotas usan tablas y RPC ya existentes.
 
+### Cierre de fotos, traducciones y canal insertado
+- Las rutas públicas `studio-media` y `media-derived` conservan su validación editorial y ahora entregan bytes de imagen desde la misma URL; nunca propagan `Location` ni una URL firmada. Se comprobó un JPEG original real de 596,014 bytes y variantes WebP con HTTP 200.
+- Sólo fuentes reconocidas por el diccionario o el caché editorial pueden persistir traducciones. Textos arbitrarios se procesan aparte para el visitante sin publicarse ni contaminar el lote confiable.
+- El Alux insertado recibe un token HMAC de 15 minutos con host y pistas normalizadas. El marco ya no acepta atribución mediante parámetros sin firma ni permisos de micrófono, geolocalización o portapapeles.
+- Seis pruebas de imágenes y seis de tokens/traducción PASS; tipos sin errores. La auditoría de candidatos huérfanos no eliminó archivos: `EventSurface` y `PageShell` conservan protección documental y los demás no tenían evidencia suficiente para una retirada segura.
+
 ### Pendientes
-Publicar este nuevo lote para aplicarlo al sitio público. La compra real/efectivo sigue reservada a un piloto autorizado. Fotos bajo dominio propio y limpieza global de código huérfano no se abordaron aquí. No se certificó Safari físico, carga de 1,000 usuarios ni una prueba de micrófono con audio real; el micrófono se comprobó con un archivo válido simulado y la lectura sí se ejerció contra el proveedor.
+Publicar este nuevo lote para aplicarlo al sitio público. La compra real/efectivo sigue reservada a un piloto autorizado. No se certificó Safari físico, carga de 1,000 usuarios, micrófono con audio humano real ni Alux dentro de un sitio externo real; el token se verificó con pruebas unitarias y la lectura de voz sí se ejerció contra el proveedor.
 
 ## Reversibilidad
 Conservar las restricciones de precios y pagos; no volver a conceder escritura directa. Ante un problema de sesión, corregir el flujo de acreditación en un cambio trazable, sin autorizar claves ajenas ni borrar memoria. Las migraciones se revierten solo mediante una migración nueva autorizada. Los cupos pueden ajustarse en los llamados existentes sin cambiar el contrato visual ni crear otro limitador.
