@@ -68,6 +68,9 @@ const HIDE_PREFIXES = [
   "/empresa",
   "/auth",
   "/carrito",
+  "/taxista",
+  "/caja/",
+  "/registro-taxista",
 ];
 
 const KIND_ICON: Record<TravelItemKind, React.ComponentType<{ className?: string }>> = {

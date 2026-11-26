@@ -226,9 +226,9 @@ function TaxiAdminPage() {
         </div>
       </header>
 
-      <nav aria-label="Secciones de Taxi Alux" className="mt-5 flex gap-2 overflow-x-auto pb-1">
+      <nav aria-label="Secciones de Taxi Alux" className="mt-5 grid grid-cols-2 gap-2 pb-1 min-[430px]:grid-cols-3 sm:flex sm:flex-wrap">
         {tabs.map((item) => (
-          <Button key={item.id} type="button" size="sm" variant={tab === item.id ? "default" : "outline"} onClick={() => setTab(item.id)}>
+          <Button key={item.id} type="button" size="sm" className="h-11 w-full justify-center sm:h-9 sm:w-auto" variant={tab === item.id ? "default" : "outline"} onClick={() => setTab(item.id)}>
             {item.label}
             {item.id === "solicitudes" && submitted.length ? <Badge className="ml-2">{submitted.length}</Badge> : null}
           </Button>
@@ -517,7 +517,20 @@ function MovementsPanel({ rides, drivers }: { rides: import("@/lib/taxi/rules").
           <Button type="button" size="sm" variant="outline" disabled={ledger.length === 0} onClick={exportCsv}>Descargar Excel (CSV)</Button>
         </div>
         {ledger.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">Todavía no hay pagos registrados.</p> : null}
-        <div className="mt-3 overflow-x-auto">
+        <ul className="mt-3 space-y-2 md:hidden">
+          {ledger.map((e) => (
+            <li key={e.ride_id} className="rounded-xl border border-border p-3 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0"><p className="font-medium">{e.folio}</p><p className="text-xs text-muted-foreground">{formatTaxiDate(e.paid_at)}</p></div>
+                <p className="shrink-0 font-semibold text-primary">{formatTaxiMoney(e.amount, e.currency)}</p>
+              </div>
+              <p className="mt-2 break-words text-xs">{e.route} · {e.distance_km.toFixed(1)} km</p>
+              <p className="mt-1 text-xs text-muted-foreground">{e.driver_name} · {e.vehicle}</p>
+              <p className="text-xs text-muted-foreground">{e.traveler_name} · {e.traveler_phone} · {e.method}</p>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 hidden overflow-x-auto md:block">
           <table className="w-full min-w-[720px] text-left text-xs">
             <thead className="text-muted-foreground">
               <tr><th className="py-2">Fecha</th><th>Folio</th><th>Conductor</th><th>Viajero</th><th>Ruta</th><th className="text-right">Km</th><th className="text-right">Importe</th><th>Forma de pago</th></tr>
