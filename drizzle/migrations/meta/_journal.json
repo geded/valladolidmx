@@ -386,6 +386,13 @@
       "when": 1795669982461,
       "tag": "0054_cash_receipt_null_safe_ownership",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1795699900999,
+      "tag": "0055_security_locks_interests_prospects",
+      "breakpoints": true
     }
   ]
 }

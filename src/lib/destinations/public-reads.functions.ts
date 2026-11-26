@@ -329,7 +329,7 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
     const { data: rows, error } = await sb
       .from("destination_media")
       .select(
-        "sort_order, media_assets:media_asset_id ( storage_bucket, storage_path ), destinations!inner(slug)",
+        "sort_order, media_assets:media_asset_id ( id, storage_bucket, storage_path, alt_text, alt_text_ai, alt_text_source, review_state, title, caption, credit, metadata, status, deleted_at, is_demo_seed, pipeline_status, width, height, original_checksum ), destinations!inner(slug)",
       )
       .eq("destinations.slug", data.slug)
       .order("sort_order", { ascending: true })
@@ -353,6 +353,9 @@ export const getDestinationGalleryUrls = createServerFn({ method: "GET" })
           }
         ).media_assets;
         if (!m?.storage_bucket || !m?.storage_path) return null;
+        // Misma política que la galería atribuida: sólo medios acreditados se firman.
+        const { isAccreditedDestinationMedia } = await import("./public-media-policy");
+        if (!isAccreditedDestinationMedia(m as never)) return null;
         const { data: s } = await signedUrlMemo(
           supabaseAdmin,
           m.storage_bucket,

@@ -15,24 +15,6 @@ const Input = z.object({
   idempotencyKey: z.string().max(300).optional(),
 });
 
-/**
- * Un negocio sólo puede mandar texto corto al viajero de su cupón: sin
- * enlaces propios (los botones usan siempre las direcciones de la plataforma).
- */
-function couponSafeData(input: Record<string, unknown> | undefined): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(input ?? {})) {
-    if (/url|link|href/i.test(k)) continue;
-    if (typeof v === "string") {
-      if (/(https?:|www\.|javascript:|<)/i.test(v)) continue;
-      out[k] = v.slice(0, 200);
-    } else if (typeof v === "number" || typeof v === "boolean") {
-      out[k] = v;
-    }
-  }
-  return out;
-}
-
 export const sendAppEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => Input.parse(data))
@@ -54,6 +36,7 @@ export const sendAppEmail = createServerFn({ method: "POST" })
     // Compuerta de autorización (fail-closed): destinatario fijo, propio,
     // staff de plataforma, concierge interno o viajero con cupón del negocio.
     let viaCoupon = false;
+    let couponData: Record<string, unknown> = {};
     let authorized = Boolean(template.to) || (callerEmail !== "" && target === callerEmail);
     if (!authorized) {
       const { data: isAdmin } = await supabase.rpc("has_role", {
@@ -95,13 +78,32 @@ export const sendAppEmail = createServerFn({ method: "POST" })
         if (businessIds.length > 0) {
           const { data: coupon } = await supabase
             .from("traveler_coupons")
-            .select("id")
+            .select("id, title, code, discount_percent, redeemed_at, business_id")
             .eq("user_id", travelerId)
             .in("business_id", businessIds)
+            .order("redeemed_at", { ascending: false, nullsFirst: false })
             .limit(1)
             .maybeSingle();
-          authorized = Boolean(coupon) && data.templateName.startsWith("coupon-");
+          authorized = Boolean(coupon) && data.templateName === "coupon-redeemed";
           viaCoupon = authorized;
+          if (authorized) {
+            // El contenido sale del cupón guardado, nunca del texto que envía la empresa.
+            const { data: biz } = await supabase
+              .from("businesses")
+              .select("display_name, slug")
+              .eq("id", coupon.business_id)
+              .maybeSingle();
+            const { SITE } = await import("@/config/site");
+            const origin = SITE.url.replace(/\/$/, "");
+            couponData = {
+              title: coupon.title ?? undefined,
+              code: coupon.code ?? undefined,
+              discountPercent: coupon.discount_percent ?? null,
+              businessName: biz?.display_name ?? null,
+              redeemedAt: coupon.redeemed_at ?? new Date().toISOString(),
+              reviewUrl: biz?.slug ? `${origin}/resenar/negocio/${biz.slug}` : origin,
+            };
+          }
         }
       }
     }
@@ -124,7 +126,7 @@ export const sendAppEmail = createServerFn({ method: "POST" })
 
     try {
       const result = await sendTemplateEmail(data.templateName, effectiveRecipient, {
-        templateData: viaCoupon ? couponSafeData(data.templateData) : (data.templateData ?? {}),
+        templateData: viaCoupon ? couponData : (data.templateData ?? {}),
         idempotencyKey: data.idempotencyKey || messageId,
       });
       if (!result.sent) {

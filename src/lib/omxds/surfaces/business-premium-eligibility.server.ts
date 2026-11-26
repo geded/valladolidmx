@@ -168,7 +168,8 @@ export const getBusinessPremiumEligibility = createServerFn({ method: "GET" })
         return createIneligibleBusinessPremiumResult(["eligibility_read_failed"]);
 
       const business = businessResult.data;
-      if (!business || business.is_demo_seed)
+      // Sólo fichas publicadas: lo no publicado nunca sale por esta lectura pública.
+      if (!business || business.is_demo_seed || business.status !== "published")
         return createIneligibleBusinessPremiumResult(["verification_missing"]);
 
       const locationRow = locationResult.data?.[0] ?? null;

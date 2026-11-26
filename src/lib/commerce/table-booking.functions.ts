@@ -19,7 +19,9 @@ type Loose = {
 };
 
 export const sendTableBookingNotices = createServerFn({ method: "POST" })
-  .inputValidator((d: { reservationId: string }) => z.object({ reservationId: z.string().uuid() }).parse(d))
+  .inputValidator((d: { reservationId: string; manageToken: string }) =>
+    z.object({ reservationId: z.string().uuid(), manageToken: z.string().min(16).max(200) }).parse(d),
+  )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb = supabaseAdmin as unknown as Loose;
@@ -28,6 +30,8 @@ export const sendTableBookingNotices = createServerFn({ method: "POST" })
       .from("restaurant_reservations")
       .update({ notices_sent_at: new Date().toISOString() })
       .eq("id", data.reservationId)
+      // Sólo quien acaba de reservar conoce el enlace privado de la reservación.
+      .eq("manage_token", data.manageToken)
       .is("notices_sent_at", null)
       .gte("created_at", since)
       .select("id, business_id, folio, starts_at, party_size, status, guest_name, guest_phone, occasion, note, manage_token")

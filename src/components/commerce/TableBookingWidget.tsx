@@ -193,7 +193,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
     const r = data as { id: string; folio: string; status: string; starts_at: string; party_size: number; manage_token: string };
     holdRef.current = null; setHold(null);
     setDone(r);
-    void notify({ data: { reservationId: r.id } }).catch(() => undefined);
+    void notify({ data: { reservationId: r.id, manageToken: r.manage_token } }).catch(() => undefined);
   }
 
   if (done) {
