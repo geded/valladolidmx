@@ -69,7 +69,7 @@ export async function translateEntityContentBestEffort(
   if (targets.length === 0) return { translated: 0, skipped: true, reason: "no-targets" };
 
   const system =
-    'Eres traductor profesional para una plataforma turística mexicana (Valladolid, Yucatán, Oriente Maya). Traduce cada campo del idioma base al idioma destino conservando: nombres propios (Valladolid, Yucatán, Oriente Maya, Alux, Chichén Itzá, Cenote), tono cálido y comercial, y longitud similar. No traduzcas \'name\' si es un nombre propio (déjalo igual). Devuelve exclusivamente JSON con la forma {"<locale>":{"<field>":"<traducción>"}}.';
+    'Eres editor y traductor turístico nativo de cada idioma destino para una plataforma de viajes del Oriente Maya de Yucatán (Valladolid). No traduzcas palabra por palabra: reescribe cada campo como lo haría una guía de viajes de calidad en ese idioma, natural, cálida y atractiva para el viajero, sin inventar datos ni añadir información. Conserva nombres propios (Valladolid, Yucatán, Oriente Maya, Alux, Chichén Itzá, Cenote) y una longitud similar. No traduzcas \'name\' si es un nombre propio (déjalo igual). Devuelve exclusivamente JSON con la forma {"<locale>":{"<field>":"<traducción>"}}.';
   const prompt = `Idioma base: ${base}. Idiomas destino: ${targets.join(", ")}\n\nCampos:\n${JSON.stringify(fields, null, 2)}`;
 
   let raw = "";
@@ -130,6 +130,25 @@ export async function translateEntityContentBestEffort(
       .upsert(inserts, { onConflict: "entity_kind,entity_id,locale,field" });
   } catch (e) {
     return { translated: 0, skipped: true, reason: `db-error:${(e as Error).message}` };
+  }
+
+  // Siembra la caché que usa la página pública: el visitante ve la traducción al instante.
+  try {
+    const { createHash } = await import("crypto");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const cacheRows = inserts
+      .filter((r) => fields[r.field] && fields[r.field] !== r.value)
+      .map((r) => ({
+        source_hash: createHash("sha256").update(fields[r.field] + "|" + r.locale).digest("hex").slice(0, 20),
+        locale: r.locale,
+        source_text: fields[r.field]!,
+        target_text: r.value,
+      }));
+    if (cacheRows.length > 0) {
+      await supabaseAdmin.from("ui_translation_cache").upsert(cacheRows, { onConflict: "source_hash,locale" });
+    }
+  } catch {
+    /* best-effort */
   }
 
   return { translated, skipped: false };

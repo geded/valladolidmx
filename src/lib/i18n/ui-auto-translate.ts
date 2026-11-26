@@ -14,7 +14,8 @@ const SOURCE_LOCALE = "es";
 const ATTR_TRANSLATED = "data-vlx-tr";
 const ATTR_ORIGINAL = "data-vlx-tr-src";
 const CACHE_KEY_PREFIX = "vlx.i18n.cache.";
-const MAX_BATCH = 40;
+const MAX_BATCH = 30;
+const PARALLEL_BATCHES = 4;
 const DEBOUNCE_MS = 250;
 const SKIP_TAGS = new Set([
   "SCRIPT",
@@ -203,37 +204,33 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
 
     if (misses.size === 0) return;
 
-    // Batch remote translation
-    const batchList = Array.from(misses).slice(0, MAX_BATCH);
+    // Lotes en paralelo (antes uno tras otro: una página completa tardaba minutos).
+    const all = Array.from(misses).slice(0, MAX_BATCH * PARALLEL_BATCHES);
+    const batches: string[][] = [];
+    for (let i = 0; i < all.length; i += MAX_BATCH) batches.push(all.slice(i, i + MAX_BATCH));
     inflight = true;
     try {
-      const result = await translateUiBatch({
-        data: { locale, texts: batchList },
-      });
-      // result: hash → translation. We don't know the hash mapping here,
-      // but we sent texts; server persists by hash. Do a simple mapping
-      // by re-requesting with a client-side mapping via matching values.
-      // Simpler: server returns hash→tr, but we can also re-derive: we
-      // rely on the returned map having entries whose values differ from
-      // sources. Instead re-do a local mapping by hashing text→locale.
-      // For simplicity we treat result values as translations and map
-      // by using a second server call semantic: return object keyed by
-      // source text. To avoid a client-side sha256, we do a linear pass
-      // matching entries by longest first.
-      // → Adjust: the server returns hash→translation. We build the map
-      //   client-side using a lightweight hash equivalent to server.
-      const enriched = await mapByHash(batchList, result, locale);
+      const results = await Promise.all(
+        batches.map(async (batchList) => {
+          try {
+            const result = await translateUiBatch({ data: { locale, texts: batchList } });
+            return await mapByHash(batchList, result, locale);
+          } catch {
+            return {} as Record<string, string>;
+          }
+        }),
+      );
       let added = 0;
-      for (const [src, tr] of Object.entries(enriched)) {
-        if (tr && tr !== src && cache.map[src] !== tr) {
-          cache.map[src] = tr;
-          cache.dirty = true;
-          added++;
+      for (const enriched of results) {
+        for (const [src, tr] of Object.entries(enriched)) {
+          if (tr && tr !== src && cache.map[src] !== tr) {
+            cache.map[src] = tr;
+            cache.dirty = true;
+            added++;
+          }
         }
       }
       if (added > 0) saveCache(cache);
-    } catch {
-      // best-effort; will retry on next scan
     } finally {
       inflight = false;
     }
@@ -258,7 +255,7 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
       }
     }
 
-    if (misses.size > MAX_BATCH) schedule();
+    if (misses.size > all.length) schedule();
   }
 
   function start() {

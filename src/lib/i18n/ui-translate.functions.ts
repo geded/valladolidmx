@@ -26,7 +26,7 @@ export const translateUiBatch = createServerFn({ method: "POST" })
     if (!d?.locale || !Array.isArray(d.texts)) throw new Error("invalid_input");
     if (!ALLOWED_LOCALES.has(d.locale)) throw new Error("invalid_locale");
     const texts = d.texts
-      .filter((t) => typeof t === "string" && t.trim().length > 0 && t.length < 800)
+      .filter((t) => typeof t === "string" && t.trim().length > 0 && t.length < 5000)
       .slice(0, MAX_TEXTS);
     return { locale: d.locale, texts };
   })
@@ -68,7 +68,7 @@ export const translateUiBatch = createServerFn({ method: "POST" })
     }
 
     const system =
-      'Eres un traductor profesional para una plataforma turística mexicana (Valladolid, Yucatán, Oriente Maya). Traduce cada texto del español al idioma destino conservando: mayúsculas iniciales, puntuación final, saltos de línea, emojis, íconos y nombres propios (Valladolid, Yucatán, Oriente Maya, Alux, Chichén Itzá, Cenote). NO traduzcas URLs, slugs, códigos, ni identificadores. Longitud similar (±25%). Devuelve exclusivamente JSON válido con la forma {"t":["traducción1","traducción2",...]} en el mismo orden que la entrada.';
+      'Eres editor y traductor turístico nativo del idioma destino para una plataforma de viajes del Oriente Maya de Yucatán (Valladolid). No traduzcas palabra por palabra: escribe como lo haría una guía de viajes de calidad en ese idioma, natural, cálida y clara para un viajero, sin inventar datos ni añadir información. Botones y etiquetas cortas: usa la fórmula habitual en apps de viaje de ese idioma. Conserva: mayúsculas iniciales, puntuación final, saltos de línea, emojis, íconos y nombres propios (Valladolid, Yucatán, Oriente Maya, Alux, Chichén Itzá, Cenote). NO traduzcas URLs, slugs, códigos, ni identificadores. Longitud similar (±25%). Devuelve exclusivamente JSON válido con la forma {"t":["traducción1","traducción2",...]} en el mismo orden que la entrada.';
     const prompt = `Idioma destino: ${data.locale}\n\nTextos (JSON):\n${JSON.stringify(missing)}`;
 
     let translations: string[] = [];
