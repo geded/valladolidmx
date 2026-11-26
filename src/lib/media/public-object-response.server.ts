@@ -54,8 +54,10 @@ export async function publicMediaObjectResponse(input: {
   }
   if (!upstream.body) return new Response("Media unavailable", { status: 502 });
 
-  const contentType = upstream.headers.get("Content-Type")?.split(";")[0]?.trim().toLowerCase();
-  if (!contentType?.startsWith("image/")) {
+  const declared = upstream.headers.get("Content-Type")?.split(";")[0]?.trim().toLowerCase();
+  // Algunas variantes (AVIF) se guardaron como octet-stream; se infiere por extensión.
+  const contentType = declared?.startsWith("image/") ? declared : imageTypeFromPath(input.path);
+  if (!contentType) {
     return new Response("Unsupported media", { status: 502 });
   }
 
@@ -75,4 +77,18 @@ export async function publicMediaObjectResponse(input: {
     if (value) headers.set(name, value);
   }
   return new Response(upstream.body, { status: upstream.status, headers });
+}
+
+const IMAGE_TYPES: Record<string, string> = {
+  avif: "image/avif",
+  webp: "image/webp",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+};
+
+export function imageTypeFromPath(path: string): string | undefined {
+  const ext = path.split("?")[0]?.split(".").pop()?.toLowerCase() ?? "";
+  return IMAGE_TYPES[ext];
 }
