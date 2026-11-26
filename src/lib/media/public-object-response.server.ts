@@ -55,10 +55,11 @@ export async function publicMediaObjectResponse(input: {
   if (!upstream.body) return new Response("Media unavailable", { status: 502 });
 
   const declared = upstream.headers.get("Content-Type")?.split(";")[0]?.trim().toLowerCase();
-  // Algunas variantes (AVIF) se guardaron como octet-stream; se infiere por extensión.
+  // Algunas variantes (AVIF) se guardaron como octet-stream; se infiere por
+  // extensión. Contenido declarado como otro tipo (p. ej. HTML) se rechaza.
   const contentType = declared?.startsWith("image/")
     ? declared
-    : !declared || declared === "application/octet-stream"
+    : !declared || declared === "application/octet-stream" || declared === "binary/octet-stream"
       ? imageTypeFromPath(input.path)
       : undefined;
   if (!contentType) {

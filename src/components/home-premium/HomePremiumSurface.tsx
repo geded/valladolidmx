@@ -761,7 +761,7 @@ function DestinationsSection({
             data-eb-card={index}
             to={destination.href ?? "/destinos"}
             onClick={() => onOpen(destination.name)}
-            className="group relative aspect-[4/3] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-soft sm:w-[46%]"
+            className="group relative aspect-[4/3] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-muted text-white shadow-soft sm:w-[46%]"
           >
             <EditorialMediaFrame
               media={destination.media}
@@ -784,7 +784,7 @@ function DestinationsSection({
           data-eb-card={0}
           to={featured.href ?? "/destinos"}
           onClick={() => onOpen(featured.name)}
-          className="group relative min-h-0 overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated"
+          className="group relative min-h-0 overflow-hidden rounded-2xl bg-muted text-white shadow-elevated"
         >
           <EditorialMediaFrame
             media={featured.media}
@@ -860,7 +860,7 @@ function PueblosMagicosSection({
           <Link
             key={pueblo.name}
             to={pueblo.href ?? "/oriente-maya"}
-            className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated lg:aspect-[21/9]"
+            className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted text-white shadow-elevated lg:aspect-[21/9]"
           >
             <EditorialMediaFrame
               media={pueblo.media}
@@ -935,7 +935,7 @@ function ExperiencesSection({
               <Link
                 data-eb-card={index}
                 to={item.href}
-                className="relative aspect-[4/3] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white sm:w-[46%]"
+                className="relative aspect-[4/3] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-muted text-white sm:w-[46%]"
               >
                 <EditorialMediaFrame
                   media={item.media}
@@ -968,7 +968,7 @@ function ExperiencesSection({
           className={cn(
             "h-full overflow-hidden rounded-2xl border border-border bg-card",
             cinematic &&
-              "relative border-0 bg-[var(--brand-territory-deep)] text-white shadow-elevated",
+              "relative border-0 bg-muted text-white shadow-elevated",
           )}
         >
           <EditorialMediaFrame
@@ -1465,7 +1465,7 @@ function EditorialSection({
             <Link
               key={item.title}
               to={item.href}
-              className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--brand-territory-deep)] text-white shadow-elevated"
+              className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted text-white shadow-elevated"
             >
               <EditorialMediaFrame
                 media={item.media}
