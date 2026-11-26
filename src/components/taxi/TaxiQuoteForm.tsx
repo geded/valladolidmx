@@ -87,9 +87,40 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     return registerStickyCta();
   }, []);
 
+  const [outsideArea, setOutsideArea] = useState<false | "yucatan" | "lejos">(false);
+
+  // Al entrar, pedir la ubicación: si está fuera del Oriente Maya, avisar y recordarlo para Alux.
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        // Oriente Maya (Valladolid, Izamal, Espita, Tizimín…); Mérida y el poniente quedan fuera.
+        const inside = lat > 20.0 && lat < 21.7 && lng > -89.15 && lng < -87.4;
+        const inYucatan = lat > 19.4 && lat < 21.8 && lng > -90.6 && lng < -86.7;
+        setOutsideArea(inside ? false : inYucatan ? "yucatan" : "lejos");
+        try {
+          window.localStorage.setItem("vmx.traveler.location-context.v1", JSON.stringify({ inTerritory: inside, nearby: !inside && inYucatan, at: Date.now() }));
+        } catch { /* opcional */ }
+        if (inside) {
+          setDraft((c) => (c.originLabel ? c : { ...c, origin: { lat, lng }, originLabel: "Mi ubicación actual" }));
+        }
+      },
+      () => undefined,
+      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
+    );
+  }, []);
+
   useEffect(() => {
     const saved = readDraft();
-    const next = saved ?? initialDraft;
+    const params = new URLSearchParams(window.location.search);
+    const dLat = Number(params.get("lat"));
+    const dLng = Number(params.get("lng"));
+    const dName = params.get("destino");
+    let next = saved ?? initialDraft;
+    if (dName && Number.isFinite(dLat) && Number.isFinite(dLng) && dLat !== 0) {
+      next = { ...next, destinationLabel: dName, destination: { lat: dLat, lng: dLng } };
+    }
     setDraft({
       ...next,
       requestedFor: next.requestedFor || localDateTimeValue(new Date(Date.now() + 30 * 60_000)),
@@ -332,6 +363,15 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
         </div>
       </section>
 
+      {outsideArea || config.available_drivers < 1 ? (
+        <div role="status" className="rounded-2xl border border-warning/40 bg-warning/10 p-4 text-sm lg:col-span-full">
+          {outsideArea === "yucatan"
+            ? "Estás fuera del Oriente Maya (por ejemplo, en Mérida). Taxi Alux opera en Valladolid y sus alrededores: hospédate en Valladolid para disfrutar del servicio y recorrer cenotes, Ek Balam y Chichén Itzá."
+            : outsideArea
+            ? "Taxi Alux sólo funciona dentro de Valladolid y el Oriente Maya de Yucatán. Puedes cotizar tu traslado desde ahora para tu viaje; Alux te ayudará a planearlo."
+            : "Por el momento no hay taxis disponibles. Puedes cotizar y volver a intentar en unos minutos."}
+        </div>
+      ) : null}
       <aside className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-floating backdrop-blur lg:sticky lg:top-24 lg:rounded-2xl lg:border lg:p-5 lg:shadow-elevated">
         <div className="mx-auto flex max-w-xl items-center gap-3 lg:block">
           <div className="min-w-0 flex-1">
