@@ -88,6 +88,7 @@ export function PublicAluxChat({
   const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
   const prepareSessionFn = useServerFn(prepareAluxSession);
+  const embedProofRef = useRef<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -189,13 +190,18 @@ export function PublicAluxChat({
       setInput("");
       setSending(true);
       try {
-        const prepared = await prepareSessionFn({ data: { sessionKey } });
+        const embedded = embedHost !== undefined;
+        const prepared = await prepareSessionFn({
+          data: { sessionKey: embedded && !embedProofRef.current ? "" : sessionKey, embedded },
+          headers: embedProofRef.current ? { "x-alux-session-proof": embedProofRef.current } : undefined,
+        });
+        if (prepared.proof) embedProofRef.current = prepared.proof;
         setSessionKey(prepared.sessionKey);
         try { window.localStorage.setItem(STORAGE_KEY, prepared.sessionKey); } catch { /* optional */ }
         const { data: auth } = await supabase.auth.getSession();
         const res = await fetch("/api/public/alux/chat", {
           method: "POST",
-          headers: { "content-type": "application/json", ...(auth.session ? { authorization: `Bearer ${auth.session.access_token}` } : {}) },
+          headers: { "content-type": "application/json", ...(embedProofRef.current ? { "x-alux-session-proof": embedProofRef.current } : {}), ...(auth.session ? { authorization: `Bearer ${auth.session.access_token}` } : {}) },
           body: JSON.stringify({
             sessionKey: prepared.sessionKey,
             message: trimmed,

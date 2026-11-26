@@ -16,7 +16,9 @@ export async function aluxRequestUserId(): Promise<string | null> {
 }
 
 export function aluxDeviceProofHash(key: string): string | null {
-  const proof = getCookie(cookieName(key));
+  // Embedded windows on partner sites cannot keep a first-party cookie, so
+  // they present the same server-issued proof in a non-ambient header.
+  const proof = getCookie(cookieName(key)) ?? getRequest().headers.get("x-alux-session-proof") ?? undefined;
   return proof && /^[a-f0-9]{64}$/.test(proof) ? digest(proof) : null;
 }
 
@@ -31,8 +33,11 @@ export async function readOwnedAluxSession(key: string, callerId: string | null)
 }
 
 /** New keys and proofs are issued by the server, never claimed by identifier. */
-export async function prepareOwnedAluxSession(candidate: string, callerId: string | null): Promise<string> {
-  if (candidate && await readOwnedAluxSession(candidate, callerId)) return candidate;
+export async function prepareOwnedAluxSession(
+  candidate: string,
+  callerId: string | null,
+): Promise<{ key: string; proof: string | null }> {
+  if (candidate && await readOwnedAluxSession(candidate, callerId)) return { key: candidate, proof: null };
   const key = crypto.randomUUID();
   const proof = randomBytes(32).toString("hex");
   const { error } = await supabaseAdmin.from("alux_public_sessions").insert({
@@ -46,7 +51,7 @@ export async function prepareOwnedAluxSession(candidate: string, callerId: strin
     httpOnly: true, secure: new URL(getRequest().url).protocol === "https:",
     sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30,
   });
-  return key;
+  return { key, proof };
 }
 
 export function hasAluxDeviceProof(key: string, storedHash: string | null): boolean {
