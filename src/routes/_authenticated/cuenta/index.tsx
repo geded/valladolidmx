@@ -11,6 +11,7 @@ import { getMyPersonalProfile } from "@/lib/traveler/profile-personal.functions"
 import { ProfileCompletionMeter } from "@/components/traveler/ProfileCompletionMeter";
 import { StageAwareCompanionBoard } from "@/components/traveler/StageAwareCompanionBoard";
 import { useTravelStage } from "@/lib/traveler/use-travel-stage";
+import { TaxiTripCard } from "@/components/taxi/TaxiTripCard";
 import { LinkGoogleCard } from "@/components/traveler/LinkGoogleCard";
 import { PublicProfileBenefitsCard } from "@/components/traveler/PublicProfileBenefitsCard";
 import { getMyPublicProfile } from "@/lib/traveler/traveler-public.functions";
@@ -151,6 +152,8 @@ function TravelerCuenta() {
       <div className="mt-6">
         <ProfileCompletionMeter personal={personal} travel={data} />
       </div>
+
+      <TaxiTripCard />
 
       <PublicProfileBenefitsCard
         isPublic={Boolean(publicProfile?.is_public)}

@@ -24,7 +24,9 @@ import {
 import {
   formatTaxiDate,
   formatTaxiMoney,
+  driverDaySummary,
   isTaxiRideActive,
+  localDay,
   nextDriverRideStatus,
   TAXI_STATUS_LABELS,
   taxiErrorMessage,
@@ -95,6 +97,41 @@ function DriverDashboard() {
     enabled: Boolean(activeRide),
     refetchInterval: 10_000,
   });
+
+  // Aviso sonoro y vibración cuando entra una solicitud nueva.
+  const seenOpen = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    const ids = (openQ.data ?? []).map((ride) => ride.id);
+    if (seenOpen.current === null) {
+      if (openQ.data) seenOpen.current = new Set(ids);
+      return;
+    }
+    const fresh = ids.filter((id) => !seenOpen.current!.has(id));
+    ids.forEach((id) => seenOpen.current!.add(id));
+    if (fresh.length === 0) return;
+    try {
+      navigator.vibrate?.([300, 150, 300]);
+      const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (Ctx) {
+        const ctx = new Ctx();
+        [0, 0.35].forEach((t) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.frequency.value = 880;
+          gain.gain.setValueAtTime(0.25, ctx.currentTime + t);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.3);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(ctx.currentTime + t);
+          osc.stop(ctx.currentTime + t + 0.3);
+        });
+      }
+    } catch {
+      /* el navegador puede bloquear el sonido hasta tocar la pantalla */
+    }
+    toast.success("Nueva solicitud de taxi disponible.");
+  }, [openQ.data]);
+  const today = driverDaySummary(rides, localDay(new Date().toISOString()));
+  const driverState = activeRide ? "ocupado" : driver?.is_available ? "libre" : "desconectado";
 
   useEffect(() => {
     if (!driver?.approved || (!driver.is_available && !activeRide) || !navigator.geolocation) return;
@@ -203,8 +240,8 @@ function DriverDashboard() {
           <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
             <Power className={`size-5 ${driver.is_available ? "text-success" : "text-muted-foreground"}`} />
             <div>
-              <p className="text-sm font-medium">{driver.is_available ? "Estoy disponible" : "No recibo solicitudes"}</p>
-              <p className="text-[11px] text-muted-foreground">Sólo acepta cuando puedas atender</p>
+              <p className="text-sm font-medium">{driverState === "ocupado" ? "Ocupado · en servicio" : driverState === "libre" ? "Libre · recibo solicitudes" : "Desconectado"}</p>
+              <p className="text-[11px] text-muted-foreground">Hoy: {today.rides} viajes · {formatTaxiMoney(today.cash)} en efectivo</p>
             </div>
             <Switch checked={driver.is_available} disabled={busy || Boolean(activeRide)} onCheckedChange={toggleAvailability} aria-label="Disponibilidad del taxista" />
           </div>

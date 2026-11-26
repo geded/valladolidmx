@@ -277,3 +277,104 @@ export function taxiErrorMessage(message: string): string {
   if (message.includes("invalid_taxi_distance")) return "Revisa el origen y el destino del viaje.";
   return "No pudimos completar la acción. Intenta de nuevo.";
 }
+
+/* ── Estadísticas y bitácora de pagos (efectivo directo al conductor) ── */
+
+export interface TaxiLedgerEntry {
+  ride_id: string;
+  folio: string;
+  paid_at: string;
+  driver_id: string | null;
+  driver_name: string;
+  vehicle: string;
+  traveler_name: string;
+  traveler_phone: string;
+  route: string;
+  distance_km: number;
+  amount: number;
+  currency: string;
+  method: string;
+}
+
+type LedgerDriver = Pick<TaxiDriver, "id" | "display_name" | "plates"> & { vehicle_number?: string | null };
+
+/** Solo los viajes terminados con efectivo cobrado entran a la bitácora, del más reciente al más antiguo. */
+export function buildTaxiLedger(rides: TaxiRide[], drivers: LedgerDriver[]): TaxiLedgerEntry[] {
+  const byId = new Map(drivers.map((d) => [d.id, d]));
+  return rides
+    .filter((r) => r.status === "completed" && r.cash_paid)
+    .map((r) => {
+      const d = r.driver_id ? byId.get(r.driver_id) : undefined;
+      return {
+        ride_id: r.id,
+        folio: r.folio,
+        paid_at: r.completed_at ?? r.updated_at,
+        driver_id: r.driver_id,
+        driver_name: d?.display_name ?? "Conductor",
+        vehicle: d ? `${d.vehicle_number ? `No. ${d.vehicle_number} · ` : ""}${d.plates}` : "",
+        traveler_name: r.traveler_name,
+        traveler_phone: r.traveler_phone,
+        route: `${r.origin_label} → ${r.destination_label}`,
+        distance_km: r.distance_km,
+        amount: r.fare_amount,
+        currency: r.currency,
+        method: "Efectivo al conductor",
+      };
+    })
+    .sort((a, b) => b.paid_at.localeCompare(a.paid_at));
+}
+
+export interface TaxiStats {
+  completed: number;
+  cancelled: number;
+  completionRate: number; // 0..100 sobre viajes cerrados
+  cashTotal: number;
+  totalKm: number;
+  avgMinutes: number;
+  byDriver: { driver_id: string; driver_name: string; rides: number; cash: number }[];
+}
+
+export function buildTaxiStats(rides: TaxiRide[], drivers: LedgerDriver[]): TaxiStats {
+  const ledger = buildTaxiLedger(rides, drivers);
+  const done = rides.filter((r) => r.status === "completed");
+  const cancelled = rides.filter((r) => r.status === "cancelled").length;
+  const closed = done.length + cancelled;
+  const per = new Map<string, { driver_id: string; driver_name: string; rides: number; cash: number }>();
+  for (const e of ledger) {
+    const key = e.driver_id ?? "—";
+    const row = per.get(key) ?? { driver_id: key, driver_name: e.driver_name, rides: 0, cash: 0 };
+    row.rides += 1;
+    row.cash += e.amount;
+    per.set(key, row);
+  }
+  return {
+    completed: done.length,
+    cancelled,
+    completionRate: closed ? Math.round((done.length / closed) * 100) : 0,
+    cashTotal: ledger.reduce((s, e) => s + e.amount, 0),
+    totalKm: Math.round(done.reduce((s, r) => s + r.distance_km, 0) * 10) / 10,
+    avgMinutes: done.length ? Math.round(done.reduce((s, r) => s + r.estimated_minutes, 0) / done.length) : 0,
+    byDriver: [...per.values()].sort((a, b) => b.cash - a.cash),
+  };
+}
+
+/** Viajes y efectivo cobrado por el conductor en el día local indicado (AAAA-MM-DD). */
+export function driverDaySummary(rides: TaxiRide[], day: string): { rides: number; cash: number } {
+  const mine = rides.filter((r) => r.status === "completed" && r.cash_paid && localDay(r.completed_at ?? r.updated_at) === day);
+  return { rides: mine.length, cash: mine.reduce((s, r) => s + r.fare_amount, 0) };
+}
+
+export function localDay(iso: string): string {
+  const d = new Date(iso);
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 10);
+}
+
+export function taxiLedgerCsv(entries: TaxiLedgerEntry[]): string {
+  const head = ["Fecha", "Folio", "Conductor", "Vehículo", "Viajero", "Teléfono", "Ruta", "Km", "Importe", "Moneda", "Forma de pago"];
+  const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+  const rows = entries.map((e) =>
+    [e.paid_at, e.folio, e.driver_name, e.vehicle, e.traveler_name, e.traveler_phone, e.route, e.distance_km, (e.amount / 100).toFixed(2), e.currency, e.method].map(esc).join(","),
+  );
+  return [head.map(esc).join(","), ...rows].join("\n");
+}

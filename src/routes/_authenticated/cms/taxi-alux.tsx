@@ -33,6 +33,9 @@ import {
   formatTaxiMoney,
   TAXI_STATUS_LABELS,
   taxiErrorMessage,
+  buildTaxiLedger,
+  buildTaxiStats,
+  taxiLedgerCsv,
   type TaxiDriverInvitation,
   type TaxiSettings,
 } from "@/lib/taxi/rules";
@@ -49,13 +52,14 @@ export const Route = createFileRoute("/_authenticated/cms/taxi-alux")({
   component: TaxiAdminPage,
 });
 
-type Tab = "resumen" | "solicitudes" | "conductores" | "viajes" | "tarifas";
+type Tab = "resumen" | "solicitudes" | "conductores" | "viajes" | "movimientos" | "tarifas";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "resumen", label: "Resumen" },
   { id: "solicitudes", label: "Solicitudes" },
   { id: "conductores", label: "Conductores" },
   { id: "viajes", label: "Viajes" },
+  { id: "movimientos", label: "Estadísticas y pagos" },
   { id: "tarifas", label: "Tarifas" },
 ];
 
@@ -386,6 +390,8 @@ function TaxiAdminPage() {
         </section>
       ) : null}
 
+      {dashboard && tab === "movimientos" ? <MovementsPanel rides={rides} drivers={drivers} /> : null}
+
       {dashboard && tab === "tarifas" ? (
         <section className="mt-5 rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
           <h2 className="flex items-center gap-2 text-lg font-semibold"><Settings2 className="size-5 text-primary" /> Tarifas y disponibilidad</h2>
@@ -467,5 +473,81 @@ function RideList({ title, rides, empty }: { title: string; rides: import("@/lib
         ))}
       </div>
     </section>
+  );
+}
+
+function MovementsPanel({ rides, drivers }: { rides: import("@/lib/taxi/rules").TaxiRide[]; drivers: import("@/lib/taxi/rules").TaxiDriver[] }) {
+  const stats = buildTaxiStats(rides, drivers);
+  const ledger = buildTaxiLedger(rides, drivers);
+  function exportCsv() {
+    const blob = new Blob(["\ufeff" + taxiLedgerCsv(ledger)], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `taxi-alux-pagos-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  return (
+    <div className="mt-5 space-y-5">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <BigStat label="Efectivo cobrado por conductores" value={formatTaxiMoney(stats.cashTotal)} />
+        <BigStat label="Viajes realizados / cancelados" value={`${stats.completed} / ${stats.cancelled}`} />
+        <BigStat label="Tasa de atención" value={`${stats.completionRate}%`} />
+        <BigStat label="Km recorridos · min promedio" value={`${stats.totalKm} km · ${stats.avgMinutes} min`} />
+      </section>
+      <section className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+        <h2 className="text-lg font-semibold">Por conductor</h2>
+        {stats.byDriver.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">Aún no hay viajes pagados.</p> : null}
+        <div className="mt-3 divide-y divide-border text-sm">
+          {stats.byDriver.map((row) => (
+            <div key={row.driver_id} className="flex items-center justify-between py-2">
+              <span>{row.driver_name}</span>
+              <span className="text-muted-foreground">{row.rides} viajes · {formatTaxiMoney(row.cash)}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Movimientos pagados</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Por ahora cada viaje se paga en efectivo directo al conductor; aquí queda el registro de cada cobro.</p>
+          </div>
+          <Button type="button" size="sm" variant="outline" disabled={ledger.length === 0} onClick={exportCsv}>Descargar Excel (CSV)</Button>
+        </div>
+        {ledger.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">Todavía no hay pagos registrados.</p> : null}
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-xs">
+            <thead className="text-muted-foreground">
+              <tr><th className="py-2">Fecha</th><th>Folio</th><th>Conductor</th><th>Viajero</th><th>Ruta</th><th className="text-right">Km</th><th className="text-right">Importe</th><th>Forma de pago</th></tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {ledger.map((e) => (
+                <tr key={e.ride_id}>
+                  <td className="py-2">{formatTaxiDate(e.paid_at)}</td>
+                  <td>{e.folio}</td>
+                  <td>{e.driver_name}<br /><span className="text-muted-foreground">{e.vehicle}</span></td>
+                  <td>{e.traveler_name}<br /><span className="text-muted-foreground">{e.traveler_phone}</span></td>
+                  <td>{e.route}</td>
+                  <td className="text-right">{e.distance_km.toFixed(1)}</td>
+                  <td className="text-right font-medium">{formatTaxiMoney(e.amount, e.currency)}</td>
+                  <td>{e.method}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function BigStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+      <p className="text-2xl font-semibold text-primary">{value}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{label}</p>
+    </div>
   );
 }

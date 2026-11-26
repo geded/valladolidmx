@@ -99,6 +99,7 @@ import {
 } from "lucide-react";
 import { ReservationsList } from "@/components/traveler/ReservationsList";
 import { TableReservationsCard } from "@/components/traveler/TableReservationsCard";
+import { TaxiTripCard } from "@/components/taxi/TaxiTripCard";
 import { TravelDocumentsList } from "@/components/traveler/TravelDocumentsList";
 import { TripBriefForm } from "@/components/traveler/TripBriefForm";
 import { formatInMerida, meridaDate, meridaDayMonth, meridaLongDate } from "@/lib/time/merida";
@@ -739,6 +740,7 @@ function MiViajeVistaBody({
     return (
       <div className="space-y-6">
         <TableReservationsCard />
+        <TaxiTripCard />
         {confirmed ? (
           <>
             <ConfirmedTravelBanner data={confirmed} />
