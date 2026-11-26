@@ -10,34 +10,23 @@ const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/audio/speech";
 const TTS_MODEL = "google/gemini-3.1-flash-tts-preview";
 const TTS_VOICE = "Kore";
 const MAX_CHARS = 4000;
+const HOUR_LIMIT = 20;
+const DAY_LIMIT = 60;
 
 export const Route = createFileRoute("/api/public/tts")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const origin = request.headers.get("origin") || "";
-        const corsOrigin =
-          origin && origin.includes("lovable.app")
-            ? origin
-            : "https://www.quehacerenvalladolid.com";
+        const corsOrigin = new URL(request.url).origin;
 
         const corsHeaders = {
           "Access-Control-Allow-Origin": corsOrigin,
           "Access-Control-Allow-Headers": "Content-Type",
           "Access-Control-Allow-Methods": "POST, OPTIONS",
-          "Cache-Control": "no-cache",
         };
 
         if (request.method === "OPTIONS") {
           return new Response(null, { status: 204, headers: corsHeaders });
-        }
-
-        const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: "TTS no disponible" }), {
-            status: 503,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          });
         }
 
         let body: { text?: string; locale?: string };
@@ -57,12 +46,44 @@ export const Route = createFileRoute("/api/public/tts")({
             headers: { "Content-Type": "application/json", ...corsHeaders },
           });
         }
-
         if (text.length > MAX_CHARS) {
           return new Response(
             JSON.stringify({ error: `Texto demasiado largo (máximo ${MAX_CHARS} caracteres)` }),
             { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
           );
+        }
+
+        const { assertPlatformOrigin, enforcePublicQuota } =
+          await import("@/lib/security/public-quota.server");
+        try {
+          assertPlatformOrigin();
+          await enforcePublicQuota("alux.tts", {
+            perMinute: 4,
+            perHour: HOUR_LIMIT,
+            perDay: DAY_LIMIT,
+            platformPerDay: 3000,
+          });
+        } catch (error) {
+          const code = error instanceof Error ? error.message : "quota_unavailable";
+          const status = code === "origin_not_allowed" ? 403 : code === "rate_limited" ? 429 : 503;
+          return new Response(
+            JSON.stringify({
+              error: status === 429 ? "rate_limited" : code,
+              message:
+                status === 429
+                  ? "Has alcanzado el límite de lectura en voz alta. Inténtalo más tarde."
+                  : "No se pudo verificar el acceso al servicio de voz.",
+            }),
+            { status, headers: { "Content-Type": "application/json", ...corsHeaders } },
+          );
+        }
+
+        const apiKey = process.env["LOVABLE_API_KEY"];
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: "TTS no disponible" }), {
+            status: 503,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          });
         }
 
         const ttsBody = {
@@ -93,16 +114,18 @@ export const Route = createFileRoute("/api/public/tts")({
             console.error(`TTS gateway error [${upstream.status}]: ${errText.slice(0, 200)}`);
             return new Response(
               JSON.stringify({ error: "No se pudo generar audio", status: upstream.status }),
-              { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } },
+              {
+                status: upstream.status,
+                headers: { "Content-Type": "application/json", ...corsHeaders },
+              },
             );
           }
 
-          // Stream the SSE response through unchanged
           return new Response(upstream.body, {
             status: 200,
             headers: {
               "Content-Type": "text/event-stream",
-              Connection: "keep-alive",
+              "Cache-Control": "no-cache, no-transform",
               ...corsHeaders,
             },
           });

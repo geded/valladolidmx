@@ -92,11 +92,16 @@ function ctx(over: Partial<GroundingContext> = {}): GroundingContext {
 }
 
 describe("PR #60 · rate-limit fail-closed", () => {
-  test("detiene la conversación si la RPC devuelve o lanza error", () => {
+  test("reserva el cupo de forma atómica y detiene la conversación si falla", () => {
     const source = readFileSync("src/lib/alux/converse.functions.ts", "utf8");
-    expect(source).toContain('if (rateRes.error) throw new Error("rate_check_failed")');
-    expect(source).toContain('error: new Error("rate_check_failed")');
+    expect(source).toContain('await enforcePublicQuota("alux.public_message"');
+    expect(source).toContain('throw new Error("rate_check_failed")');
+    expect(source).not.toContain('supabaseAdmin.rpc("alux_public_check_rate"');
     expect(source).not.toContain(".then((r) => r.data as unknown)");
+  });
+  test("no paga IA auxiliar cuando el canal, el cupo o la defensa ya la descartan", () => {
+    const source = readFileSync("src/lib/alux/converse.functions.ts", "utf8");
+    expect(source).toContain("intentApiKey && channelOn && !rateLimited && !injectionFlagged");
   });
 });
 

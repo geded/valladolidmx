@@ -83,7 +83,7 @@ export function useTTS() {
 
       if (!response.ok || !response.body) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data?.error || `TTS falló: ${response.status}`);
+        throw new Error(data?.message || data?.error || `TTS falló: ${response.status}`);
       }
 
       setState("playing");

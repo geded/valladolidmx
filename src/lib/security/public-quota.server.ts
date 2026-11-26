@@ -1,6 +1,7 @@
 /**
- * Cupo por visitante (IP) para servicios de pago usados sin cuenta
- * (rutas de mapas). Reutiliza el limitador atómico `mcp_rate_hit`.
+ * Cupo por visitante (IP) para servicios de pago usados sin cuenta.
+ * Reutiliza el limitador atómico `mcp_rate_hit`; cada llamada reserva su
+ * lugar antes de contactar al proveedor, incluso con solicitudes simultáneas.
  */
 import { createHash } from "node:crypto";
 import { getRequest } from "@tanstack/react-start/server";
@@ -27,10 +28,24 @@ export function assertPlatformOrigin(): void {
   }
 }
 
+export interface PublicQuotaUsage {
+  perMinute: number;
+  perHour: number;
+  perDay: number | null;
+}
+
+type RateRow = { allowed: boolean; current_count: number; retry_after_seconds: number };
+type RateAdmin = {
+  rpc: (
+    name: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: RateRow[] | RateRow | null; error: { message: string } | null }>;
+};
+
 export async function enforcePublicQuota(
   tool: string,
-  limits: { perMinute: number; perHour: number; platformPerDay?: number },
-): Promise<void> {
+  limits: { perMinute: number; perHour: number; perDay?: number; platformPerDay?: number },
+): Promise<PublicQuotaUsage> {
   const h = getRequest().headers;
   const ip =
     h.get("cf-connecting-ip") ??
@@ -40,12 +55,16 @@ export async function enforcePublicQuota(
   const salt = process.env["ALUX_PUBLIC_IP_SALT"] ?? process.env["SUPABASE_URL"] ?? "vmx";
   const key = `ip:${createHash("sha256").update(`${salt}:${ip}`).digest("hex")}`;
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  for (const [win, limit] of [
-    [60, limits.perMinute],
-    [3600, limits.perHour],
-  ] as const) {
-    // deno-lint-ignore no-explicit-any
-    const { data, error } = await (supabaseAdmin as any).rpc("mcp_rate_hit", {
+  const rateAdmin = supabaseAdmin as unknown as RateAdmin;
+  const usage: PublicQuotaUsage = { perMinute: 0, perHour: 0, perDay: null };
+  const windows = [
+    ["perMinute", 60, limits.perMinute],
+    ["perHour", 3600, limits.perHour],
+    ...(limits.perDay ? ([["perDay", 86400, limits.perDay]] as const) : []),
+  ] as const;
+
+  for (const [name, win, limit] of windows) {
+    const { data, error } = await rateAdmin.rpc("mcp_rate_hit", {
       p_scope_key: key,
       p_tool_name: tool,
       p_window_seconds: win,
@@ -53,12 +72,13 @@ export async function enforcePublicQuota(
     });
     if (error) throw new Error("quota_unavailable");
     const row = Array.isArray(data) ? data[0] : data;
-    if (row?.allowed === false) throw new Error("rate_limited");
+    if (!row) throw new Error("quota_unavailable");
+    usage[name] = Number(row.current_count ?? 0);
+    if (row.allowed === false) throw new Error("rate_limited");
   }
   if (limits.platformPerDay) {
     // Tope total del día para todos los visitantes juntos: el gasto nunca se dispara.
-    // deno-lint-ignore no-explicit-any
-    const { data, error } = await (supabaseAdmin as any).rpc("mcp_rate_hit", {
+    const { data, error } = await rateAdmin.rpc("mcp_rate_hit", {
       p_scope_key: "platform:all",
       p_tool_name: tool,
       p_window_seconds: 86400,
@@ -66,6 +86,8 @@ export async function enforcePublicQuota(
     });
     if (error) throw new Error("quota_unavailable");
     const row = Array.isArray(data) ? data[0] : data;
-    if (row?.allowed === false) throw new Error("rate_limited");
+    if (!row) throw new Error("quota_unavailable");
+    if (row.allowed === false) throw new Error("rate_limited");
   }
+  return usage;
 }

@@ -629,7 +629,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         try {
           const { assertPlatformOrigin } = await import("@/lib/security/public-quota.server");
           assertPlatformOrigin();
-          const { readOwnedAluxSession, aluxRequestUserId } = await import("@/lib/alux/session-ownership.server");
+          const { readOwnedAluxSession, aluxRequestUserId } =
+            await import("@/lib/alux/session-ownership.server");
           ownedSession = await readOwnedAluxSession(sessionKey, await aluxRequestUserId());
         } catch {
           return json({ error: "alux_session_not_owned" }, 403);
@@ -669,20 +670,23 @@ export const Route = createFileRoute("/api/public/alux/chat")({
           }
         }
 
-        // 1) Rate-limit atómico por IP.
-        const { data: rate, error: rateErr } = await supabaseAdmin.rpc("alux_public_check_rate", {
-          _ip_hash: ipHash,
-          _hour_limit: HOUR_LIMIT,
-          _day_limit: DAY_LIMIT,
-        });
-        if (rateErr) return json({ error: "rate_check_failed" }, 500);
-        const rateRow = Array.isArray(rate) ? rate[0] : rate;
-        if (rateRow && rateRow.allowed === false) {
+        // Reserva atómica antes de cualquier IA: solicitudes simultáneas no
+        // pueden rebasar el cupo por leer el mismo contador a la vez.
+        let rateUsage;
+        try {
+          const { enforcePublicQuota } = await import("@/lib/security/public-quota.server");
+          rateUsage = await enforcePublicQuota("alux.public_message", {
+            perMinute: 4,
+            perHour: HOUR_LIMIT,
+            perDay: DAY_LIMIT,
+            platformPerDay: 20000,
+          });
+        } catch (error) {
+          const code = error instanceof Error ? error.message : "quota_unavailable";
+          if (code !== "rate_limited") return json({ error: "rate_check_failed" }, 503);
           return json(
             {
               error: "rate_limited",
-              hour_count: rateRow.hour_count,
-              day_count: rateRow.day_count,
               hour_limit: HOUR_LIMIT,
               day_limit: DAY_LIMIT,
               message:
@@ -696,13 +700,11 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         // 2) Update only the session whose ownership was verified above.
         const { data: sessionRow, error: sessErr } = await supabaseAdmin
           .from("alux_public_sessions")
-          .update(
-            {
-              ip_hash: ipHash,
-              user_agent: userAgent,
-              last_seen_at: new Date().toISOString(),
-            },
-          )
+          .update({
+            ip_hash: ipHash,
+            user_agent: userAgent,
+            last_seen_at: new Date().toISOString(),
+          })
           .eq("id", ownedSession.id)
           .select(
             "id, message_count, summary, summary_message_count, last_destination_slug, last_category_slug, last_spatial_state, last_lat, last_lng, last_signals",
@@ -816,9 +818,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         const destinationBrief = await loadDestinationBriefServer(supabaseAdmin, activeDestination);
         // Catálogo publicado (empresas, experiencias, lugares, eventos) con la
         // misma prioridad del Alux conversacional; si falla, sigue sin él.
-        const { loadPublicCatalogBlock, recordPromotedMentions } = await import(
-          "@/lib/alux/catalog-prompt.server"
-        );
+        const { loadPublicCatalogBlock, recordPromotedMentions } =
+          await import("@/lib/alux/catalog-prompt.server");
         const catalog = await loadPublicCatalogBlock({
           query: [
             message,
@@ -1099,8 +1100,8 @@ export const Route = createFileRoute("/api/public/alux/chat")({
                     signals: mergedSignals,
                   },
                   rate: {
-                    hour_count: (rateRow?.hour_count ?? 0) + 1,
-                    day_count: (rateRow?.day_count ?? 0) + 1,
+                    hour_count: rateUsage.perHour,
+                    day_count: rateUsage.perDay ?? 0,
                     hour_limit: HOUR_LIMIT,
                     day_limit: DAY_LIMIT,
                   },

@@ -23,7 +23,8 @@
  *
  * Auditoría técnica mínima: reutiliza `alux_public_sessions` /
  * `alux_public_messages` (ya existentes para el chat público) y el
- * rate-limit atómico `alux_public_check_rate`. No se crea analítica nueva.
+ * reserva atómica `mcp_rate_hit` mediante el control público compartido.
+ * No se crea analítica nueva.
  */
 import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -382,10 +383,7 @@ function buildUserPrompt(args: {
     lines.push(
       `- CONTACTO: después de ayudar, invita en una sola frase final a dejar su nombre y WhatsApp en la tarjeta que verá abajo para que un concierge le dé seguimiento (motivo: ${args.contactOffer}). No pidas el número en el texto.`,
     );
-  else
-    lines.push(
-      "- CONTACTO: no invites a dejar datos en este mensaje.",
-    );
+  else lines.push("- CONTACTO: no invites a dejar datos en este mensaje.");
   lines.push(
     `- Destino activo: ${args.destinationLabel ? `${args.destinationLabel} (${args.destinationSlug})` : "ninguno (Home regional)"}`,
   );
@@ -641,28 +639,14 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const salt = process.env["ALUX_PUBLIC_IP_SALT"] ?? process.env["SUPABASE_URL"] ?? "vmx";
     const ipHash = createHash("sha256").update(`${salt}:${ip}`).digest("hex");
 
-    // Sólo conversaciones iniciadas desde las páginas de la plataforma: una
-    // llamada desde otro sitio o un programa sin navegador se rechaza.
-    {
-      const origin = headers.get("origin") ?? headers.get("referer") ?? "";
-      let originHost = "";
-      try {
-        originHost = origin ? new URL(origin).hostname.toLowerCase() : "";
-      } catch {
-        originHost = "";
-      }
-      const ownHost = new URL(request.url).hostname.toLowerCase();
-      const trusted =
-        originHost !== "" &&
-        (originHost === ownHost ||
-          /(^|\.)quehacerenvalladolid\.com$/.test(originHost) ||
-          /(^|\.)valladolid\.(mx|com\.mx)$/.test(originHost) ||
-          /\.lovable\.app$/.test(originHost) ||
-          originHost === "localhost");
-      const fetchSite = headers.get("sec-fetch-site");
-      if (!trusted || (fetchSite !== null && fetchSite !== "same-origin" && fetchSite !== "same-site")) {
-        throw new Error("alux_origin_not_allowed");
-      }
+    // La misma lista de hosts oficiales protege todos los accesos; un
+    // subdominio ajeno de la plataforma de alojamiento ya no basta.
+    const { assertPlatformOrigin, enforcePublicQuota } =
+      await import("@/lib/security/public-quota.server");
+    try {
+      assertPlatformOrigin();
+    } catch {
+      throw new Error("alux_origin_not_allowed");
     }
 
     const { readOwnedAluxSession, aluxRequestUserId } = await import("./session-ownership.server");
@@ -679,31 +663,32 @@ export const aluxConverse = createServerFn({ method: "POST" })
       },
     );
 
-    // ── 3. Rate-limit + sesión (memoria M3) + destinos publicados, en paralelo ──
+    // ── 3. Reserva atómica + sesión + destinos publicados, en paralelo ──
     const phases: Record<string, number> = {};
     const tPrep = Date.now();
-    const [rateRes, sessionUpsert, knownProbe] = await Promise.all([
+    const [rateLimited, sessionUpsert, knownProbe] = await Promise.all([
       (async () => {
         try {
-          return await supabaseAdmin.rpc("alux_public_check_rate", {
-            _ip_hash: ipHash,
-            _hour_limit: userId ? AUTH_HOUR_LIMIT : ANON_HOUR_LIMIT,
-            _day_limit: userId ? AUTH_DAY_LIMIT : ANON_DAY_LIMIT,
+          await enforcePublicQuota("alux.public_message", {
+            perMinute: userId ? 12 : 4,
+            perHour: userId ? AUTH_HOUR_LIMIT : ANON_HOUR_LIMIT,
+            perDay: userId ? AUTH_DAY_LIMIT : ANON_DAY_LIMIT,
+            platformPerDay: 20000,
           });
-        } catch {
-          return { data: null, error: new Error("rate_check_failed") };
+          return false;
+        } catch (error) {
+          if (error instanceof Error && error.message === "rate_limited") return true;
+          throw new Error("rate_check_failed");
         }
       })(),
       supabaseAdmin
         .from("alux_public_sessions")
-        .update(
-          {
-            ip_hash: ipHash,
-            user_agent: headers.get("user-agent")?.slice(0, 300) ?? null,
-            last_seen_at: new Date().toISOString(),
-            ...(userId ? { traveler_user_id: userId } : {}),
-          },
-        )
+        .update({
+          ip_hash: ipHash,
+          user_agent: headers.get("user-agent")?.slice(0, 300) ?? null,
+          last_seen_at: new Date().toISOString(),
+          ...(userId ? { traveler_user_id: userId } : {}),
+        })
         .eq("id", ownedSession.id)
         .select(
           "id, message_count, summary, last_destination_slug, prospect_id, contact_offer_count, contact_offer_last_message_count",
@@ -716,9 +701,6 @@ export const aluxConverse = createServerFn({ method: "POST" })
         .is("deleted_at", null)
         .limit(40),
     ]);
-    if (rateRes.error) throw new Error("rate_check_failed");
-    const rateRow = Array.isArray(rateRes.data) ? rateRes.data[0] : rateRes.data;
-    const rateLimited = Boolean(rateRow && (rateRow as { allowed?: boolean }).allowed === false);
     const session = (sessionUpsert.data ?? null) as {
       id: string;
       message_count: number | null;
@@ -752,15 +734,22 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const knownSlugs = ((knownProbe.data ?? []) as Array<{ slug: string }>).map((r) => r.slug);
     const deterministicIntent = parseTravelIntent(message, { knownDestinationSlugs: knownSlugs });
     const intentApiKey = process.env["LOVABLE_API_KEY"];
-    const baseIntent = intentApiKey
-      ? await enhanceIntentWithAI(
-          intentApiKey,
-          INTENT_MODEL,
-          message,
-          deterministicIntent,
-          knownSlugs,
-        )
-      : deterministicIntent;
+    const channelsPromise = import("./channels.server").then((m) =>
+      m.readAluxChannelsServer(supabaseAdmin),
+    );
+    const channelOn = (await channelsPromise).web;
+    // Ni el cupo agotado, ni una inyección, ni un canal apagado deben pagar
+    // una llamada auxiliar de IA antes de la respuesta determinística.
+    const baseIntent =
+      intentApiKey && channelOn && !rateLimited && !injectionFlagged
+        ? await enhanceIntentWithAI(
+            intentApiKey,
+            INTENT_MODEL,
+            message,
+            deterministicIntent,
+            knownSlugs,
+          )
+        : deterministicIntent;
     const mentioned = baseIntent.mentionedDestinationSlugs;
     const selectedRouteNeedsStopTerritory = Boolean(
       selectedRoute && selectedRoute.destinationSlugs.length === 0 && mentioned.length === 0,
@@ -793,10 +782,6 @@ export const aluxConverse = createServerFn({ method: "POST" })
     const settingsPromise = import("./settings.functions")
       .then((m) => m.resolveAluxSettingsServer(supabaseAdmin))
       .catch(() => null);
-    // Fase 4 · interruptor «Alux en Valladolid.mx» (si falla la lectura, sigue encendido).
-    const channelsPromise = import("./channels.server").then((m) =>
-      m.readAluxChannelsServer(supabaseAdmin),
-    );
     const retrieved = await retrieval.retrieveConverseCandidates(sb, {
       destinationSlug,
       declaredDestinationIds: selectedRoute?.declaredDestinationIds,
@@ -955,7 +940,7 @@ export const aluxConverse = createServerFn({ method: "POST" })
     };
 
     // ── 6. Cortocircuitos determinísticos ───────────────────────────────
-    const channelOff = !(await channelsPromise).web;
+    const channelOff = !channelOn;
     if (channelOff) {
       return settle(
         composeDeterministicResponse(candidates, ctx, "unavailable", {

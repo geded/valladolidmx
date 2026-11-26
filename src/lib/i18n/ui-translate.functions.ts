@@ -16,6 +16,7 @@ import type { Database } from "@/integrations/supabase/types";
 const MODEL = "google/gemini-3-flash-preview";
 const ALLOWED_LOCALES = new Set(["en", "fr", "de", "it", "pt"]);
 const MAX_TEXTS = 60;
+const MAX_TOTAL_CHARS = 24_000;
 
 function sha(text: string): string {
   return createHash("sha256").update(text).digest("hex").slice(0, 20);
@@ -25,9 +26,15 @@ export const translateUiBatch = createServerFn({ method: "POST" })
   .inputValidator((d: { locale: string; texts: string[] } | undefined) => {
     if (!d?.locale || !Array.isArray(d.texts)) throw new Error("invalid_input");
     if (!ALLOWED_LOCALES.has(d.locale)) throw new Error("invalid_locale");
+    let totalChars = 0;
     const texts = d.texts
       .filter((t) => typeof t === "string" && t.trim().length > 0 && t.length < 5000)
-      .slice(0, MAX_TEXTS);
+      .slice(0, MAX_TEXTS)
+      .filter((text) => {
+        if (totalChars + text.length > MAX_TOTAL_CHARS) return false;
+        totalChars += text.length;
+        return true;
+      });
     return { locale: d.locale, texts };
   })
   .handler(async ({ data }): Promise<Record<string, string>> => {
@@ -66,6 +73,17 @@ export const translateUiBatch = createServerFn({ method: "POST" })
       for (const t of missing) out[hashOf.get(t)!] = t;
       return out;
     }
+
+    // Sólo las frases nuevas consumen cuota e IA. La lectura de caché queda libre.
+    const { assertPlatformOrigin, enforcePublicQuota } =
+      await import("@/lib/security/public-quota.server");
+    assertPlatformOrigin();
+    await enforcePublicQuota("i18n.ui", {
+      perMinute: 8,
+      perHour: 120,
+      perDay: 400,
+      platformPerDay: 3000,
+    });
 
     const system =
       'Eres editor y traductor turístico nativo del idioma destino para una plataforma de viajes del Oriente Maya de Yucatán (Valladolid). No traduzcas palabra por palabra: escribe como lo haría una guía de viajes de calidad en ese idioma, natural, cálida y clara para un viajero, sin inventar datos ni añadir información. Botones y etiquetas cortas: usa la fórmula habitual en apps de viaje de ese idioma. Conserva: mayúsculas iniciales, puntuación final, saltos de línea, emojis, íconos y nombres propios (Valladolid, Yucatán, Oriente Maya, Alux, Chichén Itzá, Cenote). NO traduzcas URLs, slugs, códigos, ni identificadores. Longitud similar (±25%). Devuelve exclusivamente JSON válido con la forma {"t":["traducción1","traducción2",...]} en el mismo orden que la entrada.';

@@ -1,6 +1,7 @@
 # Alux rules
 
 - Browser sessions are server-issued with an HttpOnly device proof hashed on the existing session row; chat, memory, contact capture and account binding verify ownership through `session-ownership.server.ts`. Legacy unproved anonymous rows remain stored but cannot be claimed by identifier. Why: identifiers alone cannot authorize private memory or cross-account linkage.
+- Both web conversation entries share the atomic `alux.public_message` quota before any AI call; speech-to-text, text-to-speech and uncached UI translation use separate tools in the same public quota helper. Why: simultaneous requests and auxiliary intent AI cannot bypass a read-only message count or create unbounded provider spend.
 
 - Channel switches: web, WhatsApp and embed on/off live as `channel_*` keys inside `alux_settings.flags` (`channels.ts`); a missing key means on, every writer merges flags instead of replacing them, and servers enforce them (`aluxConverse`, `/api/public/alux/chat`, WhatsApp reply and outbox), never only the UI. Why: one settings row, instant kill switch, older console saves cannot reset channels.
 - Training: a destination brief is the Knowledge Base entry `destino-<slug>` (category `destinos`) injected into web and WhatsApp prompts; unanswered questions go only through `recordKnowledgeGapServer` (PII-scrubbed, best-effort, service-role RPC) into `alux_knowledge_gaps`. Why: reuse the existing KB authority and never let training break or leak a reply.

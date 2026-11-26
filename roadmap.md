@@ -6,7 +6,14 @@
 - [x] Restringir rutas facturadas sin bloquear descubrimiento anónimo.
 - [x] Neutralizar fórmulas en exportación de pagos de Taxi.
 - [x] Pruebas y recorridos autenticados/anónimos, compilación automática e integridad PASS; cinco hallazgos actualizados. Informe: docs/security-hardening-2026-11-26.md.
-- [ ] Publicar y revalidar en sitio publicado; confirmación propia de efectivo y compra legítima completa pendientes de piloto autorizado, sin alterar reservas reales. Voz/traducción, consumo simultáneo, embed, fotos y limpieza global no cubiertos por este lote.
+- [x] Founder publicó el lote el 2026-11-26; revalidación pública y piloto de compra/efectivo siguen sin sustituir pruebas reales con reservas del territorio.
+
+## Continuidad de protección de IA · 2026-11-26
+- [x] Voz: entrada y origen validados, cupo atómico antes de IA; micrófono 3/min, 10/h, 40/día; lectura 4/min, 20/h, 60/día, con topes compartidos. El contador anterior de micrófono no registraba consumo y fue sustituido por el existente `mcp_rate_hit`.
+- [x] Traducciones: cupo sólo para frases nuevas (8 lotes/min, 120/h, 400/día; máximo 60 textos y 24,000 caracteres por lote); las guardadas no consumen IA ni cupo.
+- [x] Conversaciones: ambos accesos comparten `alux.public_message` (4/min, 10/h, 40/día anónimo; 12/min, 30/h, 120/día con cuenta) antes de IA; intención auxiliar se omite con canal apagado, inyección o cupo agotado.
+- [x] 65 pruebas PASS; compilación OK; integridad de gobernanza PASS; voz real 200 y origen ajeno 403; Alux móvil respondió con contador 1/40; Copalli en inglés sin errores/overflow. Publicación de este nuevo lote pendiente.
+- [ ] Pendientes posteriores: entrega de fotos bajo dominio propio y limpieza global de código huérfano; compra real/efectivo sólo en piloto autorizado.
 
 ## Taxi Alux · 2026-11-25
 - [x] Servicio integral activable sólo por administración, desactivado al inicio y sin conductores precargados.

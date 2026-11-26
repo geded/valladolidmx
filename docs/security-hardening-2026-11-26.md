@@ -25,5 +25,24 @@ Corrección localizada de los cinco hallazgos del análisis profundo. No se modi
 - Fotos bajo dominio propio, pistas públicas y limpieza de archivos huérfanos pertenecen a la auditoría anterior: no están solucionados en este lote ni constituyen aislamiento de seguridad.
 - Falta publicar el código. Las migraciones ya se aplicaron. No se promete invulnerabilidad ni ocultar todo código del navegador.
 
+## Continuidad: voz, traducción y concurrencia
+Después de que el Founder publicó el primer lote, se reforzó el consumo de IA sin tocar plantillas, CMS, reservas ni configuración editorial:
+
+- El micrófono usaba `alux_public_check_rate`, que sólo cuenta mensajes escritos y por tanto nunca acumulaba transcripciones. Ahora valida audio, origen y tamaño antes de reservar consumo con el RPC atómico existente `mcp_rate_hit`.
+- Lectura en voz alta, micrófono y traducción nueva tienen cupos propios por minuto, hora y día, además de un tope diario compartido. Una petición inválida o de origen ajeno no contacta al proveedor.
+- Las traducciones ya guardadas se leen sin cuota ni IA. Sólo los lotes con frases ausentes pasan por el control, con límites de cantidad y caracteres.
+- Los dos accesos web de Alux comparten la reserva `alux.public_message` antes de cualquier IA. La IA auxiliar de intención no se ejecuta si el canal está apagado, la entrada fue bloqueada o el cupo se agotó.
+- Los avisos de voz muestran el mensaje seguro del servidor; las respuestas del proveedor conservan su estado HTTP y los streams impiden transformación de caché.
+
+### Evidencia de continuidad
+- 8 pruebas Vitest de cuotas/orígenes/voz, 2 de traducción y 55 históricas de Alux, sesiones y rutas: 65 PASS.
+- Compilación automática e integridad de gobernanza PASS. Análisis rápido sin hallazgos activos nuevos; cinco avisos previamente descartados por el Founder se conservaron intactos. Prueba real de lectura «Hola»: audio SSE 200; origen externo: 403 sin llamada al proveedor.
+- `/alux` en 390×844: pregunta turística real, respuesta editorial visible, contador `1/40 hoy`, cero errores y cero desbordamiento.
+- `/restaurante/copalli-cafe` redirige a la ficha canónica; selector English, Copalli visible, lotes de traducción 200, cero errores y cero desbordamiento. El slug inexistente `cafe-copalli` mostró el 404 esperado y no se modificó.
+- Este lote no requirió migraciones, escrituras CMS ni cambios en datos reales. Las cuotas usan tablas y RPC ya existentes.
+
+### Pendientes
+Publicar este nuevo lote para aplicarlo al sitio público. La compra real/efectivo sigue reservada a un piloto autorizado. Fotos bajo dominio propio y limpieza global de código huérfano no se abordaron aquí. No se certificó Safari físico, carga de 1,000 usuarios ni una prueba de micrófono con audio real; el micrófono se comprobó con un archivo válido simulado y la lectura sí se ejerció contra el proveedor.
+
 ## Reversibilidad
-Conservar las restricciones de precios y pagos; no volver a conceder escritura directa. Ante un problema de sesión, corregir el flujo de acreditación en un cambio trazable, sin autorizar claves ajenas ni borrar memoria. Las migraciones se revierten solo mediante una migración nueva autorizada.
+Conservar las restricciones de precios y pagos; no volver a conceder escritura directa. Ante un problema de sesión, corregir el flujo de acreditación en un cambio trazable, sin autorizar claves ajenas ni borrar memoria. Las migraciones se revierten solo mediante una migración nueva autorizada. Los cupos pueden ajustarse en los llamados existentes sin cambiar el contrato visual ni crear otro limitador.
