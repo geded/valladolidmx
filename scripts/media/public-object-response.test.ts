@@ -82,3 +82,11 @@ describe("Entrega pública de imágenes sin revelar almacenamiento", () => {
     expect(response.body).toBeNull();
   });
 });
+
+describe("imageTypeFromPath", () => {
+  it("reconoce AVIF guardado sin tipo de imagen", async () => {
+    const { imageTypeFromPath } = await import("../../src/lib/media/public-object-response.server");
+    expect(imageTypeFromPath("x/hero/avif/1600.avif")).toBe("image/avif");
+    expect(imageTypeFromPath("x/doc.pdf")).toBeUndefined();
+  });
+});
