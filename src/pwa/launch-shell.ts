@@ -40,7 +40,12 @@ export const launchShellCachedResponseWillBeUsed = async ({
       .find((p) => /^\/assets\/index-[\w-]+\.js$/.test(p));
     if (!entry) return null;
     const html = await cachedResponse.clone().text();
-    return html.includes(entry) ? cachedResponse : null;
+    if (!html.includes(entry)) return null;
+    // Las fotos protegidas llevan enlaces que caducan a las 2 h: con señal,
+    // una copia de más de 45 min se pide nueva para no mostrar fotos vacías.
+    const stamp = /data-rendered-at="(\d+)"/.exec(html);
+    if (!stamp || Date.now() - Number(stamp[1]) > 45 * 60 * 1000) return null;
+    return cachedResponse;
   } catch {
     return null;
   }

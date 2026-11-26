@@ -18,11 +18,23 @@ function setup({ windows = 0, online = true, precache = [CURRENT], htmlCache = n
   });
 }
 
-const page = (script: string) => new Response(`<html><script src="${script}"></script></html>`);
+const page = (script: string, age = 0) =>
+  new Response(`<html data-rendered-at="${Date.now() - age}"><script src="${script}"></script></html>`);
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe("arranque instantáneo de la app instalada", () => {
+  it("con señal no usa una copia de más de 45 minutos (fotos caducadas)", async () => {
+    setup({});
+    expect(await launchShellCachedResponseWillBeUsed({ cachedResponse: page(CURRENT, 46 * 60 * 1000) })).toBeNull();
+  });
+
+  it("sin señal sí usa una copia antigua", async () => {
+    setup({ online: false });
+    const copy = page(CURRENT, 5 * 60 * 60 * 1000);
+    expect(await launchShellCachedResponseWillBeUsed({ cachedResponse: copy })).toBe(copy);
+  });
+
   it("al abrir la app usa la copia guardada de la versión vigente", async () => {
     setup({});
     const copy = page(CURRENT);
