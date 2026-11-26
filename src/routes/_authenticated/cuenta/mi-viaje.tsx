@@ -79,6 +79,11 @@ import {
 } from "@/lib/traveler/itinerary-document";
 import { useItineraryProgress } from "@/lib/traveler/itinerary-progress";
 import { computeTripProgress } from "@/lib/traveler/trip-progress";
+import { DndContext, PointerSensor, TouchSensor, KeyboardSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
+import { ItineraryQuickAdd } from "@/components/traveler/ItineraryQuickAdd";
 import { estimateLeg, formatLeg } from "@/lib/traveler/itinerary-document";
 import { TripItineraryDocument } from "@/components/traveler/TripItineraryDocument";
 import { deriveTripPhase, type TripPhase } from "@/lib/traveler/trip-phase";
@@ -1010,7 +1015,7 @@ function ItinerarioViews({
   const showSideMap = view !== "mapa";
   return (
     <section className="space-y-4">
-      <TripProgressPanel data={data} onSeeTimeline={() => setView("timeline")} />
+      <TripProgressPanel data={data} onChanged={onChanged} onSeeTimeline={() => setView("timeline")} />
       <TaxiAppInstallCard signedIn purpose="trip" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="shrink-0 text-lg font-medium">Tu itinerario</h2>
@@ -1194,6 +1199,24 @@ function ItinerarioTimeline({
     const dayIds = dayItems.map((i) => i.id);
     const [moved] = dayIds.splice(idx, 1);
     dayIds.splice(target, 0, moved);
+    applyDayOrder(dayIds);
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  function onDragEnd(dayItems: TravelPlanItem[], e: DragEndEvent) {
+    if (!e.over || e.active.id === e.over.id) return;
+    const ids = dayItems.map((i) => i.id);
+    const from = ids.indexOf(String(e.active.id));
+    const to = ids.indexOf(String(e.over.id));
+    if (from < 0 || to < 0) return;
+    applyDayOrder(arrayMove(ids, from, to));
+  }
+
+  function applyDayOrder(dayIds: string[]) {
     const daySet = new Set(dayIds);
     const newOrder: string[] = [];
     let inserted = false;
@@ -1286,6 +1309,8 @@ function ItinerarioTimeline({
               ) : null}
             </div>
           </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => onDragEnd(items, e)}>
+          <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           <ol className="relative space-y-3 border-l border-border/60 pl-4">
             {items.map((it, idx) => {
               const snap = it.snapshot ?? {};
@@ -1296,7 +1321,7 @@ function ItinerarioTimeline({
               const there = nextIt ? geoById.get(nextIt.id) : undefined;
               const leg = here && there ? estimateLeg(here, there) : null;
               return (
-                <li key={it.id} className="relative">
+                <SortableStop key={it.id} id={it.id} enabled={items.length > 1}>
                   <span className="absolute -left-[21px] top-2 grid size-3 place-items-center rounded-full bg-primary" />
                   <div className="flex items-start gap-3">
                     {snap.image_url ? (
@@ -1363,10 +1388,12 @@ function ItinerarioTimeline({
                       siguiente parada
                     </p>
                   ) : null}
-                </li>
+                </SortableStop>
               );
             })}
           </ol>
+          </SortableContext>
+          </DndContext>
         </div>
       ))}
     </div>
@@ -2872,11 +2899,14 @@ function meridaTodayIso(): string {
 function TripProgressPanel({
   data,
   onSeeTimeline,
+  onChanged,
 }: {
   data: TravelPlanWithItems;
   onSeeTimeline: () => void;
+  onChanged: () => void;
 }) {
   const { done, toggle } = useItineraryProgress(data.plan.id);
+  const [adding, setAdding] = useState(false);
   const p = useMemo(
     () =>
       computeTripProgress(data.items, done, {
@@ -2968,12 +2998,13 @@ function TripProgressPanel({
         </div>
       ) : null}
       <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:flex">
-        <Link
-          to="/oriente-maya"
+        <button
+          type="button"
+          onClick={() => setAdding((v) => !v)}
           className="inline-flex min-h-10 items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-1 font-medium text-foreground hover:bg-accent"
         >
           <Plus className="size-3" aria-hidden /> Agregar parada
-        </Link>
+        </button>
         <Link
           to="/alux"
           search={{ prompt: "Sugiéreme una parada más para mi itinerario en el Oriente Maya." }}
@@ -2982,6 +3013,39 @@ function TripProgressPanel({
           <Sparkles className="size-3" aria-hidden /> Sugerencia de Alux
         </Link>
       </div>
+      {adding ? (
+        <ItineraryQuickAdd
+          planId={data.plan.id}
+          totalDays={p.totalDays}
+          onAdded={onChanged}
+          onClose={() => setAdding(false)}
+        />
+      ) : null}
     </div>
+  );
+}
+
+/** Parada arrastrable (dedo o mouse) con asa visible; flechas siguen disponibles. */
+function SortableStop({ id, enabled, children }: { id: string; enabled: boolean; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !enabled });
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`relative ${enabled ? "pr-8" : ""} ${isDragging ? "z-10 rounded-lg bg-card shadow-elevated" : ""}`}
+    >
+      {children}
+      {enabled ? (
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Arrastrar para cambiar el orden"
+          className="absolute right-0 top-0 grid size-8 touch-none place-items-center rounded-md text-muted-foreground hover:bg-accent active:cursor-grabbing"
+        >
+          <GripVertical className="size-4" aria-hidden />
+        </button>
+      ) : null}
+    </li>
   );
 }

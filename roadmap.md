@@ -680,3 +680,4 @@
 - [ ] Etapa 3: cobro, depósitos, reseñas de quien asistió
 - [x] Itinerario estilo Wanderlog: avance, mapa lateral numerado, traslados, invitación a instalar la app
 - [x] Itinerario optimizado para celular
+- [x] Itinerario: agregar parada buscando y arrastrar paradas
