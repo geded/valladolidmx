@@ -5,7 +5,7 @@ export function TaxiRideMap({
   ride,
   tracking,
 }: {
-  ride: TaxiOpenRide;
+  ride: Pick<TaxiOpenRide, "origin_lat" | "origin_lng" | "destination_lat" | "destination_lng">;
   tracking?: TaxiTracking | null;
 }) {
   const points = [

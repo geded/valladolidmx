@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, CarFront, LocateFixed, LogIn, MapPin, Users } from "lucide-react";
+import { CalendarClock, ChevronDown, Circle, LocateFixed, LogIn, MapPin, Search, Square, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { useAuth } from "@/hooks/useAuth";
 import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
-import { quoteTaxi, requestTaxiRide } from "@/lib/taxi/taxi.functions";
+import { quoteTaxi, requestTaxiRide, searchTaxiPlaces, type TaxiPlaceHit } from "@/lib/taxi/taxi.functions";
 import {
   formatTaxiMoney,
   taxiErrorMessage,
@@ -17,6 +17,7 @@ import {
   type TaxiQuote,
 } from "@/lib/taxi/rules";
 import { toast } from "@/lib/toast";
+import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 
 const DRAFT_KEY = "vmx.taxi.quote-draft.v1";
 const CENTER = { lat: 20.6896, lng: -88.2017 };
@@ -76,6 +77,15 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
   const [quote, setQuote] = useState<TaxiQuote | null>(null);
   const [busy, setBusy] = useState<"quote" | "request" | null>(null);
   const [ready, setReady] = useState(false);
+  const [pinTarget, setPinTarget] = useState<"origin" | "destination">("destination");
+  const [scheduled, setScheduled] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+
+  // La barra de precio fija en celular eleva a Alux para que no la tape.
+  useEffect(() => {
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+    return registerStickyCta();
+  }, []);
 
   useEffect(() => {
     const saved = readDraft();
@@ -103,6 +113,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
   }
 
   function requestedForIso(): string {
+    if (!scheduled) return new Date(Date.now() + 5 * 60_000).toISOString();
     const date = new Date(draft.requestedFor);
     if (Number.isNaN(date.getTime())) throw new Error("invalid_requested_for");
     return date.toISOString();
@@ -146,7 +157,12 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
       return;
     }
     if (!quote) {
-      toast.info("Primero calcula el precio de tu viaje.");
+      toast.info("Elige tu destino para ver el precio.");
+      return;
+    }
+    if (!draft.originLabel.trim() || !draft.destinationLabel.trim() || !draft.travelerName.trim() || !draft.travelerPhone.trim()) {
+      setShowDetails(true);
+      toast.info("Completa recogida, destino, tu nombre y tu celular.");
       return;
     }
     setBusy("request");
@@ -180,184 +196,242 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        patch("origin", { lat: position.coords.latitude, lng: position.coords.longitude });
-        if (!draft.originLabel) patch("originLabel", "Mi ubicación actual");
+        setDraft((c) => ({
+          ...c,
+          origin: { lat: position.coords.latitude, lng: position.coords.longitude },
+          originLabel: c.originLabel || "Mi ubicación actual",
+        }));
+        setQuote(null);
+        setPinTarget("destination");
       },
       () => toast.error("No pudimos obtener tu ubicación. Marca el punto en el mapa."),
       { enableHighAccuracy: true, timeout: 10_000 },
     );
   }
 
+  // Cotiza solo en cuanto hay recogida y destino, como en las apps de transporte.
+  const quoteKey = `${draft.origin.lat},${draft.origin.lng},${draft.destination.lat},${draft.destination.lng},${scheduled ? draft.requestedFor : "now"}`;
+  useEffect(() => {
+    if (!ready || !draft.destinationLabel.trim()) return;
+    const t = window.setTimeout(() => void calculate(), 600);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quoteKey, ready, Boolean(draft.destinationLabel.trim())]);
+
+  function pickPlace(target: "origin" | "destination", hit: TaxiPlaceHit) {
+    setDraft((c) =>
+      target === "origin"
+        ? { ...c, origin: { lat: hit.lat, lng: hit.lng }, originLabel: hit.title }
+        : { ...c, destination: { lat: hit.lat, lng: hit.lng }, destinationLabel: hit.title },
+    );
+    setQuote(null);
+    setPinTarget(target);
+  }
+
+  const activePoint = pinTarget === "origin" ? draft.origin : draft.destination;
+
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <div className="space-y-5">
-        <section className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-base font-semibold">
-              <MapPin className="size-5 text-primary" /> Origen y destino
-            </h2>
-            <Button type="button" variant="outline" size="sm" onClick={useCurrentLocation}>
-              <LocateFixed className="mr-2 size-4" /> Mi ubicación
+    <div className="grid items-start gap-5 pb-28 lg:grid-cols-[minmax(0,1fr)_360px] lg:pb-0">
+      <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+        <div className="relative">
+          <LocationPickerMap
+            key={pinTarget}
+            lat={activePoint.lat}
+            lng={activePoint.lng}
+            onChange={(point) => patch(pinTarget, point)}
+            className="h-[42vh] min-h-[260px] w-full bg-muted lg:h-[460px]"
+          />
+          <div className="absolute left-3 top-3 flex gap-1 rounded-full bg-card/95 p-1 shadow-soft">
+            {(["origin", "destination"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setPinTarget(t)}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium ${pinTarget === t ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              >
+                {t === "origin" ? "Mover recogida" : "Mover destino"}
+              </button>
+            ))}
+          </div>
+          <Button type="button" size="icon" variant="secondary" aria-label="Usar mi ubicación" onClick={useCurrentLocation} className="absolute bottom-3 right-3 size-11 rounded-full shadow-elevated">
+            <LocateFixed className="size-5" />
+          </Button>
+        </div>
+
+        <div className="space-y-3 p-4 sm:p-5">
+          <h2 className="text-xl font-semibold">¿A dónde vas?</h2>
+          <div className="relative rounded-2xl border border-border bg-background">
+            <span aria-hidden className="absolute left-[19px] top-[34px] h-[calc(100%-68px)] w-px bg-border" />
+            <PlaceField
+              id="taxi-origin"
+              icon={<Circle className="size-3 fill-foreground" />}
+              placeholder="Punto de recogida"
+              value={draft.originLabel}
+              onText={(v) => patch("originLabel", v)}
+              onPick={(hit) => pickPlace("origin", hit)}
+              onFocus={() => setPinTarget("origin")}
+            />
+            <div className="mx-4 border-t border-border" />
+            <PlaceField
+              id="taxi-destination"
+              icon={<Square className="size-3 fill-primary text-primary" />}
+              placeholder="Cenote, hotel, restaurante o dirección"
+              value={draft.destinationLabel}
+              onText={(v) => patch("destinationLabel", v)}
+              onPick={(hit) => pickPlace("destination", hit)}
+              onFocus={() => setPinTarget("destination")}
+            />
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Busca un lugar del Oriente Maya o arrastra el pin en el mapa para el punto exacto.
+          </p>
+
+          <div className="grid grid-cols-2 gap-2">
+            <Button type="button" variant={scheduled ? "outline" : "default"} className="h-11" onClick={() => setScheduled(false)}>Ahora</Button>
+            <Button type="button" variant={scheduled ? "default" : "outline"} className="h-11" onClick={() => setScheduled(true)}>
+              <CalendarClock className="mr-2 size-4" /> Programar
             </Button>
           </div>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="taxi-origin" className="text-xs font-medium">¿Dónde te recogemos?</label>
-              <Input
-                id="taxi-origin"
-                required
-                value={draft.originLabel}
-                onChange={(event) => patch("originLabel", event.target.value)}
-                placeholder="Hotel, restaurante o dirección"
-                className="mt-1"
-              />
-              <LocationPickerMap
-                lat={draft.origin.lat}
-                lng={draft.origin.lng}
-                onChange={(point) => patch("origin", point)}
-                className="mt-3 h-[240px] w-full rounded-xl border border-border bg-muted"
-              />
-            </div>
-            <div>
-              <label htmlFor="taxi-destination" className="text-xs font-medium">¿A dónde vas?</label>
-              <Input
-                id="taxi-destination"
-                required
-                value={draft.destinationLabel}
-                onChange={(event) => patch("destinationLabel", event.target.value)}
-                placeholder="Cenote, zona arqueológica o dirección"
-                className="mt-1"
-              />
-              <LocationPickerMap
-                lat={draft.destination.lat}
-                lng={draft.destination.lng}
-                onChange={(point) => patch("destination", point)}
-                className="mt-3 h-[240px] w-full rounded-xl border border-border bg-muted"
-              />
-            </div>
-          </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            Toca el mapa o arrastra cada pin para señalar el punto exacto.
-          </p>
-        </section>
+          {scheduled ? (
+            <Input
+              id="taxi-date"
+              type="datetime-local"
+              aria-label="Fecha y hora de salida"
+              value={draft.requestedFor}
+              onChange={(event) => patch("requestedFor", event.target.value)}
+              className="h-11"
+            />
+          ) : null}
 
-        <section className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
-          <h2 className="text-base font-semibold">Detalles del viaje</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="taxi-date" className="flex items-center gap-1.5 text-xs font-medium">
-                <CalendarClock className="size-4" /> Fecha y hora de salida
-              </label>
-              <Input
-                id="taxi-date"
-                type="datetime-local"
-                required
-                value={draft.requestedFor}
-                onChange={(event) => patch("requestedFor", event.target.value)}
-                className="mt-1"
-              />
+          <button type="button" onClick={() => setShowDetails((v) => !v)} className="flex w-full items-center justify-between rounded-xl bg-secondary/60 px-4 py-3 text-sm font-medium">
+            <span className="flex items-center gap-2"><Users className="size-4" /> {draft.passengers} {draft.passengers === 1 ? "persona" : "personas"} · {draft.travelerName || "tus datos"}</span>
+            <ChevronDown className={`size-4 transition-transform ${showDetails ? "rotate-180" : ""}`} />
+          </button>
+          {showDetails ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="taxi-passengers" className="text-xs font-medium">Personas</label>
+                <select id="taxi-passengers" value={draft.passengers} onChange={(event) => patch("passengers", Number(event.target.value))} className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  {[1, 2, 3, 4, 5, 6].map((count) => <option key={count} value={count}>{count}</option>)}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="taxi-name" className="text-xs font-medium">Tu nombre</label>
+                <Input id="taxi-name" autoComplete="name" value={draft.travelerName} onChange={(event) => patch("travelerName", event.target.value)} className="mt-1 h-11" />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="taxi-phone" className="text-xs font-medium">Tu celular</label>
+                <Input id="taxi-phone" type="tel" inputMode="tel" autoComplete="tel" value={draft.travelerPhone} onChange={(event) => patch("travelerPhone", event.target.value)} placeholder="Para que el taxista te llame" className="mt-1 h-11" />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="taxi-notes" className="text-xs font-medium">Indicaciones (opcional)</label>
+                <Textarea id="taxi-notes" value={draft.notes} onChange={(event) => patch("notes", event.target.value)} placeholder="Equipaje, punto de referencia o alguna necesidad especial" className="mt-1" maxLength={500} />
+              </div>
             </div>
-            <div>
-              <label htmlFor="taxi-passengers" className="flex items-center gap-1.5 text-xs font-medium">
-                <Users className="size-4" /> Personas
-              </label>
-              <select
-                id="taxi-passengers"
-                value={draft.passengers}
-                onChange={(event) => patch("passengers", Number(event.target.value))}
-                className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-              >
-                {[1, 2, 3, 4, 5, 6].map((count) => <option key={count} value={count}>{count}</option>)}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="taxi-name" className="text-xs font-medium">Tu nombre</label>
-              <Input
-                id="taxi-name"
-                required
-                autoComplete="name"
-                value={draft.travelerName}
-                onChange={(event) => patch("travelerName", event.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <label htmlFor="taxi-phone" className="text-xs font-medium">Tu celular</label>
-              <Input
-                id="taxi-phone"
-                required
-                type="tel"
-                autoComplete="tel"
-                value={draft.travelerPhone}
-                onChange={(event) => patch("travelerPhone", event.target.value)}
-                placeholder="Para coordinar la recogida"
-                className="mt-1"
-              />
-            </div>
-          </div>
-          <label htmlFor="taxi-notes" className="mt-4 block text-xs font-medium">Indicaciones (opcional)</label>
-          <Textarea
-            id="taxi-notes"
-            value={draft.notes}
-            onChange={(event) => patch("notes", event.target.value)}
-            placeholder="Equipaje, punto de referencia o alguna necesidad especial"
-            className="mt-1"
-            maxLength={500}
-          />
-        </section>
-      </div>
+          ) : null}
+        </div>
+      </section>
 
-      <aside className="rounded-2xl border border-border bg-card p-5 shadow-elevated lg:sticky lg:top-24">
-        <CarFront className="size-7 text-primary" />
-        <h2 className="mt-3 text-lg font-semibold">Tu cotización</h2>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          Precio calculado con las tarifas configuradas por Valladolid.mx. Se paga en efectivo
-          directamente al conductor.
-        </p>
-        {quote ? (
-          <div className="mt-5 rounded-xl bg-primary/10 p-4">
-            <p className="text-3xl font-semibold">{formatTaxiMoney(quote.fare_amount, quote.currency)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {quote.distance_km.toFixed(1)} km aprox. · {quote.estimated_minutes} min estimados
-            </p>
-            {quote.night_surcharge ? <p className="mt-1 text-[11px]">Incluye tarifa nocturna.</p> : null}
+      <aside className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-floating backdrop-blur lg:sticky lg:top-24 lg:rounded-2xl lg:border lg:p-5 lg:shadow-elevated">
+        <div className="mx-auto flex max-w-xl items-center gap-3 lg:block">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Taxi Alux · efectivo</p>
+            {quote ? (
+              <>
+                <p className="text-2xl font-semibold leading-tight lg:mt-2 lg:text-3xl">{formatTaxiMoney(quote.fare_amount, quote.currency)}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {quote.distance_km.toFixed(1)} km · {quote.estimated_minutes} min{quote.night_surcharge ? " · tarifa nocturna" : ""}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground lg:mt-2">
+                {busy === "quote" ? "Calculando precio…" : "Elige destino para ver el precio"}
+              </p>
+            )}
           </div>
-        ) : (
-          <p className="mt-5 text-sm text-muted-foreground">Calcula para conocer el total antes de pedir.</p>
-        )}
-        <Button
-          type="button"
-          variant="outline"
-          className="mt-5 w-full"
-          disabled={busy !== null}
-          onClick={calculate}
-        >
-          {busy === "quote" ? "Calculando…" : "Calcular precio"}
-        </Button>
-        <Button
-          type="button"
-          className="mt-2 w-full"
-          disabled={busy !== null || config.available_drivers < 1}
-          onClick={request}
-        >
-          {!user ? <LogIn className="mr-2 size-4" /> : null}
-          {busy === "request" ? "Enviando…" : user ? "Pedir Taxi Alux" : "Registrarme y pedir taxi"}
-        </Button>
-        {config.available_drivers < 1 ? (
-          <p role="status" className="mt-3 rounded-lg bg-warning/10 p-3 text-xs text-warning-foreground">
-            No hay taxistas disponibles en este momento. Puedes cotizar, pero todavía no enviar la solicitud.
-          </p>
-        ) : (
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">
-            {config.available_drivers === 1 ? "1 taxista disponible" : `${config.available_drivers} taxistas disponibles`}
-          </p>
-        )}
-        <p className="mt-4 border-t border-border pt-4 text-[11px] leading-4 text-muted-foreground">
-          {user
-            ? "La solicitud quedará guardada en Mi Cuenta para que consultes a tu conductor y el estado del viaje."
-            : "Necesitas una cuenta de viajero. Tu cotización queda guardada en este dispositivo mientras inicias sesión o te registras."}
+          <Button
+            type="button"
+            className="h-12 shrink-0 px-5 text-base lg:mt-5 lg:w-full"
+            disabled={busy !== null || config.available_drivers < 1 || (!!user && !quote)}
+            onClick={request}
+          >
+            {!user ? <LogIn className="mr-2 size-4" /> : null}
+            {busy === "request" ? "Enviando…" : user ? "Pedir Taxi Alux" : "Regístrate y pide"}
+          </Button>
+        </div>
+        <p className="mx-auto mt-2 max-w-xl text-center text-[11px] text-muted-foreground">
+          {config.available_drivers < 1
+            ? "No hay taxistas disponibles en este momento; puedes cotizar."
+            : config.available_drivers === 1
+              ? "1 taxista disponible"
+              : `${config.available_drivers} taxistas disponibles`}
         </p>
       </aside>
+    </div>
+  );
+}
+
+function PlaceField(props: {
+  id: string;
+  icon: React.ReactNode;
+  placeholder: string;
+  value: string;
+  onText: (v: string) => void;
+  onPick: (hit: TaxiPlaceHit) => void;
+  onFocus: () => void;
+}) {
+  const searchFn = useServerFn(searchTaxiPlaces);
+  const [hits, setHits] = useState<TaxiPlaceHit[]>([]);
+  const [open, setOpen] = useState(false);
+  const typed = useRef(false);
+  useEffect(() => {
+    if (!typed.current || props.value.trim().length < 2) {
+      setHits([]);
+      return;
+    }
+    const t = window.setTimeout(() => {
+      searchFn({ data: { term: props.value } }).then(setHits).catch(() => setHits([]));
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [props.value, searchFn]);
+  return (
+    <div className="relative">
+      <div className="flex items-center gap-3 px-4">
+        <span className="flex size-3 shrink-0 items-center justify-center">{props.icon}</span>
+        <label htmlFor={props.id} className="sr-only">{props.placeholder}</label>
+        <input
+          id={props.id}
+          value={props.value}
+          placeholder={props.placeholder}
+          autoComplete="off"
+          enterKeyHint="search"
+          onFocus={() => { setOpen(true); props.onFocus(); }}
+          onBlur={() => window.setTimeout(() => setOpen(false), 150)}
+          onChange={(e) => { typed.current = true; props.onText(e.target.value); setOpen(true); }}
+          className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground"
+        />
+        <Search className="size-4 shrink-0 text-muted-foreground" />
+      </div>
+      {open && hits.length > 0 ? (
+        <ul role="listbox" className="absolute inset-x-2 top-full z-30 mt-1 max-h-64 overflow-auto rounded-xl border border-border bg-popover py-1 shadow-elevated">
+          {hits.map((hit) => (
+            <li key={`${hit.subtitle}-${hit.id}`}>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => { typed.current = false; props.onPick(hit); setHits([]); setOpen(false); }}
+                className="flex w-full items-center gap-3 px-3 py-3 text-left hover:bg-muted"
+              >
+                <MapPin className="size-4 shrink-0 text-primary" />
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-medium">{hit.title}</span>
+                  <span className="block text-[11px] text-muted-foreground">{hit.subtitle}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

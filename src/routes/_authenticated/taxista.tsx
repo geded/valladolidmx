@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CarFront, Check, MapPin, Navigation, Power, ShieldCheck, UserRound } from "lucide-react";
+import { CarFront, Check, MapPin, MessageCircle, Navigation, Phone, Power, ShieldCheck, Star, UserRound } from "lucide-react";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 import { TaxiAppInstallCard } from "@/components/taxi/TaxiAppInstallCard";
@@ -17,6 +17,7 @@ import {
   getTaxiRideTracking,
   listDriverOpenRides,
   listDriverTaxiRides,
+  rateTaxiRide,
   setDriverAvailability,
   setDriverRideStatus,
   updateDriverLocation,
@@ -30,6 +31,7 @@ import {
   nextDriverRideStatus,
   TAXI_STATUS_LABELS,
   taxiErrorMessage,
+  taxiEtaMinutes,
   type TaxiOpenRide,
   type TaxiRide,
 } from "@/lib/taxi/rules";
@@ -67,6 +69,7 @@ function DriverDashboard() {
   const statusFn = useServerFn(setDriverRideStatus);
   const locationFn = useServerFn(updateDriverLocation);
   const trackingFn = useServerFn(getTaxiRideTracking);
+  const rateFn = useServerFn(rateTaxiRide);
   const [busy, setBusy] = useState(false);
   const [locationNote, setLocationNote] = useState<string | null>(null);
   const lastLocationSent = useRef(0);
@@ -230,6 +233,26 @@ function DriverDashboard() {
   }
 
   const next = activeRide ? nextDriverRideStatus(activeRide.status) : null;
+  const toPickup = activeRide ? activeRide.status === "accepted" : false;
+  const navTarget = activeRide
+    ? toPickup
+      ? { lat: activeRide.origin_lat, lng: activeRide.origin_lng }
+      : { lat: activeRide.destination_lat, lng: activeRide.destination_lng }
+    : null;
+  const me = trackingQ.data?.lat != null && trackingQ.data.lng != null ? { lat: trackingQ.data.lat, lng: trackingQ.data.lng } : null;
+  const driverEta = navTarget && activeRide && activeRide.status !== "arrived" ? taxiEtaMinutes(me, navTarget) : null;
+  const travelerPhone = activeRide?.traveler_phone ? activeRide.traveler_phone.replace(/[^\d+]/g, "") : "";
+  const toRate = rides.find((ride) => ride.status === "completed" && !ride.driver_rating && ride.completed_at && Date.now() - new Date(ride.completed_at).getTime() < 24 * 3600_000) ?? null;
+
+  async function rateTraveler(ride: TaxiRide, rating: number) {
+    try {
+      await rateFn({ data: { rideId: ride.id, rating } });
+      toast.success("Calificación guardada.");
+      await queryClient.invalidateQueries({ queryKey: ["taxi"] });
+    } catch (error) {
+      toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
+    }
+  }
   const nextLabel = next === "arrived" ? "Llegué por el viajero" : next === "in_progress" ? "Iniciar viaje" : next === "completed" ? "Llegamos al destino · terminar viaje" : null;
 
   return (
@@ -262,6 +285,9 @@ function DriverDashboard() {
                 <div>
                   <p className="text-xs text-muted-foreground">{activeRide.folio}</p>
                   <h2 className="mt-1 text-xl font-semibold">{TAXI_STATUS_LABELS[activeRide.status]}</h2>
+                  {driverEta != null ? (
+                    <p className="text-sm text-primary">{toPickup ? `Llegas por el viajero en ~${driverEta} min` : `Destino en ~${driverEta} min`}</p>
+                  ) : null}
                 </div>
                 <Badge>{formatTaxiMoney(activeRide.fare_amount, activeRide.currency)} · efectivo</Badge>
               </div>
@@ -280,7 +306,22 @@ function DriverDashboard() {
                 <p className="mt-1 text-muted-foreground">{activeRide.traveler_phone}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{formatTaxiDate(activeRide.requested_for)}</p>
                 {activeRide.notes ? <p className="mt-2 text-xs">Notas: {activeRide.notes}</p> : null}
+                {travelerPhone ? (
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <Button asChild variant="outline" className="h-11"><a href={`tel:${travelerPhone}`}><Phone className="mr-2 size-4" /> Llamar</a></Button>
+                    <Button asChild variant="outline" className="h-11">
+                      <a href={`https://wa.me/${travelerPhone.replace("+", "")}`} target="_blank" rel="noopener noreferrer"><MessageCircle className="mr-2 size-4" /> WhatsApp</a>
+                    </Button>
+                  </div>
+                ) : null}
               </div>
+              {navTarget ? (
+                <Button asChild variant="secondary" className="mt-3 h-11 w-full">
+                  <a href={`https://www.google.com/maps/dir/?api=1&destination=${navTarget.lat},${navTarget.lng}&travelmode=driving`} target="_blank" rel="noopener noreferrer">
+                    <Navigation className="mr-2 size-4" /> {toPickup ? "Navegar a la recogida" : "Navegar al destino"}
+                  </a>
+                </Button>
+              ) : null}
               <div className="mt-4"><TaxiRideMap ride={activeRide} tracking={trackingQ.data} /></div>
               <p className="mt-2 text-[11px] text-muted-foreground">
                 {locationNote ?? "Mantén este panel abierto durante el servicio para actualizar tu ubicación."}
@@ -301,12 +342,25 @@ function DriverDashboard() {
                   </div>
                 </div>
               ) : next && nextLabel ? (
-                <Button type="button" className="mt-4 w-full" disabled={busy} onClick={() => advance(activeRide)}>
+                <Button type="button" className="mt-4 h-12 w-full text-base" disabled={busy} onClick={() => advance(activeRide)}>
                   <Check className="mr-2 size-4" /> {nextLabel}
                 </Button>
               ) : null}
             </section>
           ) : (
+            <>
+            {toRate ? (
+              <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+                <p className="text-sm font-semibold">Califica a {toRate.traveler_name} ({toRate.folio})</p>
+                <div className="mt-2 flex gap-1">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button key={n} type="button" aria-label={`${n} estrellas`} className="p-1" onClick={() => rateTraveler(toRate, n)}>
+                      <Star className="size-8 text-primary" />
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
             <section className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
               <h2 className="flex items-center gap-2 text-lg font-semibold"><Navigation className="size-5 text-primary" /> Solicitudes disponibles</h2>
               {!driver.is_available ? (
@@ -327,11 +381,12 @@ function DriverDashboard() {
                       </div>
                       <Badge variant="outline">{formatTaxiMoney(ride.fare_amount, ride.currency)}</Badge>
                     </div>
-                    <Button type="button" className="mt-3 w-full" disabled={busy} onClick={() => accept(ride)}>Aceptar este viaje</Button>
+                    <Button type="button" className="mt-3 h-12 w-full text-base" disabled={busy} onClick={() => accept(ride)}>Aceptar este viaje</Button>
                   </article>
                 ))}
               </div>
             </section>
+            </>
           )}
         </div>
 

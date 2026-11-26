@@ -608,3 +608,122 @@ export const approveTaxiDriverInvitation = createServerFn({ method: "POST" })
     if (completeError) throw new Error(completeError.message);
     return { ok: true, existing, driver: driverRow };
   });
+
+export const rateTaxiRide = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        rideId: z.string().uuid(),
+        rating: z.number().int().min(1).max(5),
+        comment: z.string().trim().max(500).optional(),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { error } = await (context.supabase as unknown as Loose).rpc("taxi_rate_ride", {
+      _ride_id: data.rideId,
+      _rating: data.rating,
+      _comment: data.comment ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const shareTaxiRide = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ rideId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }): Promise<{ token: string }> => {
+    const { data: token, error } = await (context.supabase as unknown as Loose).rpc(
+      "taxi_share_ride",
+      { _ride_id: data.rideId },
+    );
+    if (error) throw new Error(error.message);
+    return { token: String(token) };
+  });
+
+export interface TaxiSharedRide {
+  folio: string;
+  status: TaxiRideStatus;
+  origin_label: string;
+  destination_label: string;
+  origin_lat: number;
+  origin_lng: number;
+  destination_lat: number;
+  destination_lng: number;
+  driver_name: string | null;
+  vehicle_description: string | null;
+  vehicle_color: string | null;
+  plates: string | null;
+  lat: number | null;
+  lng: number | null;
+  location_updated_at: string | null;
+  updated_at: string;
+}
+
+export const getSharedTaxiRide = createServerFn({ method: "POST" })
+  .inputValidator((raw: unknown) => z.object({ token: z.string().regex(/^[a-f0-9]{36}$/) }).parse(raw))
+  .handler(async ({ data }): Promise<TaxiSharedRide | null> => {
+    const { url, key } = publicEnv();
+    const { data: ride, error } = await (publicClient(url, key) as unknown as Loose).rpc(
+      "taxi_shared_ride",
+      { _token: data.token },
+    );
+    if (error) throw new Error(error.message);
+    return (ride ?? null) as TaxiSharedRide | null;
+  });
+
+export interface TaxiPlaceHit {
+  id: string;
+  title: string;
+  subtitle: string;
+  lat: number;
+  lng: number;
+}
+
+/** Lugares del territorio con coordenadas publicadas para elegir destino o recogida. */
+export const searchTaxiPlaces = createServerFn({ method: "POST" })
+  .inputValidator((raw: unknown) => z.object({ term: z.string().trim().min(2).max(80) }).parse(raw))
+  .handler(async ({ data }): Promise<TaxiPlaceHit[]> => {
+    const { accentInsensitiveOr } = await import("@/lib/cms/accent-search");
+    const { url, key } = publicEnv();
+    const client = publicClient(url, key) as unknown as Loose;
+    const bizOr = accentInsensitiveOr(["display_name"], data.term);
+    const nameOr = accentInsensitiveOr(["name"], data.term);
+    if (!bizOr || !nameOr) return [];
+    const [biz, poi, dest] = await Promise.all([
+      client
+        .from("businesses")
+        .select("id, display_name, business_locations(latitude, longitude, is_primary, deleted_at)")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .or(bizOr)
+        .limit(8),
+      client
+        .from("points_of_interest")
+        .select("id, name, latitude, longitude")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .or(nameOr)
+        .limit(6),
+      client
+        .from("destinations")
+        .select("id, name, latitude, longitude")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .or(nameOr)
+        .limit(4),
+    ]);
+    const out: TaxiPlaceHit[] = [];
+    const ok = (lat: unknown, lng: unknown) => typeof lat === "number" && typeof lng === "number";
+    for (const d of (dest.data ?? []) as Array<{ id: string; name: string; latitude: number; longitude: number }>)
+      if (ok(d.latitude, d.longitude)) out.push({ id: d.id, title: d.name, subtitle: "Destino", lat: d.latitude, lng: d.longitude });
+    for (const b of (biz.data ?? []) as Array<{ id: string; display_name: string; business_locations: Array<{ latitude: number | null; longitude: number | null; is_primary: boolean | null; deleted_at: string | null }> | null }>) {
+      const locs = (b.business_locations ?? []).filter((l) => !l.deleted_at && ok(l.latitude, l.longitude));
+      const loc = locs.find((l) => l.is_primary) ?? locs[0];
+      if (loc) out.push({ id: b.id, title: b.display_name, subtitle: "Empresa", lat: loc.latitude!, lng: loc.longitude! });
+    }
+    for (const p of (poi.data ?? []) as Array<{ id: string; name: string; latitude: number; longitude: number }>)
+      if (ok(p.latitude, p.longitude)) out.push({ id: p.id, title: p.name, subtitle: "Lugar", lat: p.latitude, lng: p.longitude });
+    return out.slice(0, 10);
+  });

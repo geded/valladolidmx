@@ -275,6 +275,12 @@ const OVERRIDES: Readonly<Record<string, Override>> = {
     dependencies: ["taxi_public_config", "taxi_quote", "taxi_request_ride"],
     notes: "Taxi Alux — cotización y solicitud con cuenta obligatoria, efectivo y disponibilidad real.",
   },
+  "src/routes/taxi_.seguimiento.$token.tsx": {
+    businessPriority: "high",
+    maturity: "L3",
+    dependencies: ["taxi_shared_ride"],
+    notes: "Taxi Alux — viaje compartido en vivo por enlace privado del viajero, noindex.",
+  },
   "src/routes/registro-taxista.$token.tsx": {
     businessPriority: "high",
     maturity: "L3",

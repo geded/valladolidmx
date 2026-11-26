@@ -8443,6 +8443,7 @@ export type Database = {
           destination_lng: number
           distance_km: number
           driver_id: string | null
+          driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
           folio: string
@@ -8454,11 +8455,14 @@ export type Database = {
           passengers: number
           payment_method: string
           requested_for: string
+          share_token: string | null
           started_at: string | null
           status: string
+          traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
+          traveler_rating: number | null
           updated_at: string
         }
         Insert: {
@@ -8475,6 +8479,7 @@ export type Database = {
           destination_lng: number
           distance_km: number
           driver_id?: string | null
+          driver_rating?: number | null
           estimated_minutes: number
           fare_amount: number
           folio: string
@@ -8486,11 +8491,14 @@ export type Database = {
           passengers?: number
           payment_method?: string
           requested_for?: string
+          share_token?: string | null
           started_at?: string | null
           status?: string
+          traveler_comment?: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
+          traveler_rating?: number | null
           updated_at?: string
         }
         Update: {
@@ -8507,6 +8515,7 @@ export type Database = {
           destination_lng?: number
           distance_km?: number
           driver_id?: string | null
+          driver_rating?: number | null
           estimated_minutes?: number
           fare_amount?: number
           folio?: string
@@ -8518,11 +8527,14 @@ export type Database = {
           passengers?: number
           payment_method?: string
           requested_for?: string
+          share_token?: string | null
           started_at?: string | null
           status?: string
+          traveler_comment?: string | null
           traveler_id?: string
           traveler_name?: string
           traveler_phone?: string
+          traveler_rating?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -12037,6 +12049,7 @@ export type Database = {
           destination_lng: number
           distance_km: number
           driver_id: string | null
+          driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
           folio: string
@@ -12048,11 +12061,14 @@ export type Database = {
           passengers: number
           payment_method: string
           requested_for: string
+          share_token: string | null
           started_at: string | null
           status: string
+          traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
+          traveler_rating: number | null
           updated_at: string
         }
         SetofOptions: {
@@ -12078,6 +12094,7 @@ export type Database = {
           destination_lng: number
           distance_km: number
           driver_id: string | null
+          driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
           folio: string
@@ -12089,11 +12106,14 @@ export type Database = {
           passengers: number
           payment_method: string
           requested_for: string
+          share_token: string | null
           started_at: string | null
           status: string
+          traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
+          traveler_rating: number | null
           updated_at: string
         }
         SetofOptions: {
@@ -12125,6 +12145,7 @@ export type Database = {
           destination_lng: number
           distance_km: number
           driver_id: string | null
+          driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
           folio: string
@@ -12136,11 +12157,14 @@ export type Database = {
           passengers: number
           payment_method: string
           requested_for: string
+          share_token: string | null
           started_at: string | null
           status: string
+          traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
+          traveler_rating: number | null
           updated_at: string
         }
         SetofOptions: {
@@ -12164,6 +12188,10 @@ export type Database = {
           _requested_for?: string
         }
         Returns: Json
+      }
+      taxi_rate_ride: {
+        Args: { _comment?: string; _rating: number; _ride_id: string }
+        Returns: undefined
       }
       taxi_request_ride: {
         Args: {
@@ -12194,6 +12222,7 @@ export type Database = {
           destination_lng: number
           distance_km: number
           driver_id: string | null
+          driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
           folio: string
@@ -12205,11 +12234,14 @@ export type Database = {
           passengers: number
           payment_method: string
           requested_for: string
+          share_token: string | null
           started_at: string | null
           status: string
+          traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
+          traveler_rating: number | null
           updated_at: string
         }
         SetofOptions: {
@@ -12220,6 +12252,8 @@ export type Database = {
         }
       }
       taxi_ride_tracking: { Args: { _ride_id: string }; Returns: Json }
+      taxi_share_ride: { Args: { _ride_id: string }; Returns: string }
+      taxi_shared_ride: { Args: { _token: string }; Returns: Json }
       taxi_submit_driver_invitation: {
         Args: {
           _applicant_notes?: string

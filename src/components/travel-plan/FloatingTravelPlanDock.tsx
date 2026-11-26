@@ -68,7 +68,7 @@ const HIDE_PREFIXES = [
   "/empresa",
   "/auth",
   "/carrito",
-  "/taxista",
+  "/taxi",
   "/caja/",
   "/registro-taxista",
 ];

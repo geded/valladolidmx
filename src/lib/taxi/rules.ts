@@ -59,6 +59,9 @@ export interface TaxiDriver {
 }
 
 export interface TaxiRide {
+  traveler_rating?: number | null;
+  traveler_comment?: string | null;
+  driver_rating?: number | null;
   id: string;
   folio: string;
   traveler_id: string;
@@ -148,6 +151,12 @@ export interface TaxiTracking {
   lng: number | null;
   location_updated_at: string | null;
   location_stale: boolean;
+  vehicle_color?: string | null;
+  vehicle_number?: string | null;
+  phone?: string | null;
+  rating_avg?: number | null;
+  rating_count?: number;
+  completed_rides?: number;
 }
 
 export const DEFAULT_TAXI_SETTINGS: TaxiSettings = {
@@ -377,4 +386,30 @@ export function taxiLedgerCsv(entries: TaxiLedgerEntry[]): string {
     [e.paid_at, e.folio, e.driver_name, e.vehicle, e.traveler_name, e.traveler_phone, e.route, e.distance_km, (e.amount / 100).toFixed(2), e.currency, e.method].map(esc).join(","),
   );
   return [head.map(esc).join(","), ...rows].join("\n");
+}
+
+/** Minutos aproximados para que el taxi llegue (o termine), a 30 km/h en línea recta ×1.3. */
+export function taxiEtaMinutes(
+  from: { lat: number; lng: number } | null,
+  to: { lat: number; lng: number },
+): number | null {
+  if (!from) return null;
+  const R = 6371;
+  const dLat = ((to.lat - from.lat) * Math.PI) / 180;
+  const dLng = ((to.lng - from.lng) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((from.lat * Math.PI) / 180) * Math.cos((to.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  const km = 2 * R * Math.asin(Math.sqrt(a)) * 1.3;
+  return Math.max(1, Math.round((km / 30) * 60));
+}
+
+/** Texto principal tipo «Tu taxi llega en 4 min» según el estado del viaje. */
+export function taxiEtaHeadline(status: TaxiRideStatus, eta: number | null): string {
+  if (status === "requested") return "Buscando un taxista para ti";
+  if (status === "accepted") return eta != null ? `Tu taxi llega en ${eta} min` : "Tu taxi va en camino";
+  if (status === "arrived") return "Tu taxi ya llegó";
+  if (status === "in_progress") return eta != null ? `Llegas a tu destino en ${eta} min` : "Vas en camino a tu destino";
+  if (status === "completed") return "Llegaste a tu destino";
+  return "Viaje cancelado";
 }

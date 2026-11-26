@@ -681,3 +681,6 @@
 - [x] Itinerario estilo Wanderlog: avance, mapa lateral numerado, traslados, invitación a instalar la app
 - [x] Itinerario optimizado para celular
 - [x] Itinerario: agregar parada buscando y arrastrar paradas
+
+- [ ] Taxi Alux: varios tipos de autos/taxis con su precio (pendiente, pedido por el usuario)
+- [ ] Taxi Alux: asignación automática al taxista libre más cercano

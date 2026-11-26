@@ -201,6 +201,7 @@ import { Route as OrienteMayaDestinoCategoriaRouteImport } from './routes/orient
 import { Route as OrienteMayaCategoriaCategoriaRouteImport } from './routes/oriente-maya/categoria.$categoria'
 import { Route as PreviewCompositionTokenRouteImport } from './routes/preview/composition.$token'
 import { Route as ResenarNegocioSlugRouteImport } from './routes/resenar.negocio.$slug'
+import { Route as TaxiSeguimientoTokenRouteImport } from './routes/taxi_.seguimiento.$token'
 import { Route as AuthenticatedAdminSistemaIndexRouteImport } from './routes/_authenticated/admin/sistema.index'
 import { Route as AuthenticatedAdminSistemaUsuariosRouteImport } from './routes/_authenticated/admin/sistema.usuarios'
 import { Route as AuthenticatedCmsAluxCalidadRouteImport } from './routes/_authenticated/cms/alux.calidad'
@@ -1369,6 +1370,11 @@ const ResenarNegocioSlugRoute = ResenarNegocioSlugRouteImport.update({
   path: '/resenar/negocio/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TaxiSeguimientoTokenRoute = TaxiSeguimientoTokenRouteImport.update({
+  id: '/taxi_/seguimiento/$token',
+  path: '/taxi/seguimiento/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminSistemaIndexRoute =
   AuthenticatedAdminSistemaIndexRouteImport.update({
     id: '/',
@@ -2132,6 +2138,7 @@ export interface FileRoutesByFullPath {
   '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
+  '/taxi/seguimiento/$token': typeof TaxiSeguimientoTokenRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/cms/': typeof AuthenticatedCmsIndexRoute
   '/concierge/': typeof AuthenticatedConciergeIndexRoute
@@ -2412,6 +2419,7 @@ export interface FileRoutesByTo {
   '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
+  '/taxi/seguimiento/$token': typeof TaxiSeguimientoTokenRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/cms': typeof AuthenticatedCmsIndexRoute
   '/concierge': typeof AuthenticatedConciergeIndexRoute
@@ -2702,6 +2710,7 @@ export interface FileRoutesById {
   '/oriente-maya/categoria/$categoria': typeof OrienteMayaCategoriaCategoriaRoute
   '/preview/composition/$token': typeof PreviewCompositionTokenRoute
   '/resenar/negocio/$slug': typeof ResenarNegocioSlugRoute
+  '/taxi_/seguimiento/$token': typeof TaxiSeguimientoTokenRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/cms/': typeof AuthenticatedCmsIndexRoute
   '/_authenticated/concierge/': typeof AuthenticatedConciergeIndexRoute
@@ -2994,6 +3003,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/categoria/$categoria'
     | '/preview/composition/$token'
     | '/resenar/negocio/$slug'
+    | '/taxi/seguimiento/$token'
     | '/admin/'
     | '/cms/'
     | '/concierge/'
@@ -3274,6 +3284,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/categoria/$categoria'
     | '/preview/composition/$token'
     | '/resenar/negocio/$slug'
+    | '/taxi/seguimiento/$token'
     | '/admin'
     | '/cms'
     | '/concierge'
@@ -3563,6 +3574,7 @@ export interface FileRouteTypes {
     | '/oriente-maya/categoria/$categoria'
     | '/preview/composition/$token'
     | '/resenar/negocio/$slug'
+    | '/taxi_/seguimiento/$token'
     | '/_authenticated/admin/'
     | '/_authenticated/cms/'
     | '/_authenticated/concierge/'
@@ -3779,6 +3791,7 @@ export interface RootRouteChildren {
   OrienteMayaCategoriaCategoriaRoute: typeof OrienteMayaCategoriaCategoriaRoute
   PreviewCompositionTokenRoute: typeof PreviewCompositionTokenRoute
   ResenarNegocioSlugRoute: typeof ResenarNegocioSlugRoute
+  TaxiSeguimientoTokenRoute: typeof TaxiSeguimientoTokenRoute
   ApiCmsStudioMediaPreviewMediaIdRoute: typeof ApiCmsStudioMediaPreviewMediaIdRoute
   ApiPublicAluxChatRoute: typeof ApiPublicAluxChatRoute
   ApiPublicAluxEmbedStatusRoute: typeof ApiPublicAluxEmbedStatusRoute
@@ -5148,6 +5161,13 @@ declare module '@tanstack/react-router' {
       path: '/resenar/negocio/$slug'
       fullPath: '/resenar/negocio/$slug'
       preLoaderRoute: typeof ResenarNegocioSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/taxi_/seguimiento/$token': {
+      id: '/taxi_/seguimiento/$token'
+      path: '/taxi/seguimiento/$token'
+      fullPath: '/taxi/seguimiento/$token'
+      preLoaderRoute: typeof TaxiSeguimientoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/sistema/': {
@@ -6573,6 +6593,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrienteMayaCategoriaCategoriaRoute: OrienteMayaCategoriaCategoriaRoute,
   PreviewCompositionTokenRoute: PreviewCompositionTokenRoute,
   ResenarNegocioSlugRoute: ResenarNegocioSlugRoute,
+  TaxiSeguimientoTokenRoute: TaxiSeguimientoTokenRoute,
   ApiCmsStudioMediaPreviewMediaIdRoute: ApiCmsStudioMediaPreviewMediaIdRoute,
   ApiPublicAluxChatRoute: ApiPublicAluxChatRoute,
   ApiPublicAluxEmbedStatusRoute: ApiPublicAluxEmbedStatusRoute,
