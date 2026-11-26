@@ -10,7 +10,18 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-export function TaxiAppInstallCard({ signedIn }: { signedIn: boolean }) {
+const COPY = {
+  taxi: {
+    title: "Instala la app para seguir tu taxi",
+    body: "Es importante instalarla en tu celular: así recibes los avisos cuando el taxista acepta y llega por ti, y sigues el taxi en el mapa. Sin instalarla recibirás únicamente los correos del viaje. También tendrás a la mano tu itinerario durante todo tu viaje.",
+  },
+  trip: {
+    title: "Instala la app para acompañar tu viaje",
+    body: "Es importante instalarla en tu celular: así recibes los avisos cuando tu concierge te responda o confirme reservaciones, y puedes seguir tu itinerario día por día durante el viaje, incluso con poca señal. Sin instalarla recibirás únicamente correos.",
+  },
+} as const;
+
+export function TaxiAppInstallCard({ signedIn, purpose = "taxi" }: { signedIn: boolean; purpose?: keyof typeof COPY }) {
   const [installed, setInstalled] = useState(false);
   const [promptEvent, setPromptEvent] = useState<InstallPromptEvent | null>(null);
 
@@ -53,12 +64,10 @@ export function TaxiAppInstallCard({ signedIn }: { signedIn: boolean }) {
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-semibold">
-            {installed ? "Aplicación instalada en este celular" : "Instala la app para seguir tu taxi"}
+            {installed ? "Aplicación instalada en este celular" : COPY[purpose].title}
           </h2>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            Sin instalarla no tendrás seguimiento en vivo ni alertas en la aplicación; recibirás
-            únicamente los correos del viaje. El taxista también debe instalarla para recibir
-            avisos y ver su ruta.
+            {COPY[purpose].body}
           </p>
           {!installed ? (
             <Button type="button" variant="outline" size="sm" className="mt-3" onClick={install}>
@@ -74,7 +83,7 @@ export function TaxiAppInstallCard({ signedIn }: { signedIn: boolean }) {
       {signedIn && installed ? (
         <div>
           <div className="flex items-center gap-2 border-t border-border px-4 pt-3 text-xs font-medium">
-            <BellRing className="size-4 text-primary" /> Alertas del viaje
+            <BellRing className="size-4 text-primary" /> Activa los avisos de tu viaje
           </div>
           <PushEnableButton />
         </div>

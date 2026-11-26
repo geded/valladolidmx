@@ -286,7 +286,7 @@ export function TripBriefForm({
       qc.invalidateQueries({ queryKey: ["cc", "my-cases"] });
       onChanged();
       toast.success("Expediente enviado al Concierge", {
-        description: "Un concierge humano revisará tu viaje.",
+        description: "Un concierge humano revisará tu viaje. Instala la app en tu celular para recibir sus avisos y seguir tu itinerario.",
         action: {
           label: "Ver caso",
           onClick: () => {

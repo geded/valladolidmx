@@ -1,3 +1,4 @@
+import { TaxiAppInstallCard } from "@/components/taxi/TaxiAppInstallCard";
 /**
  * /cuenta/mi-viaje — Workspace del Viajero (Iniciativa 7 · Sub-ola D).
  *
@@ -2400,6 +2401,12 @@ function ConciergeSection({
       </p>
 
       <TripBriefForm data={data} onChanged={onChanged} />
+
+      {cases.length > 0 ? (
+        <div className="mt-6">
+          <TaxiAppInstallCard signedIn purpose="trip" />
+        </div>
+      ) : null}
 
       <div className="mt-6">
         <div className="flex items-center justify-between">
