@@ -1,4 +1,4 @@
-import { ownDomainDeep } from "@/lib/media/own-domain-signed";
+import { fromOwnDomainDeep, ownDomainDeep } from "@/lib/media/own-domain-signed";
 /**
  * Memoria breve en el servidor para lecturas públicas (anónimas) de las
  * páginas. Nivel 1: memoria del proceso. Nivel 2: tabla
@@ -58,7 +58,7 @@ async function writeShared(key: string, value: unknown, at: number) {
     const sb = await admin();
     await sb.from("public_read_cache").upsert({
       key,
-      value: JSON.parse(JSON.stringify(value ?? null)),
+      value: fromOwnDomainDeep(JSON.parse(JSON.stringify(value ?? null)), process.env.SUPABASE_URL ?? ""),
       refreshed_at: new Date(at).toISOString(),
     });
   } catch {

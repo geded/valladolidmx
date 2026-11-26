@@ -44,3 +44,24 @@ export function ownDomainDeep<T>(value: T, depth = 0): T {
   }
   return value;
 }
+
+/**
+ * Inverso para la memoria compartida: guarda los enlaces en su forma
+ * original para que cualquier versión del sitio (incluida una publicada
+ * anterior sin el proxy) pueda leerlos. Al leer se vuelven a convertir.
+ */
+export function fromOwnDomainDeep<T>(value: T, storageBase: string, depth = 0): T {
+  if (!storageBase || depth > 40 || value === null || value === undefined) return value;
+  if (typeof value === "string") {
+    return (value.startsWith(OWN_SIGNED_PREFIX)
+      ? `${storageBase.replace(/\/+$/, "")}${SIGN_MARKER}${value.slice(OWN_SIGNED_PREFIX.length)}`
+      : value) as T;
+  }
+  if (Array.isArray(value)) return value.map((v) => fromOwnDomainDeep(v, storageBase, depth + 1)) as T;
+  if (typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype) {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = fromOwnDomainDeep(v, storageBase, depth + 1);
+    return out as T;
+  }
+  return value;
+}
