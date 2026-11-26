@@ -3,7 +3,10 @@
  * Storage al navegador. Reutiliza la firma LRU/single-flight oficial.
  */
 
-const CACHE_CONTROL = "public, max-age=300, s-maxage=300";
+// Originales inmutables y variantes con ruta única: un día en navegador y
+// borde evita que cada foto consulte la base. Una foto retirada puede seguir
+// visible hasta 24 h en cachés ya calentadas.
+const CACHE_CONTROL = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800";
 
 export async function publicMediaObjectResponse(input: {
   bucket: "studio-media" | "media-derived";
