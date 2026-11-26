@@ -377,6 +377,27 @@ export function arrangeBusinessListing(
   });
 }
 
+const PRIMARY_DESTINATION_LABEL = "valladolid";
+
+/** Agrupa tarjetas por destino de forma estable; sin destino quedan al final. */
+export function groupCardsByDestination(items: readonly TourismCardVM[]): TourismCardVM[] {
+  const keyOf = (vm: TourismCardVM) => vm.location?.label?.trim() || "";
+  return items
+    .map((vm, index) => ({ vm, index, key: keyOf(vm) }))
+    .sort((a, b) => {
+      if (a.key !== b.key) {
+        if (!a.key) return 1;
+        if (!b.key) return -1;
+        const ap = a.key.toLowerCase() === PRIMARY_DESTINATION_LABEL;
+        const bp = b.key.toLowerCase() === PRIMARY_DESTINATION_LABEL;
+        if (ap !== bp) return ap ? -1 : 1;
+        return a.key.localeCompare(b.key, "es");
+      }
+      return a.index - b.index;
+    })
+    .map(({ vm }) => vm);
+}
+
 function humanize(slug: string): string {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -437,6 +458,12 @@ export function buildPublicListing(input: BuildPublicListingInput): PublicListin
         .filter((place) => !destino || place.destination_slug === destino)
         .map(placeToTourismCard),
     ];
+  }
+
+  // Alcance regional: las tarjetas se agrupan por destino (Valladolid primero,
+  // luego alfabético) conservando dentro de cada destino el turno justo diario.
+  if (!destino && (contract.source === "businesses" || contract.source === "places")) {
+    items = groupCardsByDestination(items);
   }
 
   const discoveryRails: PublicListingDiscoveryRail[] | undefined =
