@@ -97,6 +97,19 @@ async function unregisterStale(): Promise<void> {
   }
 }
 
+const RELOAD_MARK = "vmx:sw-update-reload";
+/** Evita bucles: una sola recarga automática por versión cada 30 s. */
+function reloadedRecently(): boolean {
+  try {
+    const last = Number(sessionStorage.getItem(RELOAD_MARK) ?? 0);
+    if (Date.now() - last < 30_000) return true;
+    sessionStorage.setItem(RELOAD_MARK, String(Date.now()));
+  } catch {
+    /* sin almacenamiento: se permite la recarga */
+  }
+  return false;
+}
+
 let registrationPromise: Promise<void> | null = null;
 let currentRegistration: ServiceWorkerRegistration | null = null;
 let waitingWorker: ServiceWorker | null = null;
@@ -167,6 +180,10 @@ export function registerServiceWorker(): Promise<void> {
       return;
     }
     try {
+      // Con `skipWaiting` la versión nueva toma control sola, sin pasar por
+      // SKIP_WAITING; si ya había una versión controlando, ese cambio es una
+      // actualización y la pantalla debe recargarse para mostrarla.
+      const hadController = Boolean(navigator.serviceWorker.controller);
       const reg = await navigator.serviceWorker.register(SW_PATH, { scope: "/" });
       currentRegistration = reg;
       emit("registered", { scope: reg.scope });
@@ -182,7 +199,18 @@ export function registerServiceWorker(): Promise<void> {
 
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         emit("controlling");
-        if (updateApplying) {
+        if (updateApplying || hadController) {
+          if (!updateApplying && hasUnsavedWork()) {
+            emit("update-deferred", { reason: "unsaved-work" });
+            const reloadWhenSafe = () => {
+              if (hasUnsavedWork() || document.visibilityState !== "hidden") return;
+              window.location.reload();
+            };
+            document.addEventListener("visibilitychange", reloadWhenSafe);
+            window.addEventListener(UNSAVED_WORK_EVENT, reloadWhenSafe);
+            return;
+          }
+          if (reloadedRecently()) return;
           emit("update-applied");
           // Recarga controlada: única vía oficial de activar la nueva versión
           // sin dejar la sesión en estado mixto (Version Consistency).
