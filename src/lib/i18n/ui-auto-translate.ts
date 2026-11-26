@@ -63,6 +63,18 @@ function isSkippableAncestor(node: Node): boolean {
   return false;
 }
 
+// Valor que el traductor escribió en cada nodo de texto (débil: no retiene nodos).
+const writtenNodes = new WeakMap<Text, string>();
+const writtenAttrs = new WeakMap<HTMLElement, Map<string, string>>();
+function rememberAttr(el: HTMLElement, attr: string, value: string) {
+  let m = writtenAttrs.get(el);
+  if (!m) {
+    m = new Map();
+    writtenAttrs.set(el, m);
+  }
+  m.set(attr, value);
+}
+
 interface CacheState {
   locale: string;
   map: Record<string, string>; // sourceText → translation
@@ -72,7 +84,22 @@ interface CacheState {
 function loadCache(locale: string): CacheState {
   try {
     const raw = window.localStorage.getItem(CACHE_KEY_PREFIX + locale);
-    if (raw) return { locale, map: JSON.parse(raw), dirty: false };
+    if (raw) {
+      const map = JSON.parse(raw) as Record<string, string>;
+      // Limpia entradas envenenadas: un texto ya traducido nunca es fuente.
+      // (Antes el traductor re-traducía su propia salida y guardaba
+      // alemán→español, provocando el parpadeo entre idiomas.)
+      const outputs = new Set<string>();
+      for (const [src, tr] of Object.entries(map)) if (tr !== src) outputs.add(tr);
+      let dirty = false;
+      for (const key of Object.keys(map)) {
+        if (outputs.has(key) && map[key] !== key) {
+          delete map[key];
+          dirty = true;
+        }
+      }
+      return { locale, map, dirty };
+    }
   } catch {
     /* noop */
   }
@@ -100,6 +127,8 @@ function collectTextNodes(root: Node, pending: Map<Text, string>) {
       const marker = parent.getAttribute(ATTR_ORIGINAL);
       const raw = n.nodeValue ?? "";
       if (marker !== null && marker === raw) return NodeFilter.FILTER_REJECT;
+      // Nuestra propia traducción ya pintada: nunca se vuelve a traducir.
+      if (writtenNodes.get(n as Text) === raw) return NodeFilter.FILTER_REJECT;
       if (isSkippableText(raw)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
@@ -133,6 +162,7 @@ function collectAttrs(root: Node, pendingAttrs: Map<HTMLElement, Map<string, str
       if (!v || isSkippableText(v)) continue;
       const marker = el.getAttribute(`${ATTR_ORIGINAL}-${attr}`);
       if (marker === v) continue;
+      if (writtenAttrs.get(el)?.get(attr) === v) continue;
       let map = pendingAttrs.get(el);
       if (!map) {
         map = new Map();
@@ -155,6 +185,7 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
   let observer: MutationObserver | null = null;
   let timer: ReturnType<typeof setTimeout> | null = null;
   let inflight = false;
+  let unresolved = new Set<string>();
 
   function schedule() {
     if (timer) return;
@@ -166,10 +197,6 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
 
   async function flush() {
     if (locale === SOURCE_LOCALE) return;
-    if (inflight) {
-      schedule();
-      return;
-    }
     const pendingText = new Map<Text, string>();
     const pendingAttrs = new Map<HTMLElement, Map<string, string>>();
     collectTextNodes(document.body, pendingText);
@@ -186,7 +213,8 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
           parent.setAttribute(ATTR_TRANSLATED, locale);
         }
         node.nodeValue = (node.nodeValue ?? "").replace(text, tr);
-      } else if (tr === undefined) {
+        writtenNodes.set(node, node.nodeValue ?? "");
+      } else if (tr === undefined && !unresolved.has(text)) {
         misses.add(text);
       }
     }
@@ -196,19 +224,29 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
         if (tr && tr !== val) {
           el.setAttribute(`${ATTR_ORIGINAL}-${attr}`, val);
           el.setAttribute(attr, tr);
-        } else if (tr === undefined) {
+          rememberAttr(el, attr, tr);
+        } else if (tr === undefined && !unresolved.has(val)) {
           misses.add(val);
         }
       }
     }
 
     if (misses.size === 0) return;
+    // Lo ya guardado se aplica siempre al instante (arriba); sólo la consulta
+    // de frases nuevas espera a que termine la anterior. Antes, mientras había
+    // una consulta en curso, el texto re-pintado en español quedaba visible
+    // varios segundos y la portada parpadeaba entre idiomas.
+    if (inflight) {
+      schedule();
+      return;
+    }
 
     // Lotes en paralelo (antes uno tras otro: una página completa tardaba minutos).
     const all = Array.from(misses).slice(0, MAX_BATCH * PARALLEL_BATCHES);
     const batches: string[][] = [];
     for (let i = 0; i < all.length; i += MAX_BATCH) batches.push(all.slice(i, i + MAX_BATCH));
     inflight = true;
+    const failed: string[] = [];
     try {
       const results = await Promise.all(
         batches.map(async (batchList) => {
@@ -216,6 +254,7 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
             const result = await translateUiBatch({ data: { locale, texts: batchList } });
             return await mapByHash(batchList, result, locale);
           } catch {
+            failed.push(...batchList);
             return {} as Record<string, string>;
           }
         }),
@@ -223,13 +262,19 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
       let added = 0;
       for (const enriched of results) {
         for (const [src, tr] of Object.entries(enriched)) {
-          if (tr && tr !== src && cache.map[src] !== tr) {
+          // Nombres propios (Chichén Itzá, Ek Balam) vuelven idénticos: también
+          // se guardan para no volver a consultarlos en cada cambio de la página.
+          if (tr && cache.map[src] !== tr) {
             cache.map[src] = tr;
             cache.dirty = true;
             added++;
           }
         }
       }
+      // Frases sin respuesta no se reintentan en esta visita (evita consultas sin fin).
+      const retry = new Set(failed);
+      for (const src of all)
+        if (cache.map[src] === undefined && !retry.has(src)) unresolved.add(src);
       if (added > 0) saveCache(cache);
     } finally {
       inflight = false;
@@ -244,6 +289,7 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
       parent.setAttribute(ATTR_ORIGINAL, text);
       parent.setAttribute(ATTR_TRANSLATED, locale);
       node.nodeValue = (node.nodeValue ?? "").replace(text, tr);
+      writtenNodes.set(node, node.nodeValue ?? "");
     }
     for (const [el, attrs] of pendingAttrs) {
       for (const [attr, val] of attrs) {
@@ -252,6 +298,7 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
         if (el.getAttribute(`${ATTR_ORIGINAL}-${attr}`) === val) continue;
         el.setAttribute(`${ATTR_ORIGINAL}-${attr}`, val);
         el.setAttribute(attr, tr);
+        rememberAttr(el, attr, tr);
       }
     }
 
@@ -285,6 +332,7 @@ export function startUiAutoTranslator(initialLocale: string): UiAutoTranslatorHa
   function setLocale(l: string) {
     locale = l;
     cache = loadCache(l);
+    unresolved = new Set();
     // Undo previous translations by restoring originals
     document.querySelectorAll(`[${ATTR_ORIGINAL}]`).forEach((el) => {
       const src = el.getAttribute(ATTR_ORIGINAL);
