@@ -1,3 +1,4 @@
+import { ownDomainDeep } from "@/lib/media/own-domain-signed";
 /**
  * Memoria breve en el servidor para lecturas públicas (anónimas) de las
  * páginas. Nivel 1: memoria del proceso. Nivel 2: tabla
@@ -35,7 +36,7 @@ async function fetchShared(key: string): Promise<Entry | null> {
       .eq("key", key)
       .maybeSingle();
     if (!data) return null;
-    return { value: data.value, at: Date.parse(data.refreshed_at) };
+    return { value: ownDomainDeep(data.value), at: Date.parse(data.refreshed_at) };
   } catch {
     return null;
   }
@@ -95,6 +96,7 @@ function load<T>(key: string, fn: () => Promise<T>): Promise<T> {
   if (running) return running as Promise<T>;
   const started = Date.now();
   const p = fn()
+    .then(ownDomainDeep)
     .then(async (value) => {
       remember(key, { value, at: started });
       // Si hubo un cambio del CMS mientras se leía, no guardar copia vieja.

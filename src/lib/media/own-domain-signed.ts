@@ -18,3 +18,29 @@ export function toOwnDomainSignedUrl(url: string): string {
   if (!IMAGE_EXT.test(path)) return url;
   return `${OWN_SIGNED_PREFIX}${rest}`;
 }
+
+/** Recorre datos simples y convierte toda URL firmada de imagen. */
+export function ownDomainDeep<T>(value: T, depth = 0): T {
+  if (depth > 40 || value === null || value === undefined) return value;
+  if (typeof value === "string") return toOwnDomainSignedUrl(value) as T;
+  if (Array.isArray(value)) {
+    let changed = false;
+    const out = value.map((v) => {
+      const n = ownDomainDeep(v, depth + 1);
+      if (n !== v) changed = true;
+      return n;
+    });
+    return (changed ? out : value) as T;
+  }
+  if (typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype) {
+    let changed = false;
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      const n = ownDomainDeep(v, depth + 1);
+      if (n !== v) changed = true;
+      out[k] = n;
+    }
+    return (changed ? out : value) as T;
+  }
+  return value;
+}
