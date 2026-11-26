@@ -181,14 +181,20 @@ function DriverDashboard() {
     }
   }
 
+  const [confirmPaid, setConfirmPaid] = useState(false);
+
   async function advance(ride: TaxiRide) {
     const next = nextDriverRideStatus(ride.status);
     if (!next) return;
-    if (next === "completed" && !window.confirm("Confirma que recibiste el efectivo y terminaste el viaje.")) return;
+    if (next === "completed" && !confirmPaid) {
+      setConfirmPaid(true);
+      return;
+    }
     setBusy(true);
     try {
       await statusFn({ data: { rideId: ride.id, status: next } });
       toast.success(next === "completed" ? "Viaje realizado y pago en efectivo registrado." : "Estado actualizado.");
+      setConfirmPaid(false);
       await refresh();
     } catch (error) {
       toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
@@ -224,7 +230,7 @@ function DriverDashboard() {
   }
 
   const next = activeRide ? nextDriverRideStatus(activeRide.status) : null;
-  const nextLabel = next === "arrived" ? "Llegué por el viajero" : next === "in_progress" ? "Iniciar viaje" : next === "completed" ? "Terminar y registrar efectivo" : null;
+  const nextLabel = next === "arrived" ? "Llegué por el viajero" : next === "in_progress" ? "Iniciar viaje" : next === "completed" ? "Llegamos al destino · terminar viaje" : null;
 
   return (
     <div className="mx-auto max-w-6xl pb-14">
@@ -279,7 +285,22 @@ function DriverDashboard() {
               <p className="mt-2 text-[11px] text-muted-foreground">
                 {locationNote ?? "Mantén este panel abierto durante el servicio para actualizar tu ubicación."}
               </p>
-              {next && nextLabel ? (
+              {next === "completed" && confirmPaid ? (
+                <div className="mt-4 rounded-xl border border-primary/40 bg-secondary/60 p-4 text-sm">
+                  <p className="font-semibold">¿Terminar el viaje {activeRide.folio}?</p>
+                  <p className="mt-1 text-muted-foreground">
+                    Confirma que el viajero te pagó {formatTaxiMoney(activeRide.fare_amount, activeRide.currency)} en efectivo. Quedará registrado como pagado.
+                  </p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <Button type="button" disabled={busy} onClick={() => advance(activeRide)}>
+                      <Check className="mr-2 size-4" /> Sí, recibí el pago · terminar
+                    </Button>
+                    <Button type="button" variant="outline" disabled={busy} onClick={() => setConfirmPaid(false)}>
+                      Todavía no
+                    </Button>
+                  </div>
+                </div>
+              ) : next && nextLabel ? (
                 <Button type="button" className="mt-4 w-full" disabled={busy} onClick={() => advance(activeRide)}>
                   <Check className="mr-2 size-4" /> {nextLabel}
                 </Button>
@@ -331,7 +352,7 @@ function DriverDashboard() {
           <section className="rounded-2xl border border-border bg-card p-4 text-xs leading-5 text-muted-foreground shadow-soft">
             <CarFront className="mb-2 size-5 text-primary" />
             Recuerda: en esta etapa el viajero paga el total en efectivo. Al terminar, registra el
-            cobro con el botón «Terminar y registrar efectivo».
+            cobro con el botón «Llegamos al destino · terminar viaje».
           </section>
         </aside>
       </div>
