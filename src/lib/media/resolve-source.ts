@@ -1,3 +1,4 @@
+import { toOwnDomainSignedUrl } from "./own-domain-signed";
 /**
  * H3·A4 · M0 · resolveMediaSource()
  *
@@ -127,7 +128,8 @@ export function resolveMediaSource(
   options: ResolveMediaSourceOptions = {},
 ): ResolvedMediaSource {
   const fallback = options.fallbackUrl ?? "";
-  const canonical = (asset?.file_url?.trim() || fallback) ?? "";
+  // Fotos firmadas del almacenamiento se entregan bajo el dominio propio.
+  const canonical = toOwnDomainSignedUrl((asset?.file_url?.trim() || fallback) ?? "");
   const pipelineStatus = (asset?.pipeline_status ?? "unknown") as
     | NonNullable<MediaAssetInput["pipeline_status"]>
     | "unknown";

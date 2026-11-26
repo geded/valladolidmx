@@ -1,3 +1,4 @@
+import { toOwnDomainSignedUrl } from "./own-domain-signed";
 /**
  * Firma muchas portadas privadas con una sola petición por bucket.
  *
@@ -42,7 +43,7 @@ export async function signStorageObjects(
           .then(({ data }) => {
             for (const row of data ?? []) {
               if (row.path && row.signedUrl && !row.error) {
-                out.set(storageObjectKey({ bucket, path: row.path }), row.signedUrl);
+                out.set(storageObjectKey({ bucket, path: row.path }), toOwnDomainSignedUrl(row.signedUrl));
               }
             }
           })

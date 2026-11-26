@@ -26,6 +26,7 @@ type StorageClient = {
 const MARGIN_MS = 45 * 60_000;
 const MIN_TTL_S = 2 * 60 * 60;
 const MAX = 2000;
+import { toOwnDomainSignedUrl } from "./own-domain-signed";
 const memo = new Map<string, { url: string; exp: number }>();
 const inflight = new Map<string, Promise<{ data: { signedUrl: string } | null; error: unknown }>>();
 
@@ -45,10 +46,13 @@ export async function signedUrlMemo(
   const p = client.storage
     .from(bucket)
     .createSignedUrl(path, expiresIn)
-    .then((res) => {
+    .then((r) => {
+      let res = r;
       if (res.data?.signedUrl && !res.error) {
+        const own = toOwnDomainSignedUrl(res.data.signedUrl);
+        res = { ...res, data: { signedUrl: own } };
         if (memo.size >= MAX) memo.delete(memo.keys().next().value as string);
-        memo.set(key, { url: res.data.signedUrl, exp: Date.now() + expiresIn * 1000 });
+        memo.set(key, { url: own, exp: Date.now() + expiresIn * 1000 });
       }
       return res;
     })
@@ -95,10 +99,10 @@ export async function signedUrlsMemo(
       const byPath = new Map<string, string>();
       for (const row of data ?? []) {
         if (row.path && row.signedUrl && !row.error) {
-          byPath.set(row.path, row.signedUrl);
+          byPath.set(row.path, toOwnDomainSignedUrl(row.signedUrl));
           if (memo.size >= MAX) memo.delete(memo.keys().next().value as string);
           memo.set(`${bucket}\u0000${row.path}\u0000${expiresIn}`, {
-            url: row.signedUrl,
+            url: toOwnDomainSignedUrl(row.signedUrl),
             exp: Date.now() + expiresIn * 1000,
           });
         }

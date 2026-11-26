@@ -270,6 +270,7 @@ import { Route as ApiPublicHooksVisibilityNotificationsRouteImport } from './rou
 import { Route as ApiPublicHooksWhatsappAgentRouteImport } from './routes/api/public/hooks/whatsapp-agent'
 import { Route as ApiPublicMapsStaticRouteImport } from './routes/api/public/maps/static'
 import { Route as ApiPublicMediaDerivedSplatRouteImport } from './routes/api/public/media-derived.$'
+import { Route as ApiPublicSignedSplatRouteImport } from './routes/api/public/signed.$'
 import { Route as ApiPublicStudioMediaSplatRouteImport } from './routes/api/public/studio-media.$'
 import { Route as ApiPublicWhatsappEvolutionRouteImport } from './routes/api/public/whatsapp/evolution'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -1779,6 +1780,11 @@ const ApiPublicMediaDerivedSplatRoute =
     path: '/api/public/media-derived/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSignedSplatRoute = ApiPublicSignedSplatRouteImport.update({
+  id: '/api/public/signed/$',
+  path: '/api/public/signed/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStudioMediaSplatRoute =
   ApiPublicStudioMediaSplatRouteImport.update({
     id: '/api/public/studio-media/$',
@@ -2196,6 +2202,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
+  '/api/public/signed/$': typeof ApiPublicSignedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/api/public/whatsapp/evolution': typeof ApiPublicWhatsappEvolutionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -2476,6 +2483,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
+  '/api/public/signed/$': typeof ApiPublicSignedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/api/public/whatsapp/evolution': typeof ApiPublicWhatsappEvolutionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -2768,6 +2776,7 @@ export interface FileRoutesById {
   '/api/public/hooks/whatsapp-agent': typeof ApiPublicHooksWhatsappAgentRoute
   '/api/public/maps/static': typeof ApiPublicMapsStaticRoute
   '/api/public/media-derived/$': typeof ApiPublicMediaDerivedSplatRoute
+  '/api/public/signed/$': typeof ApiPublicSignedSplatRoute
   '/api/public/studio-media/$': typeof ApiPublicStudioMediaSplatRoute
   '/api/public/whatsapp/evolution': typeof ApiPublicWhatsappEvolutionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -3061,6 +3070,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/whatsapp-agent'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
+    | '/api/public/signed/$'
     | '/api/public/studio-media/$'
     | '/api/public/whatsapp/evolution'
     | '/lovable/email/auth/preview'
@@ -3341,6 +3351,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/whatsapp-agent'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
+    | '/api/public/signed/$'
     | '/api/public/studio-media/$'
     | '/api/public/whatsapp/evolution'
     | '/lovable/email/auth/preview'
@@ -3632,6 +3643,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/whatsapp-agent'
     | '/api/public/maps/static'
     | '/api/public/media-derived/$'
+    | '/api/public/signed/$'
     | '/api/public/studio-media/$'
     | '/api/public/whatsapp/evolution'
     | '/lovable/email/auth/preview'
@@ -3809,6 +3821,7 @@ export interface RootRouteChildren {
   ApiPublicHooksWhatsappAgentRoute: typeof ApiPublicHooksWhatsappAgentRoute
   ApiPublicMapsStaticRoute: typeof ApiPublicMapsStaticRoute
   ApiPublicMediaDerivedSplatRoute: typeof ApiPublicMediaDerivedSplatRoute
+  ApiPublicSignedSplatRoute: typeof ApiPublicSignedSplatRoute
   ApiPublicStudioMediaSplatRoute: typeof ApiPublicStudioMediaSplatRoute
   ApiPublicWhatsappEvolutionRoute: typeof ApiPublicWhatsappEvolutionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -5646,6 +5659,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMediaDerivedSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/signed/$': {
+      id: '/api/public/signed/$'
+      path: '/api/public/signed/$'
+      fullPath: '/api/public/signed/$'
+      preLoaderRoute: typeof ApiPublicSignedSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/studio-media/$': {
       id: '/api/public/studio-media/$'
       path: '/api/public/studio-media/$'
@@ -6617,6 +6637,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksWhatsappAgentRoute: ApiPublicHooksWhatsappAgentRoute,
   ApiPublicMapsStaticRoute: ApiPublicMapsStaticRoute,
   ApiPublicMediaDerivedSplatRoute: ApiPublicMediaDerivedSplatRoute,
+  ApiPublicSignedSplatRoute: ApiPublicSignedSplatRoute,
   ApiPublicStudioMediaSplatRoute: ApiPublicStudioMediaSplatRoute,
   ApiPublicWhatsappEvolutionRoute: ApiPublicWhatsappEvolutionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
