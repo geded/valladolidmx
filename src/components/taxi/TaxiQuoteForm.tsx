@@ -103,7 +103,8 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
           window.localStorage.setItem("vmx.traveler.location-context.v1", JSON.stringify({ inTerritory: inside, nearby: !inside && inYucatan, at: Date.now() }));
         } catch { /* opcional */ }
         if (inside) {
-          setDraft((c) => (c.originLabel ? c : { ...c, origin: { lat, lng }, originLabel: "Mi ubicación actual" }));
+          setDraft((c) => (c.originLabel && c.originLabel !== "Mi ubicación actual" ? c : { ...c, origin: { lat, lng }, originLabel: "Mi ubicación actual" }));
+          setPinTarget("origin");
         }
       },
       () => undefined,
@@ -270,7 +271,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             lat={activePoint.lat}
             lng={activePoint.lng}
             onChange={(point) => patch(pinTarget, point)}
-            className="h-[42vh] min-h-[260px] w-full bg-muted lg:h-[460px]"
+            className="h-[52vh] min-h-[300px] w-full bg-muted lg:h-[460px]"
           />
           <div className="absolute left-3 top-3 flex gap-1 rounded-full bg-card/95 p-1 shadow-soft">
             {(["origin", "destination"] as const).map((t) => (
@@ -289,6 +290,15 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
           </Button>
         </div>
 
+      {outsideArea || config.available_drivers < 1 ? (
+        <div role="status" className="border-b border-warning/40 bg-warning/10 px-4 py-3 text-xs leading-5 sm:text-sm">
+          {outsideArea === "yucatan"
+            ? "Estás fuera del Oriente Maya (por ejemplo, en Mérida). Taxi Alux opera en Valladolid y sus alrededores: hospédate en Valladolid para disfrutar del servicio y recorrer cenotes, Ek Balam y Chichén Itzá."
+            : outsideArea
+            ? "Taxi Alux sólo funciona dentro de Valladolid y el Oriente Maya de Yucatán. Puedes cotizar tu traslado desde ahora para tu viaje; Alux te ayudará a planearlo."
+            : "Por el momento no hay taxis disponibles. Puedes cotizar y volver a intentar en unos minutos."}
+        </div>
+      ) : null}
         <div className="space-y-3 p-4 sm:p-5">
           <h2 className="text-xl font-semibold">¿A dónde vas?</h2>
           <div className="relative rounded-2xl border border-border bg-background">
@@ -363,15 +373,6 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
         </div>
       </section>
 
-      {outsideArea || config.available_drivers < 1 ? (
-        <div role="status" className="rounded-2xl border border-warning/40 bg-warning/10 p-4 text-sm lg:col-span-full">
-          {outsideArea === "yucatan"
-            ? "Estás fuera del Oriente Maya (por ejemplo, en Mérida). Taxi Alux opera en Valladolid y sus alrededores: hospédate en Valladolid para disfrutar del servicio y recorrer cenotes, Ek Balam y Chichén Itzá."
-            : outsideArea
-            ? "Taxi Alux sólo funciona dentro de Valladolid y el Oriente Maya de Yucatán. Puedes cotizar tu traslado desde ahora para tu viaje; Alux te ayudará a planearlo."
-            : "Por el momento no hay taxis disponibles. Puedes cotizar y volver a intentar en unos minutos."}
-        </div>
-      ) : null}
       <aside className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-floating backdrop-blur lg:sticky lg:top-24 lg:rounded-2xl lg:border lg:p-5 lg:shadow-elevated">
         <div className="mx-auto flex max-w-xl items-center gap-3 lg:block">
           <div className="min-w-0 flex-1">

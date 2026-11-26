@@ -51,16 +51,16 @@ function TaxiPage() {
       className="pb-12 pt-5 sm:pt-8"
     >
       <div className="mx-auto max-w-6xl">
-        <header className="mb-7 max-w-3xl">
+        <header className="mb-4 max-w-3xl sm:mb-7">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Taxi Alux</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-4xl">
             Tu traslado por el Oriente Maya, con precio antes de pedir
           </h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+          <p className="mt-3 hidden text-sm leading-6 sm:block text-muted-foreground sm:text-base">
             Conductores turísticos revisados por Valladolid.mx, atención en inglés y pago en
             efectivo al terminar tu viaje.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs">
+          <div className="mt-4 hidden flex-wrap gap-2 text-xs sm:flex">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
               <ShieldCheck className="size-4 text-primary" /> Conductores aprobados
             </span>
