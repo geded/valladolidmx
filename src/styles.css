@@ -428,10 +428,12 @@
 
 /* Espera discreta de fotografías (EditorialMediaFrame): fondo crema mientras la
    foto carga; en portadas, el símbolo de la marca muy tenue al centro. */
-picture[data-omxds-media-state="loading"] {
+picture[data-omxds-media-state="loading"],
+picture[data-omxds-media-state="failed"] {
   background-color: var(--color-muted);
 }
-picture[data-omxds-media-state="loading"][data-omxds-media-mark] {
+picture[data-omxds-media-state="loading"][data-omxds-media-mark],
+picture[data-omxds-media-state="failed"][data-omxds-media-mark] {
   background-image:
     linear-gradient(
       color-mix(in oklab, var(--color-muted) 84%, transparent),

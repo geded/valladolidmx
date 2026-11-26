@@ -131,13 +131,24 @@ function EditorialPicture({
   // URL firmada renovada al actualizar), la foto anterior sigue visible.
   const [revealed, setRevealed] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const hideUntilLoaded = hydrated && !revealed;
+  // Fallo de red (p. ej. al abrir la app instalada): un reintento con la foto
+  // original; si vuelve a fallar se queda el fondo crema con el símbolo, nunca
+  // el ícono roto del navegador ni el color de la tarjeta.
+  const [retrySrc, setRetrySrc] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const hideUntilLoaded = (hydrated && !revealed) || failed;
 
   useLayoutEffect(() => {
     const img = imgRef.current;
     if (!img) return;
     // Foto ya en caché o pintada antes de hidratar: se muestra sin animación.
     if (img.complete) {
+      // Falló antes de hidratar (React no vio el error): reintentar igual.
+      if (img.naturalWidth === 0 && media.url) {
+        const sep = media.url.includes("?") ? "&" : "?";
+        setRetrySrc(`${media.url}${sep}r=1`);
+        return;
+      }
       setRevealed(true);
       return;
     }
@@ -146,12 +157,21 @@ function EditorialPicture({
       setRevealed(true);
     };
     img.addEventListener("load", reveal, { once: true });
-    img.addEventListener("error", reveal, { once: true });
     return () => {
       img.removeEventListener("load", reveal);
-      img.removeEventListener("error", reveal);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sólo la primera carga
   }, []);
+
+  const handleError = () => {
+    if (retrySrc === null && media.url) {
+      const sep = media.url.includes("?") ? "&" : "?";
+      setRetrySrc(`${media.url}${sep}r=1`);
+      return;
+    }
+    setFailed(true);
+    setRevealed(true);
+  };
 
   const classTokens = (className ?? "").split(/\s+/).filter(Boolean);
   const isAbsolute = classTokens.includes("absolute");
@@ -172,17 +192,17 @@ function EditorialPicture({
   const hasExplicitHeight = /(^|\s)(h-|aspect-|min-h-)/.test(className ?? "");
   return (
     <picture
-      data-omxds-media-state={revealed ? "ready" : "loading"}
-      {...(placeholderMark ? { "data-omxds-media-mark": "" } : {})}
+      data-omxds-media-state={failed ? "failed" : revealed ? "ready" : "loading"}
+      {...(placeholderMark || failed ? { "data-omxds-media-mark": "" } : {})}
       className={cn("block min-w-0 max-w-full overflow-hidden", className, isAbsolute && "inset-0")}
       style={{
-        ...(placeholderMark && !revealed ? MEDIA_MARK_STYLE : {}),
+        ...((placeholderMark && !revealed) || failed ? MEDIA_MARK_STYLE : {}),
         ...(!isAbsolute && !hasExplicitHeight && reservedRatio
           ? { aspectRatio: reservedRatio }
           : {}),
       }}
     >
-      {resolved.sources.map((source) => (
+      {(retrySrc ? [] : resolved.sources).map((source) => (
         <source
           key={source.type}
           type={source.type}
@@ -191,8 +211,15 @@ function EditorialPicture({
         />
       ))}
       <img
-        src={resolved.src}
+        src={retrySrc ?? resolved.src}
         alt={media.alt}
+        onError={handleError}
+        onLoad={() => {
+          if (!revealed) {
+            setAnimate(true);
+            setRevealed(true);
+          }
+        }}
         loading={loading}
         width={resolved.width}
         height={resolved.height}

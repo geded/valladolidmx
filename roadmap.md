@@ -1,5 +1,8 @@
 # Roadmap
 
+## Fotos que fallan al cargar · 2026-11-26
+- [x] Reintento y fondo crema en lugar de ícono roto/verde (EditorialMediaFrame)
+
 ## Protecciones autorizadas · 2026-11-26
 - [x] Verificar y proteger precios y confirmación de efectivo, sin alterar reservas existentes.
 - [x] Acreditar propiedad de la sesión al vincular memoria de Alux.
