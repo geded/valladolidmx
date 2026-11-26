@@ -22,8 +22,29 @@ export interface TaxiSettings {
   currency: string;
 }
 
+export interface TaxiPickupZone {
+  slug: string;
+  name: string;
+  lat: number;
+  lng: number;
+  radius_km: number;
+}
+
 export interface TaxiPublicConfig extends TaxiSettings {
   available_drivers: number;
+  pickup_zones: TaxiPickupZone[];
+}
+
+/** Recogida permitida sólo dentro de un destino de salida marcado por el administrador. */
+export function taxiPickupZoneFor(
+  zones: TaxiPickupZone[],
+  point: { lat: number; lng: number },
+): TaxiPickupZone | null {
+  for (const z of zones) {
+    const km = Math.hypot((point.lat - z.lat) * 111, (point.lng - z.lng) * 104);
+    if (km <= z.radius_km) return z;
+  }
+  return null;
 }
 
 export interface TaxiQuote {
@@ -202,7 +223,18 @@ export function normalizeTaxiPublicConfig(raw: unknown): TaxiPublicConfig {
   return {
     ...settings,
     available_drivers: typeof count === "number" && Number.isInteger(count) ? Math.max(0, count) : 0,
+    pickup_zones: normalizeZones(raw && typeof raw === "object" ? (raw as Record<string, unknown>).pickup_zones : null),
   };
+}
+
+function normalizeZones(raw: unknown): TaxiPickupZone[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((z) => {
+    const v = z as Record<string, unknown>;
+    return typeof v["slug"] === "string" && typeof v["lat"] === "number" && typeof v["lng"] === "number"
+      ? [{ slug: v["slug"], name: String(v["name"] ?? v["slug"]), lat: v["lat"], lng: v["lng"], radius_km: Number(v["radius_km"] ?? 30) }]
+      : [];
+  });
 }
 
 export function taxiRequestBlockReason(input: {
@@ -273,6 +305,7 @@ export function formatTaxiDate(value: string | null | undefined): string {
 
 export function taxiErrorMessage(message: string): string {
   if (message.includes("taxi_service_disabled")) return "Taxi Alux está desactivado por ahora.";
+  if (message.includes("pickup_outside_zone")) return "Por ahora Taxi Alux sólo recoge en los destinos de salida activos.";
   if (message.includes("no_drivers_available")) return "No hay taxistas disponibles en este momento.";
   if (message.includes("authentication_required")) return "Crea tu cuenta o inicia sesión para pedir tu taxi.";
   if (message.includes("active_ride_exists")) return "Ya tienes un viaje activo. Termínalo o cancélalo antes de pedir otro.";

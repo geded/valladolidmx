@@ -1,3 +1,4 @@
+import { TaxiPickupZonesCard } from "@/components/taxi/TaxiPickupZonesCard";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -422,6 +423,9 @@ function TaxiAdminPage() {
           </div>
           <Button type="button" className="mt-5" disabled={busy} onClick={saveSettings}>Guardar configuración</Button>
         </section>
+      ) : null}
+      {tab === "tarifas" ? (
+        <TaxiPickupZonesCard />
       ) : null}
     </div>
   );

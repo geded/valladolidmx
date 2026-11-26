@@ -358,6 +358,20 @@
       "when": 1795655959129,
       "tag": "0050_taxi_uber_style",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1795658663601,
+      "tag": "0051_taxi_pickup_zones",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1795658745935,
+      "tag": "0052_taxi_pickup_zones_default",
+      "breakpoints": true
     }
   ]
 }

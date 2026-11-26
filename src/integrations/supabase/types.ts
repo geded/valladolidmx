@@ -11987,6 +11987,10 @@ export type Database = {
         Args: { _approved: boolean; _driver_id: string }
         Returns: undefined
       }
+      taxi_admin_set_pickup_zones: {
+        Args: { _radius_km: number; _slugs: string[] }
+        Returns: undefined
+      }
       taxi_admin_upsert_driver: {
         Args: {
           _approved: boolean
@@ -12178,6 +12182,11 @@ export type Database = {
         Args: { _lat: number; _lng: number }
         Returns: undefined
       }
+      taxi_pickup_allowed: {
+        Args: { _lat: number; _lng: number }
+        Returns: boolean
+      }
+      taxi_pickup_zones: { Args: never; Returns: Json }
       taxi_public_config: { Args: never; Returns: Json }
       taxi_quote: {
         Args: {

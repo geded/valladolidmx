@@ -1,3 +1,4 @@
+import { TaxiToPlaceButton } from "@/components/taxi/TaxiToPlaceButton";
 /**
  * EventPremiumSurface — Ficha Premium de evento.
  *
@@ -259,6 +260,9 @@ export function EventPremiumSurface({
             {...(event.slug ? { entitySlug: event.slug } : {})}
             {...(event.cover_url ? { entityImageUrl: event.cover_url } : {})}
           />
+        ) : null}
+        {!readOnlyPreview ? (
+          <TaxiToPlaceButton name={event.title} lat={event.latitude ?? null} lng={event.longitude ?? null} />
         ) : null}
         {!readOnlyPreview ? (
           <AddToTravelPlanButton

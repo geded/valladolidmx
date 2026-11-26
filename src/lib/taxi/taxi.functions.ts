@@ -727,3 +727,43 @@ export const searchTaxiPlaces = createServerFn({ method: "POST" })
       if (ok(p.latitude, p.longitude)) out.push({ id: p.id, title: p.name, subtitle: "Lugar", lat: p.latitude, lng: p.longitude });
     return out.slice(0, 10);
   });
+
+
+export interface TaxiPickupAdmin {
+  destinations: { slug: string; name: string }[];
+  selected: string[];
+  radiusKm: number;
+}
+
+export const getTaxiPickupAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<TaxiPickupAdmin> => {
+    await assertAdmin(context);
+    const client = context.supabase as unknown as Loose;
+    const [dest, zones] = await Promise.all([
+      client.from("destinations").select("slug,name").eq("status", "published").is("deleted_at", null).not("latitude", "is", null).order("name"),
+      client.rpc("taxi_pickup_zones"),
+    ]);
+    if (dest.error) throw new Error(dest.error.message);
+    const z = (zones.data ?? []) as { slug: string; radius_km: number }[];
+    return {
+      destinations: (dest.data ?? []) as { slug: string; name: string }[],
+      selected: z.map((x) => x.slug),
+      radiusKm: z[0]?.radius_km ?? 30,
+    };
+  });
+
+export const saveTaxiPickupZones = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ slugs: z.array(z.string().min(1).max(120)).max(50), radiusKm: z.number().int().min(3).max(80) }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await (context.supabase as unknown as Loose).rpc("taxi_admin_set_pickup_zones", {
+      _slugs: data.slugs,
+      _radius_km: data.radiusKm,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

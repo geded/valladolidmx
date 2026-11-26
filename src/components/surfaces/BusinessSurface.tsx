@@ -1,3 +1,4 @@
+import { TaxiToPlaceButton } from "@/components/taxi/TaxiToPlaceButton";
 /**
  * US-R3 · Ola 2 · Sub-ola 2.2 — BusinessSurface (Plantilla Madre)
  *
@@ -803,6 +804,7 @@ export function BusinessSurface({
             <ShareButton title={b.display_name} />
           </TrackClick>
           <FavoriteButton entityKind="business" entityId={b.id} />
+          <TaxiToPlaceButton name={b.display_name} lat={b.primary_location?.latitude ?? null} lng={b.primary_location?.longitude ?? null} />
           <TrackClick
             businessId={b.id}
             surface="perfil-empresa"

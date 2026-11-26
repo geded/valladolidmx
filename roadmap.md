@@ -685,3 +685,4 @@
 - [ ] Taxi Alux: varios tipos de autos/taxis con su precio (pendiente, pedido por el usuario)
 - [ ] Taxi Alux: asignación automática al taxista libre más cercano
 - Taxi: aviso fuera de zona (Mérida → sugerir hospedarse en Valladolid)
+- Taxi: administrador marca destinos de salida (recogida); destino de llegada libre en Oriente Maya

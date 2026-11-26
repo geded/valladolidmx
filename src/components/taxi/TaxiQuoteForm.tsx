@@ -12,6 +12,7 @@ import { quoteTaxi, requestTaxiRide, searchTaxiPlaces, type TaxiPlaceHit } from 
 import {
   formatTaxiMoney,
   taxiErrorMessage,
+  taxiPickupZoneFor,
   taxiRequestBlockReason,
   type TaxiPublicConfig,
   type TaxiQuote,
@@ -87,7 +88,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     return registerStickyCta();
   }, []);
 
-  const [outsideArea, setOutsideArea] = useState<false | "yucatan" | "lejos">(false);
+  const [outsideArea, setOutsideArea] = useState<false | "oriente" | "yucatan" | "lejos">(false);
 
   // Al entrar, pedir la ubicación: si está fuera del Oriente Maya, avisar y recordarlo para Alux.
   useEffect(() => {
@@ -98,11 +99,13 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
         // Oriente Maya (Valladolid, Izamal, Espita, Tizimín…); Mérida y el poniente quedan fuera.
         const inside = lat > 20.0 && lat < 21.7 && lng > -89.15 && lng < -87.4;
         const inYucatan = lat > 19.4 && lat < 21.8 && lng > -90.6 && lng < -86.7;
-        setOutsideArea(inside ? false : inYucatan ? "yucatan" : "lejos");
+        // Destinos de salida marcados por el administrador (por omisión Valladolid).
+        const nearValladolid = taxiPickupZoneFor(config.pickup_zones, { lat, lng }) !== null;
+        setOutsideArea(nearValladolid ? false : inside ? "oriente" : inYucatan ? "yucatan" : "lejos");
         try {
-          window.localStorage.setItem("vmx.traveler.location-context.v1", JSON.stringify({ inTerritory: inside, nearby: !inside && inYucatan, at: Date.now() }));
+          window.localStorage.setItem("vmx.traveler.location-context.v1", JSON.stringify({ inTerritory: inside, nearValladolid, nearby: !inside && inYucatan, at: Date.now() }));
         } catch { /* opcional */ }
-        if (inside) {
+        if (nearValladolid) {
           setDraft((c) => (c.originLabel && c.originLabel !== "Mi ubicación actual" ? c : { ...c, origin: { lat, lng }, originLabel: "Mi ubicación actual" }));
           setPinTarget("origin");
         }
@@ -110,7 +113,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
       () => undefined,
       { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
     );
-  }, []);
+  }, [config.pickup_zones]);
 
   useEffect(() => {
     const saved = readDraft();
@@ -260,6 +263,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     setPinTarget(target);
   }
 
+  const zoneNames = config.pickup_zones.map((z) => z.name).join(", ") || "Valladolid";
   const activePoint = pinTarget === "origin" ? draft.origin : draft.destination;
 
   return (
@@ -292,7 +296,9 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
 
       {outsideArea || config.available_drivers < 1 ? (
         <div role="status" className="border-b border-warning/40 bg-warning/10 px-4 py-3 text-xs leading-5 sm:text-sm">
-          {outsideArea === "yucatan"
+          {outsideArea === "oriente"
+            ? `Por ahora Taxi Alux recoge sólo en ${zoneNames}, para llevarte a cualquier lugar del Oriente Maya. Puedes cotizar desde ahora para cuando estés ahí.`
+            : outsideArea === "yucatan"
             ? "Estás fuera del Oriente Maya (por ejemplo, en Mérida). Taxi Alux opera en Valladolid y sus alrededores: hospédate en Valladolid para disfrutar del servicio y recorrer cenotes, Ek Balam y Chichén Itzá."
             : outsideArea
             ? "Taxi Alux sólo funciona dentro de Valladolid y el Oriente Maya de Yucatán. Puedes cotizar tu traslado desde ahora para tu viaje; Alux te ayudará a planearlo."
