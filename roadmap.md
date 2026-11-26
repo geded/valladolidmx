@@ -706,3 +706,8 @@
 - [ ] Taxi Alux: asignación automática al taxista libre más cercano
 - Taxi: aviso fuera de zona (Mérida → sugerir hospedarse en Valladolid)
 - Taxi: administrador marca destinos de salida (recogida); destino de llegada libre en Oriente Maya
+
+## Identidad del acceso y configuración del proyecto · 2026-11-26
+- [x] Revisar las opciones de acceso compartidas: sólo Google y correo; acceso publicado y pantalla inicial de Google comprobados sin texto Lovable. No se certificaron reservas, favoritos ni retorno con sesión; detalles en `docs/auth-brand-review-2026-11-26.md`.
+- [x] Comprobar la identidad que Google muestra al entrar: `quehacerenvalladolid.com`; no requiere un cambio de código y no implica ocultamiento técnico del alojamiento.
+- [ ] Aclarar qué elegir en «tipo de proyecto»: espera captura o lista de las opciones que ve el Founder; sitio publicado ya confirmado público, privacidad del proyecto independiente.
