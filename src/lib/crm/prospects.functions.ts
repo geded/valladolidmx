@@ -56,6 +56,10 @@ export type SubmitProspectContactInput = z.infer<typeof SubmitContactSchema>;
 export const submitAluxProspectContact = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => SubmitContactSchema.parse(d ?? {}))
   .handler(async ({ data }) => {
+    const { readOwnedAluxSession, aluxRequestUserId } = await import("@/lib/alux/session-ownership.server");
+    if (!await readOwnedAluxSession(data.sessionKey, await aluxRequestUserId())) {
+      return { ok: false as const, error: "session_not_found" as const };
+    }
     const firstName = cleanFirstName(data.firstName);
     if (!firstName) return { ok: false as const, error: "invalid_name" as const };
     const phone = normalizeWhatsApp(data.whatsapp);

@@ -150,16 +150,18 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
       queryKey: ["maps", "territory-route", origin?.key, d.slug],
       enabled: Boolean(origin),
       staleTime: 1000 * 60 * 60 * 24,
-      queryFn: () =>
-        fn({
+      queryFn: () => {
+        if (!origin) throw new Error("Origin required");
+        return fn({
           data: {
-            originLat: origin!.lat,
-            originLng: origin!.lng,
+            originLat: origin.lat,
+            originLng: origin.lng,
             destLat: d.latitude,
             destLng: d.longitude,
             travelMode: "DRIVE" as const,
           },
-        }),
+        });
+      },
     })),
   });
 
@@ -172,6 +174,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
           loading: routes[i]?.isLoading ?? false,
           distanceMeters: r?.ok ? r.distanceMeters : null,
           durationSeconds: r?.ok ? r.durationSeconds : null,
+          estimated: Boolean(r?.estimated),
         };
       }),
     [targets, routes],
@@ -471,6 +474,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                             <RouteIcon className="h-3 w-3" aria-hidden />
                             {formatDistance(row.distanceMeters)}
                           </span>
+                          {row.estimated ? <span>aprox.</span> : null}
                         </p>
                       ) : (
                         <p className="text-xs text-muted-foreground">Distancia no disponible</p>
@@ -497,6 +501,7 @@ export function TerritoryMapExplorer({ destinations }: TerritoryMapExplorerProps
                               <p className="text-sm text-foreground">
                                 {formatDistance(row.distanceMeters)} ·{" "}
                                 {formatDuration(row.durationSeconds)} en auto desde {origin.label}
+                                {row.estimated ? " · aprox." : ""}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {dayTripHint(row.durationSeconds)}

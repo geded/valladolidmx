@@ -16,12 +16,18 @@ export const bindAluxSessionToTraveler = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data, context }): Promise<{ bound: boolean }> => {
+    const { assertPlatformOrigin } = await import("@/lib/security/public-quota.server");
+    assertPlatformOrigin();
+    const { readOwnedAluxSession, hasAluxDeviceProof } = await import("./session-ownership.server");
+    const session = await readOwnedAluxSession(data.sessionKey, context.userId);
+    if (!session || !hasAluxDeviceProof(data.sessionKey, session.device_proof_hash)) return { bound: false };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { data: bound, error } = await supabaseAdmin
       .from("alux_public_sessions")
       .update({ traveler_user_id: context.userId })
-      .eq("session_key", data.sessionKey)
-      .or(`traveler_user_id.is.null,traveler_user_id.eq.${context.userId}`);
-    if (error) return { bound: false };
-    return { bound: true };
+      .eq("id", session.id)
+      .eq("device_proof_hash", session.device_proof_hash ?? "")
+      .or(`traveler_user_id.is.null,traveler_user_id.eq.${context.userId}`)
+      .select("id").maybeSingle();
+    return { bound: !error && Boolean(bound) };
   });

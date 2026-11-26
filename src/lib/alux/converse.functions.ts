@@ -665,28 +665,10 @@ export const aluxConverse = createServerFn({ method: "POST" })
       }
     }
 
-    let userId: string | null = null;
-    const bearer = headers.get("authorization");
-    if (bearer?.toLowerCase().startsWith("bearer ")) {
-      const token = bearer.slice(7).trim();
-      if (token && !token.startsWith("sb_") && token.split(".").length === 3) {
-        const { data: userRes } = await supabaseAdmin.auth
-          .getUser(token)
-          .catch(() => ({ data: { user: null } }));
-        userId = userRes?.user?.id ?? null;
-      }
-    }
-
-    // Una conversación ya ligada a una cuenta sólo la retoma esa misma cuenta.
-    {
-      const { data: owner } = await supabaseAdmin
-        .from("alux_public_sessions")
-        .select("traveler_user_id")
-        .eq("session_key", data.sessionKey)
-        .maybeSingle();
-      const ownerId = (owner as { traveler_user_id: string | null } | null)?.traveler_user_id ?? null;
-      if (ownerId && ownerId !== userId) throw new Error("alux_session_not_owned");
-    }
+    const { readOwnedAluxSession, aluxRequestUserId } = await import("./session-ownership.server");
+    const userId = await aluxRequestUserId();
+    const ownedSession = await readOwnedAluxSession(data.sessionKey, userId);
+    if (!ownedSession) throw new Error("alux_session_not_owned");
 
     // ── 2. Cliente público (RLS anon) para recuperación ─────────────────
     const sb = createClient(
@@ -714,16 +696,15 @@ export const aluxConverse = createServerFn({ method: "POST" })
       })(),
       supabaseAdmin
         .from("alux_public_sessions")
-        .upsert(
+        .update(
           {
-            session_key: data.sessionKey,
             ip_hash: ipHash,
             user_agent: headers.get("user-agent")?.slice(0, 300) ?? null,
             last_seen_at: new Date().toISOString(),
             ...(userId ? { traveler_user_id: userId } : {}),
           },
-          { onConflict: "session_key" },
         )
+        .eq("id", ownedSession.id)
         .select(
           "id, message_count, summary, last_destination_slug, prospect_id, contact_offer_count, contact_offer_last_message_count",
         )

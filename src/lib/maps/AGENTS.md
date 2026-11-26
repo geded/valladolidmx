@@ -1,5 +1,7 @@
 # Map rules
 
+- `computeRoute` returns labelled, non-billable estimates for anonymous callers; paid directions require a validated account before the existing quota and provider call. Why: preserve public discovery without exposing a paid routing proxy.
+
 - Map lifetimes reuse idle SDK containers through `acquireGoogleMap` in the existing loader, separately for public maps and location pickers; callers remove overlays/listeners before releasing and pooled containers never belong to React. Why: the SDK retains constructed maps globally, so rebuilding on filters or navigation accumulates old page trees.
 - Crowded maps: `InteractiveMap` groups nearby pins into numbered bubbles only when a surface opts in with `cluster` (listings, destination map), using the pure `clusterMarkers` in `marker-clusters.ts`; featured (golden-pin) markers are never grouped and road-route maps never cluster. Why: ~200 businesses per destination saturate the map, while routes must show every stop.
 - Pin family and golden pin travel as optional `category`/`featured` on map markers and `vmx.experience.map` points (contract 1.1.0); `featured` comes only from the effective plan's `golden_pin` lever. Why: one map authority, and the golden pin stays a paid-package promise, not an editorial flag.

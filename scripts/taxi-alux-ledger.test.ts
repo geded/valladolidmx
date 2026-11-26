@@ -20,6 +20,13 @@ describe("Taxi Alux · bitácora de pagos", () => {
   it("exporta el importe en pesos", () => {
     expect(taxiLedgerCsv(buildTaxiLedger([ride({})], drivers))).toContain('"125.00"');
   });
+  it("neutraliza fórmulas del viajero, teléfonos y rutas al exportar", () => {
+    for (const value of ['=1+1', '+123', '-1+2', '@SUM(A1)', '  =1+1', '\t=1+1', '\r=1+1', '\n=1+1']) {
+      const csv = taxiLedgerCsv(buildTaxiLedger([ride({ traveler_name: value, traveler_phone: value, origin_label: value })], drivers));
+      expect(csv).toContain(`"'${value}"`);
+      expect(csv).toContain(`"'${value} → B"`);
+    }
+  });
   it("corte del día del conductor", () => {
     const day = new Date("2026-11-20T11:00:00Z");
     const key = new Date(day.getTime() - day.getTimezoneOffset() * 60000).toISOString().slice(0, 10);

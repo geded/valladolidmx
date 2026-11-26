@@ -34,6 +34,7 @@ import {
 import { toast } from "@/lib/toast";
 import { useAuth } from "@/hooks/useAuth";
 import { aluxConverse } from "@/lib/alux/converse.functions";
+import { prepareAluxSession } from "@/lib/alux/session.functions";
 import {
   ALUX_CONVERSE_COPY,
   ALUX_CONVERSE_LIMITS,
@@ -178,6 +179,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
   const isAuthed = Boolean(user?.id);
   const queryClient = useQueryClient();
   const converseFn = useServerFn(aluxConverse);
+  const prepareSessionFn = useServerFn(prepareAluxSession);
   const fetchActive = useServerFn(getMyActivePlan);
   const removeFn = useServerFn(removePlanItem);
   const reorderFn = useServerFn(reorderPlanItems);
@@ -323,9 +325,12 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       setStatus("thinking");
       setLiveNote(ALUX_CONVERSE_COPY.thinking);
       try {
+        const prepared = await prepareSessionFn({ data: { sessionKey } });
+        setSessionKey(prepared.sessionKey);
+        try { window.localStorage.setItem("alux_public_session_key", prepared.sessionKey); } catch { /* local storage optional */ }
         const res = await converseFn({
           data: {
-            sessionKey,
+            sessionKey: prepared.sessionKey,
             message,
             history,
             locale: props.locale,
@@ -389,6 +394,7 @@ export function AluxConverseChat(props: AluxConverseChatProps) {
       isPlanError,
       messages,
       converseFn,
+      prepareSessionFn,
       props,
       alux.name,
       understood,

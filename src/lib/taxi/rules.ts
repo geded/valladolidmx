@@ -414,7 +414,14 @@ export function localDay(iso: string): string {
 
 export function taxiLedgerCsv(entries: TaxiLedgerEntry[]): string {
   const head = ["Fecha", "Folio", "Conductor", "Vehículo", "Viajero", "Teléfono", "Ruta", "Km", "Importe", "Moneda", "Forma de pago"];
-  const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+  const esc = (v: string | number) => {
+    const text = String(v);
+    // Quoting CSV does not stop Excel from evaluating a formula.
+    const safe = /^[\s\u0000-\u001f]*[=+\-@]/u.test(text) || /^[\t\r\n]/u.test(text)
+      ? `'${text}`
+      : text;
+    return `"${safe.replace(/"/g, '""')}"`;
+  };
   const rows = entries.map((e) =>
     [e.paid_at, e.folio, e.driver_name, e.vehicle, e.traveler_name, e.traveler_phone, e.route, e.distance_km, (e.amount / 100).toFixed(2), e.currency, e.method].map(esc).join(","),
   );

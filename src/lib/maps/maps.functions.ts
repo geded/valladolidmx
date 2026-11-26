@@ -112,6 +112,7 @@ export type RouteResult = {
   ok: boolean;
   distanceMeters: number | null;
   durationSeconds: number | null;
+  estimated?: boolean;
   error?: string;
 };
 
@@ -123,6 +124,16 @@ export const computeRoute = createServerFn({ method: "POST" })
         "@/lib/security/public-quota.server"
       );
       assertPlatformOrigin();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const request = getRequest();
+      // Discovery remains available without an account, but never bills Google.
+      if (!request.headers.has("authorization")) {
+        const { approximateRoute } = await import("./route-preview");
+        return approximateRoute(data);
+      }
+      const { requireRequestUser } = await import("@/lib/security/request-auth.server");
+      const caller = await requireRequestUser(request);
+      if (caller instanceof Response) throw new Error("route_auth_required");
       await enforcePublicQuota("maps.computeRoute", {
         perMinute: 30,
         perHour: 300,
@@ -169,7 +180,7 @@ export const computeRoute = createServerFn({ method: "POST" })
         ok: false,
         distanceMeters: null,
         durationSeconds: null,
-        error: err instanceof Error ? err.message : "Route computation failed",
+        error: "Route computation unavailable",
       };
     }
   });

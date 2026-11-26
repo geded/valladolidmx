@@ -1,5 +1,13 @@
 # Roadmap
 
+## Protecciones autorizadas · 2026-11-26
+- [x] Verificar y proteger precios y confirmación de efectivo, sin alterar reservas existentes.
+- [x] Acreditar propiedad de la sesión al vincular memoria de Alux.
+- [x] Restringir rutas facturadas sin bloquear descubrimiento anónimo.
+- [x] Neutralizar fórmulas en exportación de pagos de Taxi.
+- [x] Pruebas y recorridos autenticados/anónimos, compilación automática e integridad PASS; cinco hallazgos actualizados. Informe: docs/security-hardening-2026-11-26.md.
+- [ ] Publicar y revalidar en sitio publicado; confirmación propia de efectivo y compra legítima completa pendientes de piloto autorizado, sin alterar reservas reales. Voz/traducción, consumo simultáneo, embed, fotos y limpieza global no cubiertos por este lote.
+
 ## Taxi Alux · 2026-11-25
 - [x] Servicio integral activable sólo por administración, desactivado al inicio y sin conductores precargados.
 - [x] Cotización por distancia/tiempo, disponibilidad comprobada, registro obligatorio del viajero y pago únicamente en efectivo al conductor.

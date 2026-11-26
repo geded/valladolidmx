@@ -372,6 +372,20 @@
       "when": 1795658745935,
       "tag": "0052_taxi_pickup_zones_default",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1795669670864,
+      "tag": "0053_protect_cart_prices_and_alux_session_proof",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1795669982461,
+      "tag": "0054_cash_receipt_null_safe_ownership",
+      "breakpoints": true
     }
   ]
 }

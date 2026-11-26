@@ -43,16 +43,18 @@ export function DistanceBadge({
     enabled: Boolean(location),
     staleTime: 1000 * 60 * 60 * 24,
     queryKey: ["maps", "route", location?.lat, location?.lng, destLat, destLng],
-    queryFn: () =>
-      fn({
+    queryFn: () => {
+      if (!location) throw new Error("Location required");
+      return fn({
         data: {
-          originLat: location!.lat,
-          originLng: location!.lng,
+          originLat: location.lat,
+          originLng: location.lng,
           destLat,
           destLng,
           travelMode: "DRIVE",
         },
-      }),
+      });
+    },
   });
 
   if (!location) {
@@ -140,6 +142,7 @@ export function DistanceBadge({
           <span>{formatDuration(data.durationSeconds)} en auto</span>
         </>
       ) : null}
+      {data.estimated ? <span className="text-muted-foreground"> · aprox.</span> : null}
       {compact ? null : <span className="text-muted-foreground"> desde tu ubicación</span>}
     </p>
   );

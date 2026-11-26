@@ -484,6 +484,7 @@ export type Database = {
           conversation_language: string | null
           created_at: string
           destination_visit_count: number
+          device_proof_hash: string | null
           first_seen_at: string
           handoff_reason: string | null
           handoff_requested_at: string | null
@@ -522,6 +523,7 @@ export type Database = {
           conversation_language?: string | null
           created_at?: string
           destination_visit_count?: number
+          device_proof_hash?: string | null
           first_seen_at?: string
           handoff_reason?: string | null
           handoff_requested_at?: string | null
@@ -560,6 +562,7 @@ export type Database = {
           conversation_language?: string | null
           created_at?: string
           destination_visit_count?: number
+          device_proof_hash?: string | null
           first_seen_at?: string
           handoff_reason?: string | null
           handoff_requested_at?: string | null

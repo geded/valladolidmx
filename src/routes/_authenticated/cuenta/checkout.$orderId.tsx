@@ -33,6 +33,15 @@ import { getOrderBooking } from "@/lib/commerce/booking.functions";
 import { getPaymentsReadyPublic } from "@/lib/payments/public-status.functions";
 
 export const Route = createFileRoute("/_authenticated/cuenta/checkout/$orderId")({
+  head: () => ({ meta: [
+    { title: "Confirma tu reservación · Valladolid.mx" },
+    { name: "description", content: "Revisa tu reservación y el estado de pago de tu viaje en Valladolid.mx." },
+    { property: "og:title", content: "Confirma tu reservación · Valladolid.mx" },
+    { property: "og:description", content: "Consulta los detalles y el estado de pago de tu reservación." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex, nofollow" },
+  ] }),
   component: CheckoutPage,
 });
 
@@ -165,9 +174,9 @@ function CheckoutPage() {
     setBusy(true);
     try {
       // Modalidad vigente: pago en efectivo con el concierge.
-      await payCash({ data: { orderId, note: null } });
+      const receipt = await payCash({ data: { orderId, note: null } });
       settleCheckoutOrigin(orderId);
-      await notifyConfirmed(order);
+      if (receipt.status === "paid" || receipt.status === "fulfilled") await notifyConfirmed(order);
       try {
         await notifyAdmin({ data: { orderId } });
       } catch {

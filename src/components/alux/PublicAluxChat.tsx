@@ -38,6 +38,8 @@ import { useAnonymousTrip } from "@/lib/traveler/anonymous-draft";
 import { selectAnonymousTravelItems } from "@/lib/traveler/anonymous-draft/items";
 import { rememberAuthReturnPath } from "@/lib/navigation/session-context";
 import { useAluxBrand } from "@/lib/brand/brand-context";
+import { prepareAluxSession } from "@/lib/alux/session.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 type Proposal = {
   entity_type: "business" | "product" | "event" | "destination";
@@ -85,6 +87,7 @@ export function PublicAluxChat({
   ];
   const { locale } = useTranslation();
   const [sessionKey, setSessionKey] = useState("");
+  const prepareSessionFn = useServerFn(prepareAluxSession);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -186,11 +189,15 @@ export function PublicAluxChat({
       setInput("");
       setSending(true);
       try {
+        const prepared = await prepareSessionFn({ data: { sessionKey } });
+        setSessionKey(prepared.sessionKey);
+        try { window.localStorage.setItem(STORAGE_KEY, prepared.sessionKey); } catch { /* optional */ }
+        const { data: auth } = await supabase.auth.getSession();
         const res = await fetch("/api/public/alux/chat", {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", ...(auth.session ? { authorization: `Bearer ${auth.session.access_token}` } : {}) },
           body: JSON.stringify({
-            sessionKey,
+            sessionKey: prepared.sessionKey,
             message: trimmed,
             history: messages.slice(-16),
             ...(embedHost !== undefined
@@ -316,6 +323,7 @@ export function PublicAluxChat({
       messages,
       sending,
       sessionKey,
+      prepareSessionFn,
       location,
       locale,
       anonymous.trip,

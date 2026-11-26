@@ -1,0 +1,29 @@
+# Correcciones autorizadas de seguridad · 26 noviembre 2026
+
+## Alcance y preservación
+Corrección localizada de los cinco hallazgos del análisis profundo. No se modificaron plantillas Premium, CMS, importes registrados, reservas existentes, publicación, secretos ni configuración de taxis. Los únicos textos añadidos en descubrimiento aclaran «aprox.» cuando no se consulta una ruta de pago. El checkout no anuncia confirmación de pago antes de acreditarla.
+
+## Cambios
+- `order_items`: INSERT/UPDATE/DELETE revocados a visitantes y viajeros; lectura conservada, escritura por los RPC existentes. Confirmación compara precio, moneda y empresa con catálogo y rechaza diferencias sin alterar pedidos confirmados.
+- Efectivo: la rutina vigente ya dejaba la solicitud del viajero en `awaiting_payment`, no `paid`. Se reforzó propiedad con comparación segura para valores nulos. El servidor permite confirmar lugares/enviar aviso de pagado solo a personal acreditado; el checkout no envía «viaje confirmado» por una mera solicitud de efectivo.
+- Alux: claves nuevas emitidas por servidor y prueba HttpOnly de dispositivo, hash en la misma tabla de sesiones; control compartido en chat público, dock, memoria territorial, señales, captura de contacto y vinculación de cuenta. Tokens de cuenta inválidos se rechazan. No se permite apropiarse de filas antiguas sin prueba; historial local conservado y filas originales no se borran.
+- Rutas: visitantes sin cuenta reciben estimación etiquetada, sin llamada facturada; cuentas verificadas conservan la ruta calculada y los controles actuales. No se agregó otro limitador.
+- Taxi: se neutralizan prefijos de fórmulas (incluidos espacios y controles) antes de escaparlos para Excel.
+
+## Evidencia
+- 25 pruebas de Taxi/acceso/estimación y 2 de confirmación de efectivo PASS; pruebas adicionales de helpers de seguridad PASS.
+- Dos navegadores: sesión anónima se reabre con su prueba HttpOnly; una cuenta distinta no puede leer ni vincularla; su propia sesión sí se vincula. Chat ajeno responde 403 antes de IA.
+- Viajero temporal autenticado sin privilegios: escritura directa de líneas en tres operaciones devuelve 42501; solicitud de efectivo sobre pedido ajeno rechazada. Ninguna operación creó líneas ni modificó el pedido real.
+- `/alux` en 390 px: pregunta turística real, respuesta 200 y texto visible. `/cuenta` autenticada abre correctamente. Capturas inspeccionadas.
+- Permisos consultados: SELECT de líneas sí; INSERT/UPDATE/DELETE no. Compilación automática más reciente OK.
+- 30 pruebas de anclaje, inyección y recomendaciones de Alux PASS. Integridad de gobernanza PASS (898 avisos históricos). Los cinco hallazgos autorizados se marcaron corregidos; nuevo análisis de backend sin hallazgos activos nuevos. No equivale a un nuevo análisis profundo completo.
+
+## Límites y pendientes
+- No se ejecutó cobro real ni confirmación de efectivo sobre una reserva propia; este último camino se comprobó con pruebas del handler y revisión de la rutina aplicada. No se tocaron reservas reales para forzar la prueba.
+- No se certificó carga de 1,000 usuarios, Safari físico ni Alux insertado en terceros (cookies en iframe dependen del navegador).
+- Endurecimiento amplio de voz, traducciones, límites simultáneos y acreditación del sitio de embed continúa pendiente. El entorno no dispone de un limitador estándar; uno adicional ad hoc necesita decisión informada, no se implementó silenciosamente.
+- Fotos bajo dominio propio, pistas públicas y limpieza de archivos huérfanos pertenecen a la auditoría anterior: no están solucionados en este lote ni constituyen aislamiento de seguridad.
+- Falta publicar el código. Las migraciones ya se aplicaron. No se promete invulnerabilidad ni ocultar todo código del navegador.
+
+## Reversibilidad
+Conservar las restricciones de precios y pagos; no volver a conceder escritura directa. Ante un problema de sesión, corregir el flujo de acreditación en un cambio trazable, sin autorizar claves ajenas ni borrar memoria. Las migraciones se revierten solo mediante una migración nueva autorizada.

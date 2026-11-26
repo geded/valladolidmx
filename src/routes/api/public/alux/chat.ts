@@ -625,6 +625,16 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         if (!apiKey) return json({ error: "missing_api_key" }, 500);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        let ownedSession: { id: string } | null;
+        try {
+          const { assertPlatformOrigin } = await import("@/lib/security/public-quota.server");
+          assertPlatformOrigin();
+          const { readOwnedAluxSession, aluxRequestUserId } = await import("@/lib/alux/session-ownership.server");
+          ownedSession = await readOwnedAluxSession(sessionKey, await aluxRequestUserId());
+        } catch {
+          return json({ error: "alux_session_not_owned" }, 403);
+        }
+        if (!ownedSession) return json({ error: "alux_session_not_owned" }, 403);
 
         // Fase 4 · interruptores de canales: «Alux en Valladolid.mx» y
         // «Alux en otras páginas» (solo sitios autorizados). Si la lectura
@@ -683,18 +693,17 @@ export const Route = createFileRoute("/api/public/alux/chat")({
         }
         tripContext = await hydrateTripContextItems(supabaseAdmin, tripContext);
 
-        // 2) Upsert de sesión.
+        // 2) Update only the session whose ownership was verified above.
         const { data: sessionRow, error: sessErr } = await supabaseAdmin
           .from("alux_public_sessions")
-          .upsert(
+          .update(
             {
-              session_key: sessionKey,
               ip_hash: ipHash,
               user_agent: userAgent,
               last_seen_at: new Date().toISOString(),
             },
-            { onConflict: "session_key" },
           )
+          .eq("id", ownedSession.id)
           .select(
             "id, message_count, summary, summary_message_count, last_destination_slug, last_category_slug, last_spatial_state, last_lat, last_lng, last_signals",
           )

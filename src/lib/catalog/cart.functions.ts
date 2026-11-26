@@ -258,7 +258,12 @@ export const confirmOrder = createServerFn({ method: "POST" })
       p_client_request_id: data.client_request_id,
       p_notes: data.notes,
     });
-    if (error) throw new Error(`order_confirm_failed: ${error.message}`);
+    if (error) {
+      if (error.message.includes("cart_price_changed")) {
+        throw new Error("El precio cambió. Retira el producto y agrégalo de nuevo para revisar el importe actualizado.");
+      }
+      throw new Error(`order_confirm_failed: ${error.message}`);
+    }
     const id = typeof orderId === "string" ? orderId : String(orderId ?? "");
     if (!id) throw new Error("order_confirm_returned_no_id");
     const order = await loadOrder(context.supabase, id, context.userId);

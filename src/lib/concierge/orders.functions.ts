@@ -385,14 +385,17 @@ const CashInput = z.object({
 
 /**
  * Marca la reservación como pagada en efectivo.
- * Puede ejecutarla el viajero dueño de la reservación o el equipo interno
- * (concierge, coordinación, administración). La autorización real vive en
- * `concierge_order_mark_paid_cash` (SECURITY DEFINER).
+ * El viajero sólo solicita pago en efectivo; el equipo autorizado acredita
+ * la recepción. La autorización real vive en la rutina de la base de datos.
  */
 export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => CashInput.parse(data))
   .handler(async ({ data, context }) => {
+    const roles = await Promise.all(["admin", "super_admin", "concierge", "concierge_lead"].map(
+      (role) => context.supabase.rpc("has_role", { _user_id: context.userId, _role: role as "admin" | "super_admin" | "concierge" | "concierge_lead" }),
+    ));
+    const canConfirmReceipt = roles.some((role) => !role.error && role.data === true);
     const { data: res, error } = await context.supabase.rpc("concierge_order_mark_paid_cash", {
       _order_id: data.orderId,
       _note: data.note ?? undefined,
@@ -400,7 +403,7 @@ export const markConciergeOrderPaidCash = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     const result = res as { ok: boolean; status: string; folio: string; travel_plan_id: string | null };
     // Sólo un pago registrado por el equipo (estado «paid») confirma lugares y avisa.
-    if (result?.status !== "paid") return result;
+    if (!canConfirmReceipt || result?.status !== "paid") return result;
     // Los lugares apartados quedan confirmados al registrarse el pago.
     try {
       await context.supabase.rpc("commerce_order_holds_confirm", { _order_id: data.orderId });

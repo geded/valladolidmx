@@ -89,6 +89,12 @@ export const Route = createFileRoute("/api/public/alux/signal")({
             : null;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { hasAluxDeviceProof } = await import("@/lib/alux/session-ownership.server");
+        const { data: proofRow } = await supabaseAdmin.from("alux_public_sessions")
+          .select("device_proof_hash").eq("session_key", sessionKey).maybeSingle();
+        if (!proofRow || !hasAluxDeviceProof(sessionKey, proofRow.device_proof_hash)) {
+          return json({ error: "alux_session_not_owned" }, 403);
+        }
 
         // Localiza sesión (no crea — la sesión nace en el primer turno de chat).
         const { data: row, error } = await supabaseAdmin
