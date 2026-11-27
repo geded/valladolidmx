@@ -1,6 +1,8 @@
 import { TaxiPickupZonesCard } from "@/components/taxi/TaxiPickupZonesCard";
 import { TaxiFleetCard } from "@/components/taxi/TaxiFleetCard";
 import { useEffect, useState } from "react";
+import { NumericInput } from "@/components/taxi/NumericInput";
+import { useLocalFormDraft } from "@/lib/cms/use-local-form-draft";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -89,12 +91,20 @@ function TaxiAdminPage() {
     refetchInterval: 15_000,
   });
   const dashboard = dashboardQ.data;
+  const draft = useLocalFormDraft<{ tab: Tab; settings: TaxiSettings }>({
+    key: "taxi-alux.admin",
+    value: { tab, settings },
+    isDirty: (v) => v.tab !== "resumen" || (!!dashboard && JSON.stringify(v.settings) !== JSON.stringify(dashboard.config)),
+    sanitize: (raw) => (raw && typeof raw === "object" && "settings" in raw ? (raw as { tab: Tab; settings: TaxiSettings }) : null),
+  });
   useEffect(() => {
     if (dashboard && !loadedSettings) {
-      setSettings(dashboard.config);
+      const saved = draft.take();
+      setSettings(saved ? { ...dashboard.config, ...saved.settings, fleet: dashboard.config.fleet } : dashboard.config);
+      if (saved?.tab) setTab(saved.tab);
       setLoadedSettings(true);
     }
-  }, [dashboard, loadedSettings]);
+  }, [dashboard, loadedSettings, draft]);
 
   const drivers = dashboard?.drivers ?? [];
   const invitations = dashboard?.invitations ?? [];
@@ -121,6 +131,7 @@ function TaxiAdminPage() {
           nightSurchargeBps: settings.night_surcharge_bps,
         },
       });
+      draft.clear();
       toast.success(settings.enabled ? "Taxi Alux está activado." : "Configuración guardada. El servicio sigue apagado.");
       await refresh();
     } catch (error) {
@@ -427,7 +438,7 @@ function TaxiAdminPage() {
             <MoneyField id="minimum-fare" label="Tarifa mínima" value={settings.minimum_fare_cents} onChange={(value) => setSettings((current) => ({ ...current, minimum_fare_cents: value }))} />
             <div>
               <label htmlFor="night-rate" className="text-xs font-medium">Recargo nocturno (%)</label>
-              <Input id="night-rate" type="number" min={0} max={100} step={1} value={settings.night_surcharge_bps / 100} onChange={(e) => setSettings((current) => ({ ...current, night_surcharge_bps: Math.round(Number(e.target.value) * 100) }))} className="mt-1" />
+              <NumericInput id="night-rate" value={settings.night_surcharge_bps / 100} onValue={(n) => setSettings((current) => ({ ...current, night_surcharge_bps: Math.round(Math.min(100, n) * 100) }))} className="mt-1" />
               <p className="mt-1 text-[11px] text-muted-foreground">De 20:00 a 06:00, hora local.</p>
             </div>
             <div>
@@ -474,7 +485,7 @@ function MoneyField({ id, label, value, onChange }: { id: string; label: string;
       <label htmlFor={id} className="text-xs font-medium">{label}</label>
       <div className="relative mt-1">
         <span className="absolute left-3 top-2 text-sm text-muted-foreground">$</span>
-        <Input id={id} type="number" min={0} step={1} value={value / 100} onChange={(e) => onChange(Math.round(Number(e.target.value) * 100))} className="pl-7" />
+        <NumericInput id={id} value={value / 100} onValue={(n) => onChange(Math.round(n * 100))} className="pl-7" />
       </div>
     </div>
   );

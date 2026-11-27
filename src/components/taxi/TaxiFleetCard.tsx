@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { NumericInput } from "@/components/taxi/NumericInput";
+import { useLocalFormDraft } from "@/lib/cms/use-local-form-draft";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { Car } from "lucide-react";
@@ -14,6 +16,17 @@ export function TaxiFleetCard({ initial }: { initial: TaxiFleet }) {
   const saveFn = useServerFn(saveTaxiFleetSettings);
   const queryClient = useQueryClient();
   const [fleet, setFleet] = useState<TaxiFleet>(initial);
+  const draft = useLocalFormDraft<TaxiFleet>({
+    key: "taxi-alux.fleet",
+    value: fleet,
+    isDirty: (v) => JSON.stringify(v) !== JSON.stringify(initial),
+    sanitize: (raw) => (raw && typeof raw === "object" && "classes" in raw ? (raw as TaxiFleet) : null),
+  });
+  useEffect(() => {
+    const saved = draft.take(initial);
+    if (saved) setFleet(saved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [busy, setBusy] = useState(false);
   const pesos = (c: number) => c / 100;
   const cents = (v: string) => Math.max(0, Math.round(Number(v) * 100) || 0);
@@ -24,6 +37,7 @@ export function TaxiFleetCard({ initial }: { initial: TaxiFleet }) {
     setBusy(true);
     try {
       await saveFn({ data: fleet });
+      draft.clear();
       toast.success("Vehículos y viajes redondos guardados.");
       await queryClient.invalidateQueries({ queryKey: ["taxi"] });
     } catch (e) {
@@ -47,11 +61,11 @@ export function TaxiFleetCard({ initial }: { initial: TaxiFleet }) {
             <div className="mt-2 grid grid-cols-2 gap-2">
               <div>
                 <label htmlFor={`cls-seats-${c.key}`} className="text-xs font-medium">Pasajeros</label>
-                <Input id={`cls-seats-${c.key}`} type="number" min={1} max={20} value={c.seats} onChange={(e) => set("classes", fleet.classes.map((x, j) => j === i ? { ...x, seats: int(e.target.value) } : x))} className="mt-1" />
+                <NumericInput id={`cls-seats-${c.key}`} value={c.seats} onValue={(n) => set("classes", fleet.classes.map((x, j) => j === i ? { ...x, seats: int(String(n)) } : x))} className="mt-1" />
               </div>
               <div>
                 <label htmlFor={`cls-mult-${c.key}`} className="text-xs font-medium">Tarifa (%)</label>
-                <Input id={`cls-mult-${c.key}`} type="number" min={50} max={500} value={c.multiplier_bps / 100} onChange={(e) => set("classes", fleet.classes.map((x, j) => j === i ? { ...x, multiplier_bps: Math.round(Number(e.target.value) * 100) || 10000 } : x))} className="mt-1" />
+                <NumericInput id={`cls-mult-${c.key}`} value={c.multiplier_bps / 100} onValue={(n) => set("classes", fleet.classes.map((x, j) => j === i ? { ...x, multiplier_bps: Math.round(n * 100) || 10000 } : x))} className="mt-1" />
               </div>
             </div>
           </div>
@@ -87,7 +101,7 @@ function NumberField({ id, label, value, onChange }: { id: string; label: string
   return (
     <div>
       <label htmlFor={id} className="text-xs font-medium">{label}</label>
-      <Input id={id} type="number" min={0} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1" />
+      <NumericInput id={id} value={value} onValue={(n) => onChange(String(n))} className="mt-1" />
     </div>
   );
 }
