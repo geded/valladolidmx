@@ -58,6 +58,7 @@ function reasonText(code: string, party: number, maxParty: number, minParty: num
 }
 
 function addDays(iso: string, n: number): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "";
   const d = new Date(`${iso}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);

@@ -9,6 +9,16 @@ function DefaultErrorComponent({ error, reset }: ErrorComponentProps) {
   // se ofrece un reintento inmediato, porque la mayoría de estos fallos son
   // lecturas momentáneas que se resuelven al repetir la petición.
   console.error(error);
+  // Tras publicar, una pestaña o app instalada abierta puede pedir piezas de
+  // la versión anterior que ya no existen: se recarga una sola vez.
+  if (typeof window !== "undefined" && /dynamically imported module|Importing a module script failed|Failed to fetch|Load failed|error loading dynamically/i.test(String((error as Error)?.message ?? error))) {
+    const key = "vmx.error-reload-at";
+    const last = Number(window.sessionStorage.getItem(key) ?? 0);
+    if (Date.now() - last > 60_000) {
+      window.sessionStorage.setItem(key, String(Date.now()));
+      window.location.reload();
+    }
+  }
   return (
     <div className="flex min-h-[60vh] items-center justify-center bg-background p-8">
       <div className="max-w-md text-center">
