@@ -21,7 +21,8 @@ export function TaxiToPlaceButton({ name, lat, lng }: { name: string; lat: numbe
   const [show, setShow] = useState(false);
   useEffect(() => setShow(taxiPickupAllowedHere()), []);
   if (!show || lat == null || lng == null) return null;
-  const href = `/taxi?destino=${encodeURIComponent(name)}&lat=${lat}&lng=${lng}`;
+  const from = typeof window !== "undefined" ? window.location.pathname + window.location.search : "";
+  const href = `/taxi?destino=${encodeURIComponent(name)}&lat=${lat}&lng=${lng}&volver=${encodeURIComponent(from)}&volverLabel=${encodeURIComponent(name)}`;
   return (
     <Button asChild variant="outline" size="sm" className="rounded-pill">
       <a href={href}><CarFront className="mr-1.5 size-4" /> Pedir taxi aquí</a>

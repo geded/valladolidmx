@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { CarFront, Languages, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, CarFront, Languages, ShieldCheck } from "lucide-react";
 import { PublicShell } from "@/components/discovery";
 import { TaxiQuoteForm } from "@/components/taxi/TaxiQuoteForm";
 import { TaxiAppInstallCard } from "@/components/taxi/TaxiAppInstallCard";
-import { Button } from "@/components/ui/button";
 import { buildPublicHead } from "@/lib/discovery/seo";
 import { getTaxiPublicConfig } from "@/lib/taxi/taxi.functions";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,6 +44,15 @@ export const Route = createFileRoute("/taxi")({
 function TaxiPage() {
   const { data: config } = useSuspenseQuery(configQuery);
   const { user } = useAuth();
+  const [back, setBack] = useState<{ path: string; label: string } | null>(null);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const path = q.get("volver") ?? "";
+    // Sólo rutas internas: evita redirecciones a otros sitios.
+    if (path.startsWith("/") && !path.startsWith("//") && !path.startsWith("/taxi")) {
+      setBack({ path, label: (q.get("volverLabel") ?? "").slice(0, 60) || "la página anterior" });
+    }
+  }, []);
   return (
     <PublicShell
       crumbs={[{ label: "Inicio", to: "/" }, { label: "Taxi Alux" }]}
@@ -51,6 +60,14 @@ function TaxiPage() {
       className="pb-12 pt-5 sm:pt-8"
     >
       <div className="mx-auto max-w-6xl">
+        {back ? (
+          <a
+            href={back.path}
+            className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium shadow-soft"
+          >
+            <ArrowLeft className="size-4" /> Volver a {back.label}
+          </a>
+        ) : null}
         <header className="mb-4 max-w-3xl sm:mb-7">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Taxi Alux</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-4xl">
@@ -86,18 +103,8 @@ function TaxiPage() {
           </section>
         )}
 
-        <div className="mt-6 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="mt-6">
           <TaxiAppInstallCard signedIn={Boolean(user)} />
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-            <h2 className="text-sm font-semibold">¿Eres taxista turístico?</h2>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              Tu acceso requiere una invitación del administrador. Después de llenar el formulario
-              y ser aprobado, instala la app para recibir solicitudes y ver tus rutas.
-            </p>
-            <Button asChild variant="outline" size="sm" className="mt-4">
-              <Link to="/taxista">Entrar al panel de taxista</Link>
-            </Button>
-          </section>
         </div>
       </div>
     </PublicShell>

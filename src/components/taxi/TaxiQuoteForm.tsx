@@ -18,6 +18,7 @@ import {
   type TaxiQuote,
 } from "@/lib/taxi/rules";
 import { toast } from "@/lib/toast";
+import logoSymbol from "@/assets/brand/logo-symbol.png.asset.json";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 
 const DRAFT_KEY = "vmx.taxi.quote-draft.v1";
@@ -183,7 +184,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
       authenticated: Boolean(user),
     });
     if (block === "authentication_required") {
-      rememberAuthReturnPath("/taxi", "Taxi Alux");
+      rememberAuthReturnPath(window.location.pathname + window.location.search, "Taxi Alux");
       await navigate({ to: "/auth" });
       return;
     }
@@ -275,7 +276,9 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             lat={activePoint.lat}
             lng={activePoint.lng}
             onChange={(point) => patch(pinTarget, point)}
-            className="h-[52vh] min-h-[300px] w-full bg-muted lg:h-[460px]"
+            gestureHandling="cooperative"
+            markerIconUrl={logoSymbol.url}
+            className="h-[42vh] min-h-[280px] w-full bg-muted lg:h-[460px]"
           />
           <div className="absolute left-3 top-3 flex gap-1 rounded-full bg-card/95 p-1 shadow-soft">
             {(["origin", "destination"] as const).map((t) => (
@@ -289,6 +292,9 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
               </button>
             ))}
           </div>
+          <p className="pointer-events-none absolute inset-x-3 bottom-16 mx-auto w-fit rounded-full bg-card/95 px-3 py-1 text-[11px] text-muted-foreground shadow-soft sm:hidden">
+            Toca el mapa para marcar el punto · usa dos dedos para moverlo
+          </p>
           <Button type="button" size="icon" variant="secondary" aria-label="Usar mi ubicación" onClick={useCurrentLocation} className="absolute bottom-3 right-3 size-11 rounded-full shadow-elevated">
             <LocateFixed className="size-5" />
           </Button>

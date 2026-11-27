@@ -26,6 +26,10 @@ export interface LocationPickerMapProps {
   zoom?: number;
   onChange: (p: LatLng) => void;
   className?: string;
+  /** "cooperative" deja desplazar la página con un dedo (mapa con dos dedos). */
+  gestureHandling?: "greedy" | "cooperative";
+  /** Icono propio del marcador (p. ej. símbolo de marca). */
+  markerIconUrl?: string;
 }
 
 export function LocationPickerMap({
@@ -34,6 +38,8 @@ export function LocationPickerMap({
   zoom = 15,
   onChange,
   className,
+  gestureHandling = "greedy",
+  markerIconUrl,
 }: LocationPickerMapProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<{ setCenter: (p: LatLng) => void } | null>(null);
@@ -103,7 +109,8 @@ export function LocationPickerMap({
             streetViewControl: false,
             mapTypeControl: false,
             fullscreenControl: true,
-            gestureHandling: "greedy",
+            gestureHandling,
+            clickableIcons: false,
           },
           "picker",
         );
@@ -113,6 +120,9 @@ export function LocationPickerMap({
           position: { lat, lng },
           map,
           draggable: true,
+          ...(markerIconUrl
+            ? { icon: { url: markerIconUrl, scaledSize: new google.maps.Size(44, 44), anchor: new google.maps.Point(22, 22) } }
+            : {}),
           title: "Arrastra o toca el mapa para ubicar",
         });
         marker.addListener("dragend", ((e: {
