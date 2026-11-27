@@ -29,6 +29,7 @@ import {
 import { toast } from "@/lib/toast";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 
+const ANON_QUOTE_KEY = "vmx.taxi.anon-quote.v1";
 const DRAFT_KEY = "vmx.taxi.quote-draft.v1";
 const CENTER = { lat: 20.6896, lng: -88.2017 };
 
@@ -90,6 +91,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const quoteFn = useServerFn(quoteTaxi);
+  const [needsSignup, setNeedsSignup] = useState(false);
   const requestFn = useServerFn(requestTaxiRide);
   const [draft, setDraft] = useState<Draft>(initialDraft);
   const [quote, setQuote] = useState<TaxiQuote | null>(null);
@@ -205,12 +207,26 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
 
   async function calculate() {
     if (!taxiHasRoute(draft.originLabel, draft.destinationLabel)) return;
+    if (!user && window.localStorage.getItem(ANON_QUOTE_KEY)) {
+      setQuote(null);
+      setNeedsSignup(true);
+      return;
+    }
     setBusy("quote");
     try {
       const result = await quoteFn({ data: pointInput() });
       setQuote(result);
+      setNeedsSignup(false);
+      if (!user) window.localStorage.setItem(ANON_QUOTE_KEY, "1");
     } catch (error) {
-      toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
+      const message = error instanceof Error ? error.message : "";
+      if (message.includes("taxi_quote_registration_required")) {
+        window.localStorage.setItem(ANON_QUOTE_KEY, "1");
+        setQuote(null);
+        setNeedsSignup(true);
+        return;
+      }
+      toast.error(taxiErrorMessage(message));
     } finally {
       setBusy(null);
     }
@@ -538,7 +554,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
               </>
             ) : (
               <p className="text-sm text-muted-foreground lg:mt-2">
-                {busy === "quote" ? "Calculando precio…" : !draft.originLabel.trim() ? "Esperando tu punto de recogida" : "Elige destino para ver el precio"}
+                {needsSignup && !user ? "Ya usaste tu cotización de prueba. Crea tu cuenta de cliente verificado para cotizar otro viaje." : busy === "quote" ? "Calculando precio…" : !draft.originLabel.trim() ? "Esperando tu punto de recogida" : "Elige destino para ver el precio"}
               </p>
             )}
           </div>
@@ -549,7 +565,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             onClick={request}
           >
             {!user ? <LogIn className="mr-2 size-4" /> : null}
-            {busy === "request" ? "Enviando…" : user ? "Pedir Taxi Alux" : "Regístrate y pide"}
+            {busy === "request" ? "Enviando…" : user ? "Pedir Taxi Alux" : needsSignup ? "Regístrate y cotiza" : "Regístrate y pide"}
           </Button>
         </div>
         <p className="mx-auto mt-2 max-w-xl text-center text-[11px] text-muted-foreground">

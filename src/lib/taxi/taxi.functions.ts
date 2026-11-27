@@ -158,6 +158,15 @@ export const quoteTaxi = createServerFn({ method: "POST" })
         await enforcePublicQuota("taxi.roadRoute", { perMinute: 20, perHour: 200, platformPerDay: 10000 });
         road = await taxiRoadRoute(data);
       }
+    } else {
+      // Visitante sin cuenta: una cotización real por carretera; las siguientes piden registro.
+      const { enforcePublicQuota } = await import("@/lib/security/public-quota.server");
+      try {
+        await enforcePublicQuota("taxi.roadRoute.anon", { perMinute: 2, perHour: 3, perDay: 5 });
+      } catch {
+        throw new Error("taxi_quote_registration_required");
+      }
+      road = await taxiRoadRoute(data);
     }
     const { data: quote, error } = await (publicClient(url, key) as unknown as Loose).rpc(
       "taxi_quote",

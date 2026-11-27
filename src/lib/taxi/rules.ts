@@ -462,6 +462,7 @@ export function taxiErrorMessage(message: string): string {
   if (message.includes("taxi_service_disabled")) return "Taxi Alux está desactivado por ahora.";
   if (message.includes("pickup_outside_zone")) return "Por ahora Taxi Alux sólo recoge en los destinos de salida activos.";
   if (message.includes("no_drivers_available")) return "No hay taxistas disponibles en este momento.";
+  if (message.includes("taxi_quote_registration_required")) return "Crea tu cuenta para cotizar otro viaje.";
   if (message.includes("authentication_required")) return "Crea tu cuenta o inicia sesión para pedir tu taxi.";
   if (message.includes("active_ride_exists")) return "Ya tienes un viaje activo. Termínalo o cancélalo antes de pedir otro.";
   if (message.includes("ride_no_longer_available")) return "Otro taxista ya tomó esta solicitud.";
