@@ -45,7 +45,9 @@ export function nextTableActions(status: TableStatus): TableStatus[] {
 
 /** Estados que ocupan mesa. */
 export function occupiesTable(status: string): boolean {
-  return status === "pendiente" || status === "confirmada" || status === "llego" || status === "sentada";
+  return (
+    status === "pendiente" || status === "confirmada" || status === "llego" || status === "sentada"
+  );
 }
 
 export const TABLE_SOURCE_LABEL: Record<string, string> = {
@@ -57,9 +59,15 @@ export const TABLE_SOURCE_LABEL: Record<string, string> = {
 };
 
 /** Personas que trajo la plataforma (lo que se cobraría por persona en la Etapa 3). */
-export function platformGuests(rows: ReadonlyArray<{ source: string; status: string; party_size: number }>): number {
+export function platformGuests(
+  rows: ReadonlyArray<{ source: string; status: string; party_size: number }>,
+): number {
   return rows
-    .filter((r) => (r.source === "pagina" || r.source === "alux" || r.source === "whatsapp") && (r.status === "terminada" || r.status === "sentada" || r.status === "llego"))
+    .filter(
+      (r) =>
+        (r.source === "pagina" || r.source === "alux" || r.source === "whatsapp") &&
+        (r.status === "terminada" || r.status === "sentada" || r.status === "llego"),
+    )
     .reduce((n, r) => n + r.party_size, 0);
 }
 
@@ -97,21 +105,32 @@ export const DEFAULT_TABLE_SETTINGS: TableBookingSettings = {
   min_notice_minutes: 60,
   max_days_ahead: 60,
   confirm_mode: "inmediata",
-  hours: Object.fromEntries(WEEKDAYS.map((d) => [d.key, [["08:00", "22:00"]]])) as TableBookingSettings["hours"],
-  tables: [{ seats: 4, count: 6 }, { seats: 2, count: 2 }],
+  hours: Object.fromEntries(
+    WEEKDAYS.map((d) => [d.key, [["08:00", "22:00"]]]),
+  ) as TableBookingSettings["hours"],
+  tables: [
+    { seats: 4, count: 6 },
+    { seats: 2, count: 2 },
+  ],
 };
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /** Limpia los ajustes del formulario; devuelve error legible si algo no cuadra. */
-export function normalizeTableSettings(input: TableBookingSettings): { ok: true; value: TableBookingSettings } | { ok: false; error: string } {
+export function normalizeTableSettings(
+  input: TableBookingSettings,
+): { ok: true; value: TableBookingSettings } | { ok: false; error: string } {
   const tables = input.tables.filter((t) => t.count > 0 && t.seats > 0);
   if (tables.length === 0) return { ok: false, error: "Agrega al menos una mesa." };
-  if (tables.some((t) => t.seats > 30 || t.count > 100)) return { ok: false, error: "Revisa las mesas: máximo 30 personas y 100 mesas por tipo." };
+  if (tables.some((t) => t.seats > 30 || t.count > 100))
+    return { ok: false, error: "Revisa las mesas: máximo 30 personas y 100 mesas por tipo." };
   const hours: TableBookingSettings["hours"] = {};
   for (const d of WEEKDAYS) {
-    const ranges = (input.hours[d.key] ?? []).filter(([a, b]) => HHMM.test(a) && HHMM.test(b) && a < b);
-    if ((input.hours[d.key] ?? []).length !== ranges.length) return { ok: false, error: `Revisa el horario del ${d.label.toLowerCase()}.` };
+    const ranges = (input.hours[d.key] ?? []).filter(
+      ([a, b]) => HHMM.test(a) && HHMM.test(b) && a < b,
+    );
+    if ((input.hours[d.key] ?? []).length !== ranges.length)
+      return { ok: false, error: `Revisa el horario del ${d.label.toLowerCase()}.` };
     if (ranges.length) hours[d.key] = ranges;
   }
   const maxSeats = Math.max(...tables.map((t) => t.seats));
@@ -136,12 +155,37 @@ export function meridaToday(now: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Merida" }).format(now);
 }
 
+export interface PublicTableSlot {
+  slot_time: string;
+  starts_at: string;
+  available: boolean;
+  zones?: string[];
+}
+
+/** Only server-approved slots after the local clock; never offer a past time. */
+export function futureTableSlots<T extends PublicTableSlot>(slots: readonly T[], now: number): T[] {
+  return slots.filter((slot) => slot.available && new Date(slot.starts_at).getTime() > now);
+}
+
+export function tableZoneAvailable(slot: PublicTableSlot, zone: string): boolean {
+  return slot.available && (!zone || Boolean(slot.zones?.includes(zone)));
+}
+
 export function formatTableTime(iso: string): string {
-  return new Intl.DateTimeFormat("es-MX", { timeZone: "America/Merida", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  return new Intl.DateTimeFormat("es-MX", {
+    timeZone: "America/Merida",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
 }
 
 export function formatTableDate(iso: string): string {
-  return new Intl.DateTimeFormat("es-MX", { timeZone: "America/Merida", weekday: "long", day: "numeric", month: "long" }).format(new Date(iso));
+  return new Intl.DateTimeFormat("es-MX", {
+    timeZone: "America/Merida",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(iso));
 }
 
 export const TABLE_BOOKING_ERRORS: Record<string, string> = {
@@ -158,6 +202,7 @@ export const TABLE_BOOKING_ERRORS: Record<string, string> = {
 };
 
 export function tableBookingError(message: string): string {
-  for (const [code, text] of Object.entries(TABLE_BOOKING_ERRORS)) if (message.includes(code)) return text;
+  for (const [code, text] of Object.entries(TABLE_BOOKING_ERRORS))
+    if (message.includes(code)) return text;
   return "No se pudo completar. Intenta de nuevo.";
 }

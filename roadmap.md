@@ -1,5 +1,11 @@
 # Roadmap
 
+## Reservar mesa · selector de hora y zonas · 2026-11-27
+- [x] Restaurar selector de hora disponible, excluyendo horas pasadas de hoy en Valladolid.
+- [x] Sustituir botones de horarios por zonas reales del plano; conectar apartado y mesa reservada a la zona con los RPC existentes.
+- [x] Copalli: hora → Cualquiera → apartado → cambio de fecha en 1440/834/430/390, sin errores ni desbordes; 14 pruebas y lint PASS, build automático OK. Sin reservación real ni publicación. Informe: docs/table-booking-zones-2026-11-27.md.
+- [ ] Validar reserva de una zona real y comparativa completa del constructor: Copalli no tiene plano/zonas guardadas; la conexión de pruebas no permite ejecutar como visitante. Comparativa del mapa y recomendaciones diferidas no certificada por distinta carga en las capturas.
+
 ## Taxi Alux · vehículos, espera e ida y vuelta · 2026-11-27
 - [x] Compacto/Camioneta/Van por tamaño del grupo, tarifa por vehículo, asignación sólo a autos donde caben.
 - [x] Espera al recoger (min gratis + por minuto), hasta 2 paradas, ida y vuelta por horas con km incluidos y desglose al pedir.

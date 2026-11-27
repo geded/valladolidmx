@@ -407,6 +407,13 @@
       "when": 1795761141977,
       "tag": "0057_taxi_road_distance",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1795812525107,
+      "tag": "0058_restaurant_booking_zone_selection",
+      "breakpoints": true
     }
   ]
 }

@@ -7744,6 +7744,7 @@ export type Database = {
           expires_at: string
           party_size: number
           starts_at: string
+          table_id: string | null
           token: string
         }
         Insert: {
@@ -7753,6 +7754,7 @@ export type Database = {
           expires_at: string
           party_size: number
           starts_at: string
+          table_id?: string | null
           token?: string
         }
         Update: {
@@ -7762,6 +7764,7 @@ export type Database = {
           expires_at?: string
           party_size?: number
           starts_at?: string
+          table_id?: string | null
           token?: string
         }
         Relationships: [
@@ -9655,6 +9658,16 @@ export type Database = {
           _start: string
         }
         Returns: boolean
+      }
+      _restaurant_free_table: {
+        Args: {
+          _business_id: string
+          _exclude: string
+          _party: number
+          _start: string
+          _zone: string
+        }
+        Returns: string
       }
       _restaurant_notify: {
         Args: {
@@ -11714,21 +11727,38 @@ export type Database = {
         Args: { _id: string; _table_id: string }
         Returns: undefined
       }
-      restaurant_book: {
-        Args: {
-          _business_id: string
-          _email?: string
-          _hold?: string
-          _name: string
-          _note?: string
-          _occasion?: string
-          _party: number
-          _phone: string
-          _source?: string
-          _starts_at: string
-        }
-        Returns: Json
-      }
+      restaurant_book:
+        | {
+            Args: {
+              _business_id: string
+              _email?: string
+              _hold?: string
+              _name: string
+              _note?: string
+              _occasion?: string
+              _party: number
+              _phone: string
+              _source?: string
+              _starts_at: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _business_id: string
+              _email: string
+              _hold: string
+              _name: string
+              _note: string
+              _occasion: string
+              _party: number
+              _phone: string
+              _source: string
+              _starts_at: string
+              _zone: string
+            }
+            Returns: Json
+          }
       restaurant_booking_policies_save: {
         Args: { _business_id: string; _min_party: number; _policies: string }
         Returns: undefined
@@ -11780,15 +11810,26 @@ export type Database = {
         }
         Returns: undefined
       }
-      restaurant_hold_slot: {
-        Args: {
-          _business_id: string
-          _party: number
-          _replace?: string
-          _starts_at: string
-        }
-        Returns: Json
-      }
+      restaurant_hold_slot:
+        | {
+            Args: {
+              _business_id: string
+              _party: number
+              _replace?: string
+              _starts_at: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _business_id: string
+              _party: number
+              _replace: string
+              _starts_at: string
+              _zone: string
+            }
+            Returns: Json
+          }
       restaurant_manage_cancel: { Args: { _token: string }; Returns: undefined }
       restaurant_manage_get: { Args: { _token: string }; Returns: Json }
       restaurant_manage_modify: {
@@ -11803,14 +11844,29 @@ export type Database = {
         Args: { _business_id: string }
         Returns: Json
       }
-      restaurant_public_slots: {
-        Args: { _business_id: string; _date: string; _party: number }
-        Returns: {
-          available: boolean
-          slot_time: string
-          starts_at: string
-        }[]
-      }
+      restaurant_public_slots:
+        | {
+            Args: { _business_id: string; _date: string; _party: number }
+            Returns: {
+              available: boolean
+              slot_time: string
+              starts_at: string
+            }[]
+          }
+        | {
+            Args: {
+              _business_id: string
+              _date: string
+              _party: number
+              _zone: string
+            }
+            Returns: {
+              available: boolean
+              slot_time: string
+              starts_at: string
+              zones: string[]
+            }[]
+          }
       restaurant_release_hold: { Args: { _token: string }; Returns: undefined }
       restaurant_reservation_update: {
         Args: {
