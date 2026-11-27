@@ -799,7 +799,7 @@ export function BusinessSurface({
         entityId={b.id}
       />
       <div className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center justify-end gap-2 px-5 sm:px-8 lg:px-12">
-        <span className="flex flex-wrap items-center justify-end gap-2">
+        <span className="flex flex-nowrap items-center justify-end gap-1.5 sm:flex-wrap sm:gap-2">
           <TrackClick businessId={b.id} surface="perfil-empresa" eventType="share">
             <ShareButton title={b.display_name} />
           </TrackClick>

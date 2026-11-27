@@ -268,7 +268,8 @@ function AddToTravelPlanButtonInner({
       ) : (
         <Plus className="size-3.5" aria-hidden />
       )}
-      <span>{done ? "Ya está en Mi Viaje" : busy ? "Agregando…" : "Agregar a Mi Viaje"}</span>
+      <span className="hidden sm:inline">{done ? "Ya está en Mi Viaje" : busy ? "Agregando…" : "Agregar a Mi Viaje"}</span>
+      <span className="sm:hidden">{done ? "En Mi Viaje" : busy ? "Agregando…" : "Mi Viaje"}</span>
     </button>
   );
 }

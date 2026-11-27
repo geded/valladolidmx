@@ -28,7 +28,7 @@ export function TaxiToPlaceButton({ name, lat, lng }: { name: string; lat: numbe
   };
   return (
     <Button asChild variant="outline" size="sm" className="rounded-pill">
-      <a href={base} onPointerDown={withReturn} onClick={withReturn}><CarFront className="mr-1.5 size-4" /> Pedir taxi aquí</a>
+      <a href={base} onPointerDown={withReturn} onClick={withReturn}><CarFront className="mr-1.5 size-4" /><span className="hidden sm:inline">Pedir taxi aquí</span><span className="sm:hidden">Taxi</span></a>
     </Button>
   );
 }
