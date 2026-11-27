@@ -18,7 +18,6 @@ import {
   type TaxiQuote,
 } from "@/lib/taxi/rules";
 import { toast } from "@/lib/toast";
-import logoSymbol from "@/assets/brand/logo-symbol.png.asset.json";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
 
 const DRAFT_KEY = "vmx.taxi.quote-draft.v1";
@@ -277,7 +276,8 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             lng={activePoint.lng}
             onChange={(point) => patch(pinTarget, point)}
             gestureHandling="cooperative"
-            markerIconUrl={logoSymbol.url}
+            brandStyle
+            companion={pinTarget === "origin" ? draft.destination : draft.origin}
             className="h-[42vh] min-h-[280px] w-full bg-muted lg:h-[460px]"
           />
           <div className="absolute left-3 top-3 flex gap-1 rounded-full bg-card/95 p-1 shadow-soft">

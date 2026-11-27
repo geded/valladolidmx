@@ -68,7 +68,7 @@ function mixHex(a: string, b: string, amount: number): string {
     .join("")}`;
 }
 
-function getBrandMapStyles() {
+export function getBrandMapStyles() {
   const background = themeColor("--background", "#fbf7ee");
   const secondary = themeColor("--secondary", "#ece4d3");
   const territory = themeColor("--selva", "#234933");
