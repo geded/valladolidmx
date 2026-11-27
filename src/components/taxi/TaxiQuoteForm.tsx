@@ -14,6 +14,8 @@ import {
   taxiErrorMessage,
   taxiPickupZoneFor,
   taxiRequestBlockReason,
+  taxiWithCurrentOrigin,
+  taxiHasRoute,
   type TaxiPublicConfig,
   type TaxiQuote,
 } from "@/lib/taxi/rules";
@@ -81,6 +83,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
   const [pinTarget, setPinTarget] = useState<"origin" | "destination">("destination");
   const [scheduled, setScheduled] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const initialized = useRef(false);
 
   // La barra de precio fija en celular eleva a Alux para que no la tape.
   useEffect(() => {
@@ -90,11 +93,17 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
 
   const [outsideArea, setOutsideArea] = useState<false | "oriente" | "yucatan" | "lejos">(false);
 
-  // Al entrar, pedir la ubicación: si está fuera del Oriente Maya, avisar y recordarlo para Alux.
+  // Restaurar primero el destino; después pedir una recogida actual, no la de otro traslado.
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!ready) return;
+    if (!navigator.geolocation) {
+      toast.info("Marca tu punto de recogida en el mapa para cotizar.");
+      return;
+    }
+    let cancelled = false;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        if (cancelled) return;
         const { latitude: lat, longitude: lng } = pos.coords;
         // Oriente Maya (Valladolid, Izamal, Espita, Tizimín…); Mérida y el poniente quedan fuera.
         const inside = lat > 20.0 && lat < 21.7 && lng > -89.15 && lng < -87.4;
@@ -105,17 +114,21 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
         try {
           window.localStorage.setItem("vmx.traveler.location-context.v1", JSON.stringify({ inTerritory: inside, nearValladolid, nearby: !inside && inYucatan, at: Date.now() }));
         } catch { /* opcional */ }
-        if (nearValladolid) {
-          setDraft((c) => (c.originLabel && c.originLabel !== "Mi ubicación actual" ? c : { ...c, origin: { lat, lng }, originLabel: "Mi ubicación actual" }));
-          setPinTarget("origin");
-        }
+        setDraft((c) => taxiWithCurrentOrigin(c, { lat, lng }));
+        setQuote(null);
+        setPinTarget("origin");
       },
-      () => undefined,
-      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
+      () => {
+        if (!cancelled) toast.info("Permite tu ubicación o marca tu recogida en el mapa para cotizar.");
+      },
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 },
     );
-  }, [config.pickup_zones]);
+    return () => { cancelled = true; };
+  }, [ready, config.pickup_zones]);
 
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
     const saved = readDraft();
     const params = new URLSearchParams(window.location.search);
     const dLat = Number(params.get("lat"));
@@ -127,10 +140,17 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     }
     setDraft({
       ...next,
+      originLabel: "",
       requestedFor: next.requestedFor || localDateTimeValue(new Date(Date.now() + 30 * 60_000)),
       travelerName: next.travelerName || profile?.display_name || "",
     });
     setReady(true);
+  }, [profile?.display_name]);
+
+  useEffect(() => {
+    if (profile?.display_name) {
+      setDraft((c) => c.travelerName ? c : { ...c, travelerName: profile.display_name ?? "" });
+    }
   }, [profile?.display_name]);
 
   useEffect(() => {
@@ -165,6 +185,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
   }
 
   async function calculate() {
+    if (!taxiHasRoute(draft.originLabel, draft.destinationLabel)) return;
     setBusy("quote");
     try {
       const result = await quoteFn({ data: pointInput() });
@@ -231,11 +252,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setDraft((c) => ({
-          ...c,
-          origin: { lat: position.coords.latitude, lng: position.coords.longitude },
-          originLabel: c.originLabel || "Mi ubicación actual",
-        }));
+        setDraft((c) => taxiWithCurrentOrigin(c, { lat: position.coords.latitude, lng: position.coords.longitude }));
         setQuote(null);
         setPinTarget("destination");
       },
@@ -247,11 +264,11 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
   // Cotiza solo en cuanto hay recogida y destino, como en las apps de transporte.
   const quoteKey = `${draft.origin.lat},${draft.origin.lng},${draft.destination.lat},${draft.destination.lng},${scheduled ? draft.requestedFor : "now"}`;
   useEffect(() => {
-    if (!ready || !draft.destinationLabel.trim()) return;
+    if (!ready || !taxiHasRoute(draft.originLabel, draft.destinationLabel)) return;
     const t = window.setTimeout(() => void calculate(), 600);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quoteKey, ready, Boolean(draft.destinationLabel.trim())]);
+  }, [quoteKey, ready, Boolean(draft.originLabel.trim()), Boolean(draft.destinationLabel.trim())]);
 
   function pickPlace(target: "origin" | "destination", hit: TaxiPlaceHit) {
     setDraft((c) =>
@@ -274,7 +291,12 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             key={pinTarget}
             lat={activePoint.lat}
             lng={activePoint.lng}
-            onChange={(point) => patch(pinTarget, point)}
+            onChange={(point) => {
+              setDraft((c) => pinTarget === "origin"
+                ? { ...c, origin: point, originLabel: "Punto de recogida en el mapa" }
+                : { ...c, destination: point, destinationLabel: "Destino en el mapa" });
+              setQuote(null);
+            }}
             gestureHandling="cooperative"
             brandStyle
             companion={pinTarget === "origin" ? draft.destination : draft.origin}
@@ -398,7 +420,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
               </>
             ) : (
               <p className="text-sm text-muted-foreground lg:mt-2">
-                {busy === "quote" ? "Calculando precio…" : "Elige destino para ver el precio"}
+                {busy === "quote" ? "Calculando precio…" : !draft.originLabel.trim() ? "Esperando tu punto de recogida" : "Elige destino para ver el precio"}
               </p>
             )}
           </div>

@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../scripts/governance/schemas/product-authorization.schema.json",
+  "id": "PCA-2026-122",
+  "title": "Taxi desde una ficha: ubicación actual como recogida y lugar elegido como destino",
+  "status": "Approved",
+  "branch": "main",
+  "blueprint": "docs/blueprint/19.47-PREMIUM-TEMPLATE-PRESERVATION-AND-EVOLUTION-POLICY-v1.0.md",
+  "founder_authority": "Founder 2026-11-27 03:46 UTC: el punto de partida debe ser donde está ubicado el viajero, el destino el lugar o producto que está viendo, y se solicita su ubicación para cotizar llegar allí desde Valladolid. Corrección localizada de recogida actual, preservación de destino e inicialización; sin rediseño, cambios de tarifas, zonas, permisos, datos, solicitudes reales o publicación.",
+  "permissions": [
+    { "operation": "modify", "path": "src/components/taxi/TaxiQuoteForm.tsx" },
+    { "operation": "modify", "path": "src/lib/taxi/rules.ts" }
+  ],
+  "public_routes": ["/taxi", "/oriente-maya/valladolid/restaurantes/copalli-cafe"],
+  "required_feature_flags": [],
+  "required_tests": [
+    "bunx vitest run scripts/taxi-current-origin.test.ts",
+    "bun test scripts/taxi-alux-rules.test.ts scripts/taxi-pickup-zones.test.ts",
+    "Copalli → Taxi con GPS actual y borrador anterior; destino y enlace de regreso conservados",
+    "GPS denegado: no cotizar desde el centro predeterminado",
+    "1440/834/430/390: ficha completa sin cambios de diseño; mapa real y GPS físico quedan para origen autorizado"
+  ]
+}

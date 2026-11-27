@@ -1,6 +1,18 @@
 export const TAXI_SETTINGS_KEY = "taxi_alux.settings";
 export const TAXI_PAYMENT_METHOD = "efectivo" as const;
 
+/** El GPS actualiza sólo la recogida, nunca el lugar que motivó el traslado. */
+export function taxiWithCurrentOrigin<T extends { origin: { lat: number; lng: number }; originLabel: string }>(
+  draft: T,
+  point: { lat: number; lng: number },
+): T {
+  return { ...draft, origin: point, originLabel: "Mi ubicación actual" };
+}
+
+export function taxiHasRoute(originLabel: string, destinationLabel: string): boolean {
+  return Boolean(originLabel.trim() && destinationLabel.trim());
+}
+
 export const TAXI_RIDE_STATUSES = [
   "requested",
   "accepted",

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Taxi desde la ficha · 2026-11-27
+- [x] Recogida con GPS actual (no borrador anterior), destino de la ficha y cotización sólo con ambos puntos; conservar diseño, regreso, tarifas y zonas. 14 pruebas PASS; Copalli → Taxi → volver en 1440/834/430/390, GPS denegado sin cotización ficticia. Informe: docs/taxi-current-origin-2026-11-27.md.
+- [ ] GPS y mapa en iPhone físico y publicación: requieren dispositivo/origen autorizado; control global pendiente de reconciliación histórica ajena al delta.
+
 ## Botones de la ficha · 2026-11-27
 - [x] «Agregar a Mi Viaje» parejo con Compartir/Guardar/Taxi en celular (misma caja que el botón compartido).
 - [x] Poder desmarcar una parada ya agregada desde el mismo botón (hoy se desactiva y no deja quitarla).
