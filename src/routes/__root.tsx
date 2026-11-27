@@ -450,6 +450,23 @@ function RootComponent() {
 
   // Fotos: sin menú «Guardar imagen» ni arrastre (disuasión).
   useEffect(() => installPhotoGuard(), []);
+  // Fotos con enlace vencido (copia guardada, app instalada): se piden datos
+  // nuevos una vez, sin recargar, para que cada foto reciba enlace vigente.
+  const photoRouter = useRouter();
+  useEffect(() => {
+    let dispose: (() => void) | null = null;
+    let cancelled = false;
+    void import("@/pwa/photo-link-recovery").then(({ installPhotoLinkRecovery }) => {
+      if (cancelled) return;
+      dispose = installPhotoLinkRecovery(() => {
+        void Promise.allSettled([queryClient.invalidateQueries(), photoRouter.invalidate()]);
+      });
+    });
+    return () => {
+      cancelled = true;
+      dispose?.();
+    };
+  }, [queryClient, photoRouter]);
 
   // La infraestructura PWA y el runner de sincronización son capacidades
   // post-hidratación. Se cargan en idle para no formar parte del camino
@@ -466,8 +483,16 @@ function RootComponent() {
       void registerServiceWorker();
       startSyncRunner();
     };
-    const idle = window.requestIdleCallback?.(() => void startPwa(), { timeout: 2_500 });
-    const fallback = idle == null ? window.setTimeout(() => void startPwa(), 1_200) : null;
+    // En la app instalada se revisa la versión enseguida: es donde una copia
+    // guardada puede quedarse atrás tras publicar.
+    const installed =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    const idle = installed
+      ? null
+      : window.requestIdleCallback?.(() => void startPwa(), { timeout: 2_500 });
+    const fallback =
+      idle == null ? window.setTimeout(() => void startPwa(), installed ? 300 : 1_200) : null;
     // Graceful Upgrade · comprobación oportunista al recuperar visibilidad.
     const onVisible = () => {
       if (document.visibilityState === "visible" && checkForUpdate) void checkForUpdate();

@@ -11,7 +11,7 @@
  * Toda superficie premium (Home, Destino, Empresa, Producto, Evento, Lugar)
  * debe consumirlo en lugar de emitir `<img>` sin fallback.
  */
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useHydrated } from "@tanstack/react-router";
 import logoSymbol from "@/assets/brand/logo-symbol.png.asset.json";
 import { cn } from "@/lib/utils";
@@ -162,6 +162,16 @@ function EditorialPicture({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sólo la primera carga
   }, []);
+
+  // Enlace renovado (p. ej. el anterior venció): se olvida el fallo previo y
+  // se intenta la foto nueva; la última foto visible no se oculta.
+  const lastUrlRef = useRef(media.url);
+  useEffect(() => {
+    if (lastUrlRef.current === media.url) return;
+    lastUrlRef.current = media.url;
+    setRetrySrc(null);
+    setFailed(false);
+  }, [media.url]);
 
   const handleError = () => {
     if (retrySrc === null && media.url) {

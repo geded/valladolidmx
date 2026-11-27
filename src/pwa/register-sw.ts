@@ -196,6 +196,14 @@ export function registerServiceWorker(): Promise<void> {
       reg.addEventListener("updatefound", () => {
         if (reg.installing) trackInstalling(reg.installing);
       });
+      // `register()` no vuelve a revisar si ya existía un registro: al abrir
+      // la app instalada se pregunta de inmediato por la versión publicada
+      // (sw.js pesa ~5 KB y nunca se guarda en caché) en vez de esperar a que
+      // el teléfono decida revisarlo. También al volver desde segundo plano.
+      if (hadController) void reg.update().catch(() => undefined);
+      window.addEventListener("pageshow", (e) => {
+        if ((e as PageTransitionEvent).persisted) void reg.update().catch(() => undefined);
+      });
 
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         emit("controlling");
