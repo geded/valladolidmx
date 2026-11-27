@@ -315,6 +315,8 @@ export interface TaxiTracking {
   lng: number | null;
   location_updated_at: string | null;
   location_stale: boolean;
+  /** Ruta por carretera del taxi a la recogida (sólo mientras va por el viajero). */
+  pickup_polyline?: string | null;
   vehicle_color?: string | null;
   vehicle_number?: string | null;
   phone?: string | null;

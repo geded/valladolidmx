@@ -248,7 +248,30 @@ export const getTaxiRideTracking = createServerFn({ method: "POST" })
       { _ride_id: data.rideId },
     );
     if (error) throw new Error(error.message);
-    return (tracking ?? null) as TaxiTracking | null;
+    const out = (tracking ?? null) as TaxiTracking | null;
+    if (!out || out.lat == null || out.lng == null) return out;
+    // Mientras el taxista va por el viajero, ruta por carretera de su posición a la recogida.
+    const { data: ride } = await (context.supabase as unknown as Loose)
+      .from("taxi_rides")
+      .select("status, origin_lat, origin_lng")
+      .eq("id", data.rideId)
+      .maybeSingle();
+    const r = ride as { status: string; origin_lat: number; origin_lng: number } | null;
+    if (!r || r.status !== "accepted") return out;
+    const from = { lat: Number(out.lat.toFixed(3)), lng: Number(out.lng.toFixed(3)) };
+    const key = `pickup|${from.lat},${from.lng}|${r.origin_lat.toFixed(5)},${r.origin_lng.toFixed(5)}`;
+    const hit = roadCache.get(key);
+    if (hit && Date.now() - hit.at < 10 * 60_000) return { ...out, pickup_polyline: hit.road.polyline };
+    try {
+      const { computeRoadRouteInternal } = await import("@/lib/maps/routes.server");
+      const res = await computeRoadRouteInternal([from, { lat: r.origin_lat, lng: r.origin_lng }]);
+      const polyline = res.ok ? res.encodedPolyline : null;
+      if (roadCache.size > 500) roadCache.clear();
+      roadCache.set(key, { at: Date.now(), road: { km: null, polyline } });
+      return { ...out, pickup_polyline: polyline };
+    } catch {
+      return out;
+    }
   });
 
 export const cancelTaxiRide = createServerFn({ method: "POST" })

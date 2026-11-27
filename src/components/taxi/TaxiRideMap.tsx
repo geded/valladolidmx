@@ -15,6 +15,10 @@ export function TaxiRideMap({
   if (tracking?.lat != null && tracking.lng != null) {
     points.push({ lat: tracking.lat, lng: tracking.lng });
   }
+  // Mientras el taxi va por el viajero se traza su camino hasta la recogida.
+  const pickup = tracking?.pickup_polyline && tracking.lat != null && tracking.lng != null
+    ? { polyline: tracking.pickup_polyline, from: { lat: tracking.lat, lng: tracking.lng } }
+    : null;
   return (
     <div>
       <InteractiveMap
@@ -42,14 +46,25 @@ export function TaxiRideMap({
               ]
             : []),
         ]}
-        routeStops={[
-          { lat: ride.origin_lat, lng: ride.origin_lng, key: "origin" },
-          { lat: ride.destination_lat, lng: ride.destination_lng, key: "destination" },
-        ]}
+        routeStops={
+          pickup
+            ? [
+                { ...pickup.from, key: "driver" },
+                { lat: ride.origin_lat, lng: ride.origin_lng, key: "origin" },
+              ]
+            : [
+                { lat: ride.origin_lat, lng: ride.origin_lng, key: "origin" },
+                { lat: ride.destination_lat, lng: ride.destination_lng, key: "destination" },
+              ]
+        }
+        {...(pickup ? { roadRoute: { encodedPolyline: pickup.polyline, distanceMeters: null, durationSeconds: null } } : {})}
         connectByRoad
         fitPoints={points}
         routeEmphasis="prominent"
       />
+      {pickup ? (
+        <p className="mt-2 text-xs text-muted-foreground">La línea dorada es el camino del taxi hasta tu punto de recogida.</p>
+      ) : null}
       {tracking?.location_stale ? (
         <p className="mt-2 text-xs text-muted-foreground">
           La última ubicación del taxi tiene más de dos minutos. El conductor debe mantener su
