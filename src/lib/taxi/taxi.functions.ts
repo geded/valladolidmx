@@ -155,8 +155,11 @@ export const quoteTaxi = createServerFn({ method: "POST" })
       const caller = await requireRequestUser(request);
       if (!(caller instanceof Response)) {
         const { enforcePublicQuota } = await import("@/lib/security/public-quota.server");
-        await enforcePublicQuota("taxi.roadRoute", { perMinute: 20, perHour: 200, platformPerDay: 10000 });
-        road = await taxiRoadRoute(data);
+        // Si se agota el límite, se cotiza en línea recta (estimado); al pedir se recalcula por carretera.
+        const allowed = await enforcePublicQuota("taxi.roadRoute", { perMinute: 20, perHour: 200, platformPerDay: 10000 })
+          .then(() => true)
+          .catch(() => false);
+        if (allowed) road = await taxiRoadRoute(data);
       }
     } else {
       // Visitante sin cuenta: una cotización real por carretera; las siguientes piden registro.
