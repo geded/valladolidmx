@@ -235,22 +235,15 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
               onClick={() => { setParty((p) => Math.min(maxParty, p + 1)); void pickSlot(null); }}><Plus className="size-4" /></Button>
           </div>
         </div>
-        <label className="block min-w-0 text-sm font-medium">
+        <label className="col-span-2 block min-w-0 text-sm font-medium sm:col-span-2">
           <span className="flex items-center gap-1.5"><CalendarDays className="size-4" aria-hidden /> Fecha</span>
           <Input type="date" className="mt-1 block w-full min-w-0 appearance-none" value={date} min={today} max={maxDate}
             onChange={(e) => { setDate(e.target.value); void pickSlot(null); setShowAll(false); }} />
         </label>
-        <label className="block min-w-0 text-sm font-medium">
-          <span className="flex items-center gap-1.5"><Clock className="size-4" aria-hidden /> Hora deseada</span>
-          <select className="mt-1 h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm" value={prefTime}
-            onChange={(e) => { setPrefTime(e.target.value); void pickSlot(null); setShowAll(false); }}>
-            {PREF_TIMES.map((t) => <option key={t} value={t}>{to12h(t)}</option>)}
-          </select>
-        </label>
       </div>
 
       <div className="mt-5">
-        <p className="text-sm font-semibold">{showAll ? "Todos los horarios disponibles" : "Mesas disponibles"}</p>
+        <p className="flex items-center gap-1.5 text-sm font-semibold"><Clock className="size-4" aria-hidden /> {showAll ? "Todos los horarios disponibles" : "Elige tu hora"}</p>
         {slots.isLoading ? (
           <div className="mt-2 flex gap-2" aria-label="Buscando horarios">
             {[0, 1, 2, 3, 4].map((i) => <div key={i} className="h-9 w-20 animate-pulse rounded-md bg-muted" />)}
@@ -263,7 +256,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
           <>
             {!showAll ? (
               <>
-                <p className="mt-1 text-xs text-muted-foreground">{nearMissing ? `No hay mesa a las ${to12h(prefTime)}; toca uno de los horarios más cercanos.` : "Toca un horario para apartarlo."}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Toca un horario para apartarlo.</p>
                 <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
                   {nearest.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={(x) => void pickSlot(x)} />)}
                 </div>
