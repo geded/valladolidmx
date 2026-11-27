@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { CarFront } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -18,9 +17,9 @@ export function taxiPickupAllowedHere(): boolean {
 
 /** Botón «Pedir taxi aquí» que abre Taxi Alux con el destino ya puesto. */
 export function TaxiToPlaceButton({ name, lat, lng }: { name: string; lat: number | null | undefined; lng: number | null | undefined }) {
-  const [show, setShow] = useState(false);
-  useEffect(() => setShow(taxiPickupAllowedHere()), []);
-  if (!show || lat == null || lng == null) return null;
+  // Siempre visible: la pantalla del taxi explica si no hay salida desde
+  // donde está la persona (ocultarlo en silencio confundía).
+  if (lat == null || lng == null) return null;
   const from = typeof window !== "undefined" ? window.location.pathname + window.location.search : "";
   const href = `/taxi?destino=${encodeURIComponent(name)}&lat=${lat}&lng=${lng}&volver=${encodeURIComponent(from)}&volverLabel=${encodeURIComponent(name)}`;
   return (
