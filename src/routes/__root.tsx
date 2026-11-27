@@ -514,7 +514,7 @@ function RootComponent() {
     if (typeof window === "undefined") return;
     const renderedAt = Number(document.documentElement.dataset.renderedAt ?? "");
     if (!Number.isFinite(renderedAt) || renderedAt <= 0) return;
-    if (Date.now() - renderedAt < 2 * 60_000) return;
+    if (Date.now() - renderedAt < 30 * 60_000) return;
     const standalone =
       window.matchMedia?.("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;

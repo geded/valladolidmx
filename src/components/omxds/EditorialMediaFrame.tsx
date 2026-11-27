@@ -136,7 +136,11 @@ function EditorialPicture({
   // el ícono roto del navegador ni el color de la tarjeta.
   const [retrySrc, setRetrySrc] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
-  const hideUntilLoaded = (hydrated && !revealed) || failed;
+  // Sólo se oculta mientras carga una foto montada ya en el navegador. Las que
+  // llegaron en el HTML del servidor nunca se ocultan al hidratar: ocultarlas
+  // y volver a mostrarlas era el parpadeo visible al abrir la app y las fichas.
+  const mountedAfterHydration = useRef(hydrated).current;
+  const hideUntilLoaded = (mountedAfterHydration && !revealed) || failed;
 
   useLayoutEffect(() => {
     const img = imgRef.current;
@@ -153,7 +157,7 @@ function EditorialPicture({
       return;
     }
     const reveal = () => {
-      setAnimate(true);
+      setAnimate(mountedAfterHydration);
       setRevealed(true);
     };
     img.addEventListener("load", reveal, { once: true });
@@ -226,7 +230,7 @@ function EditorialPicture({
         onError={handleError}
         onLoad={() => {
           if (!revealed) {
-            setAnimate(true);
+            setAnimate(mountedAfterHydration);
             setRevealed(true);
           }
         }}
