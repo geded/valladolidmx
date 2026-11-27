@@ -1,4 +1,5 @@
 import { TaxiPickupZonesCard } from "@/components/taxi/TaxiPickupZonesCard";
+import { TaxiFleetCard } from "@/components/taxi/TaxiFleetCard";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,6 +28,7 @@ import {
   rejectTaxiDriverInvitation,
   setTaxiDriverApproval,
   saveTaxiAdminSettings,
+  setTaxiDriverVehicleClass,
 } from "@/lib/taxi/taxi.functions";
 import {
   DEFAULT_TAXI_SETTINGS,
@@ -72,6 +74,7 @@ function TaxiAdminPage() {
   const createInvitationFn = useServerFn(createTaxiDriverInvitation);
   const approveInvitationFn = useServerFn(approveTaxiDriverInvitation);
   const rejectInvitationFn = useServerFn(rejectTaxiDriverInvitation);
+  const vehicleClassFn = useServerFn(setTaxiDriverVehicleClass);
   const [tab, setTab] = useState<Tab>("resumen");
   const [settings, setSettings] = useState<TaxiSettings>(DEFAULT_TAXI_SETTINGS);
   const [loadedSettings, setLoadedSettings] = useState(false);
@@ -119,6 +122,19 @@ function TaxiAdminPage() {
         },
       });
       toast.success(settings.enabled ? "Taxi Alux está activado." : "Configuración guardada. El servicio sigue apagado.");
+      await refresh();
+    } catch (error) {
+      toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function changeDriverClass(driverId: string, vehicleClass: "compacto" | "camioneta" | "van") {
+    setBusy(true);
+    try {
+      await vehicleClassFn({ data: { driverId, vehicleClass } });
+      toast.success("Tipo de vehículo actualizado.");
       await refresh();
     } catch (error) {
       toast.error(taxiErrorMessage(error instanceof Error ? error.message : ""));
@@ -339,6 +355,7 @@ function TaxiAdminPage() {
                 <Detail label="Licencia" value={invitation.license_number} />
                 <Detail label="Seguro" value={invitation.insurance_reference} />
                 <Detail label="Vehículo" value={invitation.vehicle_description} />
+                <Detail label="Tipo" value={dashboard.config.fleet.classes.find((c) => c.key === (invitation.vehicle_class ?? "compacto"))?.label ?? "Compacto"} />
                 <Detail label="Año / color" value={`${invitation.vehicle_year ?? "—"} · ${invitation.vehicle_color ?? "—"}`} />
                 <Detail label="Número económico" value={invitation.vehicle_number} />
                 <Detail label="Placas" value={invitation.plates} />
@@ -372,6 +389,12 @@ function TaxiAdminPage() {
                   <p>{driver.vehicle_description} · {driver.vehicle_color ?? "Color no indicado"} · {driver.plates}</p>
                   <p>{driver.union_name ?? "Sindicato no indicado"} · Número {driver.vehicle_number ?? "—"}</p>
                   <p>Idiomas: {driver.languages.join(", ")}</p>
+                  <label className="flex items-center gap-2 pt-1">
+                    <span className="font-medium text-foreground">Tipo de vehículo</span>
+                    <select value={driver.vehicle_class ?? "compacto"} disabled={busy} onChange={(e) => void changeDriverClass(driver.id, e.target.value as "compacto" | "camioneta" | "van")} className="h-8 rounded-md border border-input bg-background px-2 text-xs text-foreground">
+                      {dashboard.config.fleet.classes.map((c) => <option key={c.key} value={c.key}>{c.label} · {c.seats}</option>)}
+                    </select>
+                  </label>
                   <p>{driver.is_available ? "Disponible ahora" : "No disponible"} · ubicación {formatTaxiDate(driver.location_updated_at)}</p>
                 </div>
                 <Button type="button" size="sm" variant={driver.approved ? "outline" : "default"} className="mt-4" disabled={busy} onClick={() => toggleDriver(driver.id, !driver.approved)}>
@@ -424,6 +447,7 @@ function TaxiAdminPage() {
           <Button type="button" className="mt-5" disabled={busy} onClick={saveSettings}>Guardar configuración</Button>
         </section>
       ) : null}
+      {dashboard && tab === "tarifas" ? <TaxiFleetCard initial={dashboard.config.fleet} /> : null}
       {tab === "tarifas" ? (
         <TaxiPickupZonesCard />
       ) : null}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, ChevronDown, Circle, LocateFixed, LogIn, MapPin, Search, Square, Users } from "lucide-react";
+import { CalendarClock, Car, ChevronDown, Circle, LocateFixed, LogIn, MapPin, Plus, Repeat, Search, Square, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,7 +16,13 @@ import {
   taxiRequestBlockReason,
   taxiWithCurrentOrigin,
   taxiHasRoute,
+  taxiClassForPassengers,
+  taxiDriversForClass,
+  taxiMaxPassengers,
   type TaxiPublicConfig,
+  type TaxiStop,
+  type TaxiTripMode,
+  type TaxiVehicleClass,
   type TaxiQuote,
 } from "@/lib/taxi/rules";
 import { toast } from "@/lib/toast";
@@ -32,6 +38,10 @@ type Draft = {
   origin: Point;
   destination: Point;
   passengers: number;
+  vehicleClass: TaxiVehicleClass;
+  tripMode: TaxiTripMode;
+  hours: number;
+  stops: TaxiStop[];
   requestedFor: string;
   travelerName: string;
   travelerPhone: string;
@@ -44,6 +54,10 @@ const initialDraft: Draft = {
   origin: CENTER,
   destination: { lat: 20.674, lng: -88.215 },
   passengers: 1,
+  vehicleClass: "compacto",
+  tripMode: "one_way",
+  hours: 3,
+  stops: [],
   requestedFor: "",
   travelerName: "",
   travelerPhone: "",
@@ -181,6 +195,10 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
       destinationLat: draft.destination.lat,
       destinationLng: draft.destination.lng,
       requestedFor: requestedForIso(),
+      vehicleClass: draft.vehicleClass,
+      tripMode: draft.tripMode,
+      hours: draft.tripMode === "hourly" ? draft.hours : null,
+      stops: draft.stops,
     };
   }
 
@@ -262,7 +280,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
   }
 
   // Cotiza solo en cuanto hay recogida y destino, como en las apps de transporte.
-  const quoteKey = `${draft.origin.lat},${draft.origin.lng},${draft.destination.lat},${draft.destination.lng},${scheduled ? draft.requestedFor : "now"}`;
+  const quoteKey = `${draft.origin.lat},${draft.origin.lng},${draft.destination.lat},${draft.destination.lng},${scheduled ? draft.requestedFor : "now"},${draft.vehicleClass},${draft.tripMode},${draft.hours},${draft.stops.map((x) => `${x.lat}:${x.lng}`).join("|")}`;
   useEffect(() => {
     if (!ready || !taxiHasRoute(draft.originLabel, draft.destinationLabel)) return;
     const t = window.setTimeout(() => void calculate(), 600);
@@ -278,6 +296,33 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     );
     setQuote(null);
     setPinTarget(target);
+  }
+
+  const fleet = config.fleet;
+  const maxPassengers = taxiMaxPassengers(fleet);
+  const hourOptions = Array.from({ length: Math.max(1, fleet.hourly_max_hours - fleet.hourly_min_hours + 1) }, (_, i) => fleet.hourly_min_hours + i);
+  const selectedClass = fleet.classes.find((c) => c.key === draft.vehicleClass) ?? fleet.classes[0]!;
+  const driversForSelected = taxiDriversForClass(config, draft.vehicleClass);
+
+  function setPassengers(count: number) {
+    setDraft((c) => {
+      const current = fleet.classes.find((x) => x.key === c.vehicleClass);
+      // Como en Uber: si el grupo ya no cabe, se pasa al auto más chico donde sí caben.
+      const fits = current && current.seats >= count;
+      const next = fits ? c.vehicleClass : taxiClassForPassengers(fleet, count)?.key ?? c.vehicleClass;
+      return { ...c, passengers: count, vehicleClass: next };
+    });
+    setQuote(null);
+  }
+
+  function addStop(hit: TaxiPlaceHit) {
+    setDraft((c) => c.stops.length >= fleet.max_stops ? c : { ...c, stops: [...c.stops, { lat: hit.lat, lng: hit.lng, label: hit.title }] });
+    setQuote(null);
+  }
+
+  function removeStop(index: number) {
+    setDraft((c) => ({ ...c, stops: c.stops.filter((_, i) => i !== index) }));
+    setQuote(null);
   }
 
   const zoneNames = config.pickup_zones.map((z) => z.name).join(", ") || "Valladolid";
@@ -361,6 +406,71 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             Busca un lugar del Oriente Maya o arrastra el pin en el mapa para el punto exacto.
           </p>
 
+          {draft.stops.length > 0 ? (
+            <ul className="space-y-1.5" aria-label="Paradas en el camino">
+              {draft.stops.map((stop, i) => (
+                <li key={`${stop.lat}-${stop.lng}-${i}`} className="flex items-center gap-2 rounded-xl bg-secondary/60 px-3 py-2 text-sm">
+                  <span className="shrink-0 text-xs font-semibold text-muted-foreground">Parada {i + 1}</span>
+                  <span className="min-w-0 flex-1 truncate">{stop.label}</span>
+                  <button type="button" onClick={() => removeStop(i)} aria-label={`Quitar parada ${i + 1}`} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
+                    <X className="size-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {fleet.max_stops > 0 && draft.stops.length < fleet.max_stops ? (
+            <StopAdder onPick={addStop} />
+          ) : null}
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium">Tipo de viaje</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Button type="button" variant={draft.tripMode === "one_way" ? "default" : "outline"} className="h-11" onClick={() => patch("tripMode", "one_way")}>
+                Sólo ida
+              </Button>
+              <Button type="button" variant={draft.tripMode === "hourly" ? "default" : "outline"} className="h-11" disabled={!fleet.hourly_enabled} onClick={() => patch("tripMode", "hourly")}>
+                <Repeat className="mr-2 size-4" /> Ida y vuelta
+              </Button>
+            </div>
+            {draft.tripMode === "hourly" ? (
+              <div className="mt-2 rounded-xl border border-border bg-background p-3 text-xs leading-5 text-muted-foreground">
+                <label htmlFor="taxi-hours" className="font-medium text-foreground">¿Cuántas horas necesitas el taxi?</label>
+                <select id="taxi-hours" value={draft.hours} onChange={(e) => patch("hours", Number(e.target.value))} className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground">
+                  {hourOptions.map((h) => <option key={h} value={h}>{h} horas</option>)}
+                </select>
+                <p className="mt-2">
+                  El taxista te lleva, te espera y te regresa a tu punto de recogida. Incluye {fleet.hourly_included_km} km por hora contratada. Cada hora extra o km adicional se paga al final en efectivo.
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium">Vehículo</p>
+            <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Vehículo">
+              {fleet.classes.map((c) => {
+                const fits = c.seats >= draft.passengers;
+                const active = c.key === draft.vehicleClass;
+                return (
+                  <button
+                    key={c.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    disabled={!fits}
+                    onClick={() => patch("vehicleClass", c.key)}
+                    className={`rounded-xl border px-2 py-2.5 text-left text-xs transition-colors disabled:opacity-40 ${active ? "border-primary bg-primary/10" : "border-border bg-background"}`}
+                  >
+                    <Car className="mb-1 size-4" />
+                    <span className="block text-sm font-semibold">{c.label}</span>
+                    <span className="text-muted-foreground">Hasta {c.seats}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
             <Button type="button" variant={scheduled ? "outline" : "default"} className="h-11" onClick={() => setScheduled(false)}>Ahora</Button>
             <Button type="button" variant={scheduled ? "default" : "outline"} className="h-11" onClick={() => setScheduled(true)}>
@@ -386,8 +496,8 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label htmlFor="taxi-passengers" className="text-xs font-medium">Personas</label>
-                <select id="taxi-passengers" value={draft.passengers} onChange={(event) => patch("passengers", Number(event.target.value))} className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">
-                  {[1, 2, 3, 4, 5, 6].map((count) => <option key={count} value={count}>{count}</option>)}
+                <select id="taxi-passengers" value={draft.passengers} onChange={(event) => setPassengers(Number(event.target.value))} className="mt-1 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  {Array.from({ length: maxPassengers }, (_, i) => i + 1).map((count) => <option key={count} value={count}>{count}</option>)}
                 </select>
               </div>
               <div>
@@ -415,8 +525,9 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
               <>
                 <p className="text-2xl font-semibold leading-tight lg:mt-2 lg:text-3xl">{formatTaxiMoney(quote.fare_amount, quote.currency)}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {quote.distance_km.toFixed(1)} km · {quote.estimated_minutes} min{quote.night_surcharge ? " · tarifa nocturna" : ""}
+                  {selectedClass.label} · {quote.distance_km.toFixed(1)} km{quote.trip_mode === "hourly" ? ` · ida y vuelta ${quote.hours} h` : ` · ${quote.estimated_minutes} min`}{quote.night_surcharge ? " · nocturna" : ""}
                 </p>
+                {quote.breakdown ? <FareExplanation quote={quote} /> : null}
               </>
             ) : (
               <p className="text-sm text-muted-foreground lg:mt-2">
@@ -427,7 +538,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
           <Button
             type="button"
             className="h-12 shrink-0 px-5 text-base lg:mt-5 lg:w-full"
-            disabled={busy !== null || config.available_drivers < 1 || (!!user && !quote)}
+            disabled={busy !== null || driversForSelected < 1 || (!!user && !quote)}
             onClick={request}
           >
             {!user ? <LogIn className="mr-2 size-4" /> : null}
@@ -435,13 +546,65 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
           </Button>
         </div>
         <p className="mx-auto mt-2 max-w-xl text-center text-[11px] text-muted-foreground">
-          {config.available_drivers < 1
-            ? "No hay taxistas disponibles en este momento; puedes cotizar."
-            : config.available_drivers === 1
-              ? "1 taxista disponible"
-              : `${config.available_drivers} taxistas disponibles`}
+          {driversForSelected < 1
+            ? config.available_drivers > 0
+              ? `No hay ${selectedClass.label.toLowerCase()} disponible ahora; puedes cotizar.`
+              : "No hay taxistas disponibles en este momento; puedes cotizar."
+            : driversForSelected === 1
+              ? `1 ${selectedClass.label.toLowerCase()} disponible`
+              : `${driversForSelected} vehículos disponibles`}
         </p>
       </aside>
+    </div>
+  );
+}
+
+function FareExplanation({ quote }: { quote: TaxiQuote }) {
+  const b = quote.breakdown!;
+  const m = (c: number) => formatTaxiMoney(c, quote.currency);
+  const lines: string[] = [];
+  if (quote.trip_mode === "hourly") {
+    lines.push(`${quote.hours} h con espera: ${m(b.base_cents)} (incluye ${b.included_km} km)`);
+    if (b.extra_km > 0) lines.push(`${b.extra_km} km adicionales: ${m(b.extra_km_cents)}`);
+  } else {
+    lines.push(`Viaje: ${m(b.base_cents)}`);
+  }
+  if (b.stops > 0) lines.push(`${b.stops} ${b.stops === 1 ? "parada" : "paradas"}: ${m(b.stop_fee_cents)}`);
+  if (b.night_cents > 0) lines.push(`Tarifa nocturna: ${m(b.night_cents)}`);
+  return (
+    <details className="mt-1 text-[11px] leading-4 text-muted-foreground">
+      <summary className="cursor-pointer font-medium text-foreground">Cómo se calcula</summary>
+      <ul className="mt-1 space-y-0.5">
+        {lines.map((l) => <li key={l}>{l}</li>)}
+        <li>Espera al recogerte: {b.wait_free_minutes} min gratis, después {m(b.wait_per_minute_cents)} por minuto.</li>
+        {quote.trip_mode === "hourly" ? <li>Hora extra: {m(b.extra_hour_cents)} · km extra: {m(b.extra_km_rate_cents)}.</li> : null}
+        <li>Pagas en efectivo al conductor al terminar.</li>
+      </ul>
+    </details>
+  );
+}
+
+function StopAdder({ onPick }: { onPick: (hit: TaxiPlaceHit) => void }) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-1.5 text-xs font-medium text-primary">
+        <Plus className="size-4" /> Agregar parada en el camino
+      </button>
+    );
+  }
+  return (
+    <div className="rounded-2xl border border-border bg-background">
+      <PlaceField
+        id="taxi-stop"
+        icon={<Plus className="size-3" />}
+        placeholder="Busca la parada (hasta 3 min)"
+        value={text}
+        onText={setText}
+        onPick={(hit) => { onPick(hit); setText(""); setOpen(false); }}
+        onFocus={() => undefined}
+      />
     </div>
   );
 }

@@ -42,9 +42,119 @@ export interface TaxiPickupZone {
   radius_km: number;
 }
 
+export const TAXI_VEHICLE_CLASSES = ["compacto", "camioneta", "van"] as const;
+export type TaxiVehicleClass = (typeof TAXI_VEHICLE_CLASSES)[number];
+export type TaxiTripMode = "one_way" | "hourly";
+
+export interface TaxiVehicleClassRule {
+  key: TaxiVehicleClass;
+  label: string;
+  seats: number;
+  /** 10000 = misma tarifa que el compacto. */
+  multiplier_bps: number;
+}
+
+/** Reglas de flota tipo Uber/DiDi: tipo de auto por tamaño de grupo, espera, paradas y viaje por horas. */
+export interface TaxiFleet {
+  classes: TaxiVehicleClassRule[];
+  wait_free_minutes: number;
+  wait_per_minute_cents: number;
+  stop_fee_cents: number;
+  max_stops: number;
+  hourly_enabled: boolean;
+  hourly_cents: number;
+  hourly_min_hours: number;
+  hourly_max_hours: number;
+  hourly_included_km: number;
+}
+
+export const DEFAULT_TAXI_FLEET: TaxiFleet = {
+  classes: [
+    { key: "compacto", label: "Compacto", seats: 4, multiplier_bps: 10000 },
+    { key: "camioneta", label: "Camioneta", seats: 6, multiplier_bps: 16000 },
+    { key: "van", label: "Van", seats: 10, multiplier_bps: 22000 },
+  ],
+  wait_free_minutes: 3,
+  wait_per_minute_cents: 300,
+  stop_fee_cents: 1500,
+  max_stops: 2,
+  hourly_enabled: true,
+  hourly_cents: 25000,
+  hourly_min_hours: 2,
+  hourly_max_hours: 10,
+  hourly_included_km: 20,
+};
+
+export function normalizeTaxiFleet(raw: unknown): TaxiFleet {
+  const v = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const rawClasses = Array.isArray(v["classes"]) ? (v["classes"] as Record<string, unknown>[]) : [];
+  const classes = DEFAULT_TAXI_FLEET.classes.map((d) => {
+    const c = rawClasses.find((x) => x["key"] === d.key) ?? {};
+    return {
+      key: d.key,
+      label: typeof c["label"] === "string" && c["label"].trim() ? c["label"] : d.label,
+      seats: safeInteger(c["seats"], d.seats, 20) || d.seats,
+      multiplier_bps: safeInteger(c["multiplier_bps"], d.multiplier_bps, 50000) || d.multiplier_bps,
+    };
+  });
+  const n = (k: keyof TaxiFleet, max = 1_000_000) =>
+    safeInteger(v[k], DEFAULT_TAXI_FLEET[k] as number, max);
+  return {
+    classes,
+    wait_free_minutes: n("wait_free_minutes", 60),
+    wait_per_minute_cents: n("wait_per_minute_cents"),
+    stop_fee_cents: n("stop_fee_cents"),
+    max_stops: n("max_stops", 5),
+    hourly_enabled: v["hourly_enabled"] !== false,
+    hourly_cents: n("hourly_cents"),
+    hourly_min_hours: n("hourly_min_hours", 24) || 1,
+    hourly_max_hours: n("hourly_max_hours", 24) || 1,
+    hourly_included_km: n("hourly_included_km", 1000),
+  };
+}
+
+/** El auto más pequeño donde cabe todo el grupo; null si nadie de la flota lo lleva. */
+export function taxiClassForPassengers(fleet: TaxiFleet, passengers: number): TaxiVehicleClassRule | null {
+  return [...fleet.classes].sort((a, b) => a.seats - b.seats).find((c) => c.seats >= passengers) ?? null;
+}
+
+export function taxiMaxPassengers(fleet: TaxiFleet): number {
+  return Math.max(...fleet.classes.map((c) => c.seats));
+}
+
+export interface TaxiStop {
+  lat: number;
+  lng: number;
+  label: string;
+}
+
+export interface TaxiFareBreakdown {
+  base_cents: number;
+  extra_km: number;
+  extra_km_cents: number;
+  included_km: number;
+  stops: number;
+  stop_fee_cents: number;
+  night_cents: number;
+  wait_free_minutes: number;
+  wait_per_minute_cents: number;
+  extra_hour_cents: number;
+  extra_km_rate_cents: number;
+}
+
 export interface TaxiPublicConfig extends TaxiSettings {
   available_drivers: number;
+  drivers_by_class: Partial<Record<TaxiVehicleClass, number>>;
+  fleet: TaxiFleet;
   pickup_zones: TaxiPickupZone[];
+}
+
+/** Taxistas libres cuyo vehículo lleva al menos los lugares de la clase pedida. */
+export function taxiDriversForClass(config: Pick<TaxiPublicConfig, "drivers_by_class" | "fleet">, cls: TaxiVehicleClass): number {
+  const need = config.fleet.classes.find((c) => c.key === cls)?.seats ?? 4;
+  return config.fleet.classes
+    .filter((c) => c.seats >= need)
+    .reduce((sum, c) => sum + (config.drivers_by_class[c.key] ?? 0), 0);
 }
 
 /** Recogida permitida sólo dentro de un destino de salida marcado por el administrador. */
@@ -65,6 +175,12 @@ export interface TaxiQuote {
   fare_amount: number;
   currency: string;
   night_surcharge: boolean;
+  vehicle_class?: TaxiVehicleClass;
+  vehicle_label?: string;
+  seats?: number;
+  trip_mode?: TaxiTripMode;
+  hours?: number | null;
+  breakdown?: TaxiFareBreakdown;
 }
 
 export interface TaxiDriver {
@@ -83,6 +199,7 @@ export interface TaxiDriver {
   vehicle_year: number | null;
   vehicle_color: string | null;
   vehicle_number: string | null;
+  vehicle_class?: TaxiVehicleClass;
   approved: boolean;
   is_available: boolean;
   last_location_lat: number | null;
@@ -111,6 +228,12 @@ export interface TaxiRide {
   fare_amount: number;
   currency: string;
   passengers: number;
+  vehicle_class?: TaxiVehicleClass;
+  trip_mode?: TaxiTripMode;
+  hours?: number | null;
+  stops?: TaxiStop[];
+  fare_breakdown?: TaxiFareBreakdown | null;
+  wait_charge_cents?: number;
   requested_for: string;
   payment_method: typeof TAXI_PAYMENT_METHOD;
   cash_paid: boolean;
@@ -143,6 +266,10 @@ export type TaxiOpenRide = Pick<
   | "fare_amount"
   | "currency"
   | "passengers"
+  | "vehicle_class"
+  | "trip_mode"
+  | "hours"
+  | "stops"
   | "requested_for"
   | "created_at"
 >;
@@ -165,6 +292,7 @@ export interface TaxiDriverInvitation {
   vehicle_year: number | null;
   vehicle_color: string | null;
   vehicle_number: string | null;
+  vehicle_class?: TaxiVehicleClass;
   plates: string | null;
   applicant_notes: string | null;
   created_at: string;
@@ -235,8 +363,20 @@ export function normalizeTaxiPublicConfig(raw: unknown): TaxiPublicConfig {
   return {
     ...settings,
     available_drivers: typeof count === "number" && Number.isInteger(count) ? Math.max(0, count) : 0,
+    drivers_by_class: normalizeDriversByClass(raw && typeof raw === "object" ? (raw as Record<string, unknown>).drivers_by_class : null),
+    fleet: normalizeTaxiFleet(raw && typeof raw === "object" ? (raw as Record<string, unknown>).fleet : null),
     pickup_zones: normalizeZones(raw && typeof raw === "object" ? (raw as Record<string, unknown>).pickup_zones : null),
   };
+}
+
+function normalizeDriversByClass(raw: unknown): Partial<Record<TaxiVehicleClass, number>> {
+  const out: Partial<Record<TaxiVehicleClass, number>> = {};
+  if (!raw || typeof raw !== "object") return out;
+  for (const k of TAXI_VEHICLE_CLASSES) {
+    const n = (raw as Record<string, unknown>)[k];
+    if (typeof n === "number" && n > 0) out[k] = n;
+  }
+  return out;
 }
 
 function normalizeZones(raw: unknown): TaxiPickupZone[] {
@@ -328,6 +468,10 @@ export function taxiErrorMessage(message: string): string {
   if (message.includes("invalid_ride_transition")) return "Primero completa el paso anterior del viaje.";
   if (message.includes("ride_cannot_be_cancelled")) return "Este viaje ya no puede cancelarse desde la aplicación.";
   if (message.includes("forbidden")) return "Sólo el administrador puede realizar esta acción.";
+  if (message.includes("vehicle_too_small")) return "Son más personas de las que caben en ese vehículo. Elige uno más grande.";
+  if (message.includes("hours_too_short")) return "El recorrido de ida y vuelta tarda más que las horas elegidas. Agrega más horas.";
+  if (message.includes("invalid_hours")) return "Elige un número de horas permitido para el viaje redondo.";
+  if (message.includes("too_many_stops")) return "Agregaste más paradas de las permitidas.";
   if (message.includes("invalid_taxi_distance")) return "Revisa el origen y el destino del viaje.";
   return "No pudimos completar la acción. Intenta de nuevo.";
 }
@@ -464,4 +608,13 @@ export function taxiEtaHeadline(status: TaxiRideStatus, eta: number | null): str
   if (status === "in_progress") return eta != null ? `Llegas a tu destino en ${eta} min` : "Vas en camino a tu destino";
   if (status === "completed") return "Llegaste a tu destino";
   return "Viaje cancelado";
+}
+
+export function taxiTripLabel(ride: { trip_mode?: TaxiTripMode; hours?: number | null; vehicle_class?: TaxiVehicleClass; stops?: TaxiStop[] }): string {
+  const parts: string[] = [];
+  if (ride.vehicle_class) parts.push(ride.vehicle_class[0]!.toUpperCase() + ride.vehicle_class.slice(1));
+  parts.push(ride.trip_mode === "hourly" ? `Ida y vuelta · ${ride.hours ?? 0} h` : "Sólo ida");
+  const stops = ride.stops?.length ?? 0;
+  if (stops) parts.push(`${stops} ${stops === 1 ? "parada" : "paradas"}`);
+  return parts.join(" · ");
 }

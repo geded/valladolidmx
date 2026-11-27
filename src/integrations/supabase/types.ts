@@ -8243,6 +8243,7 @@ export type Database = {
           submitted_at: string | null
           token: string
           union_name: string | null
+          vehicle_class: string
           vehicle_color: string | null
           vehicle_description: string | null
           vehicle_number: string | null
@@ -8270,6 +8271,7 @@ export type Database = {
           submitted_at?: string | null
           token?: string
           union_name?: string | null
+          vehicle_class?: string
           vehicle_color?: string | null
           vehicle_description?: string | null
           vehicle_number?: string | null
@@ -8297,6 +8299,7 @@ export type Database = {
           submitted_at?: string | null
           token?: string
           union_name?: string | null
+          vehicle_class?: string
           vehicle_color?: string | null
           vehicle_description?: string | null
           vehicle_number?: string | null
@@ -8333,6 +8336,7 @@ export type Database = {
           union_name: string | null
           updated_at: string
           user_id: string
+          vehicle_class: string
           vehicle_color: string | null
           vehicle_description: string
           vehicle_number: string | null
@@ -8358,6 +8362,7 @@ export type Database = {
           union_name?: string | null
           updated_at?: string
           user_id: string
+          vehicle_class?: string
           vehicle_color?: string | null
           vehicle_description: string
           vehicle_number?: string | null
@@ -8383,6 +8388,7 @@ export type Database = {
           union_name?: string | null
           updated_at?: string
           user_id?: string
+          vehicle_class?: string
           vehicle_color?: string | null
           vehicle_description?: string
           vehicle_number?: string | null
@@ -8449,7 +8455,9 @@ export type Database = {
           driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
+          fare_breakdown: Json | null
           folio: string
+          hours: number | null
           id: string
           notes: string | null
           origin_label: string
@@ -8461,12 +8469,16 @@ export type Database = {
           share_token: string | null
           started_at: string | null
           status: string
+          stops: Json
           traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
           traveler_rating: number | null
+          trip_mode: string
           updated_at: string
+          vehicle_class: string
+          wait_charge_cents: number
         }
         Insert: {
           accepted_at?: string | null
@@ -8485,7 +8497,9 @@ export type Database = {
           driver_rating?: number | null
           estimated_minutes: number
           fare_amount: number
+          fare_breakdown?: Json | null
           folio: string
+          hours?: number | null
           id?: string
           notes?: string | null
           origin_label: string
@@ -8497,12 +8511,16 @@ export type Database = {
           share_token?: string | null
           started_at?: string | null
           status?: string
+          stops?: Json
           traveler_comment?: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
           traveler_rating?: number | null
+          trip_mode?: string
           updated_at?: string
+          vehicle_class?: string
+          wait_charge_cents?: number
         }
         Update: {
           accepted_at?: string | null
@@ -8521,7 +8539,9 @@ export type Database = {
           driver_rating?: number | null
           estimated_minutes?: number
           fare_amount?: number
+          fare_breakdown?: Json | null
           folio?: string
+          hours?: number | null
           id?: string
           notes?: string | null
           origin_label?: string
@@ -8533,12 +8553,16 @@ export type Database = {
           share_token?: string | null
           started_at?: string | null
           status?: string
+          stops?: Json
           traveler_comment?: string | null
           traveler_id?: string
           traveler_name?: string
           traveler_phone?: string
           traveler_rating?: number | null
+          trip_mode?: string
           updated_at?: string
+          vehicle_class?: string
+          wait_charge_cents?: number
         }
         Relationships: [
           {
@@ -11959,6 +11983,7 @@ export type Database = {
           submitted_at: string | null
           token: string
           union_name: string | null
+          vehicle_class: string
           vehicle_color: string | null
           vehicle_description: string | null
           vehicle_number: string | null
@@ -11975,6 +12000,7 @@ export type Database = {
         Args: { _invitation_id: string }
         Returns: undefined
       }
+      taxi_admin_save_fleet: { Args: { _fleet: Json }; Returns: undefined }
       taxi_admin_save_settings: {
         Args: {
           _base_fare_cents: number
@@ -11988,6 +12014,10 @@ export type Database = {
       }
       taxi_admin_set_driver_approval: {
         Args: { _approved: boolean; _driver_id: string }
+        Returns: undefined
+      }
+      taxi_admin_set_driver_vehicle_class: {
+        Args: { _driver_id: string; _vehicle_class: string }
         Returns: undefined
       }
       taxi_admin_set_pickup_zones: {
@@ -12028,6 +12058,7 @@ export type Database = {
           union_name: string | null
           updated_at: string
           user_id: string
+          vehicle_class: string
           vehicle_color: string | null
           vehicle_description: string
           vehicle_number: string | null
@@ -12059,7 +12090,9 @@ export type Database = {
           driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
+          fare_breakdown: Json | null
           folio: string
+          hours: number | null
           id: string
           notes: string | null
           origin_label: string
@@ -12071,12 +12104,16 @@ export type Database = {
           share_token: string | null
           started_at: string | null
           status: string
+          stops: Json
           traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
           traveler_rating: number | null
+          trip_mode: string
           updated_at: string
+          vehicle_class: string
+          wait_charge_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -12085,6 +12122,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      taxi_class_info: { Args: { _class: string }; Returns: Json }
       taxi_driver_accept_ride: {
         Args: { _ride_id: string }
         Returns: {
@@ -12104,7 +12142,9 @@ export type Database = {
           driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
+          fare_breakdown: Json | null
           folio: string
+          hours: number | null
           id: string
           notes: string | null
           origin_label: string
@@ -12116,12 +12156,16 @@ export type Database = {
           share_token: string | null
           started_at: string | null
           status: string
+          stops: Json
           traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
           traveler_rating: number | null
+          trip_mode: string
           updated_at: string
+          vehicle_class: string
+          wait_charge_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -12155,7 +12199,9 @@ export type Database = {
           driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
+          fare_breakdown: Json | null
           folio: string
+          hours: number | null
           id: string
           notes: string | null
           origin_label: string
@@ -12167,12 +12213,16 @@ export type Database = {
           share_token: string | null
           started_at: string | null
           status: string
+          stops: Json
           traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
           traveler_rating: number | null
+          trip_mode: string
           updated_at: string
+          vehicle_class: string
+          wait_charge_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -12185,6 +12235,11 @@ export type Database = {
         Args: { _lat: number; _lng: number }
         Returns: undefined
       }
+      taxi_fleet: { Args: never; Returns: Json }
+      taxi_km: {
+        Args: { _a_lat: number; _a_lng: number; _b_lat: number; _b_lng: number }
+        Returns: number
+      }
       taxi_pickup_allowed: {
         Args: { _lat: number; _lng: number }
         Returns: boolean
@@ -12195,9 +12250,13 @@ export type Database = {
         Args: {
           _destination_lat: number
           _destination_lng: number
+          _hours?: number
           _origin_lat: number
           _origin_lng: number
           _requested_for?: string
+          _stops?: Json
+          _trip_mode?: string
+          _vehicle_class?: string
         }
         Returns: Json
       }
@@ -12210,6 +12269,7 @@ export type Database = {
           _destination_label: string
           _destination_lat: number
           _destination_lng: number
+          _hours?: number
           _notes?: string
           _origin_label: string
           _origin_lat: number
@@ -12217,8 +12277,11 @@ export type Database = {
           _passengers: number
           _payment_method?: string
           _requested_for: string
+          _stops?: Json
           _traveler_name: string
           _traveler_phone: string
+          _trip_mode?: string
+          _vehicle_class?: string
         }
         Returns: {
           accepted_at: string | null
@@ -12237,7 +12300,9 @@ export type Database = {
           driver_rating: number | null
           estimated_minutes: number
           fare_amount: number
+          fare_breakdown: Json | null
           folio: string
+          hours: number | null
           id: string
           notes: string | null
           origin_label: string
@@ -12249,12 +12314,16 @@ export type Database = {
           share_token: string | null
           started_at: string | null
           status: string
+          stops: Json
           traveler_comment: string | null
           traveler_id: string
           traveler_name: string
           traveler_phone: string
           traveler_rating: number | null
+          trip_mode: string
           updated_at: string
+          vehicle_class: string
+          wait_charge_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -12279,6 +12348,7 @@ export type Database = {
           _plates: string
           _token: string
           _union_name: string
+          _vehicle_class?: string
           _vehicle_color: string
           _vehicle_description: string
           _vehicle_number: string

@@ -5,6 +5,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import {
   normalizeTaxiPublicConfig,
+  TAXI_VEHICLE_CLASSES,
+  type TaxiFleet,
   type TaxiDriver,
   type TaxiDriverInvitation,
   type TaxiOpenRide,
@@ -71,13 +73,32 @@ async function afterRideMutation(rideId: string, status: TaxiRideStatus): Promis
   ]);
 }
 
+const stopSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+  label: z.string().trim().min(2).max(200),
+});
+
 const pointSchema = z.object({
   originLat: z.number().min(-90).max(90),
   originLng: z.number().min(-180).max(180),
   destinationLat: z.number().min(-90).max(90),
   destinationLng: z.number().min(-180).max(180),
   requestedFor: z.string().datetime({ offset: true }),
+  vehicleClass: z.enum(TAXI_VEHICLE_CLASSES).default("compacto"),
+  tripMode: z.enum(["one_way", "hourly"]).default("one_way"),
+  hours: z.number().int().min(1).max(24).nullable().default(null),
+  stops: z.array(stopSchema).max(5).default([]),
 });
+
+function tripArgs(data: z.infer<typeof pointSchema>) {
+  return {
+    _vehicle_class: data.vehicleClass,
+    _trip_mode: data.tripMode,
+    _hours: data.tripMode === "hourly" ? data.hours : null,
+    _stops: data.stops,
+  };
+}
 
 export const getTaxiPublicConfig = createServerFn({ method: "GET" }).handler(
   async (): Promise<TaxiPublicConfig> => {
@@ -102,6 +123,7 @@ export const quoteTaxi = createServerFn({ method: "POST" })
         _destination_lat: data.destinationLat,
         _destination_lng: data.destinationLng,
         _requested_for: data.requestedFor,
+        ...tripArgs(data),
       },
     );
     if (error) throw new Error(error.message);
@@ -115,7 +137,7 @@ export const requestTaxiRide = createServerFn({ method: "POST" })
       .extend({
         originLabel: z.string().trim().min(3).max(200),
         destinationLabel: z.string().trim().min(3).max(200),
-        passengers: z.number().int().min(1).max(6),
+        passengers: z.number().int().min(1).max(20),
         travelerName: z.string().trim().min(2).max(120),
         travelerPhone: z.string().trim().min(8).max(30),
         notes: z.string().trim().max(500).optional(),
@@ -139,6 +161,7 @@ export const requestTaxiRide = createServerFn({ method: "POST" })
         _traveler_phone: data.travelerPhone,
         _notes: data.notes ?? null,
         _payment_method: data.paymentMethod,
+        ...tripArgs(data),
       },
     );
     if (error) throw new Error(error.message);
@@ -495,6 +518,7 @@ const applicationSchema = z.object({
   vehicleNumber: z.string().trim().max(50).optional(),
   plates: z.string().trim().min(2).max(20),
   applicantNotes: z.string().trim().max(500).optional(),
+  vehicleClass: z.enum(TAXI_VEHICLE_CLASSES).default("compacto"),
 });
 
 export const submitTaxiDriverInvitation = createServerFn({ method: "POST" })
@@ -519,6 +543,7 @@ export const submitTaxiDriverInvitation = createServerFn({ method: "POST" })
         _vehicle_number: data.vehicleNumber || null,
         _plates: data.plates,
         _applicant_notes: data.applicantNotes || null,
+        _vehicle_class: data.vehicleClass,
       },
     );
     if (error) throw new Error(error.message);
@@ -597,6 +622,7 @@ export const approveTaxiDriverInvitation = createServerFn({ method: "POST" })
         vehicle_year: application.vehicle_year,
         vehicle_color: application.vehicle_color,
         vehicle_number: application.vehicle_number,
+        vehicle_class: application.vehicle_class,
       })
       .eq("id", driverRow.id);
     if (detailsError) throw new Error(detailsError.message);
@@ -764,6 +790,55 @@ export const saveTaxiPickupZones = createServerFn({ method: "POST" })
       _slugs: data.slugs,
       _radius_km: data.radiusKm,
     });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+const fleetSchema = z.object({
+  classes: z
+    .array(
+      z.object({
+        key: z.enum(TAXI_VEHICLE_CLASSES),
+        label: z.string().trim().min(2).max(40),
+        seats: z.number().int().min(1).max(20),
+        multiplier_bps: z.number().int().min(5000).max(50000),
+      }),
+    )
+    .length(3),
+  wait_free_minutes: z.number().int().min(0).max(60),
+  wait_per_minute_cents: z.number().int().min(0).max(100_000),
+  stop_fee_cents: z.number().int().min(0).max(1_000_000),
+  max_stops: z.number().int().min(0).max(5),
+  hourly_enabled: z.boolean(),
+  hourly_cents: z.number().int().min(0).max(1_000_000),
+  hourly_min_hours: z.number().int().min(1).max(24),
+  hourly_max_hours: z.number().int().min(1).max(24),
+  hourly_included_km: z.number().int().min(0).max(1000),
+});
+
+export const saveTaxiFleetSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => fleetSchema.parse(raw) as TaxiFleet)
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await (context.supabase as unknown as Loose).rpc("taxi_admin_save_fleet", {
+      _fleet: data,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const setTaxiDriverVehicleClass = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ driverId: z.string().uuid(), vehicleClass: z.enum(TAXI_VEHICLE_CLASSES) }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await (context.supabase as unknown as Loose).rpc(
+      "taxi_admin_set_driver_vehicle_class",
+      { _driver_id: data.driverId, _vehicle_class: data.vehicleClass },
+    );
     if (error) throw new Error(error.message);
     return { ok: true };
   });

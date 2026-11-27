@@ -48,6 +48,7 @@ function DriverApplicationPage() {
   const [vehicleYear, setVehicleYear] = useState("");
   const [vehicleColor, setVehicleColor] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
+  const [vehicleClass, setVehicleClass] = useState<"compacto" | "camioneta" | "van">("compacto");
   const [plates, setPlates] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
@@ -77,6 +78,7 @@ function DriverApplicationPage() {
           vehicleYear: vehicleYear ? Number(vehicleYear) : null,
           vehicleColor: vehicleColor || undefined,
           vehicleNumber: vehicleNumber || undefined,
+          vehicleClass,
           plates,
           applicantNotes: notes || undefined,
         },
@@ -183,6 +185,13 @@ function DriverApplicationPage() {
 
           <FormSection title="Tu vehículo">
             <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="driver-class" label="Tipo de vehículo" required>
+                <select id="driver-class" value={vehicleClass} onChange={(e) => setVehicleClass(e.target.value as typeof vehicleClass)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  <option value="compacto">Compacto · hasta 4 pasajeros</option>
+                  <option value="camioneta">Camioneta · hasta 6 pasajeros</option>
+                  <option value="van">Van · 7 pasajeros o más</option>
+                </select>
+              </Field>
               <Field id="driver-vehicle" label="Marca y modelo" required>
                 <Input id="driver-vehicle" required value={vehicleDescription} onChange={(e) => setVehicleDescription(e.target.value)} placeholder="Nissan Versa" />
               </Field>

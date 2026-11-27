@@ -1,5 +1,10 @@
 # Roadmap
 
+## Taxi Alux · vehículos, espera e ida y vuelta · 2026-11-27
+- [x] Compacto/Camioneta/Van por tamaño del grupo, tarifa por vehículo, asignación sólo a autos donde caben.
+- [x] Espera al recoger (min gratis + por minuto), hasta 2 paradas, ida y vuelta por horas con km incluidos y desglose al pedir.
+- [ ] Confirmar con taxistas las tarifas reales (hoy valores de prueba).
+
 ## Taxi desde la ficha · 2026-11-27
 - [x] Recogida con GPS actual (no borrador anterior), destino de la ficha y cotización sólo con ambos puntos; conservar diseño, regreso, tarifas y zonas. 14 pruebas PASS; Copalli → Taxi → volver en 1440/834/430/390, GPS denegado sin cotización ficticia. Informe: docs/taxi-current-origin-2026-11-27.md.
 - [ ] GPS y mapa en iPhone físico y publicación: requieren dispositivo/origen autorizado; control global pendiente de reconciliación histórica ajena al delta.

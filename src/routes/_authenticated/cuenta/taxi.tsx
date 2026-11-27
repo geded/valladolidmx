@@ -20,6 +20,7 @@ import {
   canCancelTaxiRide,
   formatTaxiDate,
   formatTaxiMoney,
+  taxiTripLabel,
   isTaxiRideActive,
   TAXI_STATUS_LABELS,
   taxiErrorMessage,
@@ -184,6 +185,8 @@ function TravelerTaxiPage() {
               <p className="text-xs text-muted-foreground">
                 {selected.distance_km.toFixed(1)} km · {selected.estimated_minutes} min · {selected.passengers} personas
               </p>
+              <p className="text-xs font-medium">{taxiTripLabel(selected)}</p>
+              {selected.wait_charge_cents ? <p className="text-xs text-muted-foreground">Incluye espera: {formatTaxiMoney(selected.wait_charge_cents, selected.currency)}</p> : null}
             </div>
 
             {tracking ? (

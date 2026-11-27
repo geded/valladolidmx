@@ -393,6 +393,13 @@
       "when": 1795699900999,
       "tag": "0055_security_locks_interests_prospects",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1795760154870,
+      "tag": "0056_migration",
+      "breakpoints": true
     }
   ]
 }

@@ -25,6 +25,7 @@ import {
 import {
   formatTaxiDate,
   formatTaxiMoney,
+  taxiTripLabel,
   driverDaySummary,
   isTaxiRideActive,
   localDay,
@@ -303,6 +304,9 @@ function DriverDashboard() {
               </div>
               <div className="mt-4 rounded-xl border border-border p-3 text-sm">
                 <p className="flex items-center gap-2"><UserRound className="size-4" /> {activeRide.traveler_name} · {activeRide.passengers} personas</p>
+                <p className="mt-1 text-xs font-medium">{taxiTripLabel(activeRide)}</p>
+                {activeRide.stops?.length ? <p className="mt-1 text-xs">Paradas: {activeRide.stops.map((s) => s.label).join(" · ")}</p> : null}
+                {activeRide.trip_mode === "hourly" ? <p className="mt-1 text-xs text-muted-foreground">Espera al viajero y regrésalo a su punto de recogida.</p> : null}
                 <p className="mt-1 text-muted-foreground">{activeRide.traveler_phone}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{formatTaxiDate(activeRide.requested_for)}</p>
                 {activeRide.notes ? <p className="mt-2 text-xs">Notas: {activeRide.notes}</p> : null}
@@ -377,6 +381,8 @@ function DriverDashboard() {
                       <div>
                         <p className="text-sm font-semibold">{ride.origin_label} → {ride.destination_label}</p>
                         <p className="mt-1 text-xs text-muted-foreground">{formatTaxiDate(ride.requested_for)} · {ride.passengers} personas</p>
+                        <p className="mt-1 text-xs font-medium">{taxiTripLabel(ride)}</p>
+                        {ride.stops?.length ? <p className="mt-1 text-xs text-muted-foreground">Paradas: {ride.stops.map((s) => s.label).join(" · ")}</p> : null}
                         <p className="mt-1 text-xs text-muted-foreground">{ride.distance_km.toFixed(1)} km · {ride.estimated_minutes} min</p>
                       </div>
                       <Badge variant="outline">{formatTaxiMoney(ride.fare_amount, ride.currency)}</Badge>
