@@ -12254,6 +12254,7 @@ export type Database = {
           _origin_lat: number
           _origin_lng: number
           _requested_for?: string
+          _road_km?: number
           _stops?: Json
           _trip_mode?: string
           _vehicle_class?: string
@@ -12277,6 +12278,7 @@ export type Database = {
           _passengers: number
           _payment_method?: string
           _requested_for: string
+          _road_km?: number
           _stops?: Json
           _traveler_name: string
           _traveler_phone: string

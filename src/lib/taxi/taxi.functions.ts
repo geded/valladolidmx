@@ -100,6 +100,37 @@ function tripArgs(data: z.infer<typeof pointSchema>) {
   };
 }
 
+type TaxiRoad = { km: number | null; polyline: string | null };
+const roadCache = new Map<string, { at: number; road: TaxiRoad }>();
+
+/** Ruta real por carretera (Google Routes) para cotizar y dibujar; sin ella se usa la línea recta. */
+async function taxiRoadRoute(data: z.infer<typeof pointSchema>): Promise<TaxiRoad> {
+  const pts = [
+    { lat: data.originLat, lng: data.originLng },
+    ...data.stops.map((s) => ({ lat: s.lat, lng: s.lng })),
+    { lat: data.destinationLat, lng: data.destinationLng },
+  ];
+  const key = `${data.tripMode}|${pts.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join("|")}`;
+  const hit = roadCache.get(key);
+  if (hit && Date.now() - hit.at < 30 * 60_000) return hit.road;
+  try {
+    const { computeRoadRouteInternal } = await import("@/lib/maps/routes.server");
+    const out = await computeRoadRouteInternal(pts);
+    if (!out.ok || !out.distanceMeters) return { km: null, polyline: null };
+    let meters = out.distanceMeters;
+    if (data.tripMode === "hourly") {
+      const back = await computeRoadRouteInternal([pts[pts.length - 1]!, pts[0]!]);
+      meters += back.ok && back.distanceMeters ? back.distanceMeters : out.distanceMeters;
+    }
+    const road = { km: meters / 1000, polyline: out.encodedPolyline };
+    if (roadCache.size > 500) roadCache.clear();
+    roadCache.set(key, { at: Date.now(), road });
+    return road;
+  } catch {
+    return { km: null, polyline: null };
+  }
+}
+
 export const getTaxiPublicConfig = createServerFn({ method: "GET" }).handler(
   async (): Promise<TaxiPublicConfig> => {
     const { url, key } = publicEnv();
@@ -115,6 +146,19 @@ export const quoteTaxi = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => pointSchema.parse(raw))
   .handler(async ({ data }): Promise<TaxiQuote> => {
     const { url, key } = publicEnv();
+    // Sólo cuentas registradas consultan la ruta por carretera (tiene costo).
+    let road: TaxiRoad = { km: null, polyline: null };
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const request = getRequest();
+    if (request.headers.has("authorization")) {
+      const { requireRequestUser } = await import("@/lib/security/request-auth.server");
+      const caller = await requireRequestUser(request);
+      if (!(caller instanceof Response)) {
+        const { enforcePublicQuota } = await import("@/lib/security/public-quota.server");
+        await enforcePublicQuota("taxi.roadRoute", { perMinute: 20, perHour: 200, platformPerDay: 10000 });
+        road = await taxiRoadRoute(data);
+      }
+    }
     const { data: quote, error } = await (publicClient(url, key) as unknown as Loose).rpc(
       "taxi_quote",
       {
@@ -124,10 +168,11 @@ export const quoteTaxi = createServerFn({ method: "POST" })
         _destination_lng: data.destinationLng,
         _requested_for: data.requestedFor,
         ...tripArgs(data),
+        _road_km: road.km,
       },
     );
     if (error) throw new Error(error.message);
-    return quote as TaxiQuote;
+    return { ...(quote as TaxiQuote), road_polyline: road.polyline, road_route: road.km != null };
   });
 
 export const requestTaxiRide = createServerFn({ method: "POST" })
@@ -146,6 +191,7 @@ export const requestTaxiRide = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data, context }): Promise<TaxiRide> => {
+    const road = await taxiRoadRoute(data);
     const { data: ride, error } = await (context.supabase as unknown as Loose).rpc(
       "taxi_request_ride",
       {
@@ -162,6 +208,7 @@ export const requestTaxiRide = createServerFn({ method: "POST" })
         _notes: data.notes ?? null,
         _payment_method: data.paymentMethod,
         ...tripArgs(data),
+        _road_km: road.km,
       },
     );
     if (error) throw new Error(error.message);

@@ -181,6 +181,9 @@ export interface TaxiQuote {
   trip_mode?: TaxiTripMode;
   hours?: number | null;
   breakdown?: TaxiFareBreakdown;
+  /** Ruta por carretera codificada (Google); ausente = estimado en línea recta. */
+  road_polyline?: string | null;
+  road_route?: boolean;
 }
 
 export interface TaxiDriver {
@@ -617,4 +620,21 @@ export function taxiTripLabel(ride: { trip_mode?: TaxiTripMode; hours?: number |
   const stops = ride.stops?.length ?? 0;
   if (stops) parts.push(`${stops} ${stops === 1 ? "parada" : "paradas"}`);
   return parts.join(" · ");
+}
+
+/** Decodifica una polilínea de Google en puntos para dibujar la ruta del taxi. */
+export function decodeTaxiPolyline(encoded: string | null | undefined): Array<{ lat: number; lng: number }> {
+  if (!encoded) return [];
+  const out: Array<{ lat: number; lng: number }> = [];
+  let i = 0, lat = 0, lng = 0;
+  while (i < encoded.length) {
+    for (const axis of [0, 1]) {
+      let shift = 0, result = 0, b: number;
+      do { b = encoded.charCodeAt(i++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20 && i < encoded.length);
+      const delta = result & 1 ? ~(result >> 1) : result >> 1;
+      if (axis === 0) lat += delta; else lng += delta;
+    }
+    out.push({ lat: lat / 1e5, lng: lng / 1e5 });
+  }
+  return out;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarClock, Car, ChevronDown, Circle, LocateFixed, LogIn, MapPin, Plus, Repeat, Search, Square, Users, X } from "lucide-react";
@@ -24,6 +24,7 @@ import {
   type TaxiTripMode,
   type TaxiVehicleClass,
   type TaxiQuote,
+  decodeTaxiPolyline,
 } from "@/lib/taxi/rules";
 import { toast } from "@/lib/toast";
 import { registerStickyCta } from "@/lib/alux/sticky-cta-presence";
@@ -325,6 +326,11 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
     setQuote(null);
   }
 
+  const roadPath = useMemo(() => {
+    const pts = decodeTaxiPolyline(quote?.road_polyline);
+    return pts.length > 1 ? pts : null;
+  }, [quote?.road_polyline]);
+
   const zoneNames = config.pickup_zones.map((z) => z.name).join(", ") || "Valladolid";
   const activePoint = pinTarget === "origin" ? draft.origin : draft.destination;
 
@@ -345,6 +351,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
             gestureHandling="cooperative"
             brandStyle
             companion={pinTarget === "origin" ? draft.destination : draft.origin}
+            routePath={roadPath}
             className="h-[42vh] min-h-[280px] w-full bg-muted lg:h-[460px]"
           />
           <div className="absolute left-3 top-3 flex gap-1 rounded-full bg-card/95 p-1 shadow-soft">
@@ -525,7 +532,7 @@ export function TaxiQuoteForm({ config }: { config: TaxiPublicConfig }) {
               <>
                 <p className="text-2xl font-semibold leading-tight lg:mt-2 lg:text-3xl">{formatTaxiMoney(quote.fare_amount, quote.currency)}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {selectedClass.label} · {quote.distance_km.toFixed(1)} km{quote.trip_mode === "hourly" ? ` · ida y vuelta ${quote.hours} h` : ` · ${quote.estimated_minutes} min`}{quote.night_surcharge ? " · nocturna" : ""}
+                  {selectedClass.label} · {quote.distance_km.toFixed(1)} km{quote.trip_mode === "hourly" ? ` · ida y vuelta ${quote.hours} h` : ` · ${quote.estimated_minutes} min`}{quote.night_surcharge ? " · nocturna" : ""}{quote.road_route ? " · por carretera" : " · estimado en línea recta"}
                 </p>
                 {quote.breakdown ? <FareExplanation quote={quote} /> : null}
               </>

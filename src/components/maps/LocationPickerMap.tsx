@@ -33,6 +33,8 @@ export interface LocationPickerMapProps {
   brandStyle?: boolean;
   /** Segundo punto fijo (p. ej. destino) unido con una línea de trayecto. */
   companion?: LatLng | null;
+  /** Recorrido real por calles; si existe sustituye la línea recta punteada. */
+  routePath?: LatLng[] | null;
 }
 
 export function LocationPickerMap({
@@ -44,7 +46,11 @@ export function LocationPickerMap({
   gestureHandling = "greedy",
   brandStyle = false,
   companion = null,
+  routePath = null,
 }: LocationPickerMapProps) {
+  const routeRef = useRef<((path: LatLng[] | null) => void) | null>(null);
+  const routePathRef = useRef(routePath);
+  routePathRef.current = routePath;
   const ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<{ setCenter: (p: LatLng) => void } | null>(null);
   const lineRef = useRef<((p: LatLng) => void) | null>(null);
@@ -140,6 +146,7 @@ export function LocationPickerMap({
           lineRef.current?.(p);
           onChangeRef.current(p);
         }) as never);
+        let roadCleanup: (() => void) | null = null;
         let fixed: { setMap: (m: unknown) => void } | null = null;
         let line: { setMap: (m: unknown) => void; setPath: (p: LatLng[]) => void } | null = null;
         if (companion) {
@@ -164,7 +171,39 @@ export function LocationPickerMap({
           bounds.extend({ lat, lng });
           bounds.extend(companion);
           map.fitBounds(bounds, 56);
-          lineRef.current = (p: LatLng) => line?.setPath([p, companion]);
+          lineRef.current = (p: LatLng) => {
+            routeRef.current?.(null);
+            line?.setPath([p, companion]);
+          };
+          const road = new (google.maps as unknown as { Polyline: new (o: unknown) => NonNullable<typeof line> }).Polyline({
+            map: null,
+            strokeColor: cssColor("--primary", "#eaa840"),
+            strokeOpacity: 0.95,
+            strokeWeight: 5,
+          });
+          routeRef.current = (path) => {
+            try {
+              drawRoad(path);
+            } catch {
+              // Si el mapa no puede dibujar la ruta, queda la línea recta; nunca rompe la página.
+            }
+          };
+          const drawRoad = (path: LatLng[] | null) => {
+            const has = Boolean(path && path.length > 1);
+            if (has) {
+              road.setPath(path!);
+              road.setMap(map);
+            } else road.setMap(null);
+            line?.setMap(has ? null : map);
+            if (has) {
+              const b = new google.maps.LatLngBounds();
+              path!.forEach((pt) => b.extend(pt));
+              map.fitBounds(b, 56);
+            }
+          };
+          routeRef.current(routePathRef.current);
+          const prevRelease = () => road.setMap(null);
+          roadCleanup = prevRelease;
         }
         mapRef.current = map;
         markerRef.current = marker;
@@ -174,6 +213,8 @@ export function LocationPickerMap({
           marker.unbindAll();
           fixed?.setMap(null);
           line?.setMap(null);
+          roadCleanup?.();
+          routeRef.current = null;
           lineRef.current = null;
           mapRef.current = null;
           markerRef.current = null;
@@ -192,6 +233,10 @@ export function LocationPickerMap({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
+
+  useEffect(() => {
+    routeRef.current?.(routePath);
+  }, [routePath]);
 
   // Sync externo: si el padre cambia lat/lng (geolocalización, geocoding),
   // reposicionamos marker + centro.
