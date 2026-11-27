@@ -2,6 +2,7 @@
  * H-03 · Ola I1.c — `vmx.experience.info-grid` (Capa 1: Presentación).
  */
 import { Check, Clock, MapPin, Phone, Star, Tag, Users, type LucideIcon } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { ExperienceInfoGridDTO } from "@/lib/experience-builder/blocks/experience-info-grid/contract";
 
@@ -28,7 +29,12 @@ export interface ExperienceInfoGridProps {
 
 export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) {
   const { items, heading, columns, variant, ariaLabel } = dto;
+  const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
+  // Celular: la lista de opciones se muestra en pastillas y se limita a 6 (con más de 8) hasta desplegarla.
+  const MOBILE_LIMIT = 6;
+  const MOBILE_COLLAPSE_AFTER = 8;
+  const checklistIndex = new Map(items.map((it, i) => [it, i]));
 
   const colCls =
     columns === 1
@@ -69,7 +75,7 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
       ) : variant === "checklist" ? (
         /* Amenidades y servicios: cada dato se lee como un elemento propio,
            agrupado por su eje administrable del CMS. */
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {Array.from(
             items.reduce((acc, it) => {
               const group = acc.get(it.label) ?? [];
@@ -82,22 +88,26 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
               <p className="text-xs uppercase tracking-widest text-muted-foreground">
                 {groupLabel}
               </p>
-              <ul className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2" role="list">
+              <ul className="mt-2 flex flex-wrap gap-2 sm:mt-3 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-3" role="list">
                 {groupItems.map((it, i) => {
                   const I = it.iconKey ? ICONS[it.iconKey] : null;
+                  const hiddenOnMobile = !expanded && items.length > MOBILE_COLLAPSE_AFTER && (checklistIndex.get(it) ?? 0) >= MOBILE_LIMIT;
                   return (
                     <li
                       key={i}
-                      className="flex items-start gap-3 border-b border-border pb-3 last:border-b-0 sm:last:border-b-0"
+                      className={cn(
+                        "items-center gap-1.5 rounded-pill border border-border bg-background px-3 py-1.5 sm:flex sm:items-start sm:gap-3 sm:rounded-none sm:border-0 sm:border-b sm:bg-transparent sm:px-0 sm:py-0 sm:pb-3 sm:last:border-b-0",
+                        hiddenOnMobile ? "hidden" : "flex",
+                      )}
                     >
                       {I ? (
                         <I
-                          className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground"
+                          className="h-4 w-4 shrink-0 text-muted-foreground sm:mt-0.5 sm:h-5 sm:w-5"
                           aria-hidden="true"
                         />
                       ) : (
                         <Check
-                          className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground"
+                          className="h-4 w-4 shrink-0 text-muted-foreground sm:mt-0.5 sm:h-5 sm:w-5"
                           aria-hidden="true"
                         />
                       )}
@@ -110,6 +120,15 @@ export function ExperienceInfoGrid({ dto, className }: ExperienceInfoGridProps) 
               </ul>
             </div>
           ))}
+          {!expanded && items.length > MOBILE_COLLAPSE_AFTER ? (
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              className="rounded-pill border border-border px-4 py-2 text-sm font-medium text-primary sm:hidden"
+            >
+              Ver las {items.length} opciones
+            </button>
+          ) : null}
         </div>
       ) : variant === "list" ? (
         <ul
