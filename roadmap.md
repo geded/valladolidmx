@@ -1,5 +1,9 @@
 # Roadmap
 
+## Botones de la ficha · 2026-11-27
+- [x] «Agregar a Mi Viaje» parejo con Compartir/Guardar/Taxi en celular (misma caja que el botón compartido).
+- [x] Poder desmarcar una parada ya agregada desde el mismo botón (hoy se desactiva y no deja quitarla).
+
 ## Fotos que fallan al cargar · 2026-11-26
 - [x] Reintento y fondo crema en lugar de ícono roto/verde (EditorialMediaFrame)
 

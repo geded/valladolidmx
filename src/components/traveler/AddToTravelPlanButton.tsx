@@ -28,6 +28,7 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   addPlanItem,
   getMyActivePlan,
+  removePlanItem,
   type TravelItemKind,
 } from "@/lib/traveler/travel-plans.functions";
 import {
@@ -105,6 +106,7 @@ function AddToTravelPlanButtonInner({
   const queryClient = useQueryClient();
   const fetchActive = useServerFn(getMyActivePlan);
   const addItem = useServerFn(addPlanItem);
+  const removeItem = useServerFn(removePlanItem);
   const anon = useAnonymousTrip();
   const limitRegistration = useProgressiveRegistration("hard_limit");
 
@@ -127,6 +129,16 @@ function AddToTravelPlanButtonInner({
       ),
     );
   }, [active, kind, targetId, user?.id, anon.trip]);
+
+  // Identificador de la parada ya guardada: «quitar» necesita el id del
+  // registro, no el de la empresa. Se lee siempre de la fuente canónica.
+  const planItemId = useMemo(() => {
+    if (!user?.id || !active?.items) return null;
+    return (
+      active.items.find((it) => it.item_kind === kind && it.target_id === targetId)?.id ??
+      null
+    );
+  }, [active, kind, targetId, user?.id]);
 
   const [phase, setPhase] = useState<Phase>("idle");
   // Override optimista: `true` mientras se está agregando y aún no llega la
@@ -181,6 +193,35 @@ function AddToTravelPlanButtonInner({
     },
   });
 
+  // «Quitar» comparte el mismo botón: cuando la parada ya está en el viaje,
+  // tocarla la retira. Usa el id del registro de la fuente canónica.
+  const removal = useMutation({
+    mutationFn: async () => {
+      if (!planItemId) throw new Error("missing_item");
+      return removeItem({ data: { itemId: planItemId } });
+    },
+    onMutate: () => {
+      setPhase("adding");
+      setOptimisticDone(false);
+    },
+    onSuccess: () => {
+      setPhase("idle");
+      void queryClient.invalidateQueries({
+        queryKey: ["traveler", "active-plan", user?.id],
+      });
+      void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
+        notifyPlanChanged("remove_item"),
+      );
+      const c = ANON_COPY.intent.planReleased;
+      toast(c.title, { description: c.body });
+    },
+    onError: () => {
+      setOptimisticDone(null);
+      setPhase("error");
+      toast.error("Intenta de nuevo.");
+    },
+  });
+
   const anonBusyRef = useRef(false);
   const [anonBusy, setAnonBusy] = useState(false);
 
@@ -229,14 +270,41 @@ function AddToTravelPlanButtonInner({
     }
   }
 
-  const busy = phase === "adding" || mutation.isPending || anonBusy;
+  async function handleAnonymousRemove() {
+    if (anonBusyRef.current) return;
+    anonBusyRef.current = true;
+    setAnonBusy(true);
+    setPhase("adding");
+    setOptimisticDone(false);
+    try {
+      await anon.removePlannedItem(kind as AnonymousItemKind, targetId);
+      setPhase("idle");
+      void import("@/lib/alux/plan-signals").then(({ notifyPlanChanged }) =>
+        notifyPlanChanged("remove_item"),
+      );
+      const c = ANON_COPY.intent.planReleased;
+      toast(c.title, { description: c.body });
+    } catch (e) {
+      setOptimisticDone(null);
+      setPhase("error");
+      toast.error(e instanceof Error ? e.message : "Intenta de nuevo.");
+    } finally {
+      anonBusyRef.current = false;
+      setAnonBusy(false);
+    }
+  }
+
+  const busy = phase === "adding" || mutation.isPending || removal.isPending || anonBusy;
   // Fuente de verdad = canónica; override optimista sólo si aún no confirma.
   const done = optimisticDone ?? alreadyInPlan;
 
+  // Caja idéntica a la del botón compartido (`size="sm"` / `size="default"`):
+  // en la fila de acciones de la ficha (compartir, guardar, taxi) todos los
+  // botones deben verse del mismo tamaño, también en celular.
   const base =
     variant === "compact"
-      ? "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-60"
-      : "inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-60";
+      ? "inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-pill border px-3 text-xs font-medium transition-colors disabled:opacity-60"
+      : "inline-flex h-8 items-center gap-2 whitespace-nowrap rounded-pill border px-4 text-sm font-medium transition-colors disabled:opacity-60";
   const skin = done
     ? "border-primary bg-primary/10 text-primary"
     : "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10";
@@ -244,29 +312,39 @@ function AddToTravelPlanButtonInner({
   return (
     <button
       type="button"
-      disabled={busy || done}
+      disabled={busy}
       aria-pressed={done}
+      aria-label={done ? "Quitar de Mi Viaje" : "Agregar a Mi Viaje"}
       onClick={(e) => {
         // Muchas tarjetas envuelven todo en un <a>/<Link>. Evita navegar
         // cuando el usuario pulsa el botón.
         e.preventDefault();
         e.stopPropagation();
-        if (busy || done) return;
+        if (busy) return;
+        // Ya está en el viaje ⇒ el mismo botón lo quita.
+        if (done) {
+          if (user?.id) {
+            removal.mutate();
+          } else {
+            void handleAnonymousRemove();
+          }
+          return;
+        }
         if (user?.id) {
           mutation.mutate();
         } else {
           void handleAnonymousAdd();
         }
       }}
-      title={done ? "Ya está en Mi Viaje" : "Agregar a Mi Viaje"}
+      title={done ? "Quitar de Mi Viaje" : "Agregar a Mi Viaje"}
       className={[base, skin, className ?? ""].join(" ")}
     >
       {busy && !done ? (
-        <Loader2 className="size-3.5 animate-spin" aria-hidden />
+        <Loader2 className="size-4 animate-spin" aria-hidden />
       ) : done ? (
-        <Check className="size-3.5" aria-hidden />
+        <Check className="size-4" aria-hidden />
       ) : (
-        <Plus className="size-3.5" aria-hidden />
+        <Plus className="size-4" aria-hidden />
       )}
       <span className="hidden sm:inline">{done ? "Ya está en Mi Viaje" : busy ? "Agregando…" : "Agregar a Mi Viaje"}</span>
       <span className="sm:hidden">{done ? "En Mi Viaje" : busy ? "Agregando…" : "Mi Viaje"}</span>
