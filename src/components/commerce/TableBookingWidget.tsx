@@ -94,6 +94,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
   const [done, setDone] = useState<{ folio: string; status: string; starts_at: string; party_size: number; manage_token?: string } | null>(null);
   const [hold, setHold] = useState<{ token: string; expires_at: string } | null>(null);
   const holdRef = useRef<string | null>(null);
+  const detailsRef = useRef<HTMLDivElement | null>(null);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { holdRef.current = hold?.token ?? null; }, [hold]);
   useEffect(() => () => { if (holdRef.current) void rpc("restaurant_release_hold", { _token: holdRef.current }); }, []);
@@ -111,6 +112,7 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
       setHold(null); setSlot(null); return;
     }
     setSlot(s);
+    window.setTimeout(() => detailsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
     const { data, error: err } = await rpc("restaurant_hold_slot", { _business_id: businessId, _starts_at: s.starts_at, _party: party, _replace: hold?.token ?? null });
     if (err) {
       setSlot(null); setHold(null);
@@ -150,16 +152,6 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
     return defs.map((d, i) => ({ label: d.label, items: available.filter((s) => { const m = minutes(s.slot_time); return m < d.to && m >= (i ? defs[i - 1]!.to : 0); }) }))
       .filter((g) => g.items.length);
   }, [available]);
-  const quickDays = useMemo(() => {
-    if (!today) return [];
-    const maxN = Math.min(13, config.data?.max_days_ahead ?? 60);
-    return Array.from({ length: maxN + 1 }, (_, i) => {
-      const iso = addDays(today, i);
-      const label = i === 0 ? "Hoy" : i === 1 ? "Mañana" : new Date(`${iso}T12:00:00Z`).toLocaleDateString("es-MX", { weekday: "short", day: "numeric", timeZone: "UTC" });
-      return { iso, label };
-    });
-  }, [today, config.data?.max_days_ahead]);
-
   const reason = useQuery({
     queryKey: ["table-booking-reason", businessId, date, party],
     enabled: Boolean(config.data?.enabled && date && slots.data && !slots.data.some((x) => x.available)),
@@ -232,8 +224,8 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
       <h2 className="mt-1 text-2xl">Aparta tu mesa en {businessName}</h2>
       <p className="mt-1 text-sm text-muted-foreground">Sin costo. Elige personas, fecha y hora.</p>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="text-sm font-medium">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="col-span-2 text-sm font-medium sm:col-span-1">
           <span className="flex items-center gap-1.5"><Users className="size-4" aria-hidden /> Personas</span>
           <div className="mt-1 flex h-10 items-center justify-between rounded-md border border-input px-2">
             <Button type="button" size="icon" variant="ghost" aria-label="Menos personas" disabled={party <= minParty}
@@ -243,30 +235,22 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
               onClick={() => { setParty((p) => Math.min(maxParty, p + 1)); void pickSlot(null); }}><Plus className="size-4" /></Button>
           </div>
         </div>
-        <label className="block text-sm font-medium">
+        <label className="block min-w-0 text-sm font-medium">
           <span className="flex items-center gap-1.5"><CalendarDays className="size-4" aria-hidden /> Fecha</span>
-          <Input type="date" className="mt-1" value={date} min={today} max={maxDate}
+          <Input type="date" className="mt-1 block w-full min-w-0 appearance-none" value={date} min={today} max={maxDate}
             onChange={(e) => { setDate(e.target.value); void pickSlot(null); setShowAll(false); }} />
         </label>
-        <label className="block text-sm font-medium">
-          <span className="flex items-center gap-1.5"><Clock className="size-4" aria-hidden /> Hora</span>
-          <select className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={prefTime}
+        <label className="block min-w-0 text-sm font-medium">
+          <span className="flex items-center gap-1.5"><Clock className="size-4" aria-hidden /> Hora deseada</span>
+          <select className="mt-1 h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm" value={prefTime}
             onChange={(e) => { setPrefTime(e.target.value); void pickSlot(null); setShowAll(false); }}>
             {PREF_TIMES.map((t) => <option key={t} value={t}>{to12h(t)}</option>)}
           </select>
         </label>
       </div>
 
-      <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Días próximos">
-        {quickDays.map((d) => (
-          <button key={d.iso} type="button"
-            className={`shrink-0 rounded-pill border px-3 py-1.5 text-xs font-medium transition-colors ${date === d.iso ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"}`}
-            onClick={() => { setDate(d.iso); void pickSlot(null); setShowAll(false); }}>{d.label}</button>
-        ))}
-      </div>
-
       <div className="mt-5">
-        <p className="text-sm font-semibold">Elige una hora</p>
+        <p className="text-sm font-semibold">{showAll ? "Todos los horarios disponibles" : "Mesas disponibles"}</p>
         {slots.isLoading ? (
           <div className="mt-2 flex gap-2" aria-label="Buscando horarios">
             {[0, 1, 2, 3, 4].map((i) => <div key={i} className="h-9 w-20 animate-pulse rounded-md bg-muted" />)}
@@ -279,14 +263,14 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
           <>
             {!showAll ? (
               <>
-                {nearMissing ? <p className="mt-1 text-xs text-muted-foreground">No hay mesa a las {to12h(prefTime)}; estos son los horarios más cercanos.</p> : null}
+                <p className="mt-1 text-xs text-muted-foreground">{nearMissing ? `No hay mesa a las ${to12h(prefTime)}; toca uno de los horarios más cercanos.` : "Toca un horario para apartarlo."}</p>
                 <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
                   {nearest.map((s) => <SlotButton key={s.starts_at} s={s} active={slot?.starts_at === s.starts_at} onPick={(x) => void pickSlot(x)} />)}
                 </div>
                 {available.length > nearest.length ? (
-                  <button type="button" className="mt-3 text-sm font-medium text-primary underline-offset-4 hover:underline" onClick={() => setShowAll(true)}>
-                    Ver todos los horarios ({available.length})
-                  </button>
+                  <Button type="button" variant="outline" className="mt-3 w-full" onClick={() => setShowAll(true)}>
+                    Ver disponibilidad completa ({available.length})
+                  </Button>
                 ) : null}
               </>
             ) : (
@@ -321,7 +305,8 @@ export function TableBookingWidget({ businessId, businessName }: { businessId: s
       </div>
 
       {slot ? (
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div ref={detailsRef} className="mt-5 grid scroll-mt-24 gap-3 border-t border-border pt-4 sm:grid-cols-2">
+          <p className="text-sm font-semibold sm:col-span-2">Tus datos para la reservación</p>
           <label className="block text-sm font-medium">Nombre
             <Input className="mt-1" value={name} maxLength={120} autoComplete="name" onChange={(e) => setName(e.target.value)} />
           </label>
