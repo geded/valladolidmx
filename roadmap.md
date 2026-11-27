@@ -711,3 +711,4 @@
 - [x] Revisar las opciones de acceso compartidas: sólo Google y correo; acceso publicado y pantalla inicial de Google comprobados sin texto Lovable. No se certificaron reservas, favoritos ni retorno con sesión; detalles en `docs/auth-brand-review-2026-11-26.md`.
 - [x] Comprobar la identidad que Google muestra al entrar: `quehacerenvalladolid.com`; no requiere un cambio de código y no implica ocultamiento técnico del alojamiento.
 - [ ] Aclarar qué elegir en «tipo de proyecto»: espera captura o lista de las opciones que ve el Founder; sitio publicado ya confirmado público, privacidad del proyecto independiente.
+- [x] Galería de empresas: primera foto ancha se recorta sin deformarse en iPhone (forma conservada); pendiente confirmar en iPhone real.

@@ -236,8 +236,12 @@ function Thumb({
         {...thumbSrcSet(item)}
         alt={item.alt}
         loading="lazy"
+        decoding="async"
+        // iOS Safari: el recorte en línea garantiza que la foto se recorte y
+        // nunca se deforme dentro del recuadro ancho de la galería.
+        style={{ objectFit: "cover", objectPosition: "center" }}
         className={cn(
-          "h-full w-full object-cover transition group-hover:scale-[1.02]",
+          "h-full w-full object-cover transition-transform group-hover:scale-[1.02]",
           fill ? "absolute inset-0 rounded-none" : "rounded-2xl",
           !fill && cls,
         )}
