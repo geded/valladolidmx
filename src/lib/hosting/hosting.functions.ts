@@ -139,6 +139,12 @@ export const claimBusiness = createServerFn({ method: "POST" })
       _notes: data.notes,
     } as never);
     if (error) throw new Error(error.message);
+    const { notifyAdminsBusinessRequest } = await import("./business-request-admin.server");
+    await notifyAdminsBusinessRequest({
+      kind: "claim",
+      businessId: data.business_id,
+      requesterId: context.userId,
+    });
     return { ok: true };
   });
 
@@ -208,6 +214,12 @@ export const createOwnedBusiness = createServerFn({ method: "POST" })
       _verification_document_url: data.verification_document_url,
     } as never);
     if (error) throw new Error(error.message);
+    const { notifyAdminsBusinessRequest } = await import("./business-request-admin.server");
+    await notifyAdminsBusinessRequest({
+      kind: "registration",
+      businessId: businessId as string,
+      requesterId: context.userId,
+    });
     return { business_id: businessId as string };
   });
 
@@ -509,4 +521,51 @@ export const listMyPendingClaims = createServerFn({ method: "GET" })
       expires_at: r.expires_at,
       notes: r.notes,
     }));
+  });
+
+/* ── Empresas parecidas y solicitudes rechazadas ───────────────── */
+
+export interface SimilarBusiness {
+  id: string;
+  display_name: string;
+  slug: string;
+  destination_name: string | null;
+}
+
+export const findSimilarBusinesses = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { name: string; exclude_id?: string | null }) => ({
+    name: z.string().trim().max(120).parse(data?.name ?? ""),
+    exclude_id: data?.exclude_id ? z.string().uuid().parse(data.exclude_id) : null,
+  }))
+  .handler(async ({ data, context }): Promise<SimilarBusiness[]> => {
+    if (data.name.length < 3) return [];
+    const { data: rows, error } = await context.supabase.rpc("find_similar_businesses", {
+      _name: data.name,
+      _exclude_id: data.exclude_id,
+      _limit: 5,
+    } as never);
+    if (error) throw new Error(error.message);
+    return ((rows as any[]) ?? []).map((r) => ({
+      id: r.id,
+      display_name: r.display_name,
+      slug: r.slug,
+      destination_name: r.destination_name ?? null,
+    }));
+  });
+
+export interface RejectedBusinessRequest {
+  kind: "claim" | "registration";
+  business_id: string;
+  business_name: string;
+  notes: string | null;
+  decided_at: string;
+}
+
+export const listMyRejectedBusinessRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<RejectedBusinessRequest[]> => {
+    const { data, error } = await context.supabase.rpc("list_my_rejected_business_requests");
+    if (error) throw new Error(error.message);
+    return ((data as any[]) ?? []) as RejectedBusinessRequest[];
   });

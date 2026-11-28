@@ -9,7 +9,7 @@
  * No introduce infraestructura: sólo consume los RPCs SECURITY DEFINER
  * expuestos en src/lib/hosting/hosting.functions.ts.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
@@ -31,6 +31,8 @@ import {
   listBusinessCategoriesForClaim,
   listMyBusinesses,
   listMyPendingClaims,
+  listMyRejectedBusinessRequests,
+  findSimilarBusinesses,
   listPublicDestinations,
   searchBusinessesForClaim,
   type BusinessSearchHit,
@@ -99,10 +101,18 @@ function PendingRequestsBanner() {
     staleTime: 30_000,
   });
 
+  const listRejected = useServerFn(listMyRejectedBusinessRequests);
+  const myRejected = useQuery({
+    queryKey: ["hosting-my-rejected"],
+    queryFn: () => listRejected(),
+    staleTime: 30_000,
+  });
+
   const businesses = (myBiz.data ?? []).filter((b) => b.status !== "published");
   const claims = myClaims.data ?? [];
+  const rejected = myRejected.data ?? [];
 
-  if (businesses.length === 0 && claims.length === 0) return null;
+  if (businesses.length === 0 && claims.length === 0 && rejected.length === 0) return null;
 
   return (
     <div className="mb-6 space-y-3">
@@ -147,6 +157,92 @@ function PendingRequestsBanner() {
           </div>
         </div>
       ))}
+      {rejected.map((r) => (
+        <div
+          key={`${r.kind}-${r.business_id}`}
+          className="rounded-lg border border-destructive/30 bg-card p-4"
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium">{r.business_name}</span>
+            <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+              {r.kind === "claim" ? "Reclamo no aprobado" : "Alta no aprobada"}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {r.notes
+              ? `Motivo: ${r.notes}`
+              : "El administrador no dejó un motivo. Si tienes dudas, escríbenos."}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Aviso de empresas parecidas al dar de alta ─────────────────── */
+function SimilarBusinessesHint({ name }: { name: string }) {
+  const [debounced, setDebounced] = useState(name);
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebounced(name.trim()), 500);
+    return () => window.clearTimeout(t);
+  }, [name]);
+  const find = useServerFn(findSimilarBusinesses);
+  const claim = useServerFn(claimBusiness);
+  const qc = useQueryClient();
+  const similar = useQuery({
+    queryKey: ["hosting-similar", debounced],
+    queryFn: () => find({ data: { name: debounced } }),
+    enabled: debounced.length >= 3,
+    staleTime: 60_000,
+  });
+  const [claimed, setClaimed] = useState<string | null>(null);
+  const doClaim = useMutation({
+    mutationFn: (id: string) => claim({ data: { business_id: id } }),
+    onSuccess: (_d, id) => {
+      setClaimed(id);
+      void qc.invalidateQueries({ queryKey: ["hosting-my-pending-claims"] });
+    },
+  });
+  const rows = similar.data ?? [];
+  if (debounced.length < 3 || rows.length === 0) return null;
+  return (
+    <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
+      <p className="text-sm font-medium">¿Es alguna de estas? Ya existen en Valladolid.mx:</p>
+      <ul className="mt-2 space-y-2">
+        {rows.map((b) => (
+          <li key={b.id} className="flex items-center justify-between gap-3 text-sm">
+            <span className="min-w-0">
+              <span className="font-medium">{b.display_name}</span>
+              {b.destination_name ? (
+                <span className="text-muted-foreground"> · {b.destination_name}</span>
+              ) : null}
+            </span>
+            {claimed === b.id ? (
+              <span className="text-xs font-medium text-primary">Reclamo enviado</span>
+            ) : (
+              <button
+                type="button"
+                disabled={doClaim.isPending}
+                onClick={() => {
+                  if (window.confirm(`¿Reclamar ${b.display_name} como tu empresa?`))
+                    doClaim.mutate(b.id);
+                }}
+                className="min-h-[36px] shrink-0 rounded-pill bg-primary px-3 text-xs font-medium text-primary-foreground"
+              >
+                Reclamar
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      {doClaim.isError ? (
+        <p className="mt-2 text-xs text-destructive">
+          No se pudo enviar el reclamo. Puede que ya tenga una solicitud pendiente.
+        </p>
+      ) : null}
+      <p className="mt-2 text-xs text-muted-foreground">
+        Si no es ninguna, continúa con el alta. El administrador revisará que no esté repetida.
+      </p>
     </div>
   );
 }
@@ -684,6 +780,7 @@ function RegisterBranch() {
               required
             />
           </Field>
+          <SimilarBusinessesHint name={form.display_name} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Destino *">
               <select

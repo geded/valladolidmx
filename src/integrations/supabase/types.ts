@@ -11133,6 +11133,16 @@ export type Database = {
         Args: { _id: string; _kind: Database["public"]["Enums"]["entity_kind"] }
         Returns: boolean
       }
+      find_similar_businesses: {
+        Args: { _exclude_id?: string; _limit?: number; _name: string }
+        Returns: {
+          destination_name: string
+          display_name: string
+          id: string
+          score: number
+          slug: string
+        }[]
+      }
       founder_dashboard_kpis: { Args: never; Returns: Json }
       gen_random_uuid: { Args: never; Returns: string }
       gen_salt: { Args: { "": string }; Returns: string }
@@ -11331,6 +11341,16 @@ export type Database = {
           recipient_name: string
           views: number
           whatsapp: string
+        }[]
+      }
+      list_my_rejected_business_requests: {
+        Args: never
+        Returns: {
+          business_id: string
+          business_name: string
+          decided_at: string
+          kind: string
+          notes: string
         }[]
       }
       list_pending_business_requests: {

@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ExternalLink, FileText, Loader2, X } from "lucide-react";
 import {
+  findSimilarBusinesses,
   approveBusinessRegistration,
   approveOwnershipClaim,
   getVerificationDocumentSignedUrl,
@@ -188,6 +189,16 @@ function RequestCard({
             {row.requester_email && `(${row.requester_email})`}
           </p>
           {row.notes && <p className="mt-1 text-xs text-muted-foreground">Notas: {row.notes}</p>}
+          {row.kind === "registration" && (
+            <PossibleDuplicates
+              row={row}
+              onUseAsReason={(name) =>
+                setNotes(
+                  `Esta empresa ya existe en Valladolid.mx como «${name}». Reclámala desde «Ya existe mi negocio».`,
+                )
+              }
+            />
+          )}
           <p className="mt-1 text-[11px] text-muted-foreground">
             {new Date(row.created_at).toLocaleString("es-MX")}
           </p>
@@ -240,7 +251,7 @@ function RequestCard({
           placeholder={
             row.kind === "publication"
               ? "Notas para el anfitrión (obligatorio si devuelves)…"
-              : "Notas internas (opcional)…"
+              : "Motivo para el solicitante (lo verá si rechazas)…"
           }
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs"
         />
@@ -266,5 +277,44 @@ function RequestCard({
         </div>
       </div>
     </li>
+  );
+}
+
+function PossibleDuplicates({
+  row,
+  onUseAsReason,
+}: {
+  row: PendingRequestRow;
+  onUseAsReason: (name: string) => void;
+}) {
+  const find = useServerFn(findSimilarBusinesses);
+  const q = useQuery({
+    queryKey: ["admin-similar", row.business_id, row.business_name],
+    queryFn: () => find({ data: { name: row.business_name, exclude_id: row.business_id } }),
+    staleTime: 60_000,
+  });
+  const rows = q.data ?? [];
+  if (rows.length === 0) return null;
+  return (
+    <div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3">
+      <p className="text-xs font-semibold text-foreground">Posibles repetidas</p>
+      <ul className="mt-1 space-y-1">
+        {rows.map((b) => (
+          <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span>
+              {b.display_name}
+              {b.destination_name ? ` · ${b.destination_name}` : ""}
+            </span>
+            <button
+              type="button"
+              onClick={() => onUseAsReason(b.display_name)}
+              className="rounded-full border border-border bg-background px-2 py-0.5 hover:bg-accent"
+            >
+              Usar como motivo de rechazo
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
