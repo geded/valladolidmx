@@ -731,3 +731,4 @@
 - [x] Comprobar la identidad que Google muestra al entrar: `quehacerenvalladolid.com`; no requiere un cambio de código y no implica ocultamiento técnico del alojamiento.
 - [ ] Aclarar qué elegir en «tipo de proyecto»: espera captura o lista de las opciones que ve el Founder; sitio publicado ya confirmado público, privacidad del proyecto independiente.
 - [x] Galería de empresas: primera foto ancha se recorta sin deformarse en iPhone (forma conservada); pendiente confirmar en iPhone real.
+- [ ] Probar reclamo de Copalli como empresario (espera al usuario)

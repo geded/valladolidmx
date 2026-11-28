@@ -63,6 +63,15 @@ function PortalLayout() {
     }
   }, [businesses, activeBusinessId]);
 
+  useEffect(() => {
+    const h = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      if (id) setActiveBusinessIdState(id);
+    };
+    window.addEventListener("portal:active-business-changed", h);
+    return () => window.removeEventListener("portal:active-business-changed", h);
+  }, []);
+
   const setActiveBusinessId = (id: string) => {
     const previous = activeBusinessId;
     setActiveBusinessIdState(id);

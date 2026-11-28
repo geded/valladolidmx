@@ -16,6 +16,9 @@ import { ProfileCompletenessMeter } from "@/components/portal/ProfileCompletenes
 import { listMyTableBookingShortcuts } from "@/lib/commerce/table-booking.functions";
 import { useNavigate } from "@tanstack/react-router";
 import { CalendarDays } from "lucide-react";
+import { useEffect, useState } from "react";
+
+const ACTIVE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/")({
   component: PortalIndex,
@@ -66,6 +69,19 @@ function PortalIndex() {
     window.dispatchEvent(new CustomEvent("portal:active-business-changed", { detail: businessId }));
     void navigate({ to: "/portal/reservaciones-mesa" });
   };
+  const [activeId, setActiveId] = useState<string | null>(null);
+  useEffect(() => {
+    setActiveId(window.localStorage.getItem(ACTIVE_KEY));
+    const h = (e: Event) => setActiveId((e as CustomEvent<string>).detail ?? null);
+    window.addEventListener("portal:active-business-changed", h);
+    return () => window.removeEventListener("portal:active-business-changed", h);
+  }, []);
+  const manage = (businessId: string) => {
+    window.localStorage.setItem(ACTIVE_KEY, businessId);
+    window.dispatchEvent(new CustomEvent("portal:active-business-changed", { detail: businessId }));
+    setActiveId(businessId);
+    void navigate({ to: "/portal/ficha" });
+  };
   const nameBy = new Map(businesses.map((b) => [b.business_id, b.display_name]));
 
   return (
@@ -109,7 +125,7 @@ function PortalIndex() {
         </h2>
         <ul className="mt-3 grid gap-3">
           {businesses.map((b) => (
-            <li key={b.business_id} className="rounded-lg border border-border bg-card p-4">
+            <li key={b.business_id} className={`rounded-lg border bg-card p-4 ${activeId === b.business_id ? "border-primary ring-1 ring-primary/40" : "border-border"}`}>
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="font-semibold">{b.display_name}</p>
@@ -119,6 +135,20 @@ function PortalIndex() {
                   <p>{b.role}</p>
                   <p>{b.status}</p>
                 </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                {activeId === b.business_id ? (
+                  <span className="text-xs font-medium text-primary">Estás administrando esta empresa</span>
+                ) : (
+                  <span />
+                )}
+                <button
+                  type="button"
+                  onClick={() => manage(b.business_id)}
+                  className="min-h-[40px] rounded-pill bg-primary px-4 text-sm font-medium text-primary-foreground"
+                >
+                  Administrar esta →
+                </button>
               </div>
               {completenessBy.get(b.business_id) && (
                 <ProfileCompletenessMeter
