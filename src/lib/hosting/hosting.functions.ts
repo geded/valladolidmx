@@ -569,3 +569,96 @@ export const listMyRejectedBusinessRequests = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return ((data as any[]) ?? []) as RejectedBusinessRequest[];
   });
+
+/* ── Directorio de anfitriones (admin) ─────────────────────────── */
+
+export interface HostDirectoryRow {
+  user_id: string;
+  name: string | null;
+  email: string | null;
+  businesses: {
+    membership_id: string;
+    business_id: string;
+    display_name: string;
+    slug: string;
+    business_status: string;
+    role: string;
+    status: string;
+  }[];
+}
+
+export const listHostDirectory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<HostDirectoryRow[]> => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("is_admin", { _user_id: userId } as never);
+    if (!isAdmin) throw new Error("Solo administradores.");
+    const { data: members, error } = await supabase
+      .from("business_users")
+      .select("id, user_id, business_id, role, status")
+      .in("status", ["active", "pending", "suspended"])
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) throw new Error(error.message);
+    const rows = (members ?? []) as any[];
+    const bizIds = [...new Set(rows.map((r) => r.business_id))];
+    const userIds = [...new Set(rows.map((r) => r.user_id))];
+    const [{ data: biz }, { data: profiles }] = await Promise.all([
+      bizIds.length
+        ? supabase.from("businesses").select("id, display_name, slug, status").in("id", bizIds)
+        : Promise.resolve({ data: [] as any[] }),
+      userIds.length
+        ? supabase
+            .from("profiles")
+            .select("user_id, display_name, first_name, last_name, email")
+            .in("user_id", userIds)
+        : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const bizBy = new Map(((biz as any[]) ?? []).map((b) => [b.id, b]));
+    const profBy = new Map(((profiles as any[]) ?? []).map((p) => [p.user_id, p]));
+    const byUser = new Map<string, HostDirectoryRow>();
+    for (const m of rows) {
+      const b = bizBy.get(m.business_id);
+      if (!b) continue;
+      let host = byUser.get(m.user_id);
+      if (!host) {
+        const p = profBy.get(m.user_id);
+        host = {
+          user_id: m.user_id,
+          name:
+            p?.display_name ||
+            [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim() ||
+            null,
+          email: p?.email ?? null,
+          businesses: [],
+        };
+        byUser.set(m.user_id, host);
+      }
+      host.businesses.push({
+        membership_id: m.id,
+        business_id: m.business_id,
+        display_name: b.display_name,
+        slug: b.slug,
+        business_status: b.status,
+        role: m.role,
+        status: m.status,
+      });
+    }
+    return [...byUser.values()].sort((a, b) =>
+      (a.name ?? a.email ?? "").localeCompare(b.name ?? b.email ?? "", "es"),
+    );
+  });
+
+export const adminRemoveHostMembership = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { membership_id: string }) => ({
+    membership_id: z.string().uuid().parse(data?.membership_id),
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("is_admin", { _user_id: userId } as never);
+    if (!isAdmin) throw new Error("Solo administradores.");
+    const { error } = await supabase.from("business_users").delete().eq("id", data.membership_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

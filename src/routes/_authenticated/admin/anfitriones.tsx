@@ -6,12 +6,14 @@
  * ProfileModeSwitcher del reclamante.
  */
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ExternalLink, FileText, Loader2, X } from "lucide-react";
 import {
   findSimilarBusinesses,
+  listHostDirectory,
+  adminRemoveHostMembership,
   approveBusinessRegistration,
   approveOwnershipClaim,
   getVerificationDocumentSignedUrl,
@@ -37,7 +39,7 @@ function AdminHostingInbox() {
   const approveReg = useServerFn(approveBusinessRegistration);
   const decidePub = useServerFn(publishBusiness);
   const signedUrl = useServerFn(getVerificationDocumentSignedUrl);
-  const [tab, setTab] = useState<"identity" | "publication" | "claim">("identity");
+  const [tab, setTab] = useState<"identity" | "publication" | "claim" | "hosts">("identity");
 
   const q = useQuery({
     queryKey: ["admin-hosting-inbox"],
@@ -72,7 +74,7 @@ function AdminHostingInbox() {
     };
   }, [q.data]);
 
-  const visible = buckets[tab];
+  const visible = tab === "hosts" ? [] : buckets[tab];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -87,7 +89,7 @@ function AdminHostingInbox() {
         </p>
       </header>
 
-      <div className="mb-6 inline-flex rounded-full border border-border bg-card p-1">
+      <div className="mb-6 inline-flex flex-wrap rounded-full border border-border bg-card p-1">
         <TabBtn active={tab === "identity"} onClick={() => setTab("identity")}>
           Identidad ({buckets.identity.length})
         </TabBtn>
@@ -97,6 +99,9 @@ function AdminHostingInbox() {
         <TabBtn active={tab === "claim"} onClick={() => setTab("claim")}>
           Reclamos ({buckets.claim.length})
         </TabBtn>
+        <TabBtn active={tab === "hosts"} onClick={() => setTab("hosts")}>
+          Anfitriones
+        </TabBtn>
       </div>
 
       {q.isLoading && (
@@ -105,7 +110,8 @@ function AdminHostingInbox() {
         </p>
       )}
       {q.error instanceof Error && <p className="text-sm text-destructive">{q.error.message}</p>}
-      {q.data && visible.length === 0 && (
+      {tab === "hosts" && <HostDirectory />}
+      {tab !== "hosts" && q.data && visible.length === 0 && (
         <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           No hay solicitudes en esta bandeja.
         </p>
@@ -316,5 +322,110 @@ function PossibleDuplicates({
         ))}
       </ul>
     </div>
+  );
+}
+
+const ROLE_LABEL: Record<string, string> = {
+  owner: "Dueño",
+  manager: "Gerente",
+  editor: "Editor",
+  viewer: "Solo lectura",
+};
+const STATUS_LABEL: Record<string, string> = {
+  active: "Activo",
+  pending: "Por aprobar",
+  suspended: "Suspendido",
+};
+
+function HostDirectory() {
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+  const list = useServerFn(listHostDirectory);
+  const remove = useServerFn(adminRemoveHostMembership);
+  const [search, setSearch] = useState("");
+  const q = useQuery({ queryKey: ["admin-host-directory"], queryFn: () => list() });
+  const removeM = useMutation({
+    mutationFn: (membership_id: string) => remove({ data: { membership_id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-host-directory"] }),
+  });
+  const openPortal = (businessId: string) => {
+    window.localStorage.setItem("valladolidmx.portal.activeBusinessId", businessId);
+    window.dispatchEvent(new CustomEvent("portal:active-business-changed", { detail: businessId }));
+    void navigate({ to: "/portal" });
+  };
+  const term = search.trim().toLowerCase();
+  const rows = (q.data ?? []).filter(
+    (h) =>
+      !term ||
+      (h.name ?? "").toLowerCase().includes(term) ||
+      (h.email ?? "").toLowerCase().includes(term) ||
+      h.businesses.some((b) => b.display_name.toLowerCase().includes(term)),
+  );
+  return (
+    <section>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Buscar por persona, correo o empresa…"
+        className="mb-4 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+      />
+      {q.isLoading && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-3 animate-spin" aria-hidden /> Cargando…
+        </p>
+      )}
+      {q.error instanceof Error && <p className="text-sm text-destructive">{q.error.message}</p>}
+      <p className="mb-3 text-xs text-muted-foreground">
+        {rows.length} anfitriones · {rows.reduce((n, h) => n + h.businesses.length, 0)} empresas
+        administradas
+      </p>
+      <ul className="space-y-3">
+        {rows.map((h) => (
+          <li key={h.user_id} className="rounded-2xl border border-border bg-card p-4">
+            <p className="font-medium text-foreground">{h.name ?? h.email ?? "Sin nombre"}</p>
+            {h.email && h.name ? <p className="text-xs text-muted-foreground">{h.email}</p> : null}
+            <ul className="mt-3 divide-y divide-border">
+              {h.businesses.map((b) => (
+                <li
+                  key={b.membership_id}
+                  className="flex flex-col gap-2 py-2 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{b.display_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {ROLE_LABEL[b.role] ?? b.role} · {STATUS_LABEL[b.status] ?? b.status}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openPortal(b.business_id)}
+                      className="min-h-[36px] rounded-full bg-primary px-3 text-xs font-medium text-primary-foreground"
+                    >
+                      Entrar a su Portal
+                    </button>
+                    <button
+                      type="button"
+                      disabled={removeM.isPending}
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `¿Quitar a ${h.name ?? h.email ?? "esta persona"} de ${b.display_name}? La página pública no se borra.`,
+                          )
+                        )
+                          removeM.mutate(b.membership_id);
+                      }}
+                      className="min-h-[36px] rounded-full border border-border px-3 text-xs text-muted-foreground hover:text-destructive"
+                    >
+                      Quitar acceso
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

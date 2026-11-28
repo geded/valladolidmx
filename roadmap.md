@@ -734,3 +734,4 @@
 - [ ] Probar reclamo de Copalli como empresario (espera al usuario)
 - [x] Botón «Dejar de administrar» en Portal
 - [x] Detección de empresas repetidas, motivo de rechazo y aviso al admin
+- [x] Directorio de anfitriones en Administración
