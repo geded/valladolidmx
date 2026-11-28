@@ -405,7 +405,18 @@ function ClaimBranch() {
     staleTime: 5 * 60_000,
   });
 
+  // Búsqueda en vivo: sólo consulta tras 2+ letras para no listar todo el catálogo.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setTerm(q.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [q]);
+  const canSearch = term.length >= 2;
+
   const results = useQuery({
+    enabled: canSearch,
     queryKey: ["hosting-search", term, destinationId, categoryId, page],
     queryFn: () =>
       search({
@@ -425,8 +436,8 @@ function ClaimBranch() {
   });
 
   const resetPage = () => setPage(1);
-  const rows = results.data?.rows ?? [];
-  const total = results.data?.total ?? 0;
+  const rows = canSearch ? (results.data?.rows ?? []) : [];
+  const total = canSearch ? (results.data?.total ?? 0) : 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
@@ -496,7 +507,9 @@ function ClaimBranch() {
 
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
         <span>
-          {total} {total === 1 ? "resultado" : "resultados"}
+          {canSearch
+            ? `${total} ${total === 1 ? "resultado" : "resultados"}`
+            : "Escribe al menos 2 letras del nombre de tu negocio para buscarlo."}
         </span>
         {(destinationId || categoryId || term) && (
           <button
