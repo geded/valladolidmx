@@ -20,6 +20,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 import { listMyBusinesses, type PortalBusinessSummary } from "@/lib/portal/portal-reads.functions";
+import { listMyTableBookingShortcuts } from "@/lib/commerce/table-booking.functions";
+import { contributeNavItem, removeNavItem } from "@/lib/workspace/navigation-registry";
+import { PORTAL_TABLE_BOOKING_NAV_ITEM } from "@/lib/workspace/definitions";
 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -46,6 +49,8 @@ export const Route = createFileRoute("/_authenticated/portal")({
 function PortalLayout() {
   const { user } = useAuth();
   const fetchBusinesses = useServerFn(listMyBusinesses);
+  const fetchTableShortcuts = useServerFn(listMyTableBookingShortcuts);
+  const [, setNavigationRevision] = useState(0);
   const queryClient = useQueryClient();
 
   const {
@@ -60,6 +65,26 @@ function PortalLayout() {
   });
 
   const [activeBusinessId, setActiveBusinessIdState] = useState<string | null>(null);
+  const { data: tableShortcuts = [] } = useQuery({
+    queryKey: ["portal", "table-booking-shortcuts", [activeBusinessId]],
+    queryFn: () => fetchTableShortcuts({ data: { businessIds: [activeBusinessId!] } }),
+    enabled: Boolean(user?.id && activeBusinessId),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
+  const tableBookingEnabled = Boolean(
+    activeBusinessId && tableShortcuts.some((item) => item.businessId === activeBusinessId),
+  );
+
+  // El Navigation Registry conserva una sola autoridad; la empresa activa
+  // decide si esta capacidad aparece en sidebar, barra inferior y paleta.
+  useEffect(() => {
+    if (tableBookingEnabled) contributeNavItem(PORTAL_TABLE_BOOKING_NAV_ITEM);
+    else removeNavItem(PORTAL_TABLE_BOOKING_NAV_ITEM.id);
+    setNavigationRevision((revision) => revision + 1);
+  }, [tableBookingEnabled]);
+
+  useEffect(() => () => removeNavItem(PORTAL_TABLE_BOOKING_NAV_ITEM.id), []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

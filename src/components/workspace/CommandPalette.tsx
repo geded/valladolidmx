@@ -26,7 +26,7 @@ export function CommandPalette() {
 
   const navItems = useMemo(
     () => (workspace ? getNavItemsForWorkspace(workspace.id, "palette") : []),
-    [workspace],
+    [workspace, paletteOpen],
   );
 
   const commands = workspace?.commands ?? [];

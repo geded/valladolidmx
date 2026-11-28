@@ -45,7 +45,7 @@ import { Ticket, QrCode, History, BarChart3 } from "lucide-react";
 import { ShoppingBag, CalendarDays } from "lucide-react";
 import { UserPlus, Timer, CarFront } from "lucide-react";
 
-import type { WorkspaceDefinition } from "../types";
+import type { NavItem, WorkspaceDefinition } from "../types";
 import { registerWorkspace } from "../workspace-registry";
 
 const founder: WorkspaceDefinition = {
@@ -268,6 +268,18 @@ const founder: WorkspaceDefinition = {
   },
 };
 
+/** Se registra sólo mientras la empresa activa tiene «Reservar mesa» encendido. */
+export const PORTAL_TABLE_BOOKING_NAV_ITEM: NavItem = {
+  id: "portal.reservaciones-mesa",
+  workspaceId: "portal",
+  label: "Reservaciones de mesa",
+  icon: CalendarDays,
+  to: "/portal/reservaciones-mesa",
+  group: "operacion",
+  order: 6.6,
+  surfaces: ["sidebar", "bottom", "palette"],
+};
+
 const portal: WorkspaceDefinition = {
   id: "portal",
   label: "Portal Empresarial",
@@ -368,16 +380,6 @@ const portal: WorkspaceDefinition = {
       group: "operacion",
       order: 6.55,
       surfaces: ["sidebar", "palette"],
-    },
-    {
-      id: "portal.reservaciones-mesa",
-      workspaceId: "portal",
-      label: "Reservaciones de mesa",
-      icon: CalendarDays,
-      to: "/portal/reservaciones-mesa",
-      group: "operacion",
-      order: 6.6,
-      surfaces: ["sidebar", "bottom", "palette"],
     },
     {
       id: "portal.pagos",
