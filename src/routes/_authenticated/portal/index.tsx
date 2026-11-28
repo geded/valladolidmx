@@ -19,6 +19,15 @@ import { listMyTableBookingShortcuts } from "@/lib/commerce/table-booking.functi
 import { useNavigate } from "@tanstack/react-router";
 import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
+import { portalStatusLabel } from "@/lib/portal/error-messages";
+
+const ROLE_LABEL: Record<string, string> = {
+  admin: "Administrador",
+  owner: "Dueño",
+  manager: "Gerente",
+  editor: "Editor",
+  viewer: "Lector",
+};
 
 const ACTIVE_KEY = "valladolidmx.portal.activeBusinessId";
 
@@ -47,8 +56,21 @@ function PortalIndex() {
     enabled: Boolean(user?.id),
     staleTime: 60_000,
   });
+  const [activeId, setActiveId] = useState<string | null>(null);
+  useEffect(() => {
+    setActiveId(window.localStorage.getItem(ACTIVE_KEY));
+    const h = (e: Event) => setActiveId((e as CustomEvent<string>).detail ?? null);
+    window.addEventListener("portal:active-business-changed", h);
+    return () => window.removeEventListener("portal:active-business-changed", h);
+  }, []);
+  // Un administrador recibe todas las empresas; el Resumen muestra sólo la
+  // empresa activa para verla como la ve su anfitrión.
+  const isAdminView = businesses.some((b) => b.role === "admin");
+  const visibleBusinesses = isAdminView
+    ? businesses.filter((b) => b.business_id === activeId)
+    : businesses;
   const fetchCompleteness = useServerFn(getMyBusinessesCompleteness);
-  const businessIds = businesses.map((b) => b.business_id);
+  const businessIds = visibleBusinesses.map((b) => b.business_id);
   const { data: completeness = [] } = useQuery({
     queryKey: ["portal", "profile-completeness", businessIds],
     queryFn: () => fetchCompleteness({ data: { businessIds } }),
@@ -71,13 +93,6 @@ function PortalIndex() {
     window.dispatchEvent(new CustomEvent("portal:active-business-changed", { detail: businessId }));
     void navigate({ to: "/portal/reservaciones-mesa" });
   };
-  const [activeId, setActiveId] = useState<string | null>(null);
-  useEffect(() => {
-    setActiveId(window.localStorage.getItem(ACTIVE_KEY));
-    const h = (e: Event) => setActiveId((e as CustomEvent<string>).detail ?? null);
-    window.addEventListener("portal:active-business-changed", h);
-    return () => window.removeEventListener("portal:active-business-changed", h);
-  }, []);
   const manage = (businessId: string) => {
     window.localStorage.setItem(ACTIVE_KEY, businessId);
     window.dispatchEvent(new CustomEvent("portal:active-business-changed", { detail: businessId }));
@@ -140,11 +155,24 @@ function PortalIndex() {
       )}
 
       <section className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Tus empresas ({businesses.length})
-        </h2>
+        {isAdminView ? (
+          <div className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm">
+            <p className="font-medium">Estás viendo esta empresa como administrador.</p>
+            <p className="mt-1 text-muted-foreground">
+              Así la ve su anfitrión. Para cambiar de empresa usa «Empresa activa» arriba o{" "}
+              <Link to="/portal/empresas" className="font-medium text-primary underline underline-offset-2">
+                ve la lista de todas las empresas
+              </Link>
+              .
+            </p>
+          </div>
+        ) : (
+          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Tus empresas ({businesses.length})
+          </h2>
+        )}
         <ul className="mt-3 grid gap-3">
-          {businesses.map((b) => (
+          {visibleBusinesses.map((b) => (
             <li key={b.business_id} className={`rounded-lg border bg-card p-4 ${activeId === b.business_id ? "border-primary ring-1 ring-primary/40" : "border-border"}`}>
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -152,8 +180,8 @@ function PortalIndex() {
                   <p className="mt-0.5 text-xs text-muted-foreground">/{b.slug}</p>
                 </div>
                 <div className="text-right text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                  <p>{b.role}</p>
-                  <p>{b.status}</p>
+                  <p>{ROLE_LABEL[b.role] ?? b.role}</p>
+                  <p>{portalStatusLabel(b.status)}</p>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between gap-3">
@@ -190,7 +218,7 @@ function PortalIndex() {
               )}
             </li>
           ))}
-          {businesses.length === 0 && (
+          {visibleBusinesses.length === 0 && !isAdminView && (
             <li className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
               No tienes empresas asignadas todavía.
             </li>
