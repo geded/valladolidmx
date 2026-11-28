@@ -267,7 +267,7 @@ export const listMyTableReservations = createServerFn({ method: "GET" })
 export const listMyTableBookingShortcuts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { businessIds: string[] }) =>
-    z.object({ businessIds: z.array(z.string().uuid()).max(50) }).parse(d),
+    z.object({ businessIds: z.array(z.string().uuid()).max(1000) }).parse(d),
   )
   .handler(async ({ data, context }) => {
     if (!data.businessIds.length) return [];
