@@ -18,6 +18,8 @@ import { bootstrapWorkspaceDefinitions } from "@/lib/workspace/definitions";
 import { getWorkspace, listWorkspaces } from "@/lib/workspace/workspace-registry";
 import type { WorkspaceDefinition } from "@/lib/workspace/types";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfileModeState } from "@/lib/profile-mode/use-profile-mode";
+import { workspaceAllowedInMode } from "@/lib/profile-mode/workspace-mode";
 
 export type SidebarState = "expanded" | "rail" | "hidden" | "floating";
 export type InspectorState = "docked" | "drawer" | "sheet" | "closed";
@@ -126,6 +128,7 @@ export function WorkspaceProvider({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const profileMode = useProfileModeState().data?.active;
   const value = useMemo<Ctx>(() => {
     const canAccessWorkspace = (workspace: WorkspaceDefinition) => {
       const requiredRoles = workspace.roles ?? [];
@@ -133,7 +136,11 @@ export function WorkspaceProvider({
       if (user && requiredRoles.includes("authenticated")) return true;
       return requiredRoles.some((role) => roles.includes(role as never));
     };
-    const accessibleWorkspaces = listWorkspaces().filter(canAccessWorkspace);
+    const accessibleWorkspaces = listWorkspaces().filter(
+      (w) =>
+        canAccessWorkspace(w) &&
+        (!profileMode || w.id === initialWorkspaceId || workspaceAllowedInMode(w.id, profileMode)),
+    );
     const ws =
       accessibleWorkspaces.find((w) => w.id === prefs.activeWorkspaceId) ??
       accessibleWorkspaces.find((w) => w.id === initialWorkspaceId) ??
@@ -159,7 +166,7 @@ export function WorkspaceProvider({
       paletteOpen,
       setPaletteOpen,
     };
-  }, [prefs, paletteOpen, roles, user, initialWorkspaceId]);
+  }, [prefs, paletteOpen, roles, user, initialWorkspaceId, profileMode]);
 
   return <WorkspaceCtx.Provider value={value}>{children}</WorkspaceCtx.Provider>;
 }

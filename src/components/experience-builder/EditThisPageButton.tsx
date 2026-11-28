@@ -16,6 +16,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Pencil } from "lucide-react";
+import { useOperatesAsStaff } from "@/lib/profile-mode/use-profile-mode";
 import { useAuth } from "@/hooks/useAuth";
 
 const EDITOR_ROLES = new Set(["super_admin", "admin", "editor"]);
@@ -28,13 +29,14 @@ function resolvePageSlug(pathname: string): string | null {
 
 export function EditThisPageButton({ pathname }: { pathname: string }) {
   const { roles, loading } = useAuth();
+  const asStaff = useOperatesAsStaff();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   if (!mounted || loading) return null;
 
-  const canEdit = roles.some((r) => EDITOR_ROLES.has(r));
+  const canEdit = asStaff && roles.some((r) => EDITOR_ROLES.has(r));
   if (!canEdit) return null;
 
   const pageSlug = resolvePageSlug(pathname);

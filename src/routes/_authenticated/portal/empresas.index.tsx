@@ -33,9 +33,6 @@ export const Route = createFileRoute("/_authenticated/portal/empresas/")({
 function BusinessesIndex() {
   const fetchBusinesses = useServerFn(listMyBusinesses);
   const { roles } = useAuth();
-  const canCreateBusiness = roles.some(
-    (r) => r === "admin" || r === "super_admin" || r === "editor",
-  );
   // 3J.4 · El detalle comercial por empresa es una vista administrativa
   // (`getAdminBusinessCommercialStatus` exige admin/super_admin). Mostrar el
   // enlace a un propietario producía un callejón sin salida con "forbidden".
@@ -83,14 +80,14 @@ function BusinessesIndex() {
             sus órdenes y pagos.
           </p>
         </div>
-        {canCreateBusiness ? (
+        {(
           <Link
-            to="/cms/empresas/nueva"
+            to="/cuenta/anfitrion"
             className="inline-flex items-center justify-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-95"
           >
-            + Registrar nueva empresa
+            + Reclamar o registrar otra empresa
           </Link>
-        ) : null}
+        )}
       </header>
 
       <div>

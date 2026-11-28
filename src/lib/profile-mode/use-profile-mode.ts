@@ -17,7 +17,7 @@ import {
   type ProfileMode,
   type ProfileModeState,
 } from "./mode.functions";
-import { effectiveMode, hidesTravelerSurfaces } from "./workspace-mode";
+import { effectiveMode, hidesTravelerSurfaces, showsStaffTools } from "./workspace-mode";
 
 export const PROFILE_MODE_QUERY_KEY = ["profile-mode-state"] as const;
 
@@ -65,4 +65,10 @@ export function useProfileModeState(): {
 export function useHidesTravelerSurfaces(): boolean {
   const { data } = useProfileModeState();
   return Boolean(data && hidesTravelerSurfaces(data.active));
+}
+
+/** true sólo cuando la persona opera como Staff (botones de edición, accesos internos). */
+export function useOperatesAsStaff(): boolean {
+  const { data } = useProfileModeState();
+  return Boolean(data && showsStaffTools(data.active));
 }

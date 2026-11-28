@@ -55,3 +55,24 @@ export function effectiveMode(
 ): ProfileMode {
   return modeForPath(pathname, available) ?? stored;
 }
+
+/**
+ * Paneles que cada perfil puede ver en el selector y en ⌘K. Un perfil no
+ * ofrece los paneles de otro: Empresa sólo ve su Portal, Viajero su cuenta,
+ * Staff los paneles internos. Se cambia de perfil desde el menú de la foto.
+ */
+const MODE_WORKSPACES: Record<ProfileMode, readonly string[]> = {
+  traveler: ["cuenta"],
+  business: ["portal"],
+  concierge: ["concierge"],
+  staff: ["founder", "cms", "concierge"],
+};
+
+export function workspaceAllowedInMode(workspaceId: string, mode: ProfileMode): boolean {
+  return MODE_WORKSPACES[mode].includes(workspaceId);
+}
+
+/** Herramientas de edición/administración sólo se muestran operando como Staff. */
+export function showsStaffTools(mode: ProfileMode): boolean {
+  return mode === "staff";
+}

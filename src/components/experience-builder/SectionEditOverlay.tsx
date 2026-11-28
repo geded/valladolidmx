@@ -12,6 +12,7 @@
  * devuelve el contenido tal cual, sin markup extra.
  */
 import { Suspense, lazy, useEffect, useState, type ReactNode } from "react";
+import { useOperatesAsStaff } from "@/lib/profile-mode/use-profile-mode";
 import { useAuth } from "@/hooks/useAuth";
 import type { CompositionNode } from "@/lib/experience-builder/composition-tree";
 
@@ -28,10 +29,11 @@ const EDITOR_ROLES = new Set(["super_admin", "admin", "editor"]);
 
 export function useEditorMode(): boolean {
   const { roles, loading } = useAuth();
+  const asStaff = useOperatesAsStaff();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted || loading) return false;
-  return roles.some((r) => EDITOR_ROLES.has(r));
+  return asStaff && roles.some((r) => EDITOR_ROLES.has(r));
 }
 
 interface WrapArgs {
