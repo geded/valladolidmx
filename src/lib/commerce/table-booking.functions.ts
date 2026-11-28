@@ -262,3 +262,40 @@ export const listMyTableReservations = createServerFn({ method: "GET" })
       restaurant: names.get(r.business_id) ?? "Restaurante",
     }));
   });
+
+/** Portal Resumen: empresas con «Reservar mesa» activado y sus mesas de hoy. */
+export const listMyTableBookingShortcuts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessIds: string[] }) =>
+    z.object({ businessIds: z.array(z.string().uuid()).max(50) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    if (!data.businessIds.length) return [];
+    const sb = context.supabase as unknown as Loose;
+    const { data: sales } = await sb
+      .from("business_online_sales")
+      .select("business_id, enabled, modes")
+      .in("business_id", data.businessIds);
+    const ids = ((sales ?? []) as Array<{ business_id: string; enabled: boolean; modes: string[] | null }>)
+      .filter((s) => s.enabled && (s.modes ?? []).includes("mesas"))
+      .map((s) => s.business_id);
+    if (!ids.length) return [];
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Merida" }).format(new Date());
+    const dayStart = new Date(`${today}T00:00:00-06:00`).toISOString();
+    const dayEnd = new Date(new Date(dayStart).getTime() + 86_400_000).toISOString();
+    const { data: rows } = await sb
+      .from("restaurant_reservations")
+      .select("business_id, status")
+      .in("business_id", ids)
+      .gte("starts_at", dayStart)
+      .lt("starts_at", dayEnd)
+      .in("status", ["pendiente", "confirmada"]);
+    const today_ = new Map<string, { total: number; pending: number }>();
+    for (const r of (rows ?? []) as Array<{ business_id: string; status: string }>) {
+      const c = today_.get(r.business_id) ?? { total: 0, pending: 0 };
+      c.total += 1;
+      if (r.status === "pendiente") c.pending += 1;
+      today_.set(r.business_id, c);
+    }
+    return ids.map((id) => ({ businessId: id, today: today_.get(id)?.total ?? 0, pending: today_.get(id)?.pending ?? 0 }));
+  });
