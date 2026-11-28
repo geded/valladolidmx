@@ -223,10 +223,13 @@ function FichaPage() {
         </p>
       )}
 
-      <section className="rounded-lg border border-border bg-card p-5">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Contenido editorial
-        </h2>
+      <details className="group rounded-lg border border-border bg-card p-5">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2">
+          <span className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Nombre y descripción
+          </span>
+          <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-180">▾</span>
+        </summary>
         <div className="mt-4 grid gap-4">
           <Field
             label="Nombre comercial"
@@ -308,7 +311,7 @@ function FichaPage() {
           La aprobación y publicación las realiza el equipo editorial desde el CMS. Los campos slug,
           destino, categorías, verificación y fecha de publicación están reservados.
         </p>
-      </section>
+      </details>
 
       {businessId ? <BusinessAttributesPanel businessId={businessId} /> : null}
       {businessId ? <BusinessMenuPanel businessId={businessId} /> : null}
@@ -397,10 +400,13 @@ function Badge({ children, tone }: { children: React.ReactNode; tone: "ok" | "wa
 
 function AuditSection({ loading, entries }: { loading: boolean; entries: BusinessAuditEntry[] }) {
   return (
-    <section className="rounded-lg border border-border bg-card p-5">
-      <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        Historial editorial
-      </h2>
+    <details className="group rounded-lg border border-border bg-card p-5">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2">
+        <span className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Historial editorial
+        </span>
+        <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-180">▾</span>
+      </summary>
       {loading && <p className="mt-3 text-xs text-muted-foreground">Cargando historial…</p>}
       {!loading && entries.length === 0 && (
         <p className="mt-3 text-xs text-muted-foreground">Aún no hay transiciones registradas.</p>
@@ -422,7 +428,7 @@ function AuditSection({ loading, entries }: { loading: boolean; entries: Busines
           ))}
         </ul>
       )}
-    </section>
+    </details>
   );
 }
 

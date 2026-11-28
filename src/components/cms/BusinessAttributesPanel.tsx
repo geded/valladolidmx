@@ -163,19 +163,24 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
             }
             const chosen = Array.isArray(selected) ? selected : [];
             return (
-              <fieldset key={definition.key} className="rounded-lg border border-border p-4">
-                <legend className="px-1 text-sm font-semibold">
-                  {definition.label}
-                  {definition.id ? (
-                    <button
-                      type="button"
-                      onClick={() => setQuickCreateFor(definition)}
-                      className="ml-2 text-xs font-semibold text-primary hover:underline"
-                    >
-                      + Agregar
-                    </button>
-                  ) : null}
-                </legend>
+              <details key={definition.key} className="group rounded-lg border border-border p-4">
+                <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold">
+                  <span>{definition.label}</span>
+                  <span className="flex items-center gap-2 text-xs font-normal text-muted-foreground">
+                    {chosen.length ? `${chosen.length} elegidas` : "Sin elegir"}
+                    <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
+                  </span>
+                </summary>
+                <div className="mt-3">
+                {definition.id ? (
+                  <button
+                    type="button"
+                    onClick={() => setQuickCreateFor(definition)}
+                    className="mb-2 text-xs font-semibold text-primary hover:underline"
+                  >
+                    + Agregar opción
+                  </button>
+                ) : null}
                 {definition.helpText ? (
                   <p className="mb-3 text-xs text-muted-foreground">{definition.helpText}</p>
                 ) : null}
@@ -206,7 +211,8 @@ export function BusinessAttributesPanel({ businessId }: { businessId: string }) 
                     </label>
                   ))}
                 </div>
-              </fieldset>
+              </div>
+              </details>
             );
           })}
       </div>

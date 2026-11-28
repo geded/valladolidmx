@@ -261,10 +261,21 @@ export function BusinessMenuPanel({ businessId }: { businessId: string }) {
           Todavía no hay carta. Sube una foto o agrégala a mano.
         </p>
       ) : (
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-3">
           {groups.map((group) => (
-            <div key={group.section} className="rounded-lg border border-border p-4">
-              <div className="flex flex-wrap items-center gap-2">
+            <details
+              key={group.section}
+              open={Boolean(needle) || group.items.some((r) => r.fresh)}
+              className="group rounded-lg border border-border p-4"
+            >
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2">
+                <span className="font-semibold">{group.section}</span>
+                <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {group.items.length} {group.items.length === 1 ? "opción" : "opciones"}
+                  <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
+                </span>
+              </summary>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 <label className="flex-1 min-w-[12rem]">
                   <span className="text-xs font-medium text-muted-foreground">Sección</span>
                   <Input
@@ -275,9 +286,6 @@ export function BusinessMenuPanel({ businessId }: { businessId: string }) {
                     }}
                   />
                 </label>
-                <span className="mt-4 text-xs text-muted-foreground">
-                  {group.items.length} {group.items.length === 1 ? "opción" : "opciones"}
-                </span>
               </div>
               <ul className="mt-3 divide-y divide-border">
                 {group.items.map((row) => (
@@ -298,7 +306,7 @@ export function BusinessMenuPanel({ businessId }: { businessId: string }) {
               >
                 + Agregar en «{group.section}»
               </Button>
-            </div>
+            </details>
           ))}
         </div>
       )}
