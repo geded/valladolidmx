@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronLeft, ChevronRight, Phone, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Phone, Plus, Settings2, Trash2 } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -86,7 +86,10 @@ function TableReservationsPage() {
     <div className="mx-auto max-w-3xl space-y-4 p-4 sm:p-6">
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Reservaciones de mesa</p>
-        <h1 className="mt-1 text-2xl">Agenda del restaurante</h1>
+        <h1 className="mt-1 text-2xl">Operación del restaurante</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Atiende las reservaciones de hoy o configura horarios, mesas, zonas, caja y políticas.
+        </p>
         {!d.activated ? (
           <p className="mt-2 rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
             Aún no está activado «Reservar mesa» en tu página. Puedes dejar listos tus horarios y mesas; el equipo de
@@ -94,21 +97,26 @@ function TableReservationsPage() {
           </p>
         ) : !d.configured ? (
           <p className="mt-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-            Ya está activado. Configura tus mesas y horarios en «Ajustes» para que aparezca en tu página.
+            Ya está activado. Configura tus mesas y horarios en «Configuración» para que aparezca en tu página.
           </p>
         ) : null}
       </header>
 
-      <div className="flex flex-wrap gap-2">
-        {(["agenda", "plano", "espera", "reportes"] as const).map((k) => (
+      <nav className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap" aria-label="Secciones de reservaciones">
+        <Button size="sm" variant={tab === "agenda" ? "default" : "outline"} className="rounded-pill" onClick={() => setTab("agenda")}>
+          <CalendarDays className="size-4" />Agenda de hoy
+        </Button>
+        {d.canManage ? (
+          <Button size="sm" variant={tab === "ajustes" ? "default" : "outline"} className="rounded-pill" onClick={() => setTab("ajustes")}>
+            <Settings2 className="size-4" />Configuración
+          </Button>
+        ) : null}
+        {(["plano", "espera", "reportes"] as const).map((k) => (
           <Button key={k} size="sm" variant={tab === k ? "default" : "outline"} className="rounded-pill" onClick={() => setTab(k)}>
-            {{ agenda: "Agenda", plano: "Plano", espera: "Espera", reportes: "Reportes" }[k]}
+            {{ plano: "Plano y zonas", espera: "Lista de espera", reportes: "Reportes" }[k]}
           </Button>
         ))}
-        {d.canManage ? (
-          <Button size="sm" variant={tab === "ajustes" ? "default" : "outline"} className="rounded-pill" onClick={() => setTab("ajustes")}>Ajustes</Button>
-        ) : null}
-      </div>
+      </nav>
 
       {tab === "agenda" ? (
         <Agenda businessId={businessId} date={date} setDate={setDate} data={d} />
@@ -119,10 +127,10 @@ function TableReservationsPage() {
       ) : tab === "reportes" ? (
         <TableReportsView businessId={businessId} />
       ) : (
-        <><ShareTableBookingCard businessId={businessId} />
+        <><SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
         <CashierPinCard businessId={businessId} />
-        <SettingsForm businessId={businessId} initial={d.settings as TableBookingSettings} />
-        <PoliciesForm businessId={businessId} /></>
+        <PoliciesForm businessId={businessId} />
+        <ShareTableBookingCard businessId={businessId} /></>
       )}
     </div>
   );

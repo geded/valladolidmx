@@ -377,7 +377,7 @@ const portal: WorkspaceDefinition = {
       to: "/portal/reservaciones-mesa",
       group: "operacion",
       order: 6.6,
-      surfaces: ["sidebar", "palette"],
+      surfaces: ["sidebar", "bottom", "palette"],
     },
     {
       id: "portal.pagos",
