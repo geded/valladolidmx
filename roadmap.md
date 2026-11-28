@@ -732,3 +732,4 @@
 - [ ] Aclarar qué elegir en «tipo de proyecto»: espera captura o lista de las opciones que ve el Founder; sitio publicado ya confirmado público, privacidad del proyecto independiente.
 - [x] Galería de empresas: primera foto ancha se recorta sin deformarse en iPhone (forma conservada); pendiente confirmar en iPhone real.
 - [ ] Probar reclamo de Copalli como empresario (espera al usuario)
+- [x] Botón «Dejar de administrar» en Portal

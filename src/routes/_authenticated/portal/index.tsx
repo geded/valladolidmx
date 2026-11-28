@@ -6,7 +6,9 @@
  * se habilitarán en etapas siguientes (Plan 14.30 §4).
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
@@ -82,6 +84,24 @@ function PortalIndex() {
     setActiveId(businessId);
     void navigate({ to: "/portal/ficha" });
   };
+  const queryClient = useQueryClient();
+  const leave = async (businessId: string, name: string) => {
+    if (!user?.id) return;
+    if (!window.confirm(`¿Dejar de administrar ${name}? Su página pública no se borra.`)) return;
+    const { error } = await supabase
+      .from("business_users")
+      .delete()
+      .eq("business_id", businessId)
+      .eq("user_id", user.id);
+    if (error) {
+      toast.error("No se pudo quitar la empresa. Intenta de nuevo.");
+      return;
+    }
+    if (activeId === businessId) window.localStorage.removeItem(ACTIVE_KEY);
+    toast.success(`${name} ya no está en tu cuenta.`);
+    await queryClient.invalidateQueries({ queryKey: ["portal"] });
+    window.location.reload();
+  };
   const nameBy = new Map(businesses.map((b) => [b.business_id, b.display_name]));
 
   return (
@@ -150,6 +170,15 @@ function PortalIndex() {
                   Administrar esta →
                 </button>
               </div>
+              {b.role === "owner" && (
+                <button
+                  type="button"
+                  onClick={() => void leave(b.business_id, b.display_name)}
+                  className="mt-2 text-xs text-muted-foreground underline underline-offset-2 hover:text-destructive"
+                >
+                  Dejar de administrar
+                </button>
+              )}
               {completenessBy.get(b.business_id) && (
                 <ProfileCompletenessMeter
                   businessId={b.business_id}
