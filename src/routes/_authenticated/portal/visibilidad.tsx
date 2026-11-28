@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/visibilidad — Ola 7 · Sub-ola 7.2.a
  *
@@ -42,6 +43,22 @@ import { BusinessVisibilityPerformancePanel } from "@/components/portal/Business
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/visibilidad")({
+  head: () => ({
+    meta: [
+      { title: "Visibilidad · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra visibilidad de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Visibilidad · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra visibilidad de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: VisibilityPage,
 });
 
@@ -131,7 +148,7 @@ function VisibilityPage() {
     },
     onError: (e) => {
       toast.error("No pudimos registrar la solicitud", {
-        description: e instanceof Error ? e.message : "Intenta nuevamente.",
+        description: portalErrorMessage(e),
       });
     },
   });

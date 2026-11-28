@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/pagos — vista administrativa por empresa para pagos y visibilidad.
  */
@@ -15,6 +16,22 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/pagos")({
+  head: () => ({
+    meta: [
+      { title: "Pagos · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra pagos de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Pagos · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra pagos de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: PortalPaymentsPage,
 });
 
@@ -87,7 +104,7 @@ function PortalPaymentsPage() {
     return (
       <EmptyState
         title="No pudimos cargar pagos y visibilidad"
-        body={statusQuery.error instanceof Error ? statusQuery.error.message : "Error desconocido."}
+        body={portalErrorMessage(statusQuery.error)}
       />
     );
   }

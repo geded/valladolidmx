@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/catalogo — Productos y Promociones (Ola 3 · Etapa 6).
  */
@@ -42,6 +43,22 @@ const PRODUCT_TYPES: ProductType[] = [
 ];
 
 export const Route = createFileRoute("/_authenticated/portal/catalogo")({
+  head: () => ({
+    meta: [
+      { title: "Catálogo · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra catálogo de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Catálogo · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra catálogo de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: CatalogoPage,
 });
 
@@ -192,7 +209,7 @@ function ProductsPanel({ businessId }: { businessId: string }) {
       refresh();
     },
     onError: (e) => {
-      const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
+      const msg = toPlanLimitMessage(e, portalErrorMessage(e));
       setStatus(msg);
       toast.error(msg);
     },
@@ -286,11 +303,7 @@ function ProductsPanel({ businessId }: { businessId: string }) {
       )}
 
       {isLoading && <p className="text-sm text-muted-foreground">Cargando productos…</p>}
-      {error && (
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "Error desconocido"}
-        </p>
-      )}
+      {error && <p className="text-sm text-destructive">{portalErrorMessage(error)}</p>}
 
       {!isLoading && !items.length && (
         <p className="text-sm text-muted-foreground">
@@ -352,7 +365,7 @@ function ProductRow({
     try {
       await fn();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Error");
+      setErr(portalErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -514,7 +527,7 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
       refresh();
     },
     onError: (e) => {
-      const msg = toPlanLimitMessage(e, e instanceof Error ? e.message : "Error al crear");
+      const msg = toPlanLimitMessage(e, portalErrorMessage(e));
       setStatus(msg);
       toast.error(msg);
     },
@@ -605,11 +618,7 @@ function PromotionsPanel({ businessId }: { businessId: string }) {
       )}
 
       {isLoading && <p className="text-sm text-muted-foreground">Cargando promociones…</p>}
-      {error && (
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "Error desconocido"}
-        </p>
-      )}
+      {error && <p className="text-sm text-destructive">{portalErrorMessage(error)}</p>}
       {!isLoading && !items.length && (
         <p className="text-sm text-muted-foreground">Aún no hay promociones registradas.</p>
       )}
@@ -659,7 +668,7 @@ function PromotionRow({
     try {
       await fn();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Error");
+      setErr(portalErrorMessage(e));
     } finally {
       setBusy(false);
     }

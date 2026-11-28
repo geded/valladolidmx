@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * StoreProductsPanel — productos de tienda de una empresa con venta en línea
  * (fase 2). Sólo Administración: alta en grupo desde foto/PDF de la lista de
@@ -60,7 +61,7 @@ export function StoreProductsPanel({ businessId }: { businessId: string }) {
       setSheet("");
       await qc.invalidateQueries({ queryKey });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(portalErrorMessage(e)),
   });
 
   function readSheet() {
@@ -211,7 +212,7 @@ function StoreProductLine({ product, onSaved }: { product: StoreProductRow; onSa
       toast.success("Producto actualizado");
       onSaved();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(portalErrorMessage(e)),
   });
   return (
     <li className="flex flex-wrap items-center gap-3 p-3">

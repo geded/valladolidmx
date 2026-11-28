@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/reservaciones-mesa — Agenda de mesas del restaurante (Etapas 1 y 2: agenda, plano, lista de espera, ficha y reportes).
  * Pensada para el teléfono: agenda del día con estados, alta por teléfono o
@@ -43,7 +44,7 @@ import { FloorPlanView, GuestProfileCard, TableReportsView, WaitlistView } from 
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/reservaciones-mesa")({
-  head: () => ({ meta: [{ title: "Reservaciones de mesa · Portal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Reservaciones de mesa · Portal Valladolid.mx" }, { name: "description", content: "Administra reservas, horarios y mesas de tu restaurante en Valladolid.mx." }, { property: "og:title", content: "Reservaciones de mesa · Portal Valladolid.mx" }, { property: "og:description", content: "Administra reservas, horarios y mesas de tu restaurante en Valladolid.mx." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: TableReservationsPage,
 });
 
@@ -257,7 +258,7 @@ function SettingsForm({ businessId, initial }: { businessId: string; initial: Ta
       await saveFn({ data: { businessId, settings: n.value } });
     },
     onSuccess: () => { toast.success("Ajustes guardados"); void qc.invalidateQueries({ queryKey: ["portal", "table-booking", businessId] }); },
-    onError: (e: Error) => toast.error(e.message.length < 90 ? e.message : tableBookingError(e.message)),
+    onError: (e: Error) => toast.error(portalErrorMessage(e)),
   });
   const num = (k: keyof TableBookingSettings) => (e: React.ChangeEvent<HTMLInputElement>) => setS({ ...s, [k]: Number(e.target.value) || 0 });
 

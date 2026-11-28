@@ -1,3 +1,4 @@
+import { portalErrorMessage, portalStatusLabel } from "@/lib/portal/error-messages";
 /**
  * /portal/invitaciones/$token — Aceptación de invitación por el
  * destinatario (Ola 3 · Etapa 2).
@@ -21,6 +22,22 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/invitaciones/$token")({
+  head: () => ({
+    meta: [
+      { title: "Aceptar invitación · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra aceptar invitación de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Aceptar invitación · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra aceptar invitación de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AcceptInvitationPage,
 });
 
@@ -52,8 +69,7 @@ function AcceptInvitationPage() {
       });
       void navigate({ to: "/portal" });
     },
-    onError: (err: unknown) =>
-      setErrorMessage(err instanceof Error ? err.message : "Error desconocido"),
+    onError: (err: unknown) => setErrorMessage(portalErrorMessage(err)),
   });
 
   const preview = previewQuery.data;
@@ -92,7 +108,7 @@ function AcceptInvitationPage() {
       {preview && preview.found && preview.status !== "pending" && (
         <Notice
           tone="warn"
-          title={`Esta invitación ya está ${preview.status}`}
+          title={`Invitación: ${portalStatusLabel(preview.status ?? "")}`}
           body="No puede volver a utilizarse. Pide al propietario una nueva invitación si lo necesitas."
         />
       )}

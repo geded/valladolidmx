@@ -11,6 +11,10 @@ import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Button } from "@/components/ui/button";
+import { portalErrorMessage } from "@/lib/portal/error-messages";
+import { locationEditorPatch } from "@/lib/portal/location-editor";
+import { toast } from "sonner";
 import {
   createBusinessContact,
   createBusinessHour,
@@ -24,6 +28,7 @@ import {
   listBusinessHours,
   listBusinessLocations,
   listBusinessSocialLinks,
+  updateBusinessLocation,
   type PortalContact,
   type PortalHour,
   type PortalLocation,
@@ -33,6 +38,23 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/presencia")({
+  head: () => ({
+    meta: [
+      { title: "Contactos y ubicaciones de tu empresa · Valladolid.mx" },
+      {
+        name: "description",
+        content:
+          "Administra las ubicaciones, contactos, horarios y redes sociales de tu empresa en Valladolid.mx.",
+      },
+      { property: "og:title", content: "Contactos y ubicaciones de tu empresa · Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra los datos de presencia de tu empresa desde el Portal empresarial.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: PresenciaPage,
 });
 
@@ -104,7 +126,7 @@ function PresenciaPage() {
       </nav>
 
       {tab === "contactos" && <ContactsPanel businessId={businessId} />}
-      {tab === "ubicaciones" && <LocationsPanel businessId={businessId} />}
+      {tab === "ubicaciones" && <LocationsPanel key={businessId} businessId={businessId} />}
       {tab === "horarios" && <HoursPanel businessId={businessId} />}
       {tab === "redes" && <SocialPanel businessId={businessId} />}
     </div>
@@ -133,7 +155,7 @@ function PanelHeader({ title, description }: { title: string; description: strin
 
 function ErrorBanner({ error }: { error: unknown }) {
   if (!error) return null;
-  const msg = error instanceof Error ? error.message : String(error);
+  const msg = portalErrorMessage(error);
   return (
     <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
       {msg}
@@ -312,6 +334,9 @@ function LocationsPanel({ businessId }: { businessId: string }) {
   const list = useServerFn(listBusinessLocations);
   const create = useServerFn(createBusinessLocation);
   const del = useServerFn(deleteBusinessLocation);
+  const update = useServerFn(updateBusinessLocation);
+  const [editing, setEditing] = useState<PortalLocation | null>(null);
+  const [formVersion, setFormVersion] = useState(0);
 
   const q = useQuery({
     queryKey: ["portal", businessId, "locations"],
@@ -328,7 +353,24 @@ function LocationsPanel({ businessId }: { businessId: string }) {
       longitude: number | null;
       is_primary: boolean;
     }) => create({ data: { businessId, ...data } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["portal", businessId, "locations"] }),
+    onSuccess: () => {
+      setFormVersion((v) => v + 1);
+      toast.success("Ubicación añadida");
+      return qc.invalidateQueries({ queryKey: ["portal", businessId, "locations"] });
+    },
+  });
+
+  const updateMut = useMutation({
+    mutationFn: (patch: ReturnType<typeof locationEditorPatch>) => {
+      if (!editing) throw new Error("empty_patch");
+      return update({ data: { businessId, id: editing.id, patch } });
+    },
+    onSuccess: () => {
+      setEditing(null);
+      setFormVersion((v) => v + 1);
+      toast.success("Ubicación actualizada");
+      return qc.invalidateQueries({ queryKey: ["portal", businessId, "locations"] });
+    },
   });
 
   const delMut = useMutation({
@@ -343,8 +385,18 @@ function LocationsPanel({ businessId }: { businessId: string }) {
         description="Direcciones físicas asociadas a esta empresa. Marca una como principal para que sea la predeterminada en la ficha pública."
       />
 
-      <LocationForm pending={createMut.isPending} onSubmit={(d) => createMut.mutate(d)} />
-      <ErrorBanner error={createMut.error} />
+      <LocationForm
+        key={`${editing?.id ?? "new"}-${formVersion}`}
+        initial={editing}
+        pending={createMut.isPending || updateMut.isPending}
+        onCancel={() => {
+          setEditing(null);
+          updateMut.reset();
+          createMut.reset();
+        }}
+        onSubmit={(d) => (editing ? updateMut.mutate(d) : createMut.mutate(d))}
+      />
+      <ErrorBanner error={editing ? updateMut.error : createMut.error} />
 
       {q.isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando…</p>
@@ -368,16 +420,35 @@ function LocationsPanel({ businessId }: { businessId: string }) {
                     </span>
                   )}
                 </p>
-                <button
-                  type="button"
-                  disabled={delMut.isPending}
-                  onClick={() => {
-                    if (confirm("¿Eliminar esta ubicación?")) delMut.mutate(l.id);
-                  }}
-                  className="rounded-md border border-border px-2 py-0.5 text-[11px] hover:bg-accent"
-                >
-                  Eliminar
-                </button>
+                <div className="flex shrink-0 flex-wrap gap-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={createMut.isPending || updateMut.isPending}
+                    onClick={() => {
+                      updateMut.reset();
+                      createMut.reset();
+                      setEditing(l);
+                      document
+                        .getElementById("location-form")
+                        ?.scrollIntoView({ block: "center", behavior: "smooth" });
+                    }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    disabled={delMut.isPending}
+                    onClick={() => {
+                      if (confirm("¿Eliminar esta ubicación?")) delMut.mutate(l.id);
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
               </div>
               <p className="text-muted-foreground">
                 {l.address_line1 ?? "—"}
@@ -401,7 +472,11 @@ function LocationsPanel({ businessId }: { businessId: string }) {
 function LocationForm({
   pending,
   onSubmit,
+  initial,
+  onCancel,
 }: {
+  initial: PortalLocation | null;
+  onCancel: () => void;
   pending: boolean;
   onSubmit: (d: {
     label: string | null;
@@ -413,71 +488,92 @@ function LocationForm({
     is_primary: boolean;
   }) => void;
 }) {
-  const [label, setLabel] = useState("");
-  const [a1, setA1] = useState("");
-  const [a2, setA2] = useState("");
-  const [cp, setCp] = useState("");
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
-  const [primary, setPrimary] = useState(false);
+  const [label, setLabel] = useState(initial?.label ?? "");
+  const [a1, setA1] = useState(initial?.address_line1 ?? "");
+  const [a2, setA2] = useState(initial?.address_line2 ?? "");
+  const [cp, setCp] = useState(initial?.postal_code ?? "");
+  const [lat, setLat] = useState(
+    initial?.latitude === null || initial?.latitude === undefined ? "" : String(initial.latitude),
+  );
+  const [lng, setLng] = useState(
+    initial?.longitude === null || initial?.longitude === undefined
+      ? ""
+      : String(initial.longitude),
+  );
+  const [primary, setPrimary] = useState(initial?.is_primary ?? false);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      label: label.trim() || null,
-      address_line1: a1.trim() || null,
-      address_line2: a2.trim() || null,
-      postal_code: cp.trim() || null,
-      latitude: lat.trim() === "" ? null : Number(lat),
-      longitude: lng.trim() === "" ? null : Number(lng),
-      is_primary: primary,
-    });
-    setLabel("");
-    setA1("");
-    setA2("");
-    setCp("");
-    setLat("");
-    setLng("");
-    setPrimary(false);
+    onSubmit(
+      locationEditorPatch({
+        label,
+        address: a1,
+        references: a2,
+        postalCode: cp,
+        latitude: lat,
+        longitude: lng,
+        primary,
+      }),
+    );
   };
 
   return (
     <form
+      id="location-form"
       onSubmit={submit}
       className="grid gap-3 rounded-md border border-border bg-card/40 p-4 sm:grid-cols-2"
     >
+      {initial && <p className="text-sm font-semibold sm:col-span-2">Editar ubicación</p>}
       <input
         value={label}
+        aria-label="Nombre de la ubicación"
+        maxLength={120}
         onChange={(e) => setLabel(e.target.value)}
-        placeholder="Etiqueta (Sucursal centro…)"
+        placeholder="Nombre de la ubicación (Sucursal centro…)"
         className="rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
       <input
         value={cp}
+        aria-label="Código postal"
+        maxLength={24}
         onChange={(e) => setCp(e.target.value)}
         placeholder="Código postal"
         className="rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
       <input
         value={a1}
+        aria-label="Dirección"
+        maxLength={240}
         onChange={(e) => setA1(e.target.value)}
         placeholder="Dirección línea 1"
         className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
       />
       <input
         value={a2}
+        aria-label="Referencias de la dirección"
+        maxLength={240}
         onChange={(e) => setA2(e.target.value)}
         placeholder="Dirección línea 2"
         className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
       />
       <input
         value={lat}
+        aria-label="Latitud"
+        type="number"
+        step="any"
+        min={-90}
+        max={90}
         onChange={(e) => setLat(e.target.value)}
         placeholder="Latitud (-90 a 90)"
         className="rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
       <input
         value={lng}
+        aria-label="Longitud"
+        type="number"
+        step="any"
+        min={-180}
+        max={180}
         onChange={(e) => setLng(e.target.value)}
         placeholder="Longitud (-180 a 180)"
         className="rounded-md border border-border bg-background px-3 py-2 text-sm"
@@ -486,13 +582,16 @@ function LocationForm({
         <input type="checkbox" checked={primary} onChange={(e) => setPrimary(e.target.checked)} />
         Marcar como ubicación principal
       </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-95 disabled:opacity-60 sm:justify-self-end"
-      >
-        Añadir ubicación
-      </button>
+      <div className="flex gap-2 sm:justify-self-end">
+        {initial && (
+          <Button type="button" variant="outline" disabled={pending} onClick={onCancel}>
+            Cancelar
+          </Button>
+        )}
+        <Button type="submit" disabled={pending}>
+          {pending ? "Guardando…" : initial ? "Guardar cambios" : "Añadir ubicación"}
+        </Button>
+      </div>
     </form>
   );
 }

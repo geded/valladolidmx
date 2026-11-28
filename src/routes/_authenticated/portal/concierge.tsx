@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * 14.60.3 — Portal Empresarial · bandeja Concierge.
  * El negocio responde cotizaciones sin acceso al expediente ni a la
@@ -22,7 +23,15 @@ export const Route = createFileRoute("/_authenticated/portal/concierge")({
   component: PortalConciergePage,
   head: () => ({
     meta: [
-      { title: "Concierge · Portal Empresarial" },
+      { title: "Cotizaciones · Portal Valladolid.mx" },
+      { name: "description", content: "Administra cotizaciones de tu empresa en Valladolid.mx." },
+      { property: "og:title", content: "Cotizaciones · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra cotizaciones de tu empresa en Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -89,9 +98,7 @@ function PortalConciergePage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando…</p>
       ) : error ? (
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "Error desconocido"}
-        </p>
+        <p className="text-sm text-destructive">{portalErrorMessage(error)}</p>
       ) : !data || data.length === 0 ? (
         <p className="rounded-md border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
           Sin cotizaciones en este estado.
@@ -158,7 +165,7 @@ function QuoteCard({
       onChanged();
       setOpen(false);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Error al enviar");
+      setErr(portalErrorMessage(e));
     } finally {
       setSubmitting(false);
     }
@@ -170,7 +177,7 @@ function QuoteCard({
       await withdraw({ data: { quoteId: quote.quote_id, reason: null } });
       onChanged();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Error al retirar");
+      setErr(portalErrorMessage(e));
     }
   };
 

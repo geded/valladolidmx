@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/galeria — Galería de empresa (Ola 3 · Etapa 5).
  *
@@ -42,6 +43,22 @@ const ROLE_HINTS: Record<PortalMediaRole, string> = {
 };
 
 export const Route = createFileRoute("/_authenticated/portal/galeria")({
+  head: () => ({
+    meta: [
+      { title: "Galería · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra galería de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Galería · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra galería de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: GaleriaPage,
 });
 
@@ -110,11 +127,7 @@ function GaleriaPage() {
       </header>
 
       {isLoading && <p className="text-sm text-muted-foreground">Cargando galería…</p>}
-      {error && (
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "Error desconocido"}
-        </p>
-      )}
+      {error && <p className="text-sm text-destructive">{portalErrorMessage(error)}</p>}
 
       <div className="grid gap-8">
         {(Object.keys(ROLE_LABELS) as PortalMediaRole[]).map((role) => (
@@ -200,7 +213,7 @@ function MediaSection({
       setStatus("Archivo cargado.");
       await refresh();
     } catch (err) {
-      const msg = toPlanLimitMessage(err, err instanceof Error ? err.message : "Error al subir");
+      const msg = toPlanLimitMessage(err, portalErrorMessage(err));
       setStatus(msg);
       toast.error(msg);
     } finally {

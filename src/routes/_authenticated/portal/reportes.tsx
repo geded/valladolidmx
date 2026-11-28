@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/reportes — Ola 7.7 · Reporte de presencia
  *
@@ -36,6 +37,22 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/reportes")({
+  head: () => ({
+    meta: [
+      { title: "Reportes · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra reportes de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Reportes · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra reportes de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: ReportsPage,
 });
 
@@ -107,7 +124,7 @@ function ReportsPage() {
 
       {businessId && q.error && (
         <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          {(q.error as Error).message}
+          {portalErrorMessage(q.error)}
         </div>
       )}
 

@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/invitaciones — Gestión de invitaciones de la empresa activa
  * (Ola 3 · Etapa 2). Sólo owners pueden crear/revocar; RLS de
@@ -19,6 +20,22 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/invitaciones/")({
+  head: () => ({
+    meta: [
+      { title: "Invitaciones y equipo · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra invitaciones y equipo de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Invitaciones y equipo · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra invitaciones y equipo de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: InvitationsPage,
 });
 
@@ -74,8 +91,7 @@ function InvitationsPage() {
         queryKey: ["portal", "invitations", activeBusinessId],
       });
     },
-    onError: (err: unknown) =>
-      setFormError(err instanceof Error ? err.message : "Error desconocido"),
+    onError: (err: unknown) => setFormError(portalErrorMessage(err)),
   });
 
   const revokeMutation = useMutation({

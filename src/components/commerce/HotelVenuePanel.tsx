@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * Restaurante del hotel · panel del Portal.
  *
@@ -48,7 +49,7 @@ export function HotelVenuePanel({ businessId }: { businessId: string }) {
       void queryClient.invalidateQueries({ queryKey: ["hotel-venue-links"] });
       void queryClient.invalidateQueries({ queryKey: ["hotel-venue-section"] });
     },
-    onError: (e) => setError(e instanceof Error ? e.message : "No se pudo crear el vínculo."),
+    onError: (e) => setError(portalErrorMessage(e)),
   });
 
   const remove = useMutation({
@@ -58,7 +59,7 @@ export function HotelVenuePanel({ businessId }: { businessId: string }) {
       void queryClient.invalidateQueries({ queryKey: ["hotel-venue-links"] });
       void queryClient.invalidateQueries({ queryKey: ["hotel-venue-section"] });
     },
-    onError: (e) => setError(e instanceof Error ? e.message : "No se pudo quitar el vínculo."),
+    onError: (e) => setError(portalErrorMessage(e)),
   });
 
   const venues = links.data?.venues ?? [];

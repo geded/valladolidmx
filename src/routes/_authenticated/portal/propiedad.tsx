@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /_authenticated/portal/propiedad — Etapa 6 · 14.40.6
  *
@@ -24,6 +25,24 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/propiedad")({
+  head: () => ({
+    meta: [
+      { title: "Propiedad y transferencias · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content:
+          "Administra propiedad y transferencias de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Propiedad y transferencias · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content:
+          "Administra propiedad y transferencias de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: PropiedadPage,
 });
 
@@ -93,7 +112,7 @@ function PropiedadPage() {
         queryKey: ["portal", "ownership", "outgoing", activeBusinessId],
       });
     },
-    onError: (e: unknown) => setFormError(e instanceof Error ? translateError(e.message) : "Error"),
+    onError: (e: unknown) => setFormError(portalErrorMessage(e)),
   });
 
   const cancelM = useMutation({
@@ -330,14 +349,4 @@ function StatusPill({ status }: { status: OwnershipTransfer["status"] }) {
       {label[status]}
     </span>
   );
-}
-
-function translateError(code: string): string {
-  if (code.includes("forbidden_only_current_owner"))
-    return "Solo el propietario actual puede iniciar una transferencia.";
-  if (code.includes("transfer_already_pending"))
-    return "Ya existe una solicitud pendiente para esta empresa.";
-  if (code.includes("recipient_not_found")) return "El usuario destinatario no existe.";
-  if (code.includes("invalid_recipient")) return "Destinatario inválido.";
-  return code;
 }

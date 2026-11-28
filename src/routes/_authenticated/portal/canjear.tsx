@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/canjear — Ola 2 · Panel de canje de cupones para el negocio.
  *
@@ -26,6 +27,22 @@ import { sendTransactionalEmail } from "@/lib/email/send";
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/canjear")({
+  head: () => ({
+    meta: [
+      { title: "Canjear cupón · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra canjear cupón de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Canjear cupón · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra canjear cupón de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: RedeemPage,
 });
 
@@ -74,7 +91,7 @@ function RedeemPage() {
       else if (r.reason === "already_redeemed") toast.warning("Este cupón ya fue canjeado.");
       else if (r.reason === "expired") toast.warning("Este cupón ya expiró.");
     } catch (e) {
-      toast.error((e as Error).message || "Error al buscar el cupón.");
+      toast.error(portalErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -125,7 +142,7 @@ function RedeemPage() {
       setCode("");
       setIdentityConfirmed(false);
     } catch (e) {
-      toast.error((e as Error).message || "Error al canjear.");
+      toast.error(portalErrorMessage(e));
     } finally {
       setBusy(false);
     }

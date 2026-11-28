@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/whatsapp — WhatsApp de la empresa con Alux (Fase 5, propuesta 19.48).
  *
@@ -292,7 +293,7 @@ function ConnectionPanel({ businessId, data }: { businessId: string; data: Summa
                 onClick={() =>
                   void run(async () => {
                     const r = await createFn({ data: { businessId } });
-                    if (!r.ok) toast.error(r.error);
+                    if (!r.ok) toast.error(portalErrorMessage(r.error));
                     else {
                       setQr(r.qr);
                       setCode(r.pairingCode);
@@ -313,7 +314,7 @@ function ConnectionPanel({ businessId, data }: { businessId: string; data: Summa
                 onClick={() =>
                   void run(async () => {
                     const r = await refreshFn({ data: { businessId, newQr: true } });
-                    if (!r.ok) toast.error(r.error);
+                    if (!r.ok) toast.error(portalErrorMessage(r.error));
                     else if (r.status === "connected") {
                       setStatus("connected");
                       setQr(null);
@@ -337,7 +338,7 @@ function ConnectionPanel({ businessId, data }: { businessId: string; data: Summa
                     void run(async () => {
                       const r = await refreshFn({ data: { businessId, newQr: false } });
                       if (r.ok) setStatus(r.status as BusinessWhatsAppLine["status"]);
-                      else toast.error(r.error);
+                      else toast.error(portalErrorMessage(r.error));
                     })
                   }
                 >
@@ -368,7 +369,7 @@ function ConnectionPanel({ businessId, data }: { businessId: string; data: Summa
                   void run(async () => {
                     const r = await disconnectFn({ data: { businessId } });
                     if (r.ok) setStatus("disconnected");
-                    else toast.error(r.error);
+                    else toast.error(portalErrorMessage(r.error));
                   });
                 }}
               >
@@ -459,7 +460,7 @@ function PresentationPanel({ businessId, data }: { businessId: string; data: Sum
       if (r.ok) {
         toast.success("Guardado. Alux lo usa desde el siguiente mensaje.");
         void qc.invalidateQueries({ queryKey: ["portal", businessId, "whatsapp", "summary"] });
-      } else toast.error(r.error);
+      } else toast.error(portalErrorMessage(r.error));
     } catch {
       toast.error("No se pudo guardar.");
     } finally {
@@ -473,7 +474,7 @@ function PresentationPanel({ businessId, data }: { businessId: string; data: Sum
     try {
       const r = await previewFn({ data: { businessId, question, greeting, tone, highlights } });
       if (r.ok) setAnswer(r.text);
-      else toast.error(r.error);
+      else toast.error(portalErrorMessage(r.error));
     } catch {
       toast.error("No se pudo probar a Alux.");
     } finally {

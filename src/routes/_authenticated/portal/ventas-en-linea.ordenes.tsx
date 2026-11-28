@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/ventas-en-linea/ordenes — Mis ventas en línea (CV4.1 · proveedor).
  *
@@ -20,6 +21,22 @@ import { Badge } from "@/components/ui/badge";
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/ventas-en-linea/ordenes")({
+  head: () => ({
+    meta: [
+      { title: "Pedidos y ventas · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra pedidos y ventas de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Pedidos y ventas · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra pedidos y ventas de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: MyOnlineSalesPage,
 });
 
@@ -229,7 +246,7 @@ function MyOnlineSalesPage() {
               ) : ordersQ.error ? (
                 <tr>
                   <td colSpan={8} className="px-3 py-6 text-center text-destructive">
-                    {ordersQ.error instanceof Error ? ordersQ.error.message : "Error al cargar."}
+                    {portalErrorMessage(ordersQ.error)}
                   </td>
                 </tr>
               ) : orders.length === 0 ? (

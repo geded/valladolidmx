@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/productos/$productId/preview — Sub-ola 2.4a · Fase C.
  *
@@ -25,7 +26,18 @@ import { ProductSurface, ProductSurfaceProvider } from "@/components/surfaces/Pr
 export const Route = createFileRoute("/_authenticated/portal/productos/$productId/preview")({
   head: () => ({
     meta: [
-      { title: "Vista previa · Portal Empresarial" },
+      { title: "Vista previa de producto · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra vista previa de producto de tu empresa en Valladolid.mx.",
+      },
+      { property: "og:title", content: "Vista previa de producto · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra vista previa de producto de tu empresa en Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -52,11 +64,7 @@ function PortalProductPreview() {
     return <div className="p-8 text-sm text-muted-foreground">Cargando vista previa…</div>;
   }
   if (error) {
-    return (
-      <div className="p-8 text-sm text-destructive">
-        {error instanceof Error ? error.message : "Error"}
-      </div>
-    );
+    return <div className="p-8 text-sm text-destructive">{portalErrorMessage(error)}</div>;
   }
   if (!data?.product) {
     return <div className="p-8 text-sm text-muted-foreground">Producto no encontrado.</div>;

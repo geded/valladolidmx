@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * RatesCalendar — calendario único de precios por día y bloqueos para todo
  * lo que se reserva por fecha: noches de hotel, experiencias, tours y demás
@@ -79,7 +80,7 @@ function RoomCountEditor({ product }: { product: CalendarProduct }) {
       void qc.invalidateQueries({ queryKey: ["commerce", "manage-calendar", product.id] });
       void qc.invalidateQueries({ queryKey: ["commerce", "stay-calendar", product.id] });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "No se pudo guardar"),
+    onError: (err) => toast.error(portalErrorMessage(err)),
   });
   return (
     <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
@@ -172,7 +173,7 @@ export function RatesCalendar({
       void qc.invalidateQueries({ queryKey: ["commerce", "stay-calendar", product?.id] });
       void qc.invalidateQueries({ queryKey: ["commerce", "public-departures", product?.id] });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "No se pudo guardar"),
+    onError: (err) => toast.error(portalErrorMessage(err)),
   });
 
   if (!product) return null;

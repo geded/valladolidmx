@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/empresas/$businessId — Vista de detalle por empresa
  * (administración): configuración comercial, paquetes de visibilidad
@@ -12,6 +13,22 @@ import {
 } from "@/lib/portal/portal-reads.functions";
 
 export const Route = createFileRoute("/_authenticated/portal/empresas/$businessId")({
+  head: () => ({
+    meta: [
+      { title: "Detalle de empresa · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra detalle de empresa de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Detalle de empresa · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra detalle de empresa de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: BusinessDetailPage,
 });
 
@@ -32,9 +49,7 @@ function BusinessDetailPage() {
     return (
       <div className="max-w-2xl space-y-3">
         <h1 className="text-2xl font-semibold">No pudimos cargar la empresa</h1>
-        <p className="text-sm text-muted-foreground">
-          {error instanceof Error ? error.message : "Error desconocido."}
-        </p>
+        <p className="text-sm text-muted-foreground">{portalErrorMessage(error)}</p>
         <Link to="/portal/empresas" className="text-sm text-primary">
           ← Volver al listado
         </Link>

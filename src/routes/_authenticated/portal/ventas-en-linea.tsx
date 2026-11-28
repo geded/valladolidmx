@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/ventas-en-linea — Configuración de venta directa por producto (CV4.1).
  *
@@ -37,6 +38,22 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/ventas-en-linea")({
+  head: () => ({
+    meta: [
+      { title: "Ventas en línea · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra ventas en línea de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Ventas en línea · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra ventas en línea de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: DirectSalesPage,
 });
 
@@ -140,10 +157,7 @@ function DirectSalesPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando experiencias…</p>
       ) : error ? (
-        <EmptyState
-          title="No pudimos cargar tus experiencias"
-          body={error instanceof Error ? error.message : "Error desconocido."}
-        />
+        <EmptyState title="No pudimos cargar tus experiencias" body={portalErrorMessage(error)} />
       ) : products.length === 0 ? (
         <EmptyState
           title="Aún no tienes experiencias"
@@ -263,7 +277,7 @@ function ProductDirectSaleCard({
           ? "Ingresa un precio para activar la venta en línea."
           : msg === "forbidden_direct_sale_authorization_required"
             ? "Sólo Administración puede activar la venta en línea o cambiar la comisión."
-            : msg;
+            : portalErrorMessage(e);
       toast.error(label);
     },
   });
@@ -284,7 +298,7 @@ function ProductDirectSaleCard({
         ? "Ya tienes una solicitud en revisión para esta experiencia."
         : msg.includes("direct_sale_already_enabled")
           ? "Esta experiencia ya tiene la venta en línea autorizada."
-          : msg;
+          : portalErrorMessage(e);
     toast.error(label);
   };
 

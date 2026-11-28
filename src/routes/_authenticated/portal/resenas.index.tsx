@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/resenas — Trust Engine v1 · US-G.6.
  *
@@ -22,7 +23,12 @@ import { Textarea } from "@/components/ui/textarea";
 export const Route = createFileRoute("/_authenticated/portal/resenas/")({
   head: () => ({
     meta: [
-      { title: "Reseñas · Portal Empresarial" },
+      { title: "Reseñas · Portal Valladolid.mx" },
+      { name: "description", content: "Administra reseñas de tu empresa en Valladolid.mx." },
+      { property: "og:title", content: "Reseñas · Portal Valladolid.mx" },
+      { property: "og:description", content: "Administra reseñas de tu empresa en Valladolid.mx." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -249,9 +255,7 @@ function PortalResenasIndex() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Cargando reseñas…</p>
       ) : error ? (
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "Error"}
-        </p>
+        <p className="text-sm text-destructive">{portalErrorMessage(error)}</p>
       ) : filtered.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
           No hay reseñas en esta vista todavía.

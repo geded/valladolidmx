@@ -1,5 +1,11 @@
 # Roadmap
 
+## Portal empresarial · ubicaciones y avisos claros · 2026-11-28
+- [x] Conectar «Editar ubicación» al guardado existente, sin borrar datos ante errores.
+- [x] Revisar avisos técnicos en las pantallas y herramientas del Portal; explicar el problema y la acción siguiente en español.
+- [x] Verificar edición autenticada de Zazil Tunich, error real de longitud, guardado idéntico y consulta posterior; Portal en 1440/834/430/390 sin errores ni desbordes. 20 pruebas PASS, build automático OK e integridad PASS. Informe: docs/portal-avisos-2026-11-28.md.
+- [ ] Control global de autorizaciones y iPhone físico: faltan manifiestos exactos/reconciliaciones históricas y dispositivo; no se alteran evidencias protegidas ni se publica automáticamente.
+
 ## Reservar mesa · selector de hora y zonas · 2026-11-27
 - [x] Restaurar selector de hora disponible, excluyendo horas pasadas de hoy en Valladolid.
 - [x] Sustituir botones de horarios por zonas reales del plano; conectar apartado y mesa reservada a la zona con los RPC existentes.

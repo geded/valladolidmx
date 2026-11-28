@@ -1,3 +1,4 @@
+import { portalErrorMessage, portalStatusLabel } from "@/lib/portal/error-messages";
 /**
  * /_authenticated/portal — Workspace "portal" (Adenda 15.10.5c.3 · Ola 3).
  *
@@ -23,6 +24,22 @@ import { listMyBusinesses, type PortalBusinessSummary } from "@/lib/portal/porta
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal")({
+  head: () => ({
+    meta: [
+      { title: "Portal empresarial · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra portal empresarial de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Portal empresarial · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra portal empresarial de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: PortalLayout,
 });
 
@@ -101,10 +118,7 @@ function PortalLayout() {
 
   if (error) {
     return (
-      <PortalShellMessage
-        title="No pudimos cargar tus empresas"
-        body={error instanceof Error ? error.message : "Error desconocido."}
-      />
+      <PortalShellMessage title="No pudimos cargar tus empresas" body={portalErrorMessage(error)} />
     );
   }
 
@@ -173,7 +187,8 @@ function PortalBusinessSwitcher({
         {activeBusiness && (
           <p className="text-[11px] text-muted-foreground sm:text-right">
             Tu rol: <span className="font-semibold">{formatRole(activeBusiness.role)}</span>
-            {" · "}Estado: <span className="font-semibold">{activeBusiness.status}</span>
+            {" · "}Estado:{" "}
+            <span className="font-semibold">{portalStatusLabel(activeBusiness.status)}</span>
           </p>
         )}
         {canCreateBusiness ? (

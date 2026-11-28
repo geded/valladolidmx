@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/empresas — Listado administrativo de empresas con acceso al
  * detalle por empresa (configuración, paquetes de visibilidad, órdenes).
@@ -10,6 +11,22 @@ import { listMyBusinesses } from "@/lib/portal/portal-reads.functions";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/portal/empresas/")({
+  head: () => ({
+    meta: [
+      { title: "Mis empresas · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra mis empresas de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Mis empresas · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra mis empresas de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: BusinessesIndex,
 });
 
@@ -46,11 +63,7 @@ function BusinessesIndex() {
     return <p className="text-sm text-muted-foreground">Cargando empresas…</p>;
   }
   if (error) {
-    return (
-      <p className="text-sm text-destructive">
-        {error instanceof Error ? error.message : "Error desconocido."}
-      </p>
-    );
+    return <p className="text-sm text-destructive">{portalErrorMessage(error)}</p>;
   }
 
   const isAdminContext = businesses.some((b) => b.role === "admin");

@@ -83,7 +83,7 @@ export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> =
         code: "business_not_published",
         severity: "block",
         message: "La empresa aún no está publicada.",
-        fixHint: "Contacta al equipo Founder para publicar tu ficha de empresa.",
+        fixHint: "Solicita a Administración que revise y publique la ficha de tu empresa.",
       });
     }
 
@@ -92,7 +92,7 @@ export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> =
         code: "not_authorized_to_self_publish",
         severity: "block",
         message: "Tu empresa aún no está autorizada para publicación directa.",
-        fixHint: "Solicita revisión Founder o pide activación de autopublicación.",
+        fixHint: "Solicita a Administración la autorización para publicar productos directamente.",
       });
     }
 
@@ -101,7 +101,7 @@ export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> =
         code: "missing_cover",
         severity: "block",
         message: "Falta imagen de portada.",
-        fixHint: "Sube una portada en la sección de Media.",
+        fixHint: "Sube una foto de portada en la sección de fotos del producto.",
         field: "cover_media_id",
       });
     }
@@ -110,7 +110,7 @@ export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> =
       out.push({
         code: "short_gallery",
         severity: "warn",
-        message: "Sólo tienes una imagen. Recomendamos 3+ para conversión.",
+        message: "Tu galería tiene pocas fotos. Agrega al menos 3 para mostrar mejor el producto.",
         field: "gallery",
       });
     }
@@ -145,7 +145,8 @@ export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> =
       out.push({
         code: "no_faqs",
         severity: "info",
-        message: "Agregar FAQs mejora conversión y SEO.",
+        message:
+          "Agrega preguntas frecuentes para ayudar al viajero a decidir y encontrar tu producto.",
       });
     }
 
@@ -153,7 +154,7 @@ export const ProductPublishValidator: PublishValidator<ProductPublishSnapshot> =
       out.push({
         code: "invalid_name",
         severity: "block",
-        message: "Nombre inválido.",
+        message: "Escribe un nombre de al menos 3 caracteres.",
         field: "name",
       });
     }

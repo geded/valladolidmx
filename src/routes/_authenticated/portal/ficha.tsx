@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * /portal/ficha — Ficha pública editable + workflow editorial
  * (Ola 3 · Etapa 3 · Plan 14.30).
@@ -31,6 +32,22 @@ import {
 const STORAGE_KEY = "valladolidmx.portal.activeBusinessId";
 
 export const Route = createFileRoute("/_authenticated/portal/ficha")({
+  head: () => ({
+    meta: [
+      { title: "Ficha pública · Portal Valladolid.mx" },
+      {
+        name: "description",
+        content: "Administra ficha pública de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:title", content: "Ficha pública · Portal Valladolid.mx" },
+      {
+        property: "og:description",
+        content: "Administra ficha pública de tu empresa en el Portal de Valladolid.mx.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: FichaPage,
 });
 
@@ -125,7 +142,7 @@ function FichaPage() {
     },
     onError: (err: unknown) => {
       setFeedback(null);
-      setErrorMessage(err instanceof Error ? err.message : "Error desconocido");
+      setErrorMessage(portalErrorMessage(err));
     },
   });
 
@@ -141,8 +158,7 @@ function FichaPage() {
         queryKey: ["portal", "business-audit", businessId],
       });
     },
-    onError: (err: unknown) =>
-      setErrorMessage(err instanceof Error ? err.message : "Error desconocido"),
+    onError: (err: unknown) => setErrorMessage(portalErrorMessage(err)),
   });
 
   const withdrawMutation = useMutation({
@@ -157,8 +173,7 @@ function FichaPage() {
         queryKey: ["portal", "business-audit", businessId],
       });
     },
-    onError: (err: unknown) =>
-      setErrorMessage(err instanceof Error ? err.message : "Error desconocido"),
+    onError: (err: unknown) => setErrorMessage(portalErrorMessage(err)),
   });
 
   if (!businessId) {
@@ -176,10 +191,7 @@ function FichaPage() {
 
   if (cardQuery.isError) {
     return (
-      <EmptyState
-        title="No pudimos cargar la ficha"
-        body={cardQuery.error instanceof Error ? cardQuery.error.message : "Error desconocido."}
-      />
+      <EmptyState title="No pudimos cargar la ficha" body={portalErrorMessage(cardQuery.error)} />
     );
   }
 

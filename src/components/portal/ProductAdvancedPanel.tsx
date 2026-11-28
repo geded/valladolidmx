@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * ProductAdvancedPanel — Sub-ola 2.4a.
  *
@@ -110,7 +111,7 @@ function MediaSection({ productId }: { productId: string }) {
       deriveVariantsInBackground(file, registered);
       refresh();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Error al subir");
+      setErr(portalErrorMessage(e));
     } finally {
       setUploading(false);
     }
@@ -166,7 +167,6 @@ function MediaSection({ productId }: { productId: string }) {
               className="group relative overflow-hidden rounded border border-border bg-muted"
             >
               {m.previewUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={m.previewUrl}
                   alt={m.alt ?? ""}
@@ -224,7 +224,7 @@ function FaqSection({ productId }: { productId: string }) {
       setErr(null);
       refresh();
     },
-    onError: (e) => setErr(e instanceof Error ? e.message : "Error"),
+    onError: (e) => setErr(portalErrorMessage(e)),
   });
 
   return (
@@ -337,13 +337,15 @@ function PublishSection({
     onSuccess: (r) => {
       if (r.published) setFeedback("✅ Producto publicado.");
       else if (r.reason === "not_authorized_to_self_publish")
-        setFeedback("⚠️ Empresa no autorizada para autopublicar. Solicita revisión Founder.");
+        setFeedback(
+          "Solicita a Administración la autorización para publicar productos de esta empresa.",
+        );
       else if (r.reason === "validation_failed")
-        setFeedback(`⚠️ Faltan requisitos: ${(r.errors ?? []).join(", ")}`);
-      else setFeedback(r.message ?? r.reason ?? "No se pudo publicar.");
+        setFeedback(`⚠️ Faltan requisitos: ${(r.errors ?? []).map(portalErrorMessage).join(" ")}`);
+      else setFeedback(portalErrorMessage(r.message ?? r.reason));
       refresh();
     },
-    onError: (e) => setFeedback(e instanceof Error ? e.message : "Error"),
+    onError: (e) => setFeedback(portalErrorMessage(e)),
   });
   const unpublishMut = useMutation({
     mutationFn: () => unpublishFn({ data: { productId } }),
@@ -351,7 +353,7 @@ function PublishSection({
       setFeedback("Producto retirado. Vuelve a borrador.");
       refresh();
     },
-    onError: (e) => setFeedback(e instanceof Error ? e.message : "Error"),
+    onError: (e) => setFeedback(portalErrorMessage(e)),
   });
 
   const check = data?.check;

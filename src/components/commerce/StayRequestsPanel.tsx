@@ -1,3 +1,4 @@
+import { portalErrorMessage } from "@/lib/portal/error-messages";
 /**
  * StayRequestsPanel — solicitudes de hospedaje que el hotel confirma o
  * rechaza dentro de 12 horas (Portal · Ventas en línea).
@@ -47,7 +48,7 @@ function RequestCard({ row, businessId }: { row: StayRequestRow; businessId: str
       toast.success(res.result === "confirmed" ? "Reserva confirmada; el huésped ya puede pagar" : "Solicitud rechazada");
       void qc.invalidateQueries({ queryKey: ["portal", "stay-requests", businessId] });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "No se pudo guardar"),
+    onError: (err) => toast.error(portalErrorMessage(err)),
   });
 
   return (
