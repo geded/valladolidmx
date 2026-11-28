@@ -17,6 +17,8 @@ const WORKSPACE_MODES: ReadonlyArray<{
   { prefix: "/admin", candidates: ["staff"] },
   { prefix: "/portal", candidates: ["business"] },
   { prefix: "/concierge", candidates: ["concierge", "staff"] },
+  // Reclamar o dar de alta una empresa es parte del perfil Empresa.
+  { prefix: "/cuenta/anfitrion", candidates: ["business", "traveler"] },
   { prefix: "/cuenta", candidates: ["traveler"] },
   { prefix: "/mi-viaje", candidates: ["traveler"] },
 ];

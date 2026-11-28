@@ -157,10 +157,6 @@ function PortalBusinessSwitcher({
   activeBusiness: PortalBusinessSummary | null;
   onChange: (id: string) => void;
 }) {
-  const { roles } = useAuth();
-  const canCreateBusiness = roles.some(
-    (r) => r === "admin" || r === "super_admin" || r === "editor",
-  );
   return (
     <div className="mb-6 flex flex-col gap-2 rounded-lg border border-border bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1">
@@ -191,14 +187,14 @@ function PortalBusinessSwitcher({
             <span className="font-semibold">{portalStatusLabel(activeBusiness.status)}</span>
           </p>
         )}
-        {canCreateBusiness ? (
+        {(
           <Link
-            to="/cms/empresas/nueva"
+            to="/cuenta/anfitrion"
             className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"
           >
-            + Registrar nueva empresa
+            + Reclamar o registrar otra empresa
           </Link>
-        ) : null}
+        )}
       </div>
     </div>
   );
