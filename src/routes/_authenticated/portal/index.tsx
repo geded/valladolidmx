@@ -16,6 +16,7 @@ import { Link } from "@tanstack/react-router";
 import { getMyBusinessesCompleteness } from "@/lib/portal/profile-completeness.functions";
 import { ProfileCompletenessMeter } from "@/components/portal/ProfileCompletenessMeter";
 import { listMyTableBookingShortcuts } from "@/lib/commerce/table-booking.functions";
+import { activeTableBookingShortcut } from "@/lib/commerce/table-booking";
 import { useNavigate } from "@tanstack/react-router";
 import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -78,15 +79,17 @@ function PortalIndex() {
     staleTime: 60_000,
   });
   const completenessBy = new Map(completeness.map((c) => [c.businessId, c]));
-  // Sólo aparece en empresas con «Reservar mesa» activado; las demás ven el Resumen igual que siempre.
+  // El acceso y su resumen pertenecen únicamente a la empresa seleccionada.
   const fetchTables = useServerFn(listMyTableBookingShortcuts);
+  const tableBusinessIds = activeId ? [activeId] : [];
   const { data: tableShortcuts = [] } = useQuery({
-    queryKey: ["portal", "table-booking-shortcuts", businessIds],
-    queryFn: () => fetchTables({ data: { businessIds } }),
-    enabled: businessIds.length > 0,
+    queryKey: ["portal", "table-booking-shortcuts", tableBusinessIds],
+    queryFn: () => fetchTables({ data: { businessIds: tableBusinessIds } }),
+    enabled: tableBusinessIds.length > 0,
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
+  const tableShortcut = activeTableBookingShortcut(tableShortcuts, activeId);
   const navigate = useNavigate();
   const openTables = (businessId: string) => {
     window.localStorage.setItem("valladolidmx.portal.activeBusinessId", businessId);
@@ -131,26 +134,23 @@ function PortalIndex() {
         </p>
       </header>
 
-      {tableShortcuts.length > 0 && (
+      {tableShortcut && (
         <section className="mt-6 grid gap-3" aria-label="Reservaciones de mesa">
-          {tableShortcuts.map((t) => (
-            <button
-              key={t.businessId}
-              type="button"
-              onClick={() => openTables(t.businessId)}
-              className="flex min-h-[64px] w-full items-center gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4 text-left transition-colors hover:bg-primary/10"
-            >
-              <CalendarDays className="h-6 w-6 shrink-0 text-primary" aria-hidden />
-              <span className="min-w-0 flex-1">
-                <span className="block font-semibold">Reservaciones de mesa</span>
-                <span className="block text-sm text-muted-foreground">
-                  {nameBy.get(t.businessId) ?? "Tu restaurante"} · Hoy: {t.today}
-                  {t.pending > 0 ? ` · ${t.pending} por confirmar` : ""}
-                </span>
+          <button
+            type="button"
+            onClick={() => openTables(tableShortcut.businessId)}
+            className="flex min-h-[64px] w-full items-center gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4 text-left transition-colors hover:bg-primary/10"
+          >
+            <CalendarDays className="h-6 w-6 shrink-0 text-primary" aria-hidden />
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">Reservaciones de mesa</span>
+              <span className="block text-sm text-muted-foreground">
+                {nameBy.get(tableShortcut.businessId) ?? "Tu restaurante"} · Hoy: {tableShortcut.today}
+                {tableShortcut.pending > 0 ? ` · ${tableShortcut.pending} por confirmar` : ""}
               </span>
-              <span aria-hidden className="text-primary">→</span>
-            </button>
-          ))}
+            </span>
+            <span aria-hidden className="text-primary">→</span>
+          </button>
         </section>
       )}
 

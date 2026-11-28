@@ -6,6 +6,7 @@ import {
   platformGuests,
   futureTableSlots,
   tableZoneAvailable,
+  activeTableBookingShortcut,
 } from "../src/lib/commerce/table-booking";
 import {
   businessAllowsOnlineSale,
@@ -81,5 +82,11 @@ describe("Reservar mesa", () => {
       tables: [{ seats: 4, count: 3 }],
     });
     expect(r.ok && r.value.max_party).toBe(4);
+  });
+  it("el Portal sólo muestra el acceso de la empresa seleccionada y activada", () => {
+    const shortcuts = [{ businessId: "copalli", today: 3, pending: 1 }];
+    expect(activeTableBookingShortcut(shortcuts, "copalli")).toEqual(shortcuts[0]);
+    expect(activeTableBookingShortcut(shortcuts, "zazil-tunich")).toBeUndefined();
+    expect(activeTableBookingShortcut(shortcuts, null)).toBeUndefined();
   });
 });

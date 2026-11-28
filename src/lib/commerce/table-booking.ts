@@ -71,6 +71,14 @@ export function platformGuests(
     .reduce((n, r) => n + r.party_size, 0);
 }
 
+/** El Portal sólo muestra el acceso de la empresa seleccionada y activada. */
+export function activeTableBookingShortcut<T extends { businessId: string }>(
+  shortcuts: readonly T[],
+  businessId: string | null | undefined,
+): T | undefined {
+  return businessId ? shortcuts.find((shortcut) => shortcut.businessId === businessId) : undefined;
+}
+
 export const WEEKDAYS: ReadonlyArray<{ key: string; label: string }> = [
   { key: "1", label: "Lunes" },
   { key: "2", label: "Martes" },

@@ -21,6 +21,7 @@ import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 import { listMyBusinesses, type PortalBusinessSummary } from "@/lib/portal/portal-reads.functions";
 import { listMyTableBookingShortcuts } from "@/lib/commerce/table-booking.functions";
+import { activeTableBookingShortcut } from "@/lib/commerce/table-booking";
 import { contributeNavItem, removeNavItem } from "@/lib/workspace/navigation-registry";
 import { PORTAL_TABLE_BOOKING_NAV_ITEM } from "@/lib/workspace/definitions";
 
@@ -72,9 +73,7 @@ function PortalLayout() {
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
-  const tableBookingEnabled = Boolean(
-    activeBusinessId && tableShortcuts.some((item) => item.businessId === activeBusinessId),
-  );
+  const tableBookingEnabled = Boolean(activeTableBookingShortcut(tableShortcuts, activeBusinessId));
 
   // El Navigation Registry conserva una sola autoridad; la empresa activa
   // decide si esta capacidad aparece en sidebar, barra inferior y paleta.
